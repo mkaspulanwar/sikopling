@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="id">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>SIKOPLING Style Guide</title>
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Instrument+Serif:ital@0;1&display=swap');
+
+			:root {
+				--bg: #f1f5ef;
+				--bg-soft: #e8efe4;
+				--surface: #f8fbf6;
+				--surface-soft: #eef5ea;
+				--ink: #203328;
+				--muted: #55685c;
+				--line: #cad8cb;
+				--line-strong: #b8c9ba;
+				--brand: #2d6a4f;
+				--brand-soft: #dbeadb;
+				--brand-strong: #1f523b;
+				--accent: #5d8f6c;
+				--status-success: #4d7b52;
+				--status-progress: #9a7a30;
+				--status-danger: #9e4a43;
+				--status-neutral: #637768;
+			}
+
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				min-height: 100dvh;
+				background:
+					radial-gradient(circle at 50% -12%, rgb(45 106 79 / 9%), transparent 44%),
+					linear-gradient(180deg, #f7faf5 0%, var(--bg) 100%);
+				color: var(--ink);
+				font-family: 'Geist', 'Segoe UI', sans-serif;
+				line-height: 1.55;
+			}
+
+			.container {
+				width: min(1260px, calc(100% - 64px));
+				margin: 40px auto 56px;
+			}
+
+			.header {
+				display: grid;
+				gap: 10px;
+				margin-bottom: 24px;
+			}
+
+			.label {
+				display: inline-flex;
+				width: fit-content;
+				padding: 6px 14px;
+				border-radius: 999px;
+				border: 1px solid var(--line);
+				background: var(--surface-soft);
+				color: var(--brand);
+				text-transform: uppercase;
+				letter-spacing: 0.12em;
+				font-size: 11px;
+				font-weight: 700;
+			}
+
+			h1 {
+				margin: 0;
+				font-size: 52px;
+				line-height: 1.05;
+				letter-spacing: -0.03em;
+				text-wrap: balance;
+			}
+
+			.serif {
+				font-family: 'Instrument Serif', Georgia, serif;
+				font-style: italic;
+				font-weight: 400;
+			}
+
+			p {
+				margin: 0;
+				color: var(--muted);
+				max-width: 76ch;
+			}
+
+			.grid {
+				display: grid;
+				gap: 14px;
+			}
+
+			.grid-4 {
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+			}
+
+			.grid-3 {
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+			}
+
+			.card {
+				border: 1px solid var(--line);
+				border-radius: 20px;
+				background: var(--surface);
+				padding: 20px;
+				box-shadow:
+					0 12px 26px -24px rgb(32 74 53 / 24%),
+					inset 0 1px 0 rgb(255 255 255 / 78%);
+			}
+
+			.section {
+				margin-top: 18px;
+			}
+
+			h2 {
+				margin: 0 0 12px;
+				font-size: 26px;
+				letter-spacing: -0.015em;
+			}
+
+			.swatch {
+				height: 88px;
+				border-radius: 14px;
+				border: 1px solid var(--line);
+				margin-bottom: 10px;
+			}
+
+			.token {
+				font-size: 12px;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				margin-bottom: 4px;
+			}
+
+			.meta {
+				font-size: 12px;
+				color: var(--muted);
+			}
+
+			.type-block {
+				display: grid;
+				gap: 12px;
+			}
+
+			.mono {
+				font-variant-numeric: tabular-nums;
+			}
+
+			.btn-row {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+			}
+
+			.btn {
+				border: 1px solid var(--line);
+				border-radius: 999px;
+				height: 42px;
+				padding: 0 18px;
+				font-size: 14px;
+				font-weight: 600;
+				background: var(--surface);
+				color: var(--ink);
+				display: inline-flex;
+				align-items: center;
+			}
+
+			.btn-primary {
+				background: var(--brand);
+				border-color: var(--brand);
+				color: #fff;
+			}
+
+			.btn-secondary {
+				background: var(--surface-soft);
+			}
+
+			.badge {
+				display: inline-flex;
+				align-items: center;
+				height: 30px;
+				padding: 0 12px;
+				border-radius: 999px;
+				border: 1px solid transparent;
+				font-size: 12px;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				margin-right: 8px;
+			}
+
+			.b-neutral {
+				border-color: #b7c9b7;
+				background: #e6efe4;
+				color: #4f6453;
+			}
+
+			.b-progress {
+				border-color: #d1c08c;
+				background: #f1e7ca;
+				color: #7c6426;
+			}
+
+			.b-success {
+				border-color: #a6c6a7;
+				background: #e0ecdf;
+				color: #355e3e;
+			}
+
+			.b-danger {
+				border-color: #d7afa9;
+				background: #f5e5e3;
+				color: #8a3f38;
+			}
+
+			.spacing-row {
+				display: grid;
+				grid-template-columns: repeat(6, minmax(0, 1fr));
+				gap: 10px;
+			}
+
+			.space-item {
+				border: 1px solid var(--line);
+				border-radius: 14px;
+				background: var(--surface-soft);
+				padding: 12px;
+				display: grid;
+				gap: 8px;
+			}
+
+			.space-box {
+				background: var(--brand-soft);
+				border: 1px dashed var(--brand);
+				border-radius: 8px;
+			}
+
+			footer {
+				margin-top: 16px;
+				font-size: 12px;
+				color: var(--muted);
+				padding-top: 14px;
+				border-top: 1px solid var(--line);
+			}
+
+			@media (max-width: 1024px) {
+				.grid-4 {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+				}
+				.grid-3 {
+					grid-template-columns: repeat(1, minmax(0, 1fr));
+				}
+				.spacing-row {
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header class="header">
+				<span class="label">SIKOPLING Design System</span>
+				<h1>Style guide <span class="serif">tema hijau</span> untuk portal publik</h1>
+				<p>
+					Digunakan untuk menjaga konsistensi visual website Sistem Informasi Konsultasi Persetujuan
+					Lingkungan.
+				</p>
+			</header>
+
+			<section class="card section">
+				<h2>Color tokens</h2>
+				<div class="grid grid-4">
+					<div>
+						<div class="swatch" style="background: var(--bg)"></div>
+						<div class="token">--bg</div>
+						<div class="meta mono">#F1F5EF</div>
+					</div>
+					<div>
+						<div class="swatch" style="background: var(--surface)"></div>
+						<div class="token">--surface</div>
+						<div class="meta mono">#F8FBF6</div>
+					</div>
+					<div>
+						<div class="swatch" style="background: var(--brand)"></div>
+						<div class="token">--brand</div>
+						<div class="meta mono">#2D6A4F</div>
+					</div>
+					<div>
+						<div class="swatch" style="background: var(--brand-strong)"></div>
+						<div class="token">--brand-strong</div>
+						<div class="meta mono">#1F523B</div>
+					</div>
+				</div>
+			</section>
+
+			<section class="grid grid-3 section">
+				<div class="card type-block">
+					<h2>Typography</h2>
+					<div style="font-size: 40px; letter-spacing: -0.03em; line-height: 1.05; font-weight: 600;">
+						Geist
+					</div>
+					<div class="serif" style="font-size: 34px; line-height: 1.08;">
+						Instrument Serif untuk highlight editorial
+					</div>
+					<p>Body text menggunakan ukuran 16px dengan line-height 1.55 untuk keterbacaan publik.</p>
+				</div>
+
+				<div class="card">
+					<h2>Button styles</h2>
+					<div class="btn-row">
+						<button class="btn btn-primary">Primary action</button>
+						<button class="btn btn-secondary">Secondary action</button>
+						<button class="btn">Ghost action</button>
+					</div>
+				</div>
+
+				<div class="card">
+					<h2>Status badges</h2>
+					<div>
+						<span class="badge b-neutral">Belum ada progres</span>
+						<span class="badge b-progress">Dalam proses</span>
+					</div>
+					<div style="margin-top: 8px;">
+						<span class="badge b-success">Disetujui</span>
+						<span class="badge b-danger">Perlu perbaikan</span>
+					</div>
+				</div>
+			</section>
+
+			<section class="card section">
+				<h2>Spacing scale</h2>
+				<div class="spacing-row">
+					<div class="space-item">
+						<div class="token">8px</div>
+						<div class="space-box" style="height: 8px;"></div>
+					</div>
+					<div class="space-item">
+						<div class="token">12px</div>
+						<div class="space-box" style="height: 12px;"></div>
+					</div>
+					<div class="space-item">
+						<div class="token">16px</div>
+						<div class="space-box" style="height: 16px;"></div>
+					</div>
+					<div class="space-item">
+						<div class="token">20px</div>
+						<div class="space-box" style="height: 20px;"></div>
+					</div>
+					<div class="space-item">
+						<div class="token">24px</div>
+						<div class="space-box" style="height: 24px;"></div>
+					</div>
+					<div class="space-item">
+						<div class="token">32px</div>
+						<div class="space-box" style="height: 32px;"></div>
+					</div>
+				</div>
+				<footer>
+					Style guide snapshot for Figma handoff • SIKOPLING • Dinas Lingkungan Hidup
+				</footer>
+			</section>
+		</div>
+		<script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
+	</body>
+</html>
