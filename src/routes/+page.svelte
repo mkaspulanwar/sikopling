@@ -75,10 +75,6 @@
 							PERSETUJUAN LINGKUNGAN
 						</span>
 					</h1>
-					<p class="hero-lead enter-hero-copy enter-delay-3">
-						SIKOPLING membantu masyarakat dan perusahaan memantau tahapan pengajuan dokumen
-						persetujuan lingkungan dengan tampilan yang jelas, ringkas, dan terpercaya.
-					</p>
 					<div class="hero-search-wrap enter-hero-copy enter-delay-4">
 						<form
 							class="surface-panel depth-lift space-y-4 p-4 md:p-5"
