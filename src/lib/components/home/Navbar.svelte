@@ -10,19 +10,24 @@
 
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Statistik Layanan',
-			description: 'Ringkasan metrik performa utama layanan SI-KOPLING.',
+			title: 'Dashboard Layanan',
+			description: 'Halaman ringkasan untuk seluruh alur layanan.',
 			href: '#layanan-dashboard'
 		},
 		{
-			title: 'Layanan Dokumen',
-			description: 'Jenis layanan dokumen lingkungan yang dapat diproses.',
+			title: 'Formulir Online',
+			description: 'Akses formulir pengajuan dan pembaruan data.',
 			href: '#layanan-dokumen'
 		},
 		{
-			title: '8 Langkah Percepatan',
-			description: 'Alur kerja percepatan pelayanan persetujuan lingkungan.',
+			title: 'Tracking Dokumen',
+			description: 'Lacak status dokumen dan progres proses layanan.',
 			href: '#alur-percepatan'
+		},
+		{
+			title: 'Bantuan & FAQ',
+			description: 'Panduan umum dan jawaban pertanyaan layanan.',
+			href: '#kontak'
 		}
 	];
 
@@ -268,10 +273,10 @@
 		transition:fade={{ duration: 120 }}
 	></button>
 
-	<aside
-		class="fixed top-0 right-0 z-[75] flex h-dvh w-[min(76vw,18.75rem)] flex-col border-l border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_28px_72px_-28px_rgba(15,23,42,0.52)] lg:hidden"
-		transition:fly={{ x: 24, duration: 170 }}
-	>
+		<aside
+			class="fixed top-0 right-0 z-[75] flex h-dvh w-[min(76vw,18.75rem)] flex-col rounded-l-[1.4rem] border-l border-[var(--line)] bg-[var(--surface)] px-5 pt-5 pb-4 shadow-[0_28px_72px_-28px_rgba(15,23,42,0.52)] lg:hidden"
+			transition:fly={{ x: 24, duration: 170 }}
+		>
 		<div class="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
 			<p class="text-lg font-semibold text-[var(--ink)]">Menu</p>
 
@@ -288,20 +293,20 @@
 		</div>
 
 		<div class="mt-5 space-y-1.5">
-			<a
-				href="#beranda"
-				class="block rounded-lg px-3 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
-				onclick={closeMenus}
-			>
-				Beranda
-			</a>
+				<a
+					href="#beranda"
+					class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+					onclick={closeMenus}
+				>
+					Beranda
+				</a>
 
-			<button
-				type="button"
-				class="flex w-full items-center justify-between rounded-lg px-3 py-3.5 text-left [font-family:inherit] !text-lg !font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
-				aria-expanded={isMobileLayananOpen}
-				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
-			>
+				<button
+					type="button"
+					class="flex w-full items-center justify-between rounded-lg px-4 py-3.5 text-left [font-family:inherit] !text-lg !font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+					aria-expanded={isMobileLayananOpen}
+					onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
+				>
 				Layanan
 				<svg
 					viewBox="0 0 20 20"
@@ -334,20 +339,20 @@
 				</div>
 			{/if}
 
-			<a
-				href="#tentang"
-				class="block rounded-lg px-3 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
-				onclick={closeMenus}
-			>
-				Tentang
-			</a>
-			<a
-				href="#kontak"
-				class="block rounded-lg px-3 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
-				onclick={closeMenus}
-			>
-				Kontak
-			</a>
+				<a
+					href="#tentang"
+					class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+					onclick={closeMenus}
+				>
+					Tentang
+				</a>
+				<a
+					href="#kontak"
+					class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+					onclick={closeMenus}
+				>
+					Kontak
+				</a>
 		</div>
 
 		<a
