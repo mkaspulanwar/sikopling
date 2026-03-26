@@ -42,6 +42,7 @@
 	let isMobileOpen = $state(false);
 	let isMobileLayananOpen = $state(false);
 	let isSearchOpen = $state(false);
+	let isScrolled = $state(false);
 	let searchQuery = $state('');
 	let layananDropdown: HTMLDivElement | null = null;
 	let searchInputEl = $state<HTMLInputElement | null>(null);
@@ -84,11 +85,42 @@
 			closeSearch();
 		}
 	};
+
+	const updateScrollState = () => {
+		if (typeof window === 'undefined') return;
+		isScrolled = window.scrollY > 18;
+	};
+
+	const navClass = () =>
+		`fixed inset-x-0 top-0 z-40 border-b transition-[background-color,border-color,box-shadow] duration-300 ${
+			isScrolled
+				? 'border-[var(--line)] bg-[rgb(var(--surface-rgb)/0.94)] shadow-[0_14px_34px_-24px_rgba(15,23,42,0.45)] backdrop-blur-xl'
+				: 'border-white/15 bg-transparent backdrop-blur-[1.5px]'
+		}`;
+
+	const desktopLinkClass = () =>
+		`relative inline-flex py-2.5 text-base font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100 ${
+			isScrolled ? 'text-[var(--muted)] hover:text-[#A9B388] after:bg-[#A9B388]' : 'text-white/88 hover:text-white after:bg-white'
+		}`;
+
+	const actionButtonClass = () =>
+		`inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
+			isScrolled
+				? 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
+				: 'border-white/25 bg-white/10 text-white hover:bg-white/16'
+		}`;
+
+	const loginButtonClass = () =>
+		`hidden items-center rounded-lg border px-5 py-3 text-base font-semibold transition-colors lg:inline-flex ${
+			isScrolled
+				? 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
+				: 'border-white/30 bg-white/10 text-white hover:bg-white/16'
+		}`;
 </script>
 
-<svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
+<svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} onscroll={updateScrollState} onload={updateScrollState} />
 
-<nav class="sticky top-0 z-40 border-b border-[var(--line)] bg-[rgb(var(--surface-rgb)/0.92)] backdrop-blur-xl">
+<nav class={navClass()}>
 	<div class="nav-shell py-4">
 		<div class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
 			<a href="#beranda" class="flex min-w-0 items-center" onclick={closeMenus}>
@@ -97,10 +129,7 @@
 
 			<ul class="hidden items-center gap-10 lg:flex">
 				<li>
-					<a
-						href="#beranda"
-						class="relative inline-flex py-2.5 text-base font-medium text-[var(--muted)] transition-colors hover:text-[#A9B388] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#A9B388] after:transition-transform after:duration-200 hover:after:scale-x-100"
-					>
+					<a href="#beranda" class={desktopLinkClass()}>
 						Beranda
 					</a>
 				</li>
@@ -115,7 +144,7 @@
 					>
 						<button
 							type="button"
-							class="relative inline-flex items-center gap-1 py-2.5 text-base font-medium text-[var(--muted)] transition-colors hover:text-[#A9B388] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#A9B388] after:transition-transform after:duration-200 hover:after:scale-x-100"
+							class={`${desktopLinkClass()} items-center gap-1`}
 							aria-expanded={isLayananOpen}
 							aria-haspopup="true"
 							onclick={() => (isLayananOpen = !isLayananOpen)}
@@ -154,18 +183,12 @@
 				</li>
 
 				<li>
-					<a
-						href="#tentang"
-						class="relative inline-flex py-2.5 text-base font-medium text-[var(--muted)] transition-colors hover:text-[#A9B388] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#A9B388] after:transition-transform after:duration-200 hover:after:scale-x-100"
-					>
+					<a href="#tentang" class={desktopLinkClass()}>
 						Tentang
 					</a>
 				</li>
 				<li>
-					<a
-						href="#kontak"
-						class="relative inline-flex py-2.5 text-base font-medium text-[var(--muted)] transition-colors hover:text-[#A9B388] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-[#A9B388] after:transition-transform after:duration-200 hover:after:scale-x-100"
-					>
+					<a href="#kontak" class={desktopLinkClass()}>
 						Kontak
 					</a>
 				</li>
@@ -174,7 +197,7 @@
 			<div class="flex items-center gap-2 lg:justify-self-end">
 				<button
 					type="button"
-					class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+					class={actionButtonClass()}
 					aria-label="Buka pencarian"
 					onclick={openSearch}
 				>
@@ -186,14 +209,14 @@
 
 				<a
 					href="/login"
-					class="hidden items-center rounded-lg border border-[var(--line)] bg-[var(--surface)] px-5 py-3 text-base font-semibold text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)] lg:inline-flex"
+					class={loginButtonClass()}
 				>
 					Login
 				</a>
 
 				<button
 					type="button"
-					class="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)] lg:hidden"
+					class={`${actionButtonClass()} lg:hidden`}
 					aria-expanded={isMobileOpen}
 					aria-label="Buka menu"
 					onclick={toggleMobileMenu}

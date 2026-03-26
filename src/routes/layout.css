@@ -1,8 +1,11 @@
-@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&family=Public+Sans:wght@400;500;600;700;800&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
 :root {
+	--font-display: 'Roboto', 'Segoe UI', sans-serif;
+	--font-body: 'Open Sans', 'Segoe UI', sans-serif;
+	--font-site: 'Public Sans', 'Segoe UI', sans-serif;
 	--canvas: #ffffff;
 	--surface: #ffffff;
 	--surface-strong: #ffffff;
@@ -23,7 +26,7 @@ body {
 	margin: 0;
 	background: var(--canvas);
 	color: var(--ink);
-	font-family: 'Public Sans', 'Segoe UI', sans-serif;
+	font-family: var(--font-site);
 }
 
 h1,
@@ -32,7 +35,7 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: 'Public Sans', 'Segoe UI', sans-serif;
+	font-family: var(--font-site);
 }
 
 .page-shell {
@@ -54,6 +57,14 @@ h6 {
 		padding-left: max(1.3rem, calc(env(safe-area-inset-left) + 0.8rem));
 		padding-right: max(1.3rem, calc(env(safe-area-inset-right) + 0.8rem));
 	}
+}
+
+.font-hero-title {
+	font-family: var(--font-display);
+}
+
+.font-hero-copy {
+	font-family: var(--font-body);
 }
 
 @keyframes appear {
