@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { tick } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { page } from '$app/state';
 
@@ -43,7 +43,7 @@
 	let isMobileOpen = $state(false);
 	let isMobileLayananOpen = $state(false);
 	let isSearchOpen = $state(false);
-	let isScrolled = $state(false);
+	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
 	let searchQuery = $state('');
 	let layananDropdown: HTMLDivElement | null = null;
 	let searchInputEl = $state<HTMLInputElement | null>(null);
@@ -91,6 +91,14 @@
 		if (typeof window === 'undefined') return;
 		isScrolled = window.scrollY > 18;
 	};
+
+	onMount(() => {
+		updateScrollState();
+		const frameId = requestAnimationFrame(updateScrollState);
+		return () => {
+			cancelAnimationFrame(frameId);
+		};
+	});
 
 	const isLandingPage = () => page.url.pathname === '/';
 	const useLightNav = () => isLandingPage() && !isScrolled;
@@ -144,7 +152,6 @@
 	onclick={handleWindowClick}
 	onkeydown={handleWindowKeydown}
 	onscroll={updateScrollState}
-	onload={updateScrollState}
 />
 
 <nav class={navClass()}>

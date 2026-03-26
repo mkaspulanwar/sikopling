@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import Navbar from '$lib/components/home/Navbar.svelte';
@@ -6,6 +7,13 @@
 	import ChatbotWidget from '$lib/components/home/ChatbotWidget.svelte';
 
 	let { children } = $props();
+
+	onMount(() => {
+		if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
+			history.scrollRestoration = 'manual';
+		}
+		window.scrollTo(0, 0);
+	});
 </script>
 
 <svelte:head>
