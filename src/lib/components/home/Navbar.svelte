@@ -10,32 +10,27 @@
 
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Dashboard Layanan',
-			description: 'Halaman ringkasan untuk seluruh alur layanan.',
+			title: 'Statistik Layanan',
+			description: 'Ringkasan metrik performa utama layanan SI-KOPLING.',
 			href: '#layanan-dashboard'
 		},
 		{
-			title: 'Formulir Online',
-			description: 'Akses formulir pengajuan dan pembaruan data.',
-			href: '#layanan-formulir'
+			title: 'Layanan Dokumen',
+			description: 'Jenis layanan dokumen lingkungan yang dapat diproses.',
+			href: '#layanan-dokumen'
 		},
 		{
-			title: 'Tracking Dokumen',
-			description: 'Lacak status dokumen yang sudah dikirim.',
-			href: '#layanan-tracking'
-		},
-		{
-			title: 'Bantuan & FAQ',
-			description: 'Panduan umum dan jawaban pertanyaan layanan.',
-			href: '#layanan-bantuan'
+			title: '8 Langkah Percepatan',
+			description: 'Alur kerja percepatan pelayanan persetujuan lingkungan.',
+			href: '#alur-percepatan'
 		}
 	];
 
 	const searchSuggestions = [
-		{ label: 'Persyaratan Dokumen UKL-UPL', href: '#saran-ukl-upl' },
-		{ label: 'Alur Persetujuan Lingkungan', href: '#saran-alur' },
-		{ label: 'Status Permohonan Terbaru', href: '#saran-status' },
-		{ label: 'Jadwal Konsultasi DLH', href: '#saran-jadwal' }
+		{ label: 'Statistik Layanan SI-KOPLING', href: '#layanan-dashboard' },
+		{ label: 'Dokumen AMDAL dan UKL-UPL', href: '#layanan-dokumen' },
+		{ label: 'Persetujuan Teknis Air Limbah', href: '#layanan-dokumen' },
+		{ label: '8 Langkah Percepatan Pelayanan', href: '#alur-percepatan' }
 	];
 
 	let isLayananOpen = $state(false);
@@ -303,7 +298,7 @@
 
 			<button
 				type="button"
-				class="flex w-full items-center justify-between rounded-lg px-3 py-3.5 text-left text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+				class="flex w-full items-center justify-between rounded-lg px-3 py-3.5 text-left [font-family:inherit] !text-lg !font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
 				aria-expanded={isMobileLayananOpen}
 				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 			>
