@@ -103,7 +103,7 @@
 	const navClass = () =>
 		`fixed inset-x-0 top-0 z-40 border-b [font-family:var(--font-display)] transition-[background-color,border-color,box-shadow] duration-300 ${
 			isScrolled
-				? 'border-[var(--line)] bg-[var(--surface)] shadow-[0_14px_34px_-24px_rgba(15,23,42,0.45)]'
+				? 'border-[var(--line)] bg-[var(--surface)] shadow-none'
 				: 'border-transparent bg-transparent shadow-none'
 		}`;
 
