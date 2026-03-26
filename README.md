@@ -1,6 +1,6 @@
-# SIKOPLING KALSEL
+# SIKOPLING
 
-Portal antarmuka layanan informasi persetujuan lingkungan DLH Provinsi Kalimantan Selatan.
+Portal antarmuka layanan informasi persetujuan lingkungan (internal project).
 
 ![Svelte](https://img.shields.io/badge/Svelte-5-ff3e00?logo=svelte&logoColor=white)
 ![SvelteKit](https://img.shields.io/badge/SvelteKit-2-ff3e00?logo=svelte&logoColor=white)
@@ -13,6 +13,10 @@ Portal antarmuka layanan informasi persetujuan lingkungan DLH Provinsi Kalimanta
 ![Prettier](https://img.shields.io/badge/Prettier-3-f7b93e?logo=prettier&logoColor=1a2b34)
 ![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs&logoColor=white)
 
+## Status
+
+`Internal / Confidential` - repo ini ditujukan untuk penggunaan internal tim.
+
 ## Overview
 
 SIKOPLING dibangun sebagai frontend portal informasi layanan dengan fokus pada:
@@ -24,7 +28,7 @@ SIKOPLING dibangun sebagai frontend portal informasi layanan dengan fokus pada:
 
 ## Halaman Aktif
 
-- `/` - landing page utama SIKOPLING.
+- `/` - landing page utama.
 - `/login` - halaman login (dummy UI, siap dihubungkan ke autentikasi real).
 
 ## Fitur Utama
@@ -39,7 +43,7 @@ SIKOPLING dibangun sebagai frontend portal informasi layanan dengan fokus pada:
 ## Asset
 
 - Asset lokal statis ada di direktori `static/`.
-- Sumber asset eksternal (Google Drive): [SIKOPLING Asset Drive](https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6)
+- Asset reference (akses terbatas): [SIKOPLING Asset Drive](https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6)
 
 ## Tech Stack
 
@@ -76,7 +80,6 @@ src/
 
 static/
   logo_sikopling.svg
-  logo_dlh.png
   heading.svg
   chatbot.svg
   hero-mobile.mp4
@@ -121,11 +124,9 @@ npm run lint
 npm run test
 ```
 
-## Catatan Pengembangan
+## Kontribusi
 
-- Halaman login saat ini masih dummy UI.
-- Integrasi autentikasi backend belum diaktifkan.
-- Konten statistik dan informasi masih dapat disesuaikan dengan data produksi resmi.
+Ikuti panduan kontribusi di [contributing.md](contributing.md).
 
 ## Lisensi
 
