@@ -103,7 +103,7 @@
 
 <svelte:window onkeydown={handleWindowKeydown} />
 
-<div class="pointer-events-none fixed bottom-5 right-5 z-30 flex items-end sm:bottom-6 sm:right-6">
+<div class="pointer-events-none fixed right-0 bottom-0 z-30 flex items-end">
 	<div class="pointer-events-auto flex flex-col items-end gap-3">
 		{#if isOpen}
 			<section
@@ -194,19 +194,16 @@
 
 		<button
 			type="button"
-			class="inline-flex h-14 w-14 items-center justify-center rounded-full border border-[#A9B388] bg-[#A9B388] text-white shadow-[0_16px_32px_-20px_rgba(15,23,42,0.5)] transition-colors hover:bg-[#A9B388]"
+			class="inline-flex -mr-4 -mb-4 items-center justify-center border-0 bg-transparent p-0 focus-visible:outline-none sm:-mr-5 sm:-mb-5"
 			aria-label={isOpen ? 'Tutup chatbot' : 'Buka chatbot'}
 			onclick={toggleChat}
 		>
-			{#if isOpen}
-				<svg viewBox="0 0 20 20" class="h-5 w-5" aria-hidden="true">
-					<path d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5" stroke="currentColor" stroke-width="1.8" />
-				</svg>
-			{:else}
-				<svg viewBox="0 0 24 24" class="h-6 w-6" aria-hidden="true">
-					<path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z" fill="currentColor" />
-				</svg>
-			{/if}
+			<img
+				src="/chatbot.svg"
+				alt=""
+				class="h-[12.75rem] w-[12.75rem] object-contain sm:h-[14rem] sm:w-[14rem]"
+				aria-hidden="true"
+			/>
 		</button>
 	</div>
 </div>
