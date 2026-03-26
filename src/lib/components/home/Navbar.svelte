@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
+	import { page } from '$app/state';
 
 	type LayananItem = {
 		title: string;
@@ -91,6 +92,11 @@
 		isScrolled = window.scrollY > 18;
 	};
 
+	const isLandingPage = () => page.url.pathname === '/';
+	const useLightNav = () => isLandingPage() && !isScrolled;
+	const navHref = (sectionId: string) => (isLandingPage() ? `#${sectionId}` : `/#${sectionId}`);
+	const mapSectionHref = (href: string) => (isLandingPage() ? href : `/${href}`);
+
 	$effect(() => {
 		if (typeof document === 'undefined') return;
 		const previousOverflow = document.body.style.overflow;
@@ -102,35 +108,35 @@
 
 	const navClass = () =>
 		`fixed inset-x-0 top-0 z-40 border-b [font-family:var(--font-display)] transition-[background-color,border-color,box-shadow] duration-300 ${
-			isScrolled
-				? 'border-[var(--line)] bg-[var(--surface)] shadow-none'
-				: 'border-transparent bg-transparent shadow-none'
+			useLightNav()
+				? 'border-transparent bg-transparent shadow-none'
+				: 'border-[var(--line)] bg-[var(--surface)] shadow-none'
 		}`;
 
 	const desktopLinkClass = () =>
 		`relative inline-flex py-2.5 text-base font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100 ${
-			isScrolled
-				? 'text-[var(--muted)] hover:text-[#A9B388] after:bg-[#A9B388]'
-				: 'text-white/88 hover:text-white after:bg-white'
+			useLightNav()
+				? 'text-white/88 hover:text-white after:bg-white'
+				: 'text-[var(--muted)] hover:text-[#A9B388] after:bg-[#A9B388]'
 		}`;
 
 	const logoClass = () =>
 		`h-9 w-auto object-contain transition-[filter] duration-300 lg:h-11 ${
-			isScrolled ? 'brightness-100 saturate-100' : 'brightness-0 invert'
+			useLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
 		}`;
 
 	const actionButtonClass = () =>
 		`inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
-			isScrolled
-				? 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
-				: 'border-white/25 bg-white/10 text-white hover:bg-white/16'
+			useLightNav()
+				? 'border-white/25 bg-white/10 text-white hover:bg-white/16'
+				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
 		}`;
 
 	const loginButtonClass = () =>
 		`hidden h-11 items-center rounded-lg border px-5 text-base font-semibold transition-colors lg:inline-flex ${
-			isScrolled
-				? 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
-				: 'border-white/30 bg-white/10 text-white hover:bg-white/16'
+			useLightNav()
+				? 'border-white/30 bg-white/10 text-white hover:bg-white/16'
+				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
 		}`;
 </script>
 
@@ -146,13 +152,13 @@
 		<div
 			class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
-			<a href="#beranda" class="flex min-w-0 items-center" onclick={closeMenus}>
+			<a href="/#beranda" class="flex min-w-0 items-center" onclick={closeMenus}>
 				<img src="/logo_sikopling.svg" alt="Logo SIKOPLING DLH Prov Kalsel" class={logoClass()} />
 			</a>
 
 			<ul class="hidden items-center gap-10 lg:flex">
 				<li>
-					<a href="#beranda" class={desktopLinkClass()}> Beranda </a>
+					<a href={navHref('beranda')} class={desktopLinkClass()}> Beranda </a>
 				</li>
 
 				<li>
@@ -191,7 +197,7 @@
 								<div class="mt-3 grid gap-2 sm:grid-cols-2">
 									{#each layananItems as item}
 										<a
-											href={item.href}
+											href={mapSectionHref(item.href)}
 											class="rounded-lg border border-transparent p-3 transition-all hover:border-[var(--line)] hover:bg-[var(--accent-soft)]"
 											onclick={() => (isLayananOpen = false)}
 										>
@@ -209,10 +215,10 @@
 				</li>
 
 				<li>
-					<a href="#tentang" class={desktopLinkClass()}> Tentang </a>
+					<a href={navHref('tentang')} class={desktopLinkClass()}> Tentang </a>
 				</li>
 				<li>
-					<a href="#kontak" class={desktopLinkClass()}> Kontak </a>
+					<a href={navHref('kontak')} class={desktopLinkClass()}> Kontak </a>
 				</li>
 			</ul>
 
@@ -294,7 +300,7 @@
 
 		<div class="mt-5 space-y-1.5">
 				<a
-					href="#beranda"
+					href={navHref('beranda')}
 					class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
 					onclick={closeMenus}
 				>
@@ -326,7 +332,7 @@
 				<div class="mt-1 space-y-0.5 pl-2" transition:fade={{ duration: 120 }}>
 					{#each layananItems as item}
 						<a
-							href={item.href}
+							href={mapSectionHref(item.href)}
 							class="group flex items-center gap-2 rounded-md px-2 py-2.5 text-base text-[var(--muted)] transition-colors hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
 							onclick={closeMenus}
 						>
@@ -340,14 +346,14 @@
 			{/if}
 
 				<a
-					href="#tentang"
+					href={navHref('tentang')}
 					class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
 					onclick={closeMenus}
 				>
 					Tentang
 				</a>
 				<a
-					href="#kontak"
+					href={navHref('kontak')}
 					class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
 					onclick={closeMenus}
 				>
@@ -412,7 +418,7 @@
 				<div class="mt-2.5 grid gap-1.5">
 					{#each searchSuggestions as suggestion}
 						<a
-							href={suggestion.href}
+							href={mapSectionHref(suggestion.href)}
 							class="flex items-center justify-between rounded-lg px-2.5 py-2.5 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
 							onclick={closeSearch}
 						>
