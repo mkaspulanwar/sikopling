@@ -103,6 +103,11 @@
 			isScrolled ? 'text-[var(--muted)] hover:text-[#A9B388] after:bg-[#A9B388]' : 'text-white/88 hover:text-white after:bg-white'
 		}`;
 
+	const logoClass = () =>
+		`h-9 w-auto object-contain transition-[filter] duration-300 lg:h-11 ${
+			isScrolled ? 'brightness-100 saturate-100' : 'brightness-0 invert'
+		}`;
+
 	const actionButtonClass = () =>
 		`inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
 			isScrolled
@@ -111,7 +116,7 @@
 		}`;
 
 	const loginButtonClass = () =>
-		`hidden items-center rounded-lg border px-5 py-3 text-base font-semibold transition-colors lg:inline-flex ${
+		`hidden h-11 items-center rounded-lg border px-5 text-base font-semibold transition-colors lg:inline-flex ${
 			isScrolled
 				? 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
 				: 'border-white/30 bg-white/10 text-white hover:bg-white/16'
@@ -124,7 +129,7 @@
 	<div class="nav-shell py-4">
 		<div class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10">
 			<a href="#beranda" class="flex min-w-0 items-center" onclick={closeMenus}>
-				<img src="/logo_sikopling.svg" alt="Logo SIKOPLING DLH Prov Kalsel" class="h-9 w-auto object-contain lg:h-11" />
+				<img src="/logo_sikopling.svg" alt="Logo SIKOPLING DLH Prov Kalsel" class={logoClass()} />
 			</a>
 
 			<ul class="hidden items-center gap-10 lg:flex">
@@ -139,8 +144,6 @@
 						class="relative"
 						role="presentation"
 						bind:this={layananDropdown}
-						onmouseenter={() => (isLayananOpen = true)}
-						onmouseleave={() => (isLayananOpen = false)}
 					>
 						<button
 							type="button"
@@ -171,6 +174,7 @@
 										<a
 											href={item.href}
 											class="rounded-lg border border-transparent p-3 transition-all hover:border-[var(--line)] hover:bg-[var(--accent-soft)]"
+											onclick={() => (isLayananOpen = false)}
 										>
 											<span class="block text-sm font-semibold text-[var(--ink)]">{item.title}</span>
 											<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]">{item.description}</span>
