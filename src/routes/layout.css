@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
 
 :root {
-	--canvas: #ebe8d4;
-	--surface: #f6f3e7;
-	--surface-strong: #fffdf5;
-	--surface-rgb: 246 243 231;
-	--ink: #1d2520;
-	--muted: #516057;
-	--line: #c6ceb7;
-	--accent: #345443;
-	--accent-soft: #aab788;
-	--accent-ink: #f7f6ee;
+	--canvas: #ffffff;
+	--surface: #ffffff;
+	--surface-strong: #ffffff;
+	--surface-rgb: 255 255 255;
+	--ink: #0f172a;
+	--muted: #475467;
+	--line: #e4e7ec;
+	--accent: #0f172a;
+	--accent-soft: #f2f4f7;
+	--accent-ink: #ffffff;
 }
 
 html {
@@ -23,7 +23,7 @@ body {
 	margin: 0;
 	background: var(--canvas);
 	color: var(--ink);
-	font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+	font-family: 'Public Sans', 'Segoe UI', sans-serif;
 }
 
 h1,
@@ -32,7 +32,7 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: 'Outfit', 'Segoe UI', sans-serif;
+	font-family: 'Public Sans', 'Segoe UI', sans-serif;
 }
 
 .page-shell {
@@ -40,6 +40,13 @@ h6 {
 	max-width: 1180px;
 	margin-inline: auto;
 	padding-inline: clamp(1.5rem, 4vw, 4.5rem);
+}
+
+.nav-shell {
+	width: 100%;
+	max-width: 1380px;
+	margin-inline: auto;
+	padding-inline: clamp(0.9rem, 2.2vw, 2.25rem);
 }
 
 @keyframes appear {
