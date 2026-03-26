@@ -52,6 +52,8 @@ SIKOPLING dibangun sebagai frontend portal informasi layanan dengan fokus pada:
 - `typescript`
 - `tailwindcss` + `@tailwindcss/forms` + `@tailwindcss/vite`
 - `vite`
+- `@vercel/analytics`
+- `@vercel/speed-insights`
 - `vitest` + `vitest-browser-svelte`
 - `@playwright/test`
 - `eslint` + `eslint-plugin-svelte`
@@ -123,6 +125,16 @@ npm run check
 npm run lint
 npm run test
 ```
+
+## Observability (Vercel)
+
+Integrasi Web Analytics dan Speed Insights sudah ditanamkan di root layout aplikasi.
+
+Aktivasi agar data masuk:
+
+1. Enable **Web Analytics** di project Vercel.
+2. Enable **Speed Insights** di project Vercel.
+3. Deploy ke Vercel (tracking tidak aktif pada mode development lokal).
 
 ## Kontribusi
 

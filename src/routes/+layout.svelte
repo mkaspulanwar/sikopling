@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { injectAnalytics } from '@vercel/analytics/sveltekit';
+	import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import Navbar from '$lib/components/home/Navbar.svelte';
@@ -7,6 +9,9 @@
 	import ChatbotWidget from '$lib/components/home/ChatbotWidget.svelte';
 
 	let { children } = $props();
+
+	injectAnalytics();
+	injectSpeedInsights();
 
 	onMount(() => {
 		if (typeof history !== 'undefined' && 'scrollRestoration' in history) {
