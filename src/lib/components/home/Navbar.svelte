@@ -95,7 +95,7 @@
 		`fixed inset-x-0 top-0 z-40 border-b transition-[background-color,border-color,box-shadow] duration-300 ${
 			isScrolled
 				? 'border-[var(--line)] bg-[rgb(var(--surface-rgb)/0.94)] shadow-[0_14px_34px_-24px_rgba(15,23,42,0.45)] backdrop-blur-xl'
-				: 'border-white/15 bg-transparent backdrop-blur-[1.5px]'
+				: 'border-transparent bg-transparent shadow-none'
 		}`;
 
 	const desktopLinkClass = () =>

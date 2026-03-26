@@ -1,4 +1,4 @@
-<section id="beranda" class="relative isolate h-[100svh] min-h-[100svh] overflow-hidden">
+<section id="beranda" class="relative isolate h-[100vh] min-h-[100vh] overflow-hidden supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:min-h-[100dvh]">
 	<video
 		class="absolute inset-0 h-full w-full object-cover sm:hidden"
 		autoplay
@@ -21,10 +21,10 @@
 		<source src="/hero-desktop.webm" type="video/webm" />
 	</video>
 
-	<div class="relative z-10 flex min-h-[100svh] items-center justify-center px-6 text-center sm:px-10">
+	<div class="relative z-10 flex min-h-[100vh] items-center justify-center px-6 text-center supports-[height:100dvh]:min-h-[100dvh] sm:px-10">
 		<div class="mx-auto max-w-5xl">
 			<h1
-				class="font-hero-title text-[clamp(3rem,10vw,8rem)] font-black uppercase leading-[0.88] tracking-tight text-white drop-shadow-[0_10px_26px_rgba(2,6,23,0.52)]"
+				class="font-hero-title text-[clamp(4rem,14vw,8rem)] font-black uppercase leading-[0.88] tracking-tight text-white drop-shadow-[0_10px_26px_rgba(2,6,23,0.52)]"
 			>
 				SIKOPLING
 			</h1>
