@@ -199,7 +199,7 @@
 			onclick={toggleChat}
 		>
 			<img
-				src="/chatbot.svg"
+				src="/layout/chatbot.svg"
 				alt=""
 				class="h-[6.8rem] w-[6.8rem] object-contain sm:h-[7.8rem] sm:w-[7.8rem] lg:h-[8.6rem] lg:w-[8.6rem]"
 				aria-hidden="true"

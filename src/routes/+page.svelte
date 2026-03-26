@@ -212,7 +212,7 @@
 		playsinline
 		preload="metadata"
 	>
-		<source src="/hero-mobile.mp4" type="video/mp4" />
+		<source src="/home/hero-mobile.mp4" type="video/mp4" />
 	</video>
 
 	<video
@@ -223,14 +223,14 @@
 		playsinline
 		preload="metadata"
 	>
-		<source src="/hero-desktop.webm" type="video/webm" />
+		<source src="/home/hero-desktop.webm" type="video/webm" />
 	</video>
 	<div
 		class="relative z-10 flex min-h-[100svh] items-center justify-center px-6 text-center sm:px-10"
 	>
 		<div class="mx-auto flex w-full max-w-5xl flex-col items-center">
 			<img
-				src="/heading.svg"
+				src="/home/heading.svg"
 				alt="SIKOPLING"
 				class="w-full max-w-[20rem] object-contain sm:max-w-[30rem] lg:max-w-[33rem]"
 			/>

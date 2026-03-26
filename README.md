@@ -80,11 +80,14 @@ src/
       +page.svelte
 
 static/
-  logo_sikopling.svg
-  heading.svg
-  chatbot.svg
-  hero-mobile.mp4
-  hero-desktop.webm
+  home/
+    heading.svg
+    hero-mobile.mp4
+    hero-desktop.webm
+  layout/
+    chatbot.svg
+    logo_sikopling.svg
+  logo_dlh.png
   robots.txt
 ```
 

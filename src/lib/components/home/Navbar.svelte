@@ -160,7 +160,11 @@
 			class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
 			<a href="/#beranda" class="flex min-w-0 items-center" onclick={closeMenus}>
-				<img src="/logo_sikopling.svg" alt="Logo SIKOPLING DLH Prov Kalsel" class={logoClass()} />
+				<img
+					src="/layout/logo_sikopling.svg"
+					alt="Logo SIKOPLING DLH Prov Kalsel"
+					class={logoClass()}
+				/>
 			</a>
 
 			<ul class="hidden items-center gap-10 lg:flex">
