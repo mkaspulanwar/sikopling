@@ -26,8 +26,8 @@
 				</h3>
 				<div class="mt-3 space-y-2 text-sm text-[var(--muted)]">
 					<a href="#beranda" class="block transition-colors hover:text-[#A9B388]">Beranda</a>
-					<a href="#tentang" class="block transition-colors hover:text-[#A9B388]">Tentang</a>
-					<a href="#kontak" class="block transition-colors hover:text-[#A9B388]">Kontak</a>
+					<a href="/tentang" class="block transition-colors hover:text-[#A9B388]">Tentang</a>
+					<a href="/kontak" class="block transition-colors hover:text-[#A9B388]">Kontak</a>
 				</div>
 			</section>
 
