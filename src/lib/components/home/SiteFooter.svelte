@@ -1,5 +1,9 @@
 <script lang="ts">
+	import { page } from '$app/state';
+
 	const currentYear = new Date().getFullYear();
+	const isLandingPage = () => page.url.pathname === '/';
+	const sectionHref = (sectionId: string) => (isLandingPage() ? `#${sectionId}` : `/#${sectionId}`);
 </script>
 
 <footer id="kontak" class="border-t border-[var(--line)] bg-[var(--surface)]">
@@ -25,7 +29,9 @@
 					Akses Cepat
 				</h3>
 				<div class="mt-3 space-y-2 text-sm text-[var(--muted)]">
-					<a href="#beranda" class="block transition-colors hover:text-[#A9B388]">Beranda</a>
+					<a href={sectionHref('beranda')} class="block transition-colors hover:text-[#A9B388]"
+						>Beranda</a
+					>
 					<a href="/tentang" class="block transition-colors hover:text-[#A9B388]">Tentang</a>
 					<a href="/kontak" class="block transition-colors hover:text-[#A9B388]">Kontak</a>
 				</div>
@@ -34,14 +40,17 @@
 			<section>
 				<h3 class="text-sm font-semibold tracking-[0.08em] text-[var(--ink)] uppercase">Layanan</h3>
 				<div class="mt-3 space-y-2 text-sm text-[var(--muted)]">
-					<a href="#layanan-dashboard" class="block transition-colors hover:text-[#A9B388]"
-						>Statistik Layanan</a
+					<a
+						href={sectionHref('layanan-dashboard')}
+						class="block transition-colors hover:text-[#A9B388]">Statistik Layanan</a
 					>
-					<a href="#layanan-dokumen" class="block transition-colors hover:text-[#A9B388]"
-						>Layanan Dokumen</a
+					<a
+						href={sectionHref('layanan-dokumen')}
+						class="block transition-colors hover:text-[#A9B388]">Layanan Dokumen</a
 					>
-					<a href="#alur-percepatan" class="block transition-colors hover:text-[#A9B388]"
-						>8 Langkah Percepatan</a
+					<a
+						href={sectionHref('alur-percepatan')}
+						class="block transition-colors hover:text-[#A9B388]">8 Langkah Percepatan</a
 					>
 				</div>
 			</section>
