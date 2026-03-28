@@ -287,26 +287,12 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isLayananActive() || isLayananOpen)} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
+								class={`${desktopLinkClass(isLayananActive())} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
 								aria-expanded={isLayananOpen}
 								aria-haspopup="true"
 								onclick={() => (isLayananOpen ? closeLayananMenu() : openLayananMenu())}
 							>
 								Layanan
-								<svg
-									viewBox="0 0 20 20"
-									class={`h-4 w-4 transition-transform duration-200 ${isLayananOpen ? 'rotate-180' : ''}`}
-									aria-hidden="true"
-								>
-									<path
-										d="M5.5 7.75L10 12.25L14.5 7.75"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="1.7"
-										stroke-linecap="round"
-										stroke-linejoin="round"
-									/>
-								</svg>
 							</button>
 
 							{#if isLayananOpen}
