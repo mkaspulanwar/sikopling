@@ -6,7 +6,7 @@
 	type LayananItem = {
 		title: string;
 		description: string;
-		href: string;
+		href?: string;
 	};
 
 	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen', 'alur-percepatan'];
@@ -15,27 +15,24 @@
 		{
 			title: 'Pemeriksaan Antrian Dokumen',
 			description: 'Pantau urutan pemeriksaan dan progres dokumen layanan secara berkala.',
-			href: '#layanan-dashboard'
+			href: '/layanan/pemeriksaan-antrian-dokumen'
 		},
 		{
 			title: 'Lorem Ipsum Dolor',
-			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-			href: '#layanan-dokumen'
+			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
 		},
 		{
 			title: 'Sit Amet Consectetur',
-			description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-			href: '#alur-percepatan'
+			description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
 		},
 		{
 			title: 'Dummy Layanan',
-			description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
-			href: '/kontak'
+			description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
 		}
 	];
 
 	const searchSuggestions = [
-		{ label: 'Pemeriksaan Antrian Dokumen', href: '#layanan-dashboard' },
+		{ label: 'Pemeriksaan Antrian Dokumen', href: '/layanan/pemeriksaan-antrian-dokumen' },
 		{ label: 'Lorem ipsum dolor sit amet', href: '#layanan-dokumen' },
 		{ label: 'Consectetur adipiscing elit', href: '#layanan-dokumen' },
 		{ label: 'Sed do eiusmod tempor', href: '#alur-percepatan' }
@@ -110,22 +107,14 @@
 	});
 
 	const isLandingPage = () => page.url.pathname === '/';
+	const isLayananRoute = () => page.url.pathname.startsWith('/layanan');
 	const isPathActive = (path: string) => page.url.pathname === path;
-	const isLayananActive = () => isLandingPage() && layananSectionIds.includes(currentHash);
+	const isLayananActive = () =>
+		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
 	const isBerandaActive = () => isLandingPage() && !isLayananActive();
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
-	const hrefToSectionId = (href: string) => {
-		if (href.startsWith('#')) return href.slice(1);
-		if (href.startsWith('/#')) return href.slice(2);
-		return '';
-	};
-	const isLayananItemActive = (href: string) => {
-		if (!isLandingPage()) return false;
-		const sectionId = hrefToSectionId(href);
-		return sectionId !== '' && currentHash === sectionId;
-	};
 	const scrollToBeranda = () => {
 		if (typeof window === 'undefined') return;
 		const berandaSection = document.getElementById('beranda');
@@ -141,13 +130,25 @@
 		event.preventDefault();
 		scrollToBeranda();
 		if (window.location.hash) {
-			history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`);
+			history.replaceState(
+				history.state,
+				'',
+				`${window.location.pathname}${window.location.search}`
+			);
 		}
 		currentHash = '';
 	};
 	const mapSectionHref = (href: string) => {
 		if (href.startsWith('/')) return href;
 		return isLandingPage() ? href : `/${href}`;
+	};
+
+	const handleLayananItemClick = () => {
+		isLayananOpen = false;
+		closeSearch();
+		if (isMobileOpen) {
+			closeMenus();
+		}
 	};
 
 	$effect(() => {
@@ -168,24 +169,24 @@
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
-			'relative inline-flex items-center py-2.5 text-[1.03rem] font-semibold tracking-[0.002em] transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:transition-transform after:duration-200';
+			'relative inline-flex items-center py-2.5 text-[1.03rem] font-semibold tracking-[0.002em] transition-colors';
 		if (useLightNav()) {
-			return `${baseClass} ${
-				isActive
-					? 'text-white after:scale-x-100 after:bg-white'
-					: 'text-white/86 hover:text-white after:scale-x-0 hover:after:scale-x-100 after:bg-white/95'
-			}`;
+			return `${baseClass} ${isActive ? 'text-white' : 'text-white/86 hover:text-white'}`;
 		}
 		return `${baseClass} ${
-			isActive
-				? 'text-[#4f6b30] after:scale-x-100 after:bg-[#7f9662]'
-				: 'text-[var(--muted)] hover:text-[#294a2f] after:scale-x-0 hover:after:scale-x-100 after:bg-[#92aa76]'
+			isActive ? 'text-[#4f6b30]' : 'text-[var(--muted)] hover:text-[#294a2f]'
 		}`;
 	};
 
+	const mobileNavBaseClass =
+		'border-b border-transparent px-4 py-3.5 text-lg !font-semibold [font-weight:600] [font-family:var(--font-display)] leading-[1.2] tracking-[0.002em] text-[var(--ink)]';
+
 	const mobileLinkClass = (isActive = false) =>
-		`block rounded-lg px-4 py-3.5 text-lg font-medium transition-colors ${
-			isActive ? 'bg-[#eef4e7] text-[#3f5a2f]' : 'text-[var(--ink)] hover:bg-[var(--accent-soft)]'
+		`block ${mobileNavBaseClass} ${isActive ? '' : 'transition-colors hover:text-[#3f5a2f]'}`;
+
+	const mobileLayananClass = (isActive = false) =>
+		`flex w-full items-center justify-between ${mobileNavBaseClass} appearance-none border-0 bg-transparent text-left ${
+			isActive ? '' : 'transition-colors hover:text-[#3f5a2f]'
 		}`;
 
 	const logoClass = () =>
@@ -245,7 +246,7 @@
 					<div class="relative" role="presentation" bind:this={layananDropdown}>
 						<button
 							type="button"
-							class={`${desktopLinkClass(isLayananActive() || isLayananOpen)} items-center gap-1.5 border-0 bg-transparent px-0 !font-semibold [font-family:var(--font-display)] [line-height:1.2] appearance-none`}
+							class={`${desktopLinkClass(isLayananActive() || isLayananOpen)} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [font-family:var(--font-display)] [line-height:1.2] !font-semibold`}
 							aria-expanded={isLayananOpen}
 							aria-haspopup="true"
 							onclick={() => (isLayananOpen = !isLayananOpen)}
@@ -276,27 +277,34 @@
 								</p>
 								<div class="mt-3 grid gap-2 sm:grid-cols-2">
 									{#each layananItems as item}
-										<a
-											href={mapSectionHref(item.href)}
-											class={`group rounded-xl border p-3.5 transition-all duration-200 ${
-												isLayananItemActive(item.href)
-													? 'border-[#d5dfc7] bg-[#f6faef]'
-													: 'border-transparent hover:border-[#d8e2cb] hover:bg-[#f8fbf4]'
-											}`}
-											onclick={() => (isLayananOpen = false)}
-										>
-											<span
-												class={`block text-[0.98rem] font-semibold ${
-													isLayananItemActive(item.href)
-														? 'text-[#35572f]'
-														: 'text-[var(--ink)] group-hover:text-[#35572f]'
-												}`}
-												>{item.title}</span
+										{#if item.href}
+											<a
+												href={item.href}
+												class="group block w-full rounded-xl border border-transparent p-3.5 text-left transition-all duration-200 hover:border-[#d8e2cb] hover:bg-[#f8fbf4]"
+												onclick={handleLayananItemClick}
 											>
-											<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
-												>{item.description}</span
+												<span
+													class="block text-[0.98rem] font-semibold text-[var(--ink)] group-hover:text-[#35572f]"
+													>{item.title}</span
+												>
+												<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
+													>{item.description}</span
+												>
+											</a>
+										{:else}
+											<button
+												type="button"
+												class="group w-full appearance-none rounded-xl border border-transparent bg-transparent p-3.5 text-left transition-all duration-200 hover:border-[#d8e2cb] hover:bg-[#f8fbf4]"
 											>
-										</a>
+												<span
+													class="block text-[0.98rem] font-semibold text-[var(--ink)] group-hover:text-[#35572f]"
+													>{item.title}</span
+												>
+												<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
+													>{item.description}</span
+												>
+											</button>
+										{/if}
 									{/each}
 								</div>
 							</div>
@@ -411,11 +419,7 @@
 
 			<button
 				type="button"
-				class={`flex w-full items-center justify-between rounded-lg px-4 py-3.5 text-left [font-family:inherit] text-lg font-medium transition-colors ${
-					isMobileLayananOpen || isLayananActive()
-						? 'bg-[#eef4e7] text-[#3f5a2f]'
-						: 'text-[var(--ink)] hover:bg-[var(--accent-soft)]'
-				}`}
+				class={mobileLayananClass(isMobileLayananOpen || isLayananActive())}
 				aria-expanded={isMobileLayananOpen}
 				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 			>
@@ -437,40 +441,36 @@
 			{#if isMobileLayananOpen}
 				<div class="mt-1 space-y-0.5 pl-2" transition:fade={{ duration: 120 }}>
 					{#each layananItems as item}
-						<a
-							href={mapSectionHref(item.href)}
-							class={`group flex items-center gap-2 rounded-md px-2 py-2.5 text-base transition-colors ${
-								isLayananItemActive(item.href)
-									? 'bg-[#f3f8ed] text-[#3f5a2f]'
-									: 'text-[var(--muted)] hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]'
-							}`}
-							onclick={closeMenus}
-						>
-							<span
-								class={`h-1.5 w-1.5 rounded-full transition-colors ${
-									isLayananItemActive(item.href)
-										? 'bg-[#6f8f50]'
-										: 'bg-[var(--line)] group-hover:bg-[var(--ink)]'
-								}`}
-							></span>
-							{item.title}
-						</a>
+						{#if item.href}
+							<a
+								href={item.href}
+								class="group flex w-full items-center gap-2 px-2 py-2.5 text-left text-base text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+								onclick={handleLayananItemClick}
+							>
+								<span
+									class="h-1.5 w-1.5 rounded-full bg-[var(--line)] transition-colors group-hover:bg-[var(--ink)]"
+								></span>
+								{item.title}
+							</a>
+						{:else}
+							<button
+								type="button"
+								class="group flex w-full items-center gap-2 border-0 bg-transparent px-2 py-2.5 text-left text-base text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+							>
+								<span
+									class="h-1.5 w-1.5 rounded-full bg-[var(--line)] transition-colors group-hover:bg-[var(--ink)]"
+								></span>
+								{item.title}
+							</button>
+						{/if}
 					{/each}
 				</div>
 			{/if}
 
-			<a
-				href="/tentang"
-				class={mobileLinkClass(isPathActive('/tentang'))}
-				onclick={closeMenus}
-			>
+			<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
 				Tentang
 			</a>
-			<a
-				href="/kontak"
-				class={mobileLinkClass(isPathActive('/kontak'))}
-				onclick={closeMenus}
-			>
+			<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
 				Kontak
 			</a>
 		</div>
