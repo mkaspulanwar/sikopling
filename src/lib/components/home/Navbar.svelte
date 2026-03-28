@@ -102,7 +102,26 @@
 
 	const isLandingPage = () => page.url.pathname === '/';
 	const useLightNav = () => isLandingPage() && !isScrolled;
-	const navHref = (sectionId: string) => (isLandingPage() ? `#${sectionId}` : `/#${sectionId}`);
+	const navHref = (sectionId: string) =>
+		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
+	const scrollToBeranda = () => {
+		if (typeof window === 'undefined') return;
+		const berandaSection = document.getElementById('beranda');
+		if (berandaSection) {
+			berandaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			return;
+		}
+		window.scrollTo({ top: 0, behavior: 'smooth' });
+	};
+	const handleBerandaClick = (event: MouseEvent) => {
+		closeMenus();
+		if (!isLandingPage()) return;
+		event.preventDefault();
+		scrollToBeranda();
+		if (window.location.hash) {
+			history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`);
+		}
+	};
 	const mapSectionHref = (href: string) => {
 		if (href.startsWith('/')) return href;
 		return isLandingPage() ? href : `/${href}`;
@@ -162,7 +181,7 @@
 		<div
 			class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
-			<a href="/#beranda" class="flex min-w-0 items-center" onclick={closeMenus}>
+			<a href="/" class="flex min-w-0 items-center" onclick={handleBerandaClick}>
 				<img
 					src="/layout/logo_sikopling.svg"
 					alt="Logo SIKOPLING DLH Prov Kalsel"
@@ -172,7 +191,9 @@
 
 			<ul class="hidden items-center gap-10 lg:flex">
 				<li>
-					<a href={navHref('beranda')} class={desktopLinkClass()}> Beranda </a>
+					<a href={navHref('beranda')} class={desktopLinkClass()} onclick={handleBerandaClick}>
+						Beranda
+					</a>
 				</li>
 
 				<li>
@@ -316,7 +337,7 @@
 			<a
 				href={navHref('beranda')}
 				class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
-				onclick={closeMenus}
+				onclick={handleBerandaClick}
 			>
 				Beranda
 			</a>

@@ -3,7 +3,21 @@
 
 	const currentYear = new Date().getFullYear();
 	const isLandingPage = () => page.url.pathname === '/';
-	const sectionHref = (sectionId: string) => (isLandingPage() ? `#${sectionId}` : `/#${sectionId}`);
+	const sectionHref = (sectionId: string) =>
+		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
+	const handleBerandaClick = (event: MouseEvent) => {
+		if (!isLandingPage()) return;
+		event.preventDefault();
+		const berandaSection = document.getElementById('beranda');
+		if (berandaSection) {
+			berandaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+		} else {
+			window.scrollTo({ top: 0, behavior: 'smooth' });
+		}
+		if (window.location.hash) {
+			history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`);
+		}
+	};
 </script>
 
 <footer id="kontak" class="border-t border-[var(--line)] bg-[var(--surface)]">
@@ -29,7 +43,10 @@
 					Akses Cepat
 				</h3>
 				<div class="mt-3 space-y-2 text-sm text-[var(--muted)]">
-					<a href={sectionHref('beranda')} class="block transition-colors hover:text-[#A9B388]"
+					<a
+						href={sectionHref('beranda')}
+						class="block transition-colors hover:text-[#A9B388]"
+						onclick={handleBerandaClick}
 						>Beranda</a
 					>
 					<a href="/tentang" class="block transition-colors hover:text-[#A9B388]">Tentang</a>

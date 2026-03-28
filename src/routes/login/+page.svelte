@@ -80,7 +80,7 @@
 				</p>
 
 				<a
-					href="/#beranda"
+					href="/"
 					class="mt-5 inline-flex h-12 w-full items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 text-sm font-semibold text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
 				>
 					Kembali ke Beranda
