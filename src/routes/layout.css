@@ -37,10 +37,7 @@ h6 {
 	letter-spacing: -0.01em;
 }
 
-button,
-input,
-textarea,
-select {
+:where(button, input, textarea, select) {
 	font: inherit;
 }
 

@@ -9,34 +9,36 @@
 		href: string;
 	};
 
+	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen', 'alur-percepatan'];
+
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Dashboard Layanan',
-			description: 'Halaman ringkasan untuk seluruh alur layanan.',
+			title: 'Pemeriksaan Antrian Dokumen',
+			description: 'Pantau urutan pemeriksaan dan progres dokumen layanan secara berkala.',
 			href: '#layanan-dashboard'
 		},
 		{
-			title: 'Formulir Online',
-			description: 'Akses formulir pengajuan dan pembaruan data.',
+			title: 'Lorem Ipsum Dolor',
+			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 			href: '#layanan-dokumen'
 		},
 		{
-			title: 'Tracking Dokumen',
-			description: 'Lacak status dokumen dan progres proses layanan.',
+			title: 'Sit Amet Consectetur',
+			description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
 			href: '#alur-percepatan'
 		},
 		{
-			title: 'Bantuan & FAQ',
-			description: 'Panduan umum dan jawaban pertanyaan layanan.',
+			title: 'Dummy Layanan',
+			description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.',
 			href: '/kontak'
 		}
 	];
 
 	const searchSuggestions = [
-		{ label: 'Statistik Layanan SI-KOPLING', href: '#layanan-dashboard' },
-		{ label: 'Dokumen AMDAL dan UKL-UPL', href: '#layanan-dokumen' },
-		{ label: 'Persetujuan Teknis Air Limbah', href: '#layanan-dokumen' },
-		{ label: '8 Langkah Percepatan Pelayanan', href: '#alur-percepatan' }
+		{ label: 'Pemeriksaan Antrian Dokumen', href: '#layanan-dashboard' },
+		{ label: 'Lorem ipsum dolor sit amet', href: '#layanan-dokumen' },
+		{ label: 'Consectetur adipiscing elit', href: '#layanan-dokumen' },
+		{ label: 'Sed do eiusmod tempor', href: '#alur-percepatan' }
 	];
 
 	let isLayananOpen = $state(false);
@@ -44,6 +46,7 @@
 	let isMobileLayananOpen = $state(false);
 	let isSearchOpen = $state(false);
 	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
+	let currentHash = $state('');
 	let searchQuery = $state('');
 	let layananDropdown: HTMLDivElement | null = null;
 	let searchInputEl = $state<HTMLInputElement | null>(null);
@@ -92,8 +95,14 @@
 		isScrolled = window.scrollY > 18;
 	};
 
+	const updateHashState = () => {
+		if (typeof window === 'undefined') return;
+		currentHash = window.location.hash.replace(/^#/, '');
+	};
+
 	onMount(() => {
 		updateScrollState();
+		updateHashState();
 		const frameId = requestAnimationFrame(updateScrollState);
 		return () => {
 			cancelAnimationFrame(frameId);
@@ -101,9 +110,22 @@
 	});
 
 	const isLandingPage = () => page.url.pathname === '/';
+	const isPathActive = (path: string) => page.url.pathname === path;
+	const isLayananActive = () => isLandingPage() && layananSectionIds.includes(currentHash);
+	const isBerandaActive = () => isLandingPage() && !isLayananActive();
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
+	const hrefToSectionId = (href: string) => {
+		if (href.startsWith('#')) return href.slice(1);
+		if (href.startsWith('/#')) return href.slice(2);
+		return '';
+	};
+	const isLayananItemActive = (href: string) => {
+		if (!isLandingPage()) return false;
+		const sectionId = hrefToSectionId(href);
+		return sectionId !== '' && currentHash === sectionId;
+	};
 	const scrollToBeranda = () => {
 		if (typeof window === 'undefined') return;
 		const berandaSection = document.getElementById('beranda');
@@ -121,6 +143,7 @@
 		if (window.location.hash) {
 			history.replaceState(history.state, '', `${window.location.pathname}${window.location.search}`);
 		}
+		currentHash = '';
 	};
 	const mapSectionHref = (href: string) => {
 		if (href.startsWith('/')) return href;
@@ -143,11 +166,26 @@
 				: 'border-[var(--line)] bg-[var(--surface)] shadow-none'
 		}`;
 
-	const desktopLinkClass = () =>
-		`relative inline-flex py-2.5 text-base font-medium transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:transition-transform after:duration-200 hover:after:scale-x-100 ${
-			useLightNav()
-				? 'text-white/88 hover:text-white after:bg-white'
-				: 'text-[var(--muted)] hover:text-[#A9B388] after:bg-[#A9B388]'
+	const desktopLinkClass = (isActive = false) => {
+		const baseClass =
+			'relative inline-flex items-center py-2.5 text-[1.03rem] font-semibold tracking-[0.002em] transition-colors after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:transition-transform after:duration-200';
+		if (useLightNav()) {
+			return `${baseClass} ${
+				isActive
+					? 'text-white after:scale-x-100 after:bg-white'
+					: 'text-white/86 hover:text-white after:scale-x-0 hover:after:scale-x-100 after:bg-white/95'
+			}`;
+		}
+		return `${baseClass} ${
+			isActive
+				? 'text-[#4f6b30] after:scale-x-100 after:bg-[#7f9662]'
+				: 'text-[var(--muted)] hover:text-[#294a2f] after:scale-x-0 hover:after:scale-x-100 after:bg-[#92aa76]'
+		}`;
+	};
+
+	const mobileLinkClass = (isActive = false) =>
+		`block rounded-lg px-4 py-3.5 text-lg font-medium transition-colors ${
+			isActive ? 'bg-[#eef4e7] text-[#3f5a2f]' : 'text-[var(--ink)] hover:bg-[var(--accent-soft)]'
 		}`;
 
 	const logoClass = () =>
@@ -173,6 +211,8 @@
 <svelte:window
 	onclick={handleWindowClick}
 	onkeydown={handleWindowKeydown}
+	onhashchange={updateHashState}
+	onpopstate={updateHashState}
 	onscroll={updateScrollState}
 />
 
@@ -191,7 +231,12 @@
 
 			<ul class="hidden items-center gap-10 lg:flex">
 				<li>
-					<a href={navHref('beranda')} class={desktopLinkClass()} onclick={handleBerandaClick}>
+					<a
+						href={navHref('beranda')}
+						class={desktopLinkClass(isBerandaActive())}
+						aria-current={isBerandaActive() ? 'page' : undefined}
+						onclick={handleBerandaClick}
+					>
 						Beranda
 					</a>
 				</li>
@@ -200,7 +245,7 @@
 					<div class="relative" role="presentation" bind:this={layananDropdown}>
 						<button
 							type="button"
-							class={`${desktopLinkClass()} items-center gap-1`}
+							class={`${desktopLinkClass(isLayananActive() || isLayananOpen)} items-center gap-1.5 border-0 bg-transparent px-0 !font-semibold [font-family:var(--font-display)] [line-height:1.2] appearance-none`}
 							aria-expanded={isLayananOpen}
 							aria-haspopup="true"
 							onclick={() => (isLayananOpen = !isLayananOpen)}
@@ -233,10 +278,20 @@
 									{#each layananItems as item}
 										<a
 											href={mapSectionHref(item.href)}
-											class="rounded-lg border border-transparent p-3 transition-all hover:border-[var(--line)] hover:bg-[var(--accent-soft)]"
+											class={`group rounded-xl border p-3.5 transition-all duration-200 ${
+												isLayananItemActive(item.href)
+													? 'border-[#d5dfc7] bg-[#f6faef]'
+													: 'border-transparent hover:border-[#d8e2cb] hover:bg-[#f8fbf4]'
+											}`}
 											onclick={() => (isLayananOpen = false)}
 										>
-											<span class="block text-sm font-semibold text-[var(--ink)]">{item.title}</span
+											<span
+												class={`block text-[0.98rem] font-semibold ${
+													isLayananItemActive(item.href)
+														? 'text-[#35572f]'
+														: 'text-[var(--ink)] group-hover:text-[#35572f]'
+												}`}
+												>{item.title}</span
 											>
 											<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
 												>{item.description}</span
@@ -250,10 +305,22 @@
 				</li>
 
 				<li>
-					<a href="/tentang" class={desktopLinkClass()}> Tentang </a>
+					<a
+						href="/tentang"
+						class={desktopLinkClass(isPathActive('/tentang'))}
+						aria-current={isPathActive('/tentang') ? 'page' : undefined}
+					>
+						Tentang
+					</a>
 				</li>
 				<li>
-					<a href="/kontak" class={desktopLinkClass()}> Kontak </a>
+					<a
+						href="/kontak"
+						class={desktopLinkClass(isPathActive('/kontak'))}
+						aria-current={isPathActive('/kontak') ? 'page' : undefined}
+					>
+						Kontak
+					</a>
 				</li>
 			</ul>
 
@@ -336,7 +403,7 @@
 		<div class="mt-5 space-y-1.5">
 			<a
 				href={navHref('beranda')}
-				class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+				class={mobileLinkClass(isBerandaActive())}
 				onclick={handleBerandaClick}
 			>
 				Beranda
@@ -344,7 +411,11 @@
 
 			<button
 				type="button"
-				class="flex w-full items-center justify-between rounded-lg px-4 py-3.5 text-left [font-family:inherit] !text-lg !font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+				class={`flex w-full items-center justify-between rounded-lg px-4 py-3.5 text-left [font-family:inherit] text-lg font-medium transition-colors ${
+					isMobileLayananOpen || isLayananActive()
+						? 'bg-[#eef4e7] text-[#3f5a2f]'
+						: 'text-[var(--ink)] hover:bg-[var(--accent-soft)]'
+				}`}
 				aria-expanded={isMobileLayananOpen}
 				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 			>
@@ -368,11 +439,19 @@
 					{#each layananItems as item}
 						<a
 							href={mapSectionHref(item.href)}
-							class="group flex items-center gap-2 rounded-md px-2 py-2.5 text-base text-[var(--muted)] transition-colors hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
+							class={`group flex items-center gap-2 rounded-md px-2 py-2.5 text-base transition-colors ${
+								isLayananItemActive(item.href)
+									? 'bg-[#f3f8ed] text-[#3f5a2f]'
+									: 'text-[var(--muted)] hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]'
+							}`}
 							onclick={closeMenus}
 						>
 							<span
-								class="h-1.5 w-1.5 rounded-full bg-[var(--line)] transition-colors group-hover:bg-[var(--ink)]"
+								class={`h-1.5 w-1.5 rounded-full transition-colors ${
+									isLayananItemActive(item.href)
+										? 'bg-[#6f8f50]'
+										: 'bg-[var(--line)] group-hover:bg-[var(--ink)]'
+								}`}
 							></span>
 							{item.title}
 						</a>
@@ -382,14 +461,14 @@
 
 			<a
 				href="/tentang"
-				class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+				class={mobileLinkClass(isPathActive('/tentang'))}
 				onclick={closeMenus}
 			>
 				Tentang
 			</a>
 			<a
 				href="/kontak"
-				class="block rounded-lg px-4 py-3.5 text-lg font-medium text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+				class={mobileLinkClass(isPathActive('/kontak'))}
 				onclick={closeMenus}
 			>
 				Kontak
