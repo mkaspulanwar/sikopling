@@ -200,7 +200,7 @@
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
-			'relative inline-flex items-center py-2.5 text-[1.01rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
+			'relative inline-flex items-center py-2.5 lg:py-2 text-[1.01rem] lg:text-[0.98rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
 		if (useLightNav()) {
 			return `${baseClass} ${isActive ? 'text-white' : 'text-white/85 hover:text-[#3EB14A]'}`;
 		}
@@ -223,19 +223,19 @@
 		}`;
 
 	const logoClass = () =>
-		`h-9 w-auto object-contain transition-[filter] duration-300 lg:h-11 ${
+		`h-8 w-auto object-contain transition-[filter] duration-300 lg:h-10 ${
 			useLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
 		}`;
 
 	const actionButtonClass = () =>
-		`inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
+		`inline-flex h-9 w-9 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
 			useLightNav()
 				? 'border-white/25 bg-white/10 text-white'
 				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
 		}`;
 
 	const loginButtonClass = () =>
-		`hidden h-11 items-center rounded-lg border px-5 text-base font-semibold transition-colors lg:inline-flex ${
+		`hidden h-11 lg:h-10 items-center rounded-lg border px-5 lg:px-4 text-base lg:text-[1rem] font-semibold transition-colors lg:inline-flex ${
 			useLightNav()
 				? 'border-white/30 bg-white/10 text-white'
 				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
@@ -251,9 +251,9 @@
 />
 
 <nav class={navClass()}>
-	<div class="nav-shell py-4">
+	<div class="nav-shell py-2.5 lg:py-2.5">
 		<div
-			class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
+			class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
 			<a href="/" class="flex min-w-0 items-center" onclick={handleBerandaClick}>
 				<img
@@ -311,7 +311,7 @@
 
 							{#if isLayananOpen}
 								<div
-									class="absolute top-[calc(100%+0.9rem)] left-1/2 w-[min(92vw,34rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+									class="absolute top-[calc(100%+1.25rem)] left-1/2 w-[min(92vw,34rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
 								>
 									<div class="grid gap-1.5 sm:grid-cols-2">
 										{#each layananItems as item}
@@ -389,7 +389,7 @@
 					aria-label="Buka pencarian"
 					onclick={openSearch}
 				>
-					<svg viewBox="0 0 20 20" class="h-4.5 w-4.5" aria-hidden="true">
+					<svg viewBox="0 0 20 20" class="h-4 w-4 lg:h-4.5 lg:w-4.5" aria-hidden="true">
 						<circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.7" />
 						<path
 							d="M13 13L16.4 16.4"
@@ -410,7 +410,7 @@
 						aria-label="Buka menu"
 						onclick={toggleMobileMenu}
 					>
-						<svg viewBox="0 0 20 20" class="h-5 w-5" aria-hidden="true">
+						<svg viewBox="0 0 20 20" class="h-4 w-4" aria-hidden="true">
 							{#if isMobileOpen}
 								<path
 									d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5"
