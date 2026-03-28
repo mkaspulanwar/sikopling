@@ -9,34 +9,38 @@
 		href?: string;
 	};
 
-	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen', 'alur-percepatan'];
+	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen'];
 
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Pemeriksaan Antrian Dokumen',
+			title: 'Ajukan Permohonan',
+			description: 'Mulai pengajuan dokumen layanan persetujuan lingkungan secara terarah.',
+			href: '#layanan-dokumen'
+		},
+		{
+			title: 'Antrian Dokumen',
 			description: 'Pantau urutan pemeriksaan dan progres dokumen layanan secara berkala.',
 			href: '/layanan/pemeriksaan-antrian-dokumen'
 		},
 		{
-			title: 'Lorem Ipsum Dolor',
-			description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+			title: 'Unduhan Formulir',
+			description: 'Akses formulir administratif yang dibutuhkan sebelum proses konsultasi.',
+			href: '#layanan-dashboard'
 		},
 		{
-			title: 'Sit Amet Consectetur',
-			description: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-		},
-		{
-			title: 'Dummy Layanan',
-			description: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.'
+			title: 'Bantuan & FAQ',
+			description: 'Temukan jawaban cepat dan bantuan umum terkait layanan SI-KOPLING.',
+			href: '/kontak'
 		}
 	];
 
 	const searchSuggestions = [
-		{ label: 'Pemeriksaan Antrian Dokumen', href: '/layanan/pemeriksaan-antrian-dokumen' },
-		{ label: 'Lorem ipsum dolor sit amet', href: '#layanan-dokumen' },
-		{ label: 'Consectetur adipiscing elit', href: '#layanan-dokumen' },
-		{ label: 'Sed do eiusmod tempor', href: '#alur-percepatan' }
+		{ label: 'Ajukan Permohonan', href: '#layanan-dokumen' },
+		{ label: 'Antrian Dokumen', href: '/layanan/pemeriksaan-antrian-dokumen' },
+		{ label: 'Unduhan Formulir', href: '#layanan-dashboard' },
+		{ label: 'Bantuan & FAQ', href: '/kontak' }
 	];
+	const showNavMenus = true;
 
 	let isLayananOpen = $state(false);
 	let isMobileOpen = $state(false);
@@ -45,11 +49,36 @@
 	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
 	let currentHash = $state('');
 	let searchQuery = $state('');
-	let layananDropdown: HTMLDivElement | null = null;
+	let layananDropdown = $state<HTMLDivElement | null>(null);
 	let searchInputEl = $state<HTMLInputElement | null>(null);
+	let layananCloseTimer: ReturnType<typeof setTimeout> | null = null;
+
+	const clearLayananCloseTimer = () => {
+		if (!layananCloseTimer) return;
+		clearTimeout(layananCloseTimer);
+		layananCloseTimer = null;
+	};
+
+	const openLayananMenu = () => {
+		clearLayananCloseTimer();
+		isLayananOpen = true;
+	};
+
+	const closeLayananMenu = () => {
+		clearLayananCloseTimer();
+		isLayananOpen = false;
+	};
+
+	const scheduleCloseLayananMenu = () => {
+		clearLayananCloseTimer();
+		layananCloseTimer = setTimeout(() => {
+			isLayananOpen = false;
+			layananCloseTimer = null;
+		}, 140);
+	};
 
 	const closeMenus = () => {
-		isLayananOpen = false;
+		closeLayananMenu();
 		isMobileOpen = false;
 		isMobileLayananOpen = false;
 	};
@@ -76,7 +105,7 @@
 	const handleWindowClick = (event: MouseEvent) => {
 		const target = event.target as Node | null;
 		if (layananDropdown && target && !layananDropdown.contains(target)) {
-			isLayananOpen = false;
+			closeLayananMenu();
 		}
 	};
 
@@ -103,6 +132,7 @@
 		const frameId = requestAnimationFrame(updateScrollState);
 		return () => {
 			cancelAnimationFrame(frameId);
+			clearLayananCloseTimer();
 		};
 	});
 
@@ -111,7 +141,8 @@
 	const isPathActive = (path: string) => page.url.pathname === path;
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
-	const isBerandaActive = () => isLandingPage() && !isLayananActive();
+	const isBerandaActive = () => isLandingPage() && currentHash === '';
+	const isPanduanActive = () => isLandingPage() && currentHash === 'alur-percepatan';
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
@@ -161,32 +192,34 @@
 	});
 
 	const navClass = () =>
-		`fixed inset-x-0 top-0 z-40 border-b [font-family:var(--font-display)] transition-[background-color,border-color,box-shadow] duration-300 ${
+		`fixed inset-x-0 top-0 z-40 border-b [font-family:var(--font-body)] transition-[background-color,border-color,box-shadow,color] duration-300 ${
 			useLightNav()
-				? 'border-transparent bg-transparent shadow-none'
-				: 'border-[var(--line)] bg-[var(--surface)] shadow-none'
+				? 'border-transparent bg-transparent text-white shadow-none'
+				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] shadow-none'
 		}`;
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
-			'relative inline-flex items-center py-2.5 text-[1.03rem] font-semibold tracking-[0.002em] transition-colors';
+			'relative inline-flex items-center py-2.5 text-[1.01rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
 		if (useLightNav()) {
-			return `${baseClass} ${isActive ? 'text-white' : 'text-white/86 hover:text-white'}`;
+			return `${baseClass} ${isActive ? 'text-white' : 'text-white/85 hover:text-[#3EB14A]'}`;
 		}
 		return `${baseClass} ${
-			isActive ? 'text-[#4f6b30]' : 'text-[var(--muted)] hover:text-[#294a2f]'
+			isActive ? 'text-[var(--ink)]' : 'text-[#334155] hover:text-[#3EB14A]'
 		}`;
 	};
 
 	const mobileNavBaseClass =
-		'border-b border-transparent px-4 py-3.5 text-lg !font-semibold [font-weight:600] [font-family:var(--font-display)] leading-[1.2] tracking-[0.002em] text-[var(--ink)]';
+		'border-b border-transparent px-4 py-3.5 !text-lg !font-semibold [font-weight:600] nav-menu-font leading-[1.2] tracking-[0.002em] text-[var(--ink)]';
 
 	const mobileLinkClass = (isActive = false) =>
-		`block ${mobileNavBaseClass} ${isActive ? '' : 'transition-colors hover:text-[#3f5a2f]'}`;
+		`block menu-item-static ${mobileNavBaseClass} ${
+			isActive ? 'text-[var(--ink)]' : 'transition-colors hover:text-[#3EB14A]'
+		}`;
 
 	const mobileLayananClass = (isActive = false) =>
-		`flex w-full items-center justify-between ${mobileNavBaseClass} appearance-none border-0 bg-transparent text-left ${
-			isActive ? '' : 'transition-colors hover:text-[#3f5a2f]'
+		`flex w-full items-center justify-between menu-item-static ${mobileNavBaseClass} appearance-none border-0 bg-transparent text-left ${
+			isActive ? 'text-[var(--ink)]' : 'transition-colors hover:text-[#3EB14A]'
 		}`;
 
 	const logoClass = () =>
@@ -197,15 +230,15 @@
 	const actionButtonClass = () =>
 		`inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors ${
 			useLightNav()
-				? 'border-white/25 bg-white/10 text-white hover:bg-white/16'
-				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
+				? 'border-white/25 bg-white/10 text-white'
+				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
 		}`;
 
 	const loginButtonClass = () =>
 		`hidden h-11 items-center rounded-lg border px-5 text-base font-semibold transition-colors lg:inline-flex ${
 			useLightNav()
-				? 'border-white/30 bg-white/10 text-white hover:bg-white/16'
-				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] hover:bg-[var(--accent-soft)]'
+				? 'border-white/30 bg-white/10 text-white'
+				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
 		}`;
 </script>
 
@@ -230,107 +263,124 @@
 				/>
 			</a>
 
-			<ul class="hidden items-center gap-10 lg:flex">
-				<li>
-					<a
-						href={navHref('beranda')}
-						class={desktopLinkClass(isBerandaActive())}
-						aria-current={isBerandaActive() ? 'page' : undefined}
-						onclick={handleBerandaClick}
-					>
-						Beranda
-					</a>
-				</li>
-
-				<li>
-					<div class="relative" role="presentation" bind:this={layananDropdown}>
-						<button
-							type="button"
-							class={`${desktopLinkClass(isLayananActive() || isLayananOpen)} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [font-family:var(--font-display)] [line-height:1.2] !font-semibold`}
-							aria-expanded={isLayananOpen}
-							aria-haspopup="true"
-							onclick={() => (isLayananOpen = !isLayananOpen)}
+			{#if showNavMenus}
+				<ul class="hidden items-center gap-9 lg:flex lg:justify-self-center">
+					<li>
+						<a
+							href={navHref('beranda')}
+							class={desktopLinkClass(isBerandaActive())}
+							aria-current={isBerandaActive() ? 'page' : undefined}
+							onclick={handleBerandaClick}
 						>
-							Layanan
-							<svg
-								viewBox="0 0 20 20"
-								class={`h-4 w-4 transition-transform ${isLayananOpen ? 'rotate-180' : ''}`}
-								aria-hidden="true"
-							>
-								<path
-									d="M5.5 7.75L10 12.25L14.5 7.75"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="1.7"
-								/>
-							</svg>
-						</button>
+							Beranda
+						</a>
+					</li>
 
-						{#if isLayananOpen}
-							<div
-								class="absolute top-[calc(100%+0.9rem)] left-1/2 w-[min(92vw,34rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-3 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+					<li>
+						<div
+							class="relative"
+							role="presentation"
+							bind:this={layananDropdown}
+							onmouseenter={openLayananMenu}
+							onmouseleave={scheduleCloseLayananMenu}
+							onfocusin={openLayananMenu}
+						>
+							<button
+								type="button"
+								class={`${desktopLinkClass(isLayananActive() || isLayananOpen)} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
+								aria-expanded={isLayananOpen}
+								aria-haspopup="true"
+								onclick={() => (isLayananOpen ? closeLayananMenu() : openLayananMenu())}
 							>
-								<p
-									class="px-2 text-xs font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+								Layanan
+								<svg
+									viewBox="0 0 20 20"
+									class={`h-4 w-4 transition-transform duration-200 ${isLayananOpen ? 'rotate-180' : ''}`}
+									aria-hidden="true"
 								>
-									Menu Layanan
-								</p>
-								<div class="mt-3 grid gap-2 sm:grid-cols-2">
-									{#each layananItems as item}
-										{#if item.href}
-											<a
-												href={item.href}
-												class="group block w-full rounded-xl border border-transparent p-3.5 text-left transition-all duration-200 hover:border-[#d8e2cb] hover:bg-[#f8fbf4]"
-												onclick={handleLayananItemClick}
-											>
-												<span
-													class="block text-[0.98rem] font-semibold text-[var(--ink)] group-hover:text-[#35572f]"
-													>{item.title}</span
-												>
-												<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
-													>{item.description}</span
-												>
-											</a>
-										{:else}
-											<button
-												type="button"
-												class="group w-full appearance-none rounded-xl border border-transparent bg-transparent p-3.5 text-left transition-all duration-200 hover:border-[#d8e2cb] hover:bg-[#f8fbf4]"
-											>
-												<span
-													class="block text-[0.98rem] font-semibold text-[var(--ink)] group-hover:text-[#35572f]"
-													>{item.title}</span
-												>
-												<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
-													>{item.description}</span
-												>
-											</button>
-										{/if}
-									{/each}
-								</div>
-							</div>
-						{/if}
-					</div>
-				</li>
+									<path
+										d="M5.5 7.75L10 12.25L14.5 7.75"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.7"
+										stroke-linecap="round"
+										stroke-linejoin="round"
+									/>
+								</svg>
+							</button>
 
-				<li>
-					<a
-						href="/tentang"
-						class={desktopLinkClass(isPathActive('/tentang'))}
-						aria-current={isPathActive('/tentang') ? 'page' : undefined}
-					>
-						Tentang
-					</a>
-				</li>
-				<li>
-					<a
-						href="/kontak"
-						class={desktopLinkClass(isPathActive('/kontak'))}
-						aria-current={isPathActive('/kontak') ? 'page' : undefined}
-					>
-						Kontak
-					</a>
-				</li>
-			</ul>
+							{#if isLayananOpen}
+								<div
+									class="absolute top-[calc(100%+0.9rem)] left-1/2 w-[min(92vw,34rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+								>
+									<div class="grid gap-1.5 sm:grid-cols-2">
+										{#each layananItems as item}
+											{#if item.href}
+												<a
+													href={mapSectionHref(item.href)}
+													class="group menu-item-static block w-full rounded-lg px-3.5 py-3 text-left transition-colors duration-150 hover:bg-[#f8fbf4]"
+													onclick={handleLayananItemClick}
+												>
+													<span
+														class="block text-[0.96rem] font-semibold text-[var(--ink)] transition-colors group-hover:text-[#3EB14A]"
+														>{item.title}</span
+													>
+													<span
+														class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
+														>{item.description}</span
+													>
+												</a>
+											{:else}
+												<button
+													type="button"
+													class="group menu-item-static w-full appearance-none rounded-lg px-3.5 py-3 text-left transition-colors duration-150 hover:bg-[#f8fbf4]"
+												>
+													<span
+														class="block text-[0.96rem] font-semibold text-[var(--ink)] transition-colors group-hover:text-[#3EB14A]"
+														>{item.title}</span
+													>
+													<span
+														class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
+														>{item.description}</span
+													>
+												</button>
+											{/if}
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					</li>
+
+					<li>
+						<a
+							href="/tentang"
+							class={desktopLinkClass(isPathActive('/tentang'))}
+							aria-current={isPathActive('/tentang') ? 'page' : undefined}
+						>
+							Tentang
+						</a>
+					</li>
+					<li>
+						<a
+							href={navHref('alur-percepatan')}
+							class={desktopLinkClass(isPanduanActive())}
+							aria-current={isPanduanActive() ? 'page' : undefined}
+						>
+							Panduan
+						</a>
+					</li>
+					<li>
+						<a
+							href="/kontak"
+							class={desktopLinkClass(isPathActive('/kontak'))}
+							aria-current={isPathActive('/kontak') ? 'page' : undefined}
+						>
+							Kontak
+						</a>
+					</li>
+				</ul>
+			{/if}
 
 			<div class="flex items-center gap-2 lg:justify-self-end">
 				<button
@@ -352,35 +402,37 @@
 
 				<a href="/login" class={loginButtonClass()}> Login </a>
 
-				<button
-					type="button"
-					class={`${actionButtonClass()} lg:hidden`}
-					aria-expanded={isMobileOpen}
-					aria-label="Buka menu"
-					onclick={toggleMobileMenu}
-				>
-					<svg viewBox="0 0 20 20" class="h-5 w-5" aria-hidden="true">
-						{#if isMobileOpen}
-							<path
-								d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5"
-								stroke="currentColor"
-								stroke-width="1.8"
-							/>
-						{:else}
-							<path
-								d="M3.5 6.5H16.5M3.5 10H16.5M3.5 13.5H16.5"
-								stroke="currentColor"
-								stroke-width="1.8"
-							/>
-						{/if}
-					</svg>
-				</button>
+				{#if showNavMenus}
+					<button
+						type="button"
+						class={`${actionButtonClass()} lg:hidden`}
+						aria-expanded={isMobileOpen}
+						aria-label="Buka menu"
+						onclick={toggleMobileMenu}
+					>
+						<svg viewBox="0 0 20 20" class="h-5 w-5" aria-hidden="true">
+							{#if isMobileOpen}
+								<path
+									d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5"
+									stroke="currentColor"
+									stroke-width="1.8"
+								/>
+							{:else}
+								<path
+									d="M3.5 6.5H16.5M3.5 10H16.5M3.5 13.5H16.5"
+									stroke="currentColor"
+									stroke-width="1.8"
+								/>
+							{/if}
+						</svg>
+					</button>
+				{/if}
 			</div>
 		</div>
 	</div>
 </nav>
 
-{#if isMobileOpen}
+{#if showNavMenus && isMobileOpen}
 	<button
 		type="button"
 		class="fixed inset-0 z-[70] bg-slate-950/22 backdrop-blur-lg backdrop-saturate-150 [-webkit-backdrop-filter:blur(16px)] lg:hidden"
@@ -423,7 +475,7 @@
 				aria-expanded={isMobileLayananOpen}
 				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 			>
-				Layanan
+				<span class="nav-menu-font text-lg font-semibold tracking-[0.002em]">Layanan</span>
 				<svg
 					viewBox="0 0 20 20"
 					class={`h-4 w-4 transition-transform ${isMobileLayananOpen ? 'rotate-180' : ''}`}
@@ -439,27 +491,21 @@
 			</button>
 
 			{#if isMobileLayananOpen}
-				<div class="mt-1 space-y-0.5 pl-2" transition:fade={{ duration: 120 }}>
+				<div class="mt-1.5 space-y-1 pl-4" transition:fade={{ duration: 120 }}>
 					{#each layananItems as item}
 						{#if item.href}
 							<a
-								href={item.href}
-								class="group flex w-full items-center gap-2 px-2 py-2.5 text-left text-base text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+								href={mapSectionHref(item.href)}
+								class="menu-item-static nav-menu-font block w-full rounded-md px-3 py-2 text-left text-[0.95rem] font-semibold text-[#475467] transition-colors hover:bg-[#f8fafc] hover:text-[#3EB14A]"
 								onclick={handleLayananItemClick}
 							>
-								<span
-									class="h-1.5 w-1.5 rounded-full bg-[var(--line)] transition-colors group-hover:bg-[var(--ink)]"
-								></span>
 								{item.title}
 							</a>
 						{:else}
 							<button
 								type="button"
-								class="group flex w-full items-center gap-2 border-0 bg-transparent px-2 py-2.5 text-left text-base text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+								class="menu-item-static nav-menu-font block w-full appearance-none rounded-md border-0 bg-transparent px-3 py-2 text-left text-[0.95rem] font-semibold text-[#475467] transition-colors hover:bg-[#f8fafc] hover:text-[#3EB14A]"
 							>
-								<span
-									class="h-1.5 w-1.5 rounded-full bg-[var(--line)] transition-colors group-hover:bg-[var(--ink)]"
-								></span>
 								{item.title}
 							</button>
 						{/if}
@@ -470,6 +516,13 @@
 			<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
 				Tentang
 			</a>
+			<a
+				href={navHref('alur-percepatan')}
+				class={mobileLinkClass(isPanduanActive())}
+				onclick={closeMenus}
+			>
+				Panduan
+			</a>
 			<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
 				Kontak
 			</a>
@@ -477,7 +530,7 @@
 
 		<a
 			href="/login"
-			class="mt-auto inline-flex w-full items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-base font-semibold text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+			class="mt-auto inline-flex w-full items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-base font-semibold text-[var(--ink)] transition-colors"
 			onclick={closeMenus}
 		>
 			Login
@@ -518,7 +571,7 @@
 				/>
 				<button
 					type="button"
-					class="rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors hover:bg-[var(--accent-soft)] hover:text-[var(--ink)] sm:text-sm"
+					class="rounded-lg border border-[var(--line)] px-3 py-1.5 text-xs font-medium text-[var(--muted)] transition-colors sm:text-sm"
 					onclick={closeSearch}
 				>
 					Tutup
@@ -533,7 +586,7 @@
 					{#each searchSuggestions as suggestion}
 						<a
 							href={mapSectionHref(suggestion.href)}
-							class="flex items-center justify-between rounded-lg px-2.5 py-2.5 text-sm text-[var(--ink)] transition-colors hover:bg-[var(--accent-soft)]"
+							class="flex items-center justify-between rounded-lg px-2.5 py-2.5 text-sm text-[var(--ink)] transition-colors"
 							onclick={closeSearch}
 						>
 							<span>{suggestion.label}</span>
@@ -553,3 +606,21 @@
 		</div>
 	</div>
 {/if}
+
+<style>
+	:global(.nav-menu-font) {
+		font-family: 'Open Sans', 'Segoe UI', sans-serif;
+	}
+
+	:global(.menu-item-static:hover),
+	:global(.menu-item-static:focus),
+	:global(.menu-item-static:focus-visible),
+	:global(.menu-item-static:active) {
+		background-color: transparent;
+		text-decoration: none;
+	}
+
+	:global(.menu-item-static:visited) {
+		text-decoration: none;
+	}
+</style>

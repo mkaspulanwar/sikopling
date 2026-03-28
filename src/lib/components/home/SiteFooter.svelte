@@ -45,12 +45,12 @@
 				<div class="mt-3 space-y-2 text-sm text-[var(--muted)]">
 					<a
 						href={sectionHref('beranda')}
-						class="block transition-colors hover:text-[#A9B388]"
+						class="block transition-colors"
 						onclick={handleBerandaClick}
 						>Beranda</a
 					>
-					<a href="/tentang" class="block transition-colors hover:text-[#A9B388]">Tentang</a>
-					<a href="/kontak" class="block transition-colors hover:text-[#A9B388]">Kontak</a>
+					<a href="/tentang" class="block transition-colors">Tentang</a>
+					<a href="/kontak" class="block transition-colors">Kontak</a>
 				</div>
 			</section>
 
@@ -59,15 +59,15 @@
 				<div class="mt-3 space-y-2 text-sm text-[var(--muted)]">
 					<a
 						href={sectionHref('layanan-dashboard')}
-						class="block transition-colors hover:text-[#A9B388]">Statistik Layanan</a
+						class="block transition-colors">Statistik Layanan</a
 					>
 					<a
 						href={sectionHref('layanan-dokumen')}
-						class="block transition-colors hover:text-[#A9B388]">Layanan Dokumen</a
+						class="block transition-colors">Layanan Dokumen</a
 					>
 					<a
 						href={sectionHref('alur-percepatan')}
-						class="block transition-colors hover:text-[#A9B388]">8 Langkah Percepatan</a
+						class="block transition-colors">8 Langkah Percepatan</a
 					>
 				</div>
 			</section>
@@ -89,12 +89,8 @@
 				&copy; {currentYear} Dinas Lingkungan Hidup Provinsi Kalimantan Selatan. Seluruh hak cipta dilindungi.
 			</p>
 			<div class="flex items-center gap-4">
-				<a href="/kebijakan-privasi" class="transition-colors hover:text-[#A9B388]"
-					>Kebijakan Privasi</a
-				>
-				<a href="/ketentuan-layanan" class="transition-colors hover:text-[#A9B388]"
-					>Ketentuan Layanan</a
-				>
+				<a href="/kebijakan-privasi" class="transition-colors">Kebijakan Privasi</a>
+				<a href="/ketentuan-layanan" class="transition-colors">Ketentuan Layanan</a>
 			</div>
 		</div>
 	</div>
