@@ -9,13 +9,17 @@
 		href?: string;
 	};
 
+	type SearchSuggestion = {
+		label: string;
+		href?: string;
+	};
+
 	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen'];
 
 	const layananItems: LayananItem[] = [
 		{
 			title: 'Ajukan Permohonan',
-			description: 'Mulai pengajuan dokumen layanan persetujuan lingkungan secara terarah.',
-			href: '#layanan-dokumen'
+			description: 'Mulai pengajuan dokumen layanan persetujuan lingkungan secara terarah.'
 		},
 		{
 			title: 'Antrian Dokumen',
@@ -24,21 +28,19 @@
 		},
 		{
 			title: 'Unduhan Formulir',
-			description: 'Akses formulir administratif yang dibutuhkan sebelum proses konsultasi.',
-			href: '#layanan-dashboard'
+			description: 'Akses formulir administratif yang dibutuhkan sebelum proses konsultasi.'
 		},
 		{
 			title: 'Bantuan & FAQ',
-			description: 'Temukan jawaban cepat dan bantuan umum terkait layanan SI-KOPLING.',
-			href: '/kontak'
+			description: 'Temukan jawaban cepat dan bantuan umum terkait layanan SI-KOPLING.'
 		}
 	];
 
-	const searchSuggestions = [
-		{ label: 'Ajukan Permohonan', href: '#layanan-dokumen' },
+	const searchSuggestions: SearchSuggestion[] = [
+		{ label: 'Ajukan Permohonan' },
 		{ label: 'Antrian Dokumen', href: '/layanan/pemeriksaan-antrian-dokumen' },
-		{ label: 'Unduhan Formulir', href: '#layanan-dashboard' },
-		{ label: 'Bantuan & FAQ', href: '/kontak' }
+		{ label: 'Unduhan Formulir' },
+		{ label: 'Bantuan & FAQ' }
 	];
 	const showNavMenus = true;
 
@@ -142,7 +144,7 @@
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
 	const isBerandaActive = () => isLandingPage() && currentHash === '';
-	const isPanduanActive = () => isLandingPage() && currentHash === 'alur-percepatan';
+	const isPanduanActive = () => isPathActive('/panduan');
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
@@ -349,7 +351,7 @@
 					</li>
 					<li>
 						<a
-							href={navHref('alur-percepatan')}
+							href="/panduan"
 							class={desktopLinkClass(isPanduanActive())}
 							aria-current={isPanduanActive() ? 'page' : undefined}
 						>
@@ -503,7 +505,7 @@
 				Tentang
 			</a>
 			<a
-				href={navHref('alur-percepatan')}
+				href="/panduan"
 				class={mobileLinkClass(isPanduanActive())}
 				onclick={closeMenus}
 			>
@@ -570,22 +572,31 @@
 				</p>
 				<div class="mt-2.5 grid gap-1.5">
 					{#each searchSuggestions as suggestion}
-						<a
-							href={mapSectionHref(suggestion.href)}
-							class="flex items-center justify-between rounded-lg px-2.5 py-2.5 text-sm text-[var(--ink)] transition-colors"
-							onclick={closeSearch}
-						>
-							<span>{suggestion.label}</span>
-							<svg viewBox="0 0 20 20" class="h-4 w-4 text-[var(--muted)]" aria-hidden="true">
-								<path
-									d="M7 5L13 10L7 15"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="1.6"
-									stroke-linecap="round"
-								/>
-							</svg>
-						</a>
+						{#if suggestion.href}
+							<a
+								href={mapSectionHref(suggestion.href)}
+								class="flex items-center justify-between rounded-lg px-2.5 py-2.5 text-sm text-[var(--ink)] transition-colors"
+								onclick={closeSearch}
+							>
+								<span>{suggestion.label}</span>
+								<svg viewBox="0 0 20 20" class="h-4 w-4 text-[var(--muted)]" aria-hidden="true">
+									<path
+										d="M7 5L13 10L7 15"
+										fill="none"
+										stroke="currentColor"
+										stroke-width="1.6"
+										stroke-linecap="round"
+									/>
+								</svg>
+							</a>
+						{:else}
+							<button
+								type="button"
+								class="flex w-full items-center justify-between rounded-lg px-2.5 py-2.5 text-left text-sm text-[var(--ink)] transition-colors"
+							>
+								<span>{suggestion.label}</span>
+							</button>
+						{/if}
 					{/each}
 				</div>
 			</div>

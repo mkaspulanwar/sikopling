@@ -65,10 +65,7 @@
 						href={sectionHref('layanan-dokumen')}
 						class="block transition-colors">Layanan Dokumen</a
 					>
-					<a
-						href={sectionHref('alur-percepatan')}
-						class="block transition-colors">8 Langkah Percepatan</a
-					>
+					<a href="/panduan" class="block transition-colors">Panduan</a>
 				</div>
 			</section>
 
