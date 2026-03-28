@@ -223,7 +223,7 @@
 		}`;
 
 	const logoClass = () =>
-		`h-8 w-auto object-contain transition-[filter] duration-300 lg:h-10 ${
+		`h-[1.85rem] w-auto object-contain transition-[filter] duration-300 lg:h-[2.2rem] ${
 			useLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
 		}`;
 
@@ -251,7 +251,7 @@
 />
 
 <nav class={navClass()}>
-	<div class="nav-shell py-2.5 lg:py-2.5">
+	<div class="nav-shell py-3 lg:py-3">
 		<div
 			class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
