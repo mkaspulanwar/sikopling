@@ -126,6 +126,7 @@
 	let searchQuery = $state('');
 	let statusFilter = $state<'Semua Status' | ProgressStatus>('Semua Status');
 	let positionFilter = $state<PositionFilter>('Semua Posisi');
+	let expandedRows = $state<string[]>([]);
 
 	const toTimestamp = (value: string) => new Date(`${value}T00:00:00`).getTime();
 	const formatDate = (value: string) => dateFormatter.format(new Date(`${value}T00:00:00`));
@@ -173,10 +174,18 @@
 		)
 	);
 
+	const isRowExpanded = (registrationNo: string) => expandedRows.includes(registrationNo);
+	const toggleRowExpanded = (registrationNo: string) => {
+		expandedRows = isRowExpanded(registrationNo)
+			? expandedRows.filter((item) => item !== registrationNo)
+			: [...expandedRows, registrationNo];
+	};
+
 	const resetFilter = () => {
 		searchQuery = '';
 		statusFilter = 'Semua Status';
 		positionFilter = 'Semua Posisi';
+		expandedRows = [];
 	};
 </script>
 
@@ -285,7 +294,7 @@
 		</div>
 
 		<div
-			class="mt-6 overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_24px_52px_-42px_rgba(15,23,42,0.42)]"
+			class="mt-6 hidden overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_24px_52px_-42px_rgba(15,23,42,0.42)] md:block"
 		>
 			<div class="overflow-x-auto">
 				<table class="w-full min-w-[1100px] border-collapse">
@@ -368,6 +377,121 @@
 					</tbody>
 				</table>
 			</div>
+		</div>
+
+		<div
+			class="mt-6 overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_24px_52px_-42px_rgba(15,23,42,0.42)] md:hidden"
+		>
+			<div
+				class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-3 border-b border-[var(--line)] bg-[#f7faf5] px-4 py-3 text-[0.64rem] font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+			>
+				<span>No Registrasi</span>
+				<span>Instansi</span>
+			</div>
+
+			{#if sortedRows.length === 0}
+				<div class="px-6 py-12 text-center">
+					<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
+					<p class="mt-1 text-sm text-[var(--muted)]">
+						Coba ubah kata kunci pencarian atau reset filter.
+					</p>
+				</div>
+			{:else}
+				<ul>
+					{#each sortedRows as row}
+						<li class="border-t border-[var(--line)] first:border-t-0">
+							<button
+								type="button"
+								class="grid w-full grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#fcfdfb]"
+								onclick={() => toggleRowExpanded(row.registrationNo)}
+								aria-expanded={isRowExpanded(row.registrationNo)}
+							>
+								<p class="text-sm leading-snug font-semibold text-[var(--ink)]">
+									{row.registrationNo}
+								</p>
+
+								<div class="min-w-0">
+									<div class="flex items-start justify-between gap-2">
+										<p class="text-sm leading-snug text-[var(--ink)]">{row.agency}</p>
+										<span
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
+											aria-hidden="true"
+										>
+											<svg viewBox="0 0 20 20" class="h-3.5 w-3.5">
+												<path
+													d="M5.5 7.75L10 12.25L14.5 7.75"
+													fill="none"
+													stroke="currentColor"
+													stroke-width="1.7"
+													stroke-linecap="round"
+												/>
+											</svg>
+										</span>
+									</div>
+								</div>
+							</button>
+
+							{#if isRowExpanded(row.registrationNo)}
+								<div class="border-t border-[var(--line)] bg-[#fbfdf9] px-4 py-3">
+									<dl class="space-y-3">
+										<div>
+											<dt
+												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+											>
+												Tanggal Masuk
+											</dt>
+											<dd class="mt-0.5 text-sm text-[var(--ink)]">
+												{formatDate(row.receivedDate)}
+											</dd>
+										</div>
+										<div>
+											<dt
+												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+											>
+												Kegiatan
+											</dt>
+											<dd class="mt-0.5 text-sm leading-relaxed text-[var(--ink)]">
+												{row.activity}
+											</dd>
+										</div>
+										<div>
+											<dt
+												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+											>
+												Posisi
+											</dt>
+											<dd class="mt-0.5 text-sm text-[var(--ink)]">{row.position}</dd>
+										</div>
+										<div>
+											<dt
+												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+											>
+												Status Progress
+											</dt>
+											<dd class="mt-1">
+												<span
+													class={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-semibold ${statusToneClass[row.progressStatus]}`}
+													>{row.progressStatus}</span
+												>
+											</dd>
+										</div>
+										<div>
+											<dt
+												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+											>
+												Tanggal Update Progress
+											</dt>
+											<dd class="mt-0.5 text-sm text-[var(--ink)]">
+												{formatDate(row.progressUpdatedDate)}
+											</dd>
+										</div>
+									</dl>
+								</div>
+							{/if}
+						</li>
+					{/each}
+				</ul>
+			{/if}
 		</div>
 	</div>
 </section>
