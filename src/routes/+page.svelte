@@ -205,25 +205,14 @@
 
 <section id="beranda" class="relative isolate h-[100svh] min-h-[100svh] overflow-hidden">
 	<video
-		class="absolute inset-0 h-full w-full object-cover sm:hidden"
+		class="absolute inset-0 h-full w-full object-cover"
 		autoplay
 		muted
 		loop
 		playsinline
 		preload="metadata"
 	>
-		<source src="/home/hero-mobile.mp4" type="video/mp4" />
-	</video>
-
-	<video
-		class="absolute inset-0 hidden h-full w-full object-cover sm:block"
-		autoplay
-		muted
-		loop
-		playsinline
-		preload="metadata"
-	>
-		<source src="/home/hero-desktop.webm" type="video/webm" />
+		<source src="/home/hero-video.webm" type="video/webm" />
 	</video>
 	<div
 		class="relative z-10 flex min-h-[100svh] items-center justify-center px-6 text-center sm:px-10"
