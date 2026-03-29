@@ -2,12 +2,11 @@
 	import { onDestroy } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
 	import { fly, scale } from 'svelte/transition';
-	import Bot from 'lucide-svelte/icons/bot';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import Headset from 'lucide-svelte/icons/headset';
 	import MessageCircle from 'lucide-svelte/icons/message-circle';
 	import Phone from 'lucide-svelte/icons/phone';
 	import X from 'lucide-svelte/icons/x';
+	import { siWhatsapp } from 'simple-icons';
 
 	type SupportChannel = {
 		id: 'chatbot' | 'cs';
@@ -112,17 +111,15 @@
 						>
 							<span class="flex items-start gap-3">
 								<span
-									class={`mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
+									class={`mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${
 										channel.id === 'cs'
-											? 'bg-[#25D366] text-white'
-											: 'border border-[#d7e1cd] bg-[#eef4e7] text-[#4f6a2c]'
+											? 'border-[#b7e7cb] bg-[#e8f8ef] text-[#1FA855]'
+											: 'border-[#cfe3bc] bg-[#f2f9ec] text-[#25D366]'
 									}`}
 								>
-									{#if channel.id === 'chatbot'}
-										<Bot class="h-4.5 w-4.5" strokeWidth={1.8} aria-hidden="true" />
-									{:else}
-										<Headset class="h-4.5 w-4.5" strokeWidth={1.8} aria-hidden="true" />
-									{/if}
+									<svg viewBox="0 0 24 24" class="h-4.5 w-4.5" aria-hidden="true">
+										<path d={siWhatsapp.path} fill="currentColor"></path>
+									</svg>
 								</span>
 								<span class="min-w-0 flex-1">
 									<span class="block text-sm font-semibold text-[var(--ink)]">{channel.title}</span>
