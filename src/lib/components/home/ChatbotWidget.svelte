@@ -1,5 +1,13 @@
 <script lang="ts">
-	import { fly } from 'svelte/transition';
+	import { onDestroy } from 'svelte';
+	import { cubicOut } from 'svelte/easing';
+	import { fly, scale } from 'svelte/transition';
+	import Bot from 'lucide-svelte/icons/bot';
+	import ChevronRight from 'lucide-svelte/icons/chevron-right';
+	import Headset from 'lucide-svelte/icons/headset';
+	import MessageCircle from 'lucide-svelte/icons/message-circle';
+	import Phone from 'lucide-svelte/icons/phone';
+	import X from 'lucide-svelte/icons/x';
 
 	type SupportChannel = {
 		id: 'chatbot' | 'cs';
@@ -27,13 +35,30 @@
 	];
 
 	let isOpen = $state(false);
+	let buttonAnimating = $state(false);
+	let buttonAnimationTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	function triggerButtonAnimation() {
+		buttonAnimating = true;
+		if (buttonAnimationTimeout) {
+			clearTimeout(buttonAnimationTimeout);
+		}
+		buttonAnimationTimeout = setTimeout(() => {
+			buttonAnimating = false;
+		}, 260);
+	}
 
 	function togglePopup() {
 		isOpen = !isOpen;
+		triggerButtonAnimation();
 	}
 
 	function closePopup() {
+		if (!isOpen) {
+			return;
+		}
 		isOpen = false;
+		triggerButtonAnimation();
 	}
 
 	function openWhatsApp(channel: SupportChannel) {
@@ -48,35 +73,33 @@
 			closePopup();
 		}
 	}
+
+	onDestroy(() => {
+		if (buttonAnimationTimeout) {
+			clearTimeout(buttonAnimationTimeout);
+		}
+	});
 </script>
 
 <svelte:window onkeydown={handleWindowKeydown} />
 
-<div class="pointer-events-none fixed right-4 bottom-4 z-30 sm:right-6 sm:bottom-6 lg:right-8 lg:bottom-8">
-	<div class="pointer-events-auto flex flex-col items-end">
+<div
+	class="pointer-events-none fixed right-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 z-30 px-3 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8"
+>
+	<div class="pointer-events-auto flex w-full flex-col items-end sm:w-auto">
 		{#if isOpen}
 			<section
-				class="w-[min(92vw,24rem)] overflow-hidden rounded-xl border border-[#d7ded0] bg-[var(--surface)] shadow-[0_20px_36px_-24px_rgba(15,23,42,0.46)]"
-				in:fly={{ y: 12, duration: 180 }}
+				id="chatbot-popup"
+				class="mb-3 w-full max-w-[24rem] overflow-hidden rounded-xl border border-[#d7ded0] bg-[var(--surface)] shadow-[0_20px_36px_-24px_rgba(15,23,42,0.46)] sm:w-[min(92vw,24rem)]"
+				in:fly={{ y: 14, duration: 190 }}
+				out:fly={{ y: 10, duration: 140 }}
 			>
 				<div class="border-b border-[#e2e8db] bg-[#fbfcfa] px-4 py-3.5">
-					<div class="flex items-start justify-between gap-3">
-						<div>
-							<p class="text-[0.95rem] font-semibold text-[var(--ink)]">Bantuan SI-KOPLING</p>
-							<p class="mt-1 text-xs leading-relaxed text-[var(--muted)]">
-								Pilih kanal bantuan, lalu lanjut chat via WhatsApp.
-							</p>
-						</div>
-						<button
-							type="button"
-							class="inline-flex h-8 w-8 items-center justify-center rounded-md border border-[#d9e0d2] bg-[var(--surface)] text-[var(--muted)]"
-							aria-label="Tutup pilihan bantuan"
-							onclick={closePopup}
-						>
-							<svg viewBox="0 0 20 20" class="h-4 w-4" aria-hidden="true">
-								<path d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5" stroke="currentColor" stroke-width="1.8" />
-							</svg>
-						</button>
+					<div>
+						<p class="text-[0.95rem] font-semibold text-[var(--ink)]">Bantuan SI-KOPLING</p>
+						<p class="mt-1 text-xs leading-relaxed text-[var(--muted)]">
+							Pilih kanal bantuan, lalu lanjut chat via WhatsApp.
+						</p>
 					</div>
 				</div>
 
@@ -96,72 +119,21 @@
 									}`}
 								>
 									{#if channel.id === 'chatbot'}
-										<svg viewBox="0 0 20 20" class="h-4.5 w-4.5" aria-hidden="true">
-											<path
-												d="M4.2 10a5.8 5.8 0 0 1 10.1-3.8A5.8 5.8 0 0 1 10 15.8H6.7l-2 .9.6-1.9A5.8 5.8 0 0 1 4.2 10Z"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="1.5"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-											<path
-												d="M7.3 9.4h5.1M7.3 11.4h3.6"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="1.5"
-												stroke-linecap="round"
-											/>
-										</svg>
+										<Bot class="h-4.5 w-4.5" strokeWidth={1.8} aria-hidden="true" />
 									{:else}
-										<svg viewBox="0 0 24 24" class="h-4.5 w-4.5" aria-hidden="true">
-											<path
-												d="M12 3.5a8.2 8.2 0 0 0-7.1 12.3l-.9 3.1 3.2-.8A8.2 8.2 0 1 0 12 3.5Z"
-												fill="none"
-												stroke="white"
-												stroke-width="1.8"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-											<path
-												d="M9.2 8.9c.2-.2.3-.2.4-.2h.4c.1 0 .3 0 .4.3l.6 1.3c.1.2 0 .3 0 .4l-.3.4c-.1.1-.1.2 0 .3.1.2.5.8 1.2 1.3.8.6 1.4.8 1.6.9.2.1.2.1.3-.1l.5-.6c.1-.1.2-.2.3-.1l1.4.6c.1.1.2.2.2.3 0 .2-.2.8-.6 1.1-.3.3-.8.5-1.5.4-.8-.1-1.7-.5-2.8-1.2-1.6-1.1-2.5-2.6-2.9-3.3-.3-.7-.3-1.3.2-1.8l.4-.4Z"
-												fill="none"
-												stroke="white"
-												stroke-width="1.4"
-												stroke-linejoin="round"
-												stroke-linecap="round"
-											/>
-										</svg>
+										<Headset class="h-4.5 w-4.5" strokeWidth={1.8} aria-hidden="true" />
 									{/if}
 								</span>
 								<span class="min-w-0 flex-1">
 									<span class="block text-sm font-semibold text-[var(--ink)]">{channel.title}</span>
 									<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]">{channel.description}</span>
 									<span class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#1E7A42]">
-										<svg viewBox="0 0 20 20" class="h-3.5 w-3.5" aria-hidden="true">
-											<path
-												d="M6 4.5h2L9 7l-1.4 1.3A10.3 10.3 0 0011.7 12L13 10.6l2.5 1v2a1 1 0 01-1 1A10 10 0 015 5.5a1 1 0 011-1z"
-												fill="none"
-												stroke="currentColor"
-												stroke-width="1.5"
-												stroke-linecap="round"
-												stroke-linejoin="round"
-											/>
-										</svg>
+										<Phone class="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
 										{channel.phone}
 									</span>
 								</span>
 								<span class="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#d5decb] bg-[var(--surface)] text-[#5f7640]">
-									<svg viewBox="0 0 20 20" class="h-3.5 w-3.5" aria-hidden="true">
-										<path
-											d="M7 5.5L12 10L7 14.5"
-											fill="none"
-											stroke="currentColor"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-											stroke-width="1.8"
-										/>
-									</svg>
+									<ChevronRight class="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
 								</span>
 							</span>
 						</button>
@@ -174,20 +146,62 @@
 					</p>
 				</div>
 			</section>
-		{:else}
-			<button
-				type="button"
-				class="inline-flex items-center justify-center border-0 bg-transparent p-0 focus-visible:outline-none"
-				aria-label="Buka pilihan bantuan"
-				onclick={togglePopup}
-			>
-				<img
-					src="/layout/chatbot.svg"
-					alt=""
-					class="h-[6.8rem] w-[6.8rem] object-contain sm:h-[7.8rem] sm:w-[7.8rem] lg:h-[8.6rem] lg:w-[8.6rem]"
-					aria-hidden="true"
-				/>
-			</button>
 		{/if}
+
+		<button
+			type="button"
+			class={`chatbot-trigger mt-0.5 inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_16px_30px_-16px_rgba(100,173,49,0.82)] transition-[transform,background-color,box-shadow] duration-300 hover:scale-[1.03] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:h-16 sm:w-16 ${
+				isOpen
+					? 'bg-[#EB9E27] shadow-[0_16px_30px_-16px_rgba(235,158,39,0.9)] hover:bg-[#CF8921]'
+					: 'bg-[#64AD31] hover:bg-[#548F29]'
+			} ${buttonAnimating ? 'chatbot-trigger--bounce' : ''}`}
+			aria-label={isOpen ? 'Tutup pilihan bantuan' : 'Buka pilihan bantuan'}
+			aria-expanded={isOpen}
+			aria-controls="chatbot-popup"
+			onclick={togglePopup}
+		>
+			<span class="relative block h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true">
+				{#key isOpen}
+					{#if isOpen}
+						<span
+							class="block h-full w-full"
+							in:scale={{ start: 0.55, duration: 160, easing: cubicOut }}
+							out:scale={{ start: 1, duration: 120, easing: cubicOut }}
+						>
+							<X class="h-full w-full" strokeWidth={2.45} aria-hidden="true" />
+						</span>
+					{:else}
+						<span
+							class="block h-full w-full"
+							in:scale={{ start: 0.55, duration: 160, easing: cubicOut }}
+							out:scale={{ start: 1, duration: 120, easing: cubicOut }}
+						>
+							<MessageCircle class="h-full w-full" strokeWidth={2.15} aria-hidden="true" />
+						</span>
+					{/if}
+				{/key}
+			</span>
+		</button>
 	</div>
 </div>
+
+<style>
+	.chatbot-trigger--bounce {
+		animation: chatbot-trigger-bounce 0.26s cubic-bezier(0.32, 1.55, 0.58, 1);
+	}
+
+	@keyframes chatbot-trigger-bounce {
+		0% {
+			transform: scale(1);
+		}
+		40% {
+			transform: scale(0.86);
+		}
+		78% {
+			transform: scale(1.09);
+		}
+		100% {
+			transform: scale(1);
+		}
+	}
+</style>

@@ -2,6 +2,11 @@
 	import { onMount, tick } from 'svelte';
 	import { fade, fly } from 'svelte/transition';
 	import { page } from '$app/state';
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import ChevronRight from 'lucide-svelte/icons/chevron-right';
+	import Menu from 'lucide-svelte/icons/menu';
+	import Search from 'lucide-svelte/icons/search';
+	import X from 'lucide-svelte/icons/x';
 
 	type LayananItem = {
 		title: string;
@@ -377,15 +382,7 @@
 					aria-label="Buka pencarian"
 					onclick={openSearch}
 				>
-					<svg viewBox="0 0 20 20" class="h-4 w-4 lg:h-4.5 lg:w-4.5" aria-hidden="true">
-						<circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.7" />
-						<path
-							d="M13 13L16.4 16.4"
-							stroke="currentColor"
-							stroke-width="1.7"
-							stroke-linecap="round"
-						/>
-					</svg>
+					<Search class="h-4 w-4 lg:h-4.5 lg:w-4.5" strokeWidth={2} aria-hidden="true" />
 				</button>
 
 				<a href="/login" class={loginButtonClass()}> Login </a>
@@ -398,21 +395,11 @@
 						aria-label="Buka menu"
 						onclick={toggleMobileMenu}
 					>
-						<svg viewBox="0 0 20 20" class="h-4 w-4" aria-hidden="true">
-							{#if isMobileOpen}
-								<path
-									d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5"
-									stroke="currentColor"
-									stroke-width="1.8"
-								/>
-							{:else}
-								<path
-									d="M3.5 6.5H16.5M3.5 10H16.5M3.5 13.5H16.5"
-									stroke="currentColor"
-									stroke-width="1.8"
-								/>
-							{/if}
-						</svg>
+						{#if isMobileOpen}
+							<X class="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+						{:else}
+							<Menu class="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+						{/if}
 					</button>
 				{/if}
 			</div>
@@ -442,9 +429,7 @@
 				aria-label="Tutup menu"
 				onclick={closeMenus}
 			>
-				<svg viewBox="0 0 20 20" class="h-5 w-5" aria-hidden="true">
-					<path d="M5.5 5.5L14.5 14.5M14.5 5.5L5.5 14.5" stroke="currentColor" stroke-width="1.8" />
-				</svg>
+				<X class="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
 			</button>
 		</div>
 
@@ -464,18 +449,11 @@
 				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 			>
 				<span class="nav-menu-font text-lg font-semibold tracking-[0.002em]">Layanan</span>
-				<svg
-					viewBox="0 0 20 20"
+				<ChevronDown
 					class={`h-4 w-4 transition-transform ${isMobileLayananOpen ? 'rotate-180' : ''}`}
+					strokeWidth={2.2}
 					aria-hidden="true"
-				>
-					<path
-						d="M5.5 7.75L10 12.25L14.5 7.75"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.7"
-					/>
-				</svg>
+				/>
 			</button>
 
 			{#if isMobileLayananOpen}
@@ -541,15 +519,7 @@
 			transition:fly={{ y: -10, duration: 150 }}
 		>
 			<form class="flex items-center gap-3 p-3 sm:p-4" onsubmit={(event) => event.preventDefault()}>
-				<svg viewBox="0 0 20 20" class="h-5 w-5 text-[var(--muted)]" aria-hidden="true">
-					<circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.7" />
-					<path
-						d="M13 13L16.4 16.4"
-						stroke="currentColor"
-						stroke-width="1.7"
-						stroke-linecap="round"
-					/>
-				</svg>
+				<Search class="h-5 w-5 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
 				<input
 					bind:this={searchInputEl}
 					bind:value={searchQuery}
@@ -579,15 +549,7 @@
 								onclick={closeSearch}
 							>
 								<span>{suggestion.label}</span>
-								<svg viewBox="0 0 20 20" class="h-4 w-4 text-[var(--muted)]" aria-hidden="true">
-									<path
-										d="M7 5L13 10L7 15"
-										fill="none"
-										stroke="currentColor"
-										stroke-width="1.6"
-										stroke-linecap="round"
-									/>
-								</svg>
+								<ChevronRight class="h-4 w-4 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
 							</a>
 						{:else}
 							<button

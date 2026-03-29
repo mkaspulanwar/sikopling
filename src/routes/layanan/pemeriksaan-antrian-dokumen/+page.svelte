@@ -1,4 +1,7 @@
 <script lang="ts">
+	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import Search from 'lucide-svelte/icons/search';
+
 	type ProgressStatus =
 		| 'Menunggu Verifikasi'
 		| 'Penilaian Teknis'
@@ -227,15 +230,7 @@
 					for="search-antrian"
 					class="flex h-12 items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4"
 				>
-					<svg viewBox="0 0 20 20" class="h-4.5 w-4.5 text-[var(--muted)]" aria-hidden="true">
-						<circle cx="9" cy="9" r="5.4" fill="none" stroke="currentColor" stroke-width="1.7" />
-						<path
-							d="M13 13L16.4 16.4"
-							stroke="currentColor"
-							stroke-width="1.7"
-							stroke-linecap="round"
-						/>
-					</svg>
+					<Search class="h-4.5 w-4.5 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
 					<input
 						id="search-antrian"
 						type="text"
@@ -417,15 +412,7 @@
 											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
 											aria-hidden="true"
 										>
-											<svg viewBox="0 0 20 20" class="h-3.5 w-3.5">
-												<path
-													d="M5.5 7.75L10 12.25L14.5 7.75"
-													fill="none"
-													stroke="currentColor"
-													stroke-width="1.7"
-													stroke-linecap="round"
-												/>
-											</svg>
+											<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
 										</span>
 									</div>
 								</div>
