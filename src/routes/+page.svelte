@@ -214,6 +214,7 @@
 	>
 		<source src="/home/hero-video.webm" type="video/webm" />
 	</video>
+	<div class="absolute inset-0 bg-black/15" aria-hidden="true"></div>
 	<div
 		class="relative z-10 flex min-h-[100svh] items-center justify-center px-6 text-center sm:px-10"
 	>
