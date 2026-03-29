@@ -6,14 +6,7 @@
 	/>
 </svelte:head>
 
-<section class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-14 sm:pt-32 sm:pb-20">
-	<div
-		class="pointer-events-none absolute top-[-8rem] right-[7%] h-[21rem] w-[21rem] rounded-full bg-[#d8e7c8]/45 blur-3xl"
-	></div>
-	<div
-		class="pointer-events-none absolute bottom-[-8rem] left-[7%] h-[23rem] w-[23rem] rounded-full bg-[#d8e3f2]/35 blur-3xl"
-	></div>
-
+<section class="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-20">
 	<div class="page-shell relative">
 		<div class="mx-auto max-w-3xl text-center">
 			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">Panduan</p>
@@ -30,7 +23,7 @@
 	</div>
 </section>
 
-<section class="bg-[var(--canvas)] pb-16 sm:pb-20">
+<section class="pb-16 sm:pb-20">
 	<div class="page-shell">
 		<div class="mx-auto max-w-3xl rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-8">
 			<h2 class="text-2xl font-semibold tracking-tight text-[var(--ink)] sm:text-3xl">
