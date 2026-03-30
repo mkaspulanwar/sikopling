@@ -479,7 +479,7 @@
 			class="mt-6 overflow-hidden rounded-2xl border-y border-[#d7dee8] bg-transparent md:hidden"
 		>
 			<div
-				class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-4 py-3 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
+				class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-4 py-3.5 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
 				<span>No Registrasi</span>
 				<span>Instansi</span>
@@ -498,19 +498,19 @@
 						<li class="border-t border-[var(--line)] first:border-t-0">
 							<button
 								type="button"
-								class="grid w-full grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-3 px-4 py-3 text-left"
+								class="grid w-full grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-4 px-4 py-4 text-left"
 								onclick={() => toggleRowExpanded(row.registrationNo)}
 								aria-expanded={isRowExpanded(row.registrationNo)}
 							>
-								<p class="text-sm leading-snug font-semibold text-[#20232A]">
+								<p class="text-sm leading-relaxed font-semibold text-[#20232A]">
 									{row.registrationNo}
 								</p>
 
 								<div class="min-w-0">
 									<div class="flex items-start justify-between gap-2">
-										<p class="text-sm leading-snug text-[#20232A]">{row.agency}</p>
+										<p class="text-sm leading-relaxed text-[#20232A]">{row.agency}</p>
 										<span
-											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
+											class={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
 											aria-hidden="true"
 										>
 											<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
@@ -520,15 +520,15 @@
 							</button>
 
 							{#if isRowExpanded(row.registrationNo)}
-								<div class="border-t border-[var(--line)] bg-transparent px-4 py-3">
-									<dl class="space-y-3">
+								<div class="border-t border-[var(--line)] bg-transparent px-4 py-4">
+									<dl class="space-y-4">
 										<div>
 											<dt
 												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
 												Tanggal Masuk
 											</dt>
-											<dd class="mt-0.5 text-sm text-[#20232A]">
+											<dd class="mt-1 text-sm text-[#20232A]">
 												{formatDate(row.receivedDate)}
 											</dd>
 										</div>
@@ -538,7 +538,7 @@
 											>
 												Kegiatan
 											</dt>
-											<dd class="mt-0.5 text-sm leading-relaxed text-[#20232A]">
+											<dd class="mt-1 text-sm leading-relaxed text-[#20232A]">
 												{row.activity}
 											</dd>
 										</div>
@@ -548,7 +548,7 @@
 											>
 												Posisi
 											</dt>
-											<dd class="mt-0.5 text-sm text-[#20232A]">{row.position}</dd>
+											<dd class="mt-1 text-sm text-[#20232A]">{row.position}</dd>
 										</div>
 										<div>
 											<dt
@@ -556,7 +556,7 @@
 											>
 												Status
 											</dt>
-											<dd class="mt-0.5 text-sm text-[#20232A]">{row.progressStatus}</dd>
+											<dd class="mt-1 text-sm text-[#20232A]">{row.progressStatus}</dd>
 										</div>
 										<div>
 											<dt
@@ -564,7 +564,7 @@
 											>
 												Tanggal Update
 											</dt>
-											<dd class="mt-0.5 text-sm text-[#20232A]">
+											<dd class="mt-1 text-sm text-[#20232A]">
 												{formatDate(row.progressUpdatedDate)}
 											</dd>
 										</div>
