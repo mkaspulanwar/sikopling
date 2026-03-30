@@ -1,5 +1,8 @@
 <script lang="ts">
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
+	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
+	import ChevronRight from 'lucide-svelte/icons/chevron-right';
+	import Download from 'lucide-svelte/icons/download';
 	import Search from 'lucide-svelte/icons/search';
 
 	type ProgressStatus =
@@ -28,97 +31,88 @@
 		| 'DPLH'
 		| 'Pertek';
 
-	const queueRows: QueueRow[] = [
+	const queueTemplates: Array<Omit<QueueRow, 'registrationNo' | 'receivedDate' | 'progressUpdatedDate'>> = [
 		{
-			registrationNo: 'REG-PL-2026-0312',
-			receivedDate: '2026-03-12',
 			agency: 'PT Mitra Agro Banua',
 			activity: 'Pengembangan Kawasan Industri Pengolahan Hasil Pertanian',
 			position: 'AMDAL',
-			progressStatus: 'Penilaian Teknis',
-			progressUpdatedDate: '2026-03-27'
+			progressStatus: 'Penilaian Teknis'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0309',
-			receivedDate: '2026-03-09',
 			agency: 'Dinas PUPR Kab. Banjar',
 			activity: 'Normalisasi Sungai dan Penguatan Tanggul',
 			position: 'UKL-UPL',
-			progressStatus: 'Perbaikan Dokumen',
-			progressUpdatedDate: '2026-03-26'
+			progressStatus: 'Perbaikan Dokumen'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0304',
-			receivedDate: '2026-03-04',
 			agency: 'PT Karya Borneo Energi',
 			activity: 'Pembangunan Fasilitas Penyimpanan Limbah B3',
 			position: 'Pertek Limbah B3',
-			progressStatus: 'Penerbitan Persetujuan',
-			progressUpdatedDate: '2026-03-25'
+			progressStatus: 'Penerbitan Persetujuan'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0228',
-			receivedDate: '2026-02-28',
 			agency: 'PT Sinar Khatulistiwa Mineral',
 			activity: 'Perluasan Area Stockpile Batubara',
 			position: 'AMDAL',
-			progressStatus: 'Penilaian Teknis',
-			progressUpdatedDate: '2026-03-24'
+			progressStatus: 'Penilaian Teknis'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0221',
-			receivedDate: '2026-02-21',
 			agency: 'PT Tirta Kalimantan Sejahtera',
 			activity: 'Instalasi Pengolahan Air Limbah Kawasan',
 			position: 'Pertek Air Limbah Domestik',
-			progressStatus: 'Selesai',
-			progressUpdatedDate: '2026-03-23'
+			progressStatus: 'Selesai'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0219',
-			receivedDate: '2026-02-19',
 			agency: 'Pemkab Tanah Laut',
 			activity: 'Revitalisasi TPA dan Sistem Pengelolaan Sampah Terpadu',
 			position: 'DELH',
-			progressStatus: 'Penerbitan Persetujuan',
-			progressUpdatedDate: '2026-03-22'
+			progressStatus: 'Penerbitan Persetujuan'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0213',
-			receivedDate: '2026-02-13',
 			agency: 'PT Samudra Pangan Nusantara',
 			activity: 'Pembangunan Pabrik Pengolahan Hasil Laut',
 			position: 'UKL-UPL',
-			progressStatus: 'Menunggu Verifikasi',
-			progressUpdatedDate: '2026-03-20'
+			progressStatus: 'Menunggu Verifikasi'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0208',
-			receivedDate: '2026-02-08',
 			agency: 'PT Angkasa Banua Logistik',
 			activity: 'Pembangunan Gudang Logistik Terintegrasi',
 			position: 'DPLH',
-			progressStatus: 'Perbaikan Dokumen',
-			progressUpdatedDate: '2026-03-18'
+			progressStatus: 'Perbaikan Dokumen'
 		},
 		{
-			registrationNo: 'REG-PL-2026-0203',
-			receivedDate: '2026-02-03',
 			agency: 'PT Borneo Kencana Pulp',
 			activity: 'Penyesuaian Kapasitas Produksi dan Emisi Udara',
 			position: 'Pertek Emisi',
-			progressStatus: 'Penilaian Teknis',
-			progressUpdatedDate: '2026-03-17'
+			progressStatus: 'Penilaian Teknis'
+		},
+		{
+			agency: 'PT Nusantara Konstruksi Raya',
+			activity: 'Addendum Dokumen Pengelolaan Lingkungan Kawasan Komersial',
+			position: 'Addendum',
+			progressStatus: 'Menunggu Verifikasi'
 		}
 	];
 
-	const statusToneClass: Record<ProgressStatus, string> = {
-		'Menunggu Verifikasi': 'border-[#d8dee8] bg-[#f5f7fa] text-[#3f4b5d]',
-		'Penilaian Teknis': 'border-[#cbdcf8] bg-[#edf4ff] text-[#1f4b8f]',
-		'Perbaikan Dokumen': 'border-[#f7d7b3] bg-[#fff5e9] text-[#8f4e14]',
-		'Penerbitan Persetujuan': 'border-[#cde7d3] bg-[#ecf8ef] text-[#22653a]',
-		Selesai: 'border-[#b9d7b9] bg-[#e7f7e7] text-[#1f5f1f]'
+	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
+	const addDaysUtc = (isoDate: string, offsetDays: number) => {
+		const [year, month, day] = isoDate.split('-').map(Number);
+		const baseDate = new Date(Date.UTC(year, month - 1, day));
+		baseDate.setUTCDate(baseDate.getUTCDate() + offsetDays);
+		return formatIsoDate(baseDate);
 	};
+
+	const queueRows: QueueRow[] = Array.from({ length: 1000 }, (_, index) => {
+		const template = queueTemplates[index % queueTemplates.length];
+		const receivedDate = addDaysUtc('2026-01-06', index * 2);
+		const progressUpdatedDate = addDaysUtc(receivedDate, (index % 6) + 1);
+		return {
+			registrationNo: `REG-PL-2026-${String(3001 + index).padStart(4, '0')}`,
+			receivedDate,
+			progressUpdatedDate,
+			...template
+		};
+	});
 
 	const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 		day: '2-digit',
@@ -130,10 +124,15 @@
 	let statusFilter = $state<'Semua Status' | ProgressStatus>('Semua Status');
 	let positionFilter = $state<PositionFilter>('Semua Posisi');
 	let expandedRows = $state<string[]>([]);
+	const rowsPerPageOptions = [5, 10, 20] as const;
+	type RowsPerPage = (typeof rowsPerPageOptions)[number];
+	let rowsPerPage = $state<RowsPerPage>(10);
+	let currentPage = $state(1);
 
 	const toTimestamp = (value: string) => new Date(`${value}T00:00:00`).getTime();
 	const formatDate = (value: string) => dateFormatter.format(new Date(`${value}T00:00:00`));
 	const normalize = (value: string) => value.trim().toLowerCase();
+	const escapeCsvValue = (value: string) => `"${value.replaceAll('"', '""')}"`;
 	const resolvePositionCategory = (
 		position: string
 	): Exclude<PositionFilter, 'Semua Posisi'> | 'Lainnya' => {
@@ -176,12 +175,94 @@
 				toTimestamp(right.progressUpdatedDate) - toTimestamp(left.progressUpdatedDate)
 		)
 	);
+	const totalFilteredRows = $derived(sortedRows.length);
+	const totalPages = $derived(Math.max(1, Math.ceil(totalFilteredRows / rowsPerPage)));
+	const pageStartIndex = $derived((currentPage - 1) * rowsPerPage);
+	const pageEndIndex = $derived(pageStartIndex + rowsPerPage);
+	const paginatedRows = $derived(sortedRows.slice(pageStartIndex, pageEndIndex));
+	const visibleRangeStart = $derived(totalFilteredRows === 0 ? 0 : pageStartIndex + 1);
+	const visibleRangeEnd = $derived(Math.min(pageEndIndex, totalFilteredRows));
 
 	const isRowExpanded = (registrationNo: string) => expandedRows.includes(registrationNo);
+	const resetExpandedAndFirstPage = () => {
+		expandedRows = [];
+		currentPage = 1;
+	};
+	const handleRowsPerPageChange = (event: Event) => {
+		const target = event.currentTarget as HTMLSelectElement;
+		rowsPerPage = Number(target.value) as RowsPerPage;
+		resetExpandedAndFirstPage();
+	};
 	const toggleRowExpanded = (registrationNo: string) => {
 		expandedRows = isRowExpanded(registrationNo)
 			? expandedRows.filter((item) => item !== registrationNo)
 			: [...expandedRows, registrationNo];
+	};
+	const goToPreviousPage = () => {
+		if (currentPage === 1) return;
+		currentPage -= 1;
+		expandedRows = [];
+	};
+	const goToFirstPage = () => {
+		if (currentPage === 1) return;
+		currentPage = 1;
+		expandedRows = [];
+	};
+	const goToNextPage = () => {
+		if (currentPage === totalPages) return;
+		currentPage += 1;
+		expandedRows = [];
+	};
+	const goToLastPage = () => {
+		if (currentPage === totalPages) return;
+		currentPage = totalPages;
+		expandedRows = [];
+	};
+
+	$effect(() => {
+		if (currentPage > totalPages) {
+			currentPage = totalPages;
+			expandedRows = [];
+		}
+	});
+
+	const exportFilteredRows = () => {
+		if (sortedRows.length === 0) return;
+
+		const header = [
+			'No Registrasi',
+			'Tanggal Masuk',
+			'Instansi',
+			'Kegiatan',
+			'Posisi',
+			'Status',
+			'Tanggal Update'
+		];
+
+		const lines = sortedRows.map((row) =>
+			[
+				row.registrationNo,
+				formatDate(row.receivedDate),
+				row.agency,
+				row.activity,
+				row.position,
+				row.progressStatus,
+				formatDate(row.progressUpdatedDate)
+			]
+				.map(escapeCsvValue)
+				.join(',')
+		);
+
+		const csvContent = [`\uFEFF${header.map(escapeCsvValue).join(',')}`, ...lines].join('\r\n');
+		const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+		const objectUrl = URL.createObjectURL(blob);
+		const anchor = document.createElement('a');
+		anchor.href = objectUrl;
+		anchor.download = `antrian-dokumen-${formatIsoDate(new Date())}.csv`;
+		document.body.append(anchor);
+		anchor.click();
+		anchor.remove();
+		URL.revokeObjectURL(objectUrl);
 	};
 
 	const resetFilter = () => {
@@ -189,6 +270,7 @@
 		statusFilter = 'Semua Status';
 		positionFilter = 'Semua Posisi';
 		expandedRows = [];
+		currentPage = 1;
 	};
 </script>
 
@@ -201,40 +283,19 @@
 </svelte:head>
 
 <section class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-16 sm:pt-32 sm:pb-20">
-	<div
-		class="pointer-events-none absolute top-[-9rem] left-[6%] h-[24rem] w-[24rem] rounded-full bg-[#d9e8cb]/45 blur-3xl"
-	></div>
-	<div
-		class="pointer-events-none absolute right-[4%] bottom-[-7rem] h-[22rem] w-[22rem] rounded-full bg-[#dbe5f4]/40 blur-3xl"
-	></div>
-
 	<div class="nav-shell relative">
-		<div class="mx-auto max-w-4xl text-center">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">Layanan</p>
-			<h1
-				class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-5xl"
-			>
-				Pemeriksaan Antrian Dokumen
-			</h1>
-			<p class="mt-4 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Lacak status pengajuan dokumen secara real-time, mulai dari tanggal masuk hingga pembaruan
-				progress terakhir.
-			</p>
-		</div>
-
-		<div
-			class="mt-10 rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_24px_55px_-40px_rgba(15,23,42,0.38)] sm:p-6"
-		>
+		<div class="mt-0">
 			<div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem_14rem]">
 				<label
 					for="search-antrian"
-					class="flex h-12 items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4"
+					class="flex h-12 items-center gap-3 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4"
 				>
 					<Search class="h-4.5 w-4.5 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
 					<input
 						id="search-antrian"
 						type="text"
 						bind:value={searchQuery}
+						oninput={resetExpandedAndFirstPage}
 						placeholder="Cari no registrasi, instansi, kegiatan, atau status..."
 						class="h-full w-full border-0 bg-transparent px-0 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] focus:ring-0 focus:outline-none"
 					/>
@@ -243,8 +304,9 @@
 				<label for="status-filter" class="sr-only">Filter status progress</label>
 				<select
 					id="status-filter"
-					class="h-12 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#9fb27d] focus:ring-0"
+					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
 					bind:value={statusFilter}
+					onchange={resetExpandedAndFirstPage}
 				>
 					<option value="Semua Status">Semua Status</option>
 					<option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
@@ -257,8 +319,9 @@
 				<label for="position-filter" class="sr-only">Filter posisi</label>
 				<select
 					id="position-filter"
-					class="h-12 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#9fb27d] focus:ring-0"
+					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
 					bind:value={positionFilter}
+					onchange={resetExpandedAndFirstPage}
 				>
 					<option value="Semua Posisi">Semua Posisi</option>
 					<option value="AMDAL">AMDAL</option>
@@ -270,71 +333,114 @@
 				</select>
 			</div>
 
-			<div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+			<div class="mt-3 flex flex-wrap items-center justify-between gap-3 pb-3">
 				<p class="text-xs font-medium text-[var(--muted)] sm:text-sm">
-					Menampilkan <span class="font-semibold text-[var(--ink)]">{sortedRows.length}</span> dari
+					Menampilkan
+					<span class="font-semibold text-[var(--ink)]">{visibleRangeStart}</span>
+					-
+					<span class="font-semibold text-[var(--ink)]">{visibleRangeEnd}</span>
+					dari
+					<span class="font-semibold text-[var(--ink)]">{totalFilteredRows}</span>
+					hasil filter, total
 					<span class="font-semibold text-[var(--ink)]">{queueRows.length}</span> pengajuan dokumen
 				</p>
 
-				{#if searchQuery || statusFilter !== 'Semua Status' || positionFilter !== 'Semua Posisi'}
+				<div class="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
+					<div
+						class="inline-flex h-9 items-center gap-2 rounded-md border border-[#d3dbe7] bg-[#ffffff] pr-2 pl-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
+					>
+						<span class="text-xs font-semibold text-[var(--muted)]">Baris</span>
+						<label for="rows-per-page" class="sr-only">Jumlah baris</label>
+						<div class="relative">
+							<select
+								id="rows-per-page"
+								class="h-8 min-w-[4.25rem] appearance-none rounded-md border-0 bg-transparent bg-none py-0 pr-7 pl-2 text-xs font-semibold text-[#20232A] [background-image:none] focus:ring-0 focus:outline-none"
+								value={rowsPerPage}
+								onchange={handleRowsPerPageChange}
+							>
+								{#each rowsPerPageOptions as option}
+									<option value={option}>{option}</option>
+								{/each}
+							</select>
+							<span
+								class="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[var(--muted)]"
+								aria-hidden="true"
+							>
+								<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
+							</span>
+						</div>
+					</div>
+
 					<button
 						type="button"
-						class="inline-flex h-9 items-center justify-center rounded-lg border border-[var(--line)] px-3 text-xs font-semibold text-[var(--muted)] transition-colors hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
-						onclick={resetFilter}
+						onclick={exportFilteredRows}
+						disabled={totalFilteredRows === 0}
+						class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-50"
 					>
-						Reset Filter
+						<Download class="h-3.5 w-3.5" strokeWidth={2.2} />
+						Export CSV
 					</button>
-				{/if}
+
+					{#if searchQuery || statusFilter !== 'Semua Status' || positionFilter !== 'Semua Posisi'}
+						<button
+							type="button"
+							class="inline-flex h-9 items-center justify-center rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[var(--muted)] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] hover:text-[var(--ink)]"
+							onclick={resetFilter}
+						>
+							Reset Filter
+						</button>
+					{/if}
+				</div>
 			</div>
 		</div>
 
-		<div
-			class="mt-6 hidden overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_24px_52px_-42px_rgba(15,23,42,0.42)] md:block"
-		>
-			<div class="overflow-x-auto">
+		<div class="mt-6 hidden md:block">
+			<div
+				class="overflow-x-auto rounded-2xl border-y border-[#d7dee8] bg-transparent"
+			>
 				<table class="w-full min-w-[1100px] border-collapse">
-					<thead class="bg-[#f7faf5]">
+					<thead class="bg-[#20232A]">
 						<tr>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								No Registrasi
 							</th>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Tanggal Masuk
 							</th>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Instansi
 							</th>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Kegiatan
 							</th>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Posisi
 							</th>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
-								Status Progress
+								Status
 							</th>
 							<th
-								class="px-5 py-4 text-left text-xs font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
-								Tanggal Update Progress
+								Tanggal Update
 							</th>
 						</tr>
 					</thead>
 
 					<tbody>
-						{#if sortedRows.length === 0}
+						{#if totalFilteredRows === 0}
 							<tr>
 								<td colspan="7" class="px-6 py-12 text-center">
 									<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
@@ -344,26 +450,21 @@
 								</td>
 							</tr>
 						{:else}
-							{#each sortedRows as row}
-								<tr class="border-t border-[var(--line)] align-top even:bg-[#fcfdfb]">
-									<td class="px-5 py-4 text-sm font-semibold text-[var(--ink)]"
+							{#each paginatedRows as row}
+								<tr class="border-t border-[#e9edf3] align-top">
+									<td class="px-6 py-4 text-sm font-semibold text-[#20232A]"
 										>{row.registrationNo}</td
 									>
-									<td class="px-5 py-4 text-sm text-[var(--muted)]"
+									<td class="px-6 py-4 text-sm text-[#20232A]"
 										>{formatDate(row.receivedDate)}</td
 									>
-									<td class="px-5 py-4 text-sm text-[var(--ink)]">{row.agency}</td>
-									<td class="px-5 py-4 text-sm leading-relaxed text-[var(--muted)]"
+									<td class="px-6 py-4 text-sm text-[#20232A]">{row.agency}</td>
+									<td class="px-6 py-4 text-sm leading-relaxed text-[#20232A]"
 										>{row.activity}</td
 									>
-									<td class="px-5 py-4 text-sm text-[var(--ink)]">{row.position}</td>
-									<td class="px-5 py-4 text-sm">
-										<span
-											class={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusToneClass[row.progressStatus]}`}
-											>{row.progressStatus}</span
-										>
-									</td>
-									<td class="px-5 py-4 text-sm text-[var(--muted)]">
+									<td class="px-6 py-4 text-sm text-[#20232A]">{row.position}</td>
+									<td class="px-6 py-4 text-sm text-[#20232A]">{row.progressStatus}</td>
+									<td class="px-6 py-4 text-sm text-[#20232A]">
 										{formatDate(row.progressUpdatedDate)}
 									</td>
 								</tr>
@@ -375,16 +476,16 @@
 		</div>
 
 		<div
-			class="mt-6 overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] shadow-[0_24px_52px_-42px_rgba(15,23,42,0.42)] md:hidden"
+			class="mt-6 overflow-hidden rounded-2xl border-y border-[#d7dee8] bg-transparent md:hidden"
 		>
 			<div
-				class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-3 border-b border-[var(--line)] bg-[#f7faf5] px-4 py-3 text-[0.64rem] font-semibold tracking-[0.08em] text-[#61794a] uppercase"
+				class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-4 py-3 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
 				<span>No Registrasi</span>
 				<span>Instansi</span>
 			</div>
 
-			{#if sortedRows.length === 0}
+			{#if totalFilteredRows === 0}
 				<div class="px-6 py-12 text-center">
 					<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
 					<p class="mt-1 text-sm text-[var(--muted)]">
@@ -393,23 +494,23 @@
 				</div>
 			{:else}
 				<ul>
-					{#each sortedRows as row}
+					{#each paginatedRows as row}
 						<li class="border-t border-[var(--line)] first:border-t-0">
 							<button
 								type="button"
-								class="grid w-full grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-[#fcfdfb]"
+								class="grid w-full grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-3 px-4 py-3 text-left"
 								onclick={() => toggleRowExpanded(row.registrationNo)}
 								aria-expanded={isRowExpanded(row.registrationNo)}
 							>
-								<p class="text-sm leading-snug font-semibold text-[var(--ink)]">
+								<p class="text-sm leading-snug font-semibold text-[#20232A]">
 									{row.registrationNo}
 								</p>
 
 								<div class="min-w-0">
 									<div class="flex items-start justify-between gap-2">
-										<p class="text-sm leading-snug text-[var(--ink)]">{row.agency}</p>
+										<p class="text-sm leading-snug text-[#20232A]">{row.agency}</p>
 										<span
-											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
 											aria-hidden="true"
 										>
 											<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
@@ -419,56 +520,51 @@
 							</button>
 
 							{#if isRowExpanded(row.registrationNo)}
-								<div class="border-t border-[var(--line)] bg-[#fbfdf9] px-4 py-3">
+								<div class="border-t border-[var(--line)] bg-transparent px-4 py-3">
 									<dl class="space-y-3">
 										<div>
 											<dt
-												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
 												Tanggal Masuk
 											</dt>
-											<dd class="mt-0.5 text-sm text-[var(--ink)]">
+											<dd class="mt-0.5 text-sm text-[#20232A]">
 												{formatDate(row.receivedDate)}
 											</dd>
 										</div>
 										<div>
 											<dt
-												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
 												Kegiatan
 											</dt>
-											<dd class="mt-0.5 text-sm leading-relaxed text-[var(--ink)]">
+											<dd class="mt-0.5 text-sm leading-relaxed text-[#20232A]">
 												{row.activity}
 											</dd>
 										</div>
 										<div>
 											<dt
-												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
 												Posisi
 											</dt>
-											<dd class="mt-0.5 text-sm text-[var(--ink)]">{row.position}</dd>
+											<dd class="mt-0.5 text-sm text-[#20232A]">{row.position}</dd>
 										</div>
 										<div>
 											<dt
-												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
-												Status Progress
+												Status
 											</dt>
-											<dd class="mt-1">
-												<span
-													class={`inline-flex rounded-full border px-2.5 py-1 text-[0.7rem] font-semibold ${statusToneClass[row.progressStatus]}`}
-													>{row.progressStatus}</span
-												>
-											</dd>
+											<dd class="mt-0.5 text-sm text-[#20232A]">{row.progressStatus}</dd>
 										</div>
 										<div>
 											<dt
-												class="text-[0.67rem] font-semibold tracking-[0.08em] text-[var(--muted)] uppercase"
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
-												Tanggal Update Progress
+												Tanggal Update
 											</dt>
-											<dd class="mt-0.5 text-sm text-[var(--ink)]">
+											<dd class="mt-0.5 text-sm text-[#20232A]">
 												{formatDate(row.progressUpdatedDate)}
 											</dd>
 										</div>
@@ -480,5 +576,62 @@
 				</ul>
 			{/if}
 		</div>
+
+		{#if totalFilteredRows > 0}
+			<div
+				class="mt-5 flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between"
+			>
+				<p class="text-xs font-medium text-[var(--muted)] sm:text-sm">
+					Halaman <span class="font-semibold text-[var(--ink)]">{currentPage}</span> dari
+					<span class="font-semibold text-[var(--ink)]">{totalPages}</span>
+				</p>
+
+				<div class="inline-flex w-full items-center justify-between gap-1.5 sm:w-auto sm:justify-end">
+					<button
+						type="button"
+						onclick={goToFirstPage}
+						disabled={currentPage === 1}
+						class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+					>
+						Awal
+					</button>
+
+					<button
+						type="button"
+						onclick={goToPreviousPage}
+						disabled={currentPage === 1}
+						aria-label="Halaman sebelumnya"
+						class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+					>
+						<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
+					</button>
+
+					<div
+						class="inline-flex h-9 min-w-[5.75rem] items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#f8fafc] px-3 text-xs font-semibold text-[#20232A]"
+					>
+						{currentPage} / {totalPages}
+					</div>
+
+					<button
+						type="button"
+						onclick={goToNextPage}
+						disabled={currentPage === totalPages}
+						aria-label="Halaman berikutnya"
+						class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+					>
+						<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
+					</button>
+
+					<button
+						type="button"
+						onclick={goToLastPage}
+						disabled={currentPage === totalPages}
+						class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+					>
+						Akhir
+					</button>
+				</div>
+			</div>
+		{/if}
 	</div>
 </section>
