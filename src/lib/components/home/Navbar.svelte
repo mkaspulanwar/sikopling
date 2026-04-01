@@ -10,7 +10,6 @@
 
 	type LayananItem = {
 		title: string;
-		description: string;
 		href?: string;
 	};
 
@@ -23,29 +22,24 @@
 
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Ajukan Permohonan',
-			description: 'Mulai pengajuan dokumen layanan persetujuan lingkungan secara terarah.'
+			title: 'Antrian Dokumen Lingkungan',
+			href: '/layanan/pemeriksaan-antrian-dokumen-lingkungan'
 		},
 		{
-			title: 'Antrian Dokumen',
-			description: 'Pantau urutan pemeriksaan dan progres dokumen layanan secara berkala.',
-			href: '/layanan/pemeriksaan-antrian-dokumen'
-		},
-		{
-			title: 'Unduhan Formulir',
-			description: 'Akses formulir administratif yang dibutuhkan sebelum proses konsultasi.'
-		},
-		{
-			title: 'Bantuan & FAQ',
-			description: 'Temukan jawaban cepat dan bantuan umum terkait layanan SI-KOPLING.'
+			title: 'Antrian Persetujuan Teknis',
+			href: '/layanan/pemeriksaan-antrian-persetujuan-teknis'
 		}
 	];
 
 	const searchSuggestions: SearchSuggestion[] = [
-		{ label: 'Ajukan Permohonan' },
-		{ label: 'Antrian Dokumen', href: '/layanan/pemeriksaan-antrian-dokumen' },
-		{ label: 'Unduhan Formulir' },
-		{ label: 'Bantuan & FAQ' }
+		{
+			label: 'Antrian Dokumen Lingkungan',
+			href: '/layanan/pemeriksaan-antrian-dokumen-lingkungan'
+		},
+		{
+			label: 'Antrian Persetujuan Teknis',
+			href: '/layanan/pemeriksaan-antrian-persetujuan-teknis'
+		}
 	];
 	const showNavMenus = true;
 
@@ -304,38 +298,24 @@
 
 							{#if isLayananOpen}
 								<div
-									class="absolute top-[calc(100%+1.25rem)] left-1/2 w-[min(92vw,34rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2.5 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+									class="absolute top-[calc(100%+1.25rem)] left-1/2 w-[min(92vw,21rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
 								>
-									<div class="grid gap-1.5 sm:grid-cols-2">
+									<div class="space-y-1">
 										{#each layananItems as item}
 											{#if item.href}
 												<a
 													href={mapSectionHref(item.href)}
-													class="group menu-item-static block w-full rounded-lg px-3.5 py-3 text-left transition-colors duration-150 hover:bg-[#f8fbf4]"
+													class="menu-item-static block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.96rem] font-semibold text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handleLayananItemClick}
 												>
-													<span
-														class="block text-[0.96rem] font-semibold text-[var(--ink)] transition-colors group-hover:text-[#3EB14A]"
-														>{item.title}</span
-													>
-													<span
-														class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
-														>{item.description}</span
-													>
+													{item.title}
 												</a>
 											{:else}
 												<button
 													type="button"
-													class="group menu-item-static w-full appearance-none rounded-lg px-3.5 py-3 text-left transition-colors duration-150 hover:bg-[#f8fbf4]"
+													class="menu-item-static block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.96rem] font-semibold text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												>
-													<span
-														class="block text-[0.96rem] font-semibold text-[var(--ink)] transition-colors group-hover:text-[#3EB14A]"
-														>{item.title}</span
-													>
-													<span
-														class="mt-1 block text-xs leading-relaxed text-[var(--muted)]"
-														>{item.description}</span
-													>
+													{item.title}
 												</button>
 											{/if}
 										{/each}
