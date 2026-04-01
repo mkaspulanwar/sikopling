@@ -143,7 +143,6 @@
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
 	const isBerandaActive = () => isLandingPage() && currentHash === '';
-	const isPanduanActive = () => isPathActive('/panduan');
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
@@ -336,15 +335,6 @@
 					</li>
 					<li>
 						<a
-							href="/panduan"
-							class={desktopLinkClass(isPanduanActive())}
-							aria-current={isPanduanActive() ? 'page' : undefined}
-						>
-							Panduan
-						</a>
-					</li>
-					<li>
-						<a
 							href="/kontak"
 							class={desktopLinkClass(isPathActive('/kontak'))}
 							aria-current={isPathActive('/kontak') ? 'page' : undefined}
@@ -461,13 +451,6 @@
 
 			<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
 				Tentang
-			</a>
-			<a
-				href="/panduan"
-				class={mobileLinkClass(isPanduanActive())}
-				onclick={closeMenus}
-			>
-				Panduan
 			</a>
 			<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
 				Kontak

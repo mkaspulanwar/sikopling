@@ -14,7 +14,7 @@
 		<div class="mx-auto max-w-4xl text-center">
 			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">Layanan</p>
 			<h1 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-5xl">
-				Antrian Persetujuan Teknis
+				Antrian Persetujuan Teknis (Dummy)
 			</h1>
 			<p class="mt-4 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
 				Pantau antrean pemeriksaan teknis secara ringkas untuk melihat tahapan dan pembaruan proses
