@@ -109,7 +109,7 @@
 	const registrationSeed = Number.parseInt('681195DAEA4DD', 16);
 	const queuePositions: QueuePosition[] = ['Penyusun', 'Pemrakarsa', 'Sekretariat TU'];
 
-	const queueRows: QueueRow[] = Array.from({ length: 1000 }, (_, index) => {
+	const queueRows: QueueRow[] = Array.from({ length: 100 }, (_, index) => {
 		const template = queueTemplates[index % queueTemplates.length];
 		const receivedDate = addDaysUtc('2026-01-06', index * 2);
 		const progressUpdatedDate = addDaysUtc(receivedDate, (index % 6) + 1);
@@ -141,6 +141,14 @@
 	const formatDate = (value: string) => dateFormatter.format(new Date(`${value}T00:00:00`));
 	const normalize = (value: string) => value.trim().toLowerCase();
 	const escapeCsvValue = (value: string) => `"${value.replaceAll('"', '""')}"`;
+	const statusBadgeClassMap: Record<ProgressStatus, string> = {
+		'Menunggu Verifikasi': 'border-[#d9c489] bg-[#fff8e3] text-[#8a6a1c]',
+		'Penilaian Teknis': 'border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]',
+		'Perbaikan Dokumen': 'border-[#e3b2a8] bg-[#fff1ee] text-[#8f3d2f]',
+		'Penerbitan Persetujuan': 'border-[#9fcaa9] bg-[#edf9f0] text-[#24613a]',
+		Selesai: 'border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]'
+	};
+	const getStatusBadgeClass = (status: ProgressStatus) => statusBadgeClassMap[status];
 	const resolvePositionCategory = (
 		documentType: string
 	): Exclude<PositionFilter, 'Semua Posisi'> | 'Lainnya' => {
@@ -512,10 +520,9 @@
 			class="mt-6 overflow-hidden rounded-2xl border-y border-[#d7dee8] bg-transparent md:hidden"
 		>
 			<div
-				class="grid grid-cols-[7.5rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-4 py-3.5 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
+				class="border-b border-[#323944] bg-[#20232A] px-3 py-3.5 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
-				<span>No Registrasi</span>
-				<span>Instansi</span>
+				<span>Daftar Antrian</span>
 			</div>
 
 			{#if totalFilteredRows === 0}
@@ -527,26 +534,43 @@
 				</div>
 			{:else}
 				<ul>
-					{#each paginatedRows as row}
+					{#each paginatedRows as row, index}
 						<li class="border-t border-[var(--line)] first:border-t-0">
 							<button
 								type="button"
-								class="grid w-full grid-cols-[7.5rem_minmax(0,1fr)] items-start gap-4 px-4 py-4 text-left"
+								class="grid w-full grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-3 px-3 py-3.5 text-left"
 								onclick={() => toggleRowExpanded(row.registrationNo)}
 								aria-expanded={isRowExpanded(row.registrationNo)}
 							>
-								<p class="text-sm leading-relaxed font-semibold text-[#20232A]">
-									{row.registrationNo}
+								<p class="pt-0.5 text-center text-sm font-semibold text-[#20232A]">
+									{pageStartIndex + index + 1}
 								</p>
 
 								<div class="min-w-0">
 									<div class="flex items-start justify-between gap-2">
-										<p class="text-sm leading-relaxed text-[#20232A]">{row.agency}</p>
+										<div class="min-w-0">
+											<p class="truncate pr-1 text-sm leading-snug font-semibold text-[#20232A]">
+												{row.agency}
+											</p>
+											<p class="mt-1 break-all text-[0.75rem] leading-tight text-[var(--muted)]">
+												{row.registrationNo}
+											</p>
+											<div class="mt-2 flex flex-wrap items-center gap-1.5">
+												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
+													{row.documentType}
+												</span>
+												<span
+													class={`inline-flex items-center rounded-full border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.progressStatus)}`}
+												>
+													{row.progressStatus}
+												</span>
+											</div>
+										</div>
 										<span
-											class={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? 'rotate-180' : ''}`}
 											aria-hidden="true"
 										>
-											<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
+											<ChevronDown class="h-3 w-3" strokeWidth={2.2} />
 										</span>
 									</div>
 								</div>
@@ -579,25 +603,9 @@
 											<dt
 												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
 											>
-												Jenis Dokumen
-											</dt>
-											<dd class="mt-1 text-sm text-[#20232A]">{row.documentType}</dd>
-										</div>
-										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
 												Posisi
 											</dt>
 											<dd class="mt-1 text-sm text-[#20232A]">{row.position}</dd>
-										</div>
-										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
-												Status
-											</dt>
-											<dd class="mt-1 text-sm text-[#20232A]">{row.progressStatus}</dd>
 										</div>
 										<div>
 											<dt
