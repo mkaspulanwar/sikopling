@@ -31,8 +31,14 @@
 		| 'Addendum'
 		| 'UKP-UPL'
 		| 'DPLH'
-		| 'Pertek'
 		;
+	type SortOption =
+		| 'Terbaru'
+		| 'Terlama'
+		| 'Update terbaru'
+		| 'Update terlama'
+		| 'Instansi A-Z'
+		| 'Instansi Z-A';
 
 	const queueTemplates: Array<
 		Omit<QueueRow, 'registrationNo' | 'receivedDate' | 'progressUpdatedDate' | 'position'>
@@ -52,7 +58,7 @@
 		{
 			agency: 'PT Karya Borneo Energi',
 			activity: 'Pembangunan Fasilitas Penyimpanan Limbah B3',
-			documentType: 'Pertek',
+			documentType: 'DPLH',
 			progressStatus: 'Penerbitan Persetujuan'
 		},
 		{
@@ -129,6 +135,7 @@
 	});
 
 	let searchQuery = $state('');
+	let sortOption = $state<SortOption>('Terbaru');
 	let statusFilter = $state<'Semua Status' | ProgressStatus>('Semua Status');
 	let positionFilter = $state<PositionFilter>('Semua Posisi');
 	let expandedRows = $state<string[]>([]);
@@ -164,7 +171,6 @@
 		)
 			return 'UKP-UPL';
 		if (value.includes('dplh')) return 'DPLH';
-		if (value.includes('pertek')) return 'Pertek';
 		return 'Lainnya';
 	};
 
@@ -192,11 +198,25 @@
 		});
 	});
 
+	const agencyCollator = new Intl.Collator('id-ID', { sensitivity: 'base' });
 	const sortedRows = $derived.by(() =>
-		[...filteredRows].sort(
-			(left, right) =>
-				toTimestamp(right.progressUpdatedDate) - toTimestamp(left.progressUpdatedDate)
-		)
+		[...filteredRows].sort((left, right) => {
+			switch (sortOption) {
+				case 'Terbaru':
+					return toTimestamp(right.receivedDate) - toTimestamp(left.receivedDate);
+				case 'Terlama':
+					return toTimestamp(left.receivedDate) - toTimestamp(right.receivedDate);
+				case 'Update terlama':
+					return toTimestamp(left.progressUpdatedDate) - toTimestamp(right.progressUpdatedDate);
+				case 'Instansi A-Z':
+					return agencyCollator.compare(left.agency, right.agency);
+				case 'Instansi Z-A':
+					return agencyCollator.compare(right.agency, left.agency);
+				case 'Update terbaru':
+				default:
+					return toTimestamp(right.progressUpdatedDate) - toTimestamp(left.progressUpdatedDate);
+			}
+		})
 	);
 	const totalFilteredRows = $derived(sortedRows.length);
 	const totalPages = $derived(Math.max(1, Math.ceil(totalFilteredRows / rowsPerPage)));
@@ -292,6 +312,7 @@
 
 	const resetFilter = () => {
 		searchQuery = '';
+		sortOption = 'Terbaru';
 		statusFilter = 'Semua Status';
 		positionFilter = 'Semua Posisi';
 		expandedRows = [];
@@ -309,8 +330,19 @@
 
 <section class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-16 sm:pt-32 sm:pb-20">
 	<div class="nav-shell relative">
+		<header class="mb-7 sm:mb-8">
+			<div class="mx-auto max-w-3xl text-center">
+				<h1 class="text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-5xl">
+					Antrian Dokumen Lingkungan
+				</h1>
+				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+					Pantau status, posisi, dan perkembangan pengajuan dokumen lingkungan secara berkala.
+				</p>
+			</div>
+		</header>
+
 		<div class="mt-0">
-			<div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_14rem_14rem]">
+			<div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_12rem_12rem_12rem]">
 				<label
 					for="search-antrian"
 					class="flex h-12 items-center gap-3 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4"
@@ -325,6 +357,21 @@
 						class="h-full w-full border-0 bg-transparent px-0 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] focus:ring-0 focus:outline-none"
 					/>
 				</label>
+
+				<label for="sort-option" class="sr-only">Urutkan data</label>
+				<select
+					id="sort-option"
+					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
+					bind:value={sortOption}
+					onchange={resetExpandedAndFirstPage}
+				>
+					<option value="Terbaru">Terbaru</option>
+					<option value="Terlama">Terlama</option>
+					<option value="Update terbaru">Update terbaru</option>
+					<option value="Update terlama">Update terlama</option>
+					<option value="Instansi A-Z">Instansi A-Z</option>
+					<option value="Instansi Z-A">Instansi Z-A</option>
+				</select>
 
 				<label for="status-filter" class="sr-only">Filter status progress</label>
 				<select
@@ -348,13 +395,12 @@
 					bind:value={positionFilter}
 					onchange={resetExpandedAndFirstPage}
 				>
-					<option value="Semua Posisi">Semua Jenis Dokumen</option>
+					<option value="Semua Posisi">Semua Jenis</option>
 					<option value="Andal">Andal</option>
 					<option value="DELH">DELH</option>
 					<option value="Addendum">Addendum</option>
 					<option value="UKP-UPL">UKP-UPL</option>
 					<option value="DPLH">DPLH</option>
-					<option value="Pertek">Pertek</option>
 				</select>
 			</div>
 
@@ -371,31 +417,6 @@
 				</p>
 
 				<div class="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
-					<div
-						class="inline-flex h-9 items-center gap-2 rounded-md border border-[#d3dbe7] bg-[#ffffff] pr-2 pl-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
-					>
-						<span class="text-xs font-semibold text-[var(--muted)]">Baris</span>
-						<label for="rows-per-page" class="sr-only">Jumlah baris</label>
-						<div class="relative">
-							<select
-								id="rows-per-page"
-								class="h-8 min-w-[4.25rem] appearance-none rounded-md border-0 bg-transparent bg-none py-0 pr-7 pl-2 text-xs font-semibold text-[#20232A] [background-image:none] focus:ring-0 focus:outline-none"
-								value={rowsPerPage}
-								onchange={handleRowsPerPageChange}
-							>
-								{#each rowsPerPageOptions as option}
-									<option value={option}>{option}</option>
-								{/each}
-							</select>
-							<span
-								class="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[var(--muted)]"
-								aria-hidden="true"
-							>
-								<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
-							</span>
-						</div>
-					</div>
-
 					<button
 						type="button"
 						onclick={exportFilteredRows}
@@ -406,7 +427,11 @@
 						Export CSV
 					</button>
 
-					{#if searchQuery || statusFilter !== 'Semua Status' || positionFilter !== 'Semua Posisi'}
+					{#if
+						searchQuery ||
+						sortOption !== 'Terbaru' ||
+						statusFilter !== 'Semua Status' ||
+						positionFilter !== 'Semua Posisi'}
 						<button
 							type="button"
 							class="inline-flex h-9 items-center justify-center rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[var(--muted)] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] hover:text-[var(--ink)]"
@@ -627,58 +652,78 @@
 		</div>
 
 		{#if totalFilteredRows > 0}
-			<div
-				class="mt-5 flex flex-col gap-3 pt-4 sm:flex-row sm:items-center sm:justify-between"
-			>
-				<p class="text-xs font-medium text-[var(--muted)] sm:text-sm">
-					Halaman <span class="font-semibold text-[var(--ink)]">{currentPage}</span> dari
-					<span class="font-semibold text-[var(--ink)]">{totalPages}</span>
-				</p>
-
-				<div class="inline-flex w-full items-center justify-between gap-1.5 sm:w-auto sm:justify-end">
-					<button
-						type="button"
-						onclick={goToFirstPage}
-						disabled={currentPage === 1}
-						class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
-					>
-						Awal
-					</button>
-
-					<button
-						type="button"
-						onclick={goToPreviousPage}
-						disabled={currentPage === 1}
-						aria-label="Halaman sebelumnya"
-						class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
-					>
-						<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
-					</button>
-
+			<div class="mt-5 pt-4">
+				<div class="flex w-full flex-wrap items-center justify-between gap-3">
 					<div
-						class="inline-flex h-9 min-w-[5.75rem] items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#f8fafc] px-3 text-xs font-semibold text-[#20232A]"
+						class="inline-flex h-9 items-center gap-2 rounded-md border border-[#d3dbe7] bg-[#ffffff] pr-2 pl-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
 					>
-						{currentPage} / {totalPages}
+						<span class="text-xs font-semibold text-[var(--muted)]">Baris</span>
+						<label for="rows-per-page" class="sr-only">Jumlah baris</label>
+						<div class="relative">
+							<select
+								id="rows-per-page"
+								class="h-8 min-w-[4.25rem] appearance-none rounded-md border-0 bg-transparent bg-none py-0 pr-7 pl-2 text-xs font-semibold text-[#20232A] [background-image:none] focus:ring-0 focus:outline-none"
+								value={rowsPerPage}
+								onchange={handleRowsPerPageChange}
+							>
+								{#each rowsPerPageOptions as option}
+									<option value={option}>{option}</option>
+								{/each}
+							</select>
+							<span
+								class="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[var(--muted)]"
+								aria-hidden="true"
+							>
+								<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
+							</span>
+						</div>
 					</div>
 
-					<button
-						type="button"
-						onclick={goToNextPage}
-						disabled={currentPage === totalPages}
-						aria-label="Halaman berikutnya"
-						class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
-					>
-						<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
-					</button>
+					<div class="inline-flex w-full items-center justify-end gap-1.5 sm:w-auto">
+						<button
+							type="button"
+							onclick={goToFirstPage}
+							disabled={currentPage === 1}
+							class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+						>
+							Awal
+						</button>
 
-					<button
-						type="button"
-						onclick={goToLastPage}
-						disabled={currentPage === totalPages}
-						class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
-					>
-						Akhir
-					</button>
+						<button
+							type="button"
+							onclick={goToPreviousPage}
+							disabled={currentPage === 1}
+							aria-label="Halaman sebelumnya"
+							class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+						>
+							<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
+						</button>
+
+						<div
+							class="inline-flex h-9 min-w-[5.75rem] items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#f8fafc] px-3 text-xs font-semibold text-[#20232A]"
+						>
+							{currentPage} / {totalPages}
+						</div>
+
+						<button
+							type="button"
+							onclick={goToNextPage}
+							disabled={currentPage === totalPages}
+							aria-label="Halaman berikutnya"
+							class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+						>
+							<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
+						</button>
+
+						<button
+							type="button"
+							onclick={goToLastPage}
+							disabled={currentPage === totalPages}
+							class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+						>
+							Akhir
+						</button>
+					</div>
 				</div>
 			</div>
 		{/if}
