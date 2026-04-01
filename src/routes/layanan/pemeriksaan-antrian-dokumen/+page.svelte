@@ -11,85 +11,90 @@
 		| 'Perbaikan Dokumen'
 		| 'Penerbitan Persetujuan'
 		| 'Selesai';
+	type QueuePosition = 'Penyusun' | 'Pemrakarsa' | 'Sekretariat TU';
 
 	type QueueRow = {
 		registrationNo: string;
 		receivedDate: string;
 		agency: string;
 		activity: string;
-		position: string;
+		documentType: string;
+		position: QueuePosition;
 		progressStatus: ProgressStatus;
 		progressUpdatedDate: string;
 	};
 
 	type PositionFilter =
 		| 'Semua Posisi'
-		| 'AMDAL'
+		| 'Andal'
 		| 'DELH'
 		| 'Addendum'
-		| 'UKL-UPL'
+		| 'UKP-UPL'
 		| 'DPLH'
-		| 'Pertek';
+		| 'Pertek'
+		;
 
-	const queueTemplates: Array<Omit<QueueRow, 'registrationNo' | 'receivedDate' | 'progressUpdatedDate'>> = [
+	const queueTemplates: Array<
+		Omit<QueueRow, 'registrationNo' | 'receivedDate' | 'progressUpdatedDate' | 'position'>
+	> = [
 		{
 			agency: 'PT Mitra Agro Banua',
 			activity: 'Pengembangan Kawasan Industri Pengolahan Hasil Pertanian',
-			position: 'AMDAL',
+			documentType: 'Andal',
 			progressStatus: 'Penilaian Teknis'
 		},
 		{
 			agency: 'Dinas PUPR Kab. Banjar',
 			activity: 'Normalisasi Sungai dan Penguatan Tanggul',
-			position: 'UKL-UPL',
+			documentType: 'UKP-UPL',
 			progressStatus: 'Perbaikan Dokumen'
 		},
 		{
 			agency: 'PT Karya Borneo Energi',
 			activity: 'Pembangunan Fasilitas Penyimpanan Limbah B3',
-			position: 'Pertek Limbah B3',
+			documentType: 'Pertek',
 			progressStatus: 'Penerbitan Persetujuan'
 		},
 		{
 			agency: 'PT Sinar Khatulistiwa Mineral',
 			activity: 'Perluasan Area Stockpile Batubara',
-			position: 'AMDAL',
+			documentType: 'Andal',
 			progressStatus: 'Penilaian Teknis'
 		},
 		{
 			agency: 'PT Tirta Kalimantan Sejahtera',
 			activity: 'Instalasi Pengolahan Air Limbah Kawasan',
-			position: 'Pertek Air Limbah Domestik',
+			documentType: 'UKP-UPL',
 			progressStatus: 'Selesai'
 		},
 		{
 			agency: 'Pemkab Tanah Laut',
 			activity: 'Revitalisasi TPA dan Sistem Pengelolaan Sampah Terpadu',
-			position: 'DELH',
+			documentType: 'DELH',
 			progressStatus: 'Penerbitan Persetujuan'
 		},
 		{
 			agency: 'PT Samudra Pangan Nusantara',
 			activity: 'Pembangunan Pabrik Pengolahan Hasil Laut',
-			position: 'UKL-UPL',
+			documentType: 'UKP-UPL',
 			progressStatus: 'Menunggu Verifikasi'
 		},
 		{
 			agency: 'PT Angkasa Banua Logistik',
 			activity: 'Pembangunan Gudang Logistik Terintegrasi',
-			position: 'DPLH',
+			documentType: 'DPLH',
 			progressStatus: 'Perbaikan Dokumen'
 		},
 		{
 			agency: 'PT Borneo Kencana Pulp',
 			activity: 'Penyesuaian Kapasitas Produksi dan Emisi Udara',
-			position: 'Pertek Emisi',
+			documentType: 'DELH',
 			progressStatus: 'Penilaian Teknis'
 		},
 		{
 			agency: 'PT Nusantara Konstruksi Raya',
 			activity: 'Addendum Dokumen Pengelolaan Lingkungan Kawasan Komersial',
-			position: 'Addendum',
+			documentType: 'Addendum',
 			progressStatus: 'Menunggu Verifikasi'
 		}
 	];
@@ -101,15 +106,18 @@
 		baseDate.setUTCDate(baseDate.getUTCDate() + offsetDays);
 		return formatIsoDate(baseDate);
 	};
+	const registrationSeed = Number.parseInt('681195DAEA4DD', 16);
+	const queuePositions: QueuePosition[] = ['Penyusun', 'Pemrakarsa', 'Sekretariat TU'];
 
 	const queueRows: QueueRow[] = Array.from({ length: 1000 }, (_, index) => {
 		const template = queueTemplates[index % queueTemplates.length];
 		const receivedDate = addDaysUtc('2026-01-06', index * 2);
 		const progressUpdatedDate = addDaysUtc(receivedDate, (index % 6) + 1);
 		return {
-			registrationNo: `REG-PL-2026-${String(3001 + index).padStart(4, '0')}`,
+			registrationNo: (registrationSeed + index).toString(16).toUpperCase(),
 			receivedDate,
 			progressUpdatedDate,
+			position: queuePositions[index % queuePositions.length],
 			...template
 		};
 	});
@@ -134,13 +142,19 @@
 	const normalize = (value: string) => value.trim().toLowerCase();
 	const escapeCsvValue = (value: string) => `"${value.replaceAll('"', '""')}"`;
 	const resolvePositionCategory = (
-		position: string
+		documentType: string
 	): Exclude<PositionFilter, 'Semua Posisi'> | 'Lainnya' => {
-		const value = normalize(position);
-		if (value.includes('amdal')) return 'AMDAL';
+		const value = normalize(documentType);
+		if (value.includes('andal') || value.includes('amdal')) return 'Andal';
 		if (value.includes('delh')) return 'DELH';
 		if (value.includes('addendum')) return 'Addendum';
-		if (value.includes('ukl-upl') || value.includes('ukl upl')) return 'UKL-UPL';
+		if (
+			value.includes('ukp-upl') ||
+			value.includes('ukp upl') ||
+			value.includes('ukl-upl') ||
+			value.includes('ukl upl')
+		)
+			return 'UKP-UPL';
 		if (value.includes('dplh')) return 'DPLH';
 		if (value.includes('pertek')) return 'Pertek';
 		return 'Lainnya';
@@ -152,7 +166,7 @@
 			const statusMatched = statusFilter === 'Semua Status' || row.progressStatus === statusFilter;
 			const positionMatched =
 				positionFilter === 'Semua Posisi' ||
-				resolvePositionCategory(row.position) === positionFilter;
+				resolvePositionCategory(row.documentType) === positionFilter;
 			if (!statusMatched) return false;
 			if (!positionMatched) return false;
 			if (!query) return true;
@@ -161,6 +175,7 @@
 				row.registrationNo,
 				row.agency,
 				row.activity,
+				row.documentType,
 				row.position,
 				row.progressStatus,
 				formatDate(row.receivedDate),
@@ -234,6 +249,7 @@
 			'Tanggal Masuk',
 			'Instansi',
 			'Kegiatan',
+			'Jenis Dokumen',
 			'Posisi',
 			'Status',
 			'Tanggal Update'
@@ -245,6 +261,7 @@
 				formatDate(row.receivedDate),
 				row.agency,
 				row.activity,
+				row.documentType,
 				row.position,
 				row.progressStatus,
 				formatDate(row.progressUpdatedDate)
@@ -316,18 +333,18 @@
 					<option value="Selesai">Selesai</option>
 				</select>
 
-				<label for="position-filter" class="sr-only">Filter posisi</label>
+				<label for="position-filter" class="sr-only">Filter jenis dokumen</label>
 				<select
 					id="position-filter"
 					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
 					bind:value={positionFilter}
 					onchange={resetExpandedAndFirstPage}
 				>
-					<option value="Semua Posisi">Semua Posisi</option>
-					<option value="AMDAL">AMDAL</option>
+					<option value="Semua Posisi">Semua Jenis Dokumen</option>
+					<option value="Andal">Andal</option>
 					<option value="DELH">DELH</option>
 					<option value="Addendum">Addendum</option>
-					<option value="UKL-UPL">UKL-UPL</option>
+					<option value="UKP-UPL">UKP-UPL</option>
 					<option value="DPLH">DPLH</option>
 					<option value="Pertek">Pertek</option>
 				</select>
@@ -398,9 +415,14 @@
 			<div
 				class="overflow-x-auto rounded-2xl border-y border-[#d7dee8] bg-transparent"
 			>
-				<table class="w-full min-w-[1100px] border-collapse">
+				<table class="w-full min-w-[1180px] border-collapse">
 					<thead class="bg-[#20232A]">
 						<tr>
+							<th
+								class="w-14 border-b border-[#323944] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white"
+							>
+								No
+							</th>
 							<th
 								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
@@ -424,10 +446,15 @@
 							<th
 								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
+								Jenis Dokumen
+							</th>
+							<th
+								class="w-28 border-b border-[#323944] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+							>
 								Posisi
 							</th>
 							<th
-								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="w-32 border-b border-[#323944] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Status
 							</th>
@@ -442,7 +469,7 @@
 					<tbody>
 						{#if totalFilteredRows === 0}
 							<tr>
-								<td colspan="7" class="px-6 py-12 text-center">
+								<td colspan="9" class="px-6 py-12 text-center">
 									<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
 									<p class="mt-1 text-sm text-[var(--muted)]">
 										Coba ubah kata kunci pencarian atau reset filter.
@@ -450,8 +477,11 @@
 								</td>
 							</tr>
 						{:else}
-							{#each paginatedRows as row}
+							{#each paginatedRows as row, index}
 								<tr class="border-t border-[#e9edf3] align-top">
+									<td class="w-14 px-3 py-4 text-center text-sm font-semibold text-[#20232A]">
+										{pageStartIndex + index + 1}
+									</td>
 									<td class="px-6 py-4 text-sm font-semibold text-[#20232A]"
 										>{row.registrationNo}</td
 									>
@@ -462,8 +492,11 @@
 									<td class="px-6 py-4 text-sm leading-relaxed text-[#20232A]"
 										>{row.activity}</td
 									>
-									<td class="px-6 py-4 text-sm text-[#20232A]">{row.position}</td>
-									<td class="px-6 py-4 text-sm text-[#20232A]">{row.progressStatus}</td>
+									<td class="px-6 py-4 text-sm text-[#20232A]">{row.documentType}</td>
+									<td class="w-28 px-4 py-4 text-sm text-[#20232A]">{row.position}</td>
+									<td class="w-32 px-4 py-4 text-sm leading-snug text-[#20232A]">
+										{row.progressStatus}
+									</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">
 										{formatDate(row.progressUpdatedDate)}
 									</td>
@@ -541,6 +574,14 @@
 											<dd class="mt-1 text-sm leading-relaxed text-[#20232A]">
 												{row.activity}
 											</dd>
+										</div>
+										<div>
+											<dt
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
+											>
+												Jenis Dokumen
+											</dt>
+											<dd class="mt-1 text-sm text-[#20232A]">{row.documentType}</dd>
 										</div>
 										<div>
 											<dt
