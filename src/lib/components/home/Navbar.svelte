@@ -23,22 +23,22 @@
 	const layananItems: LayananItem[] = [
 		{
 			title: 'Antrian Dokumen Lingkungan',
-			href: '/layanan/pemeriksaan-antrian-dokumen-lingkungan'
+			href: '/layanan/dokling'
 		},
 		{
 			title: 'Antrian Persetujuan Teknis',
-			href: '/layanan/pemeriksaan-antrian-persetujuan-teknis'
+			href: '/layanan/pertek'
 		}
 	];
 
 	const searchSuggestions: SearchSuggestion[] = [
 		{
 			label: 'Antrian Dokumen Lingkungan',
-			href: '/layanan/pemeriksaan-antrian-dokumen-lingkungan'
+			href: '/layanan/dokling'
 		},
 		{
 			label: 'Antrian Persetujuan Teknis',
-			href: '/layanan/pemeriksaan-antrian-persetujuan-teknis'
+			href: '/layanan/pertek'
 		}
 	];
 	const showNavMenus = true;
