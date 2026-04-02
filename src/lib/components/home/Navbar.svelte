@@ -4,6 +4,7 @@
 	import { page } from '$app/state';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
+	import LogIn from 'lucide-svelte/icons/log-in';
 	import Menu from 'lucide-svelte/icons/menu';
 	import Search from 'lucide-svelte/icons/search';
 	import X from 'lucide-svelte/icons/x';
@@ -142,7 +143,6 @@
 	const isPathActive = (path: string) => page.url.pathname === path;
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
-	const isBerandaActive = () => isLandingPage() && currentHash === '';
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
@@ -192,34 +192,30 @@
 	});
 
 	const navClass = () =>
-		`fixed inset-x-0 top-0 z-40 border-b [font-family:var(--font-body)] transition-[background-color,border-color,box-shadow,color] duration-300 ${
+		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color] duration-300 ${
 			useLightNav()
-				? 'border-transparent bg-transparent text-white shadow-none'
-				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] shadow-none'
+				? 'bg-transparent text-white shadow-none'
+				: 'bg-[var(--surface)] text-[var(--ink)] shadow-none'
 		}`;
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
-			'relative inline-flex items-center py-2.5 lg:py-2 text-[1.01rem] lg:text-[0.98rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
+			'relative inline-flex items-center py-2.5 lg:py-2 text-base lg:text-[1rem] font-medium tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
 		if (useLightNav()) {
-			return `${baseClass} ${isActive ? 'text-white' : 'text-white/85 hover:text-[#3EB14A]'}`;
+			return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-white hover:text-[#77D37F]'}`;
 		}
-		return `${baseClass} ${
-			isActive ? 'text-[var(--ink)]' : 'text-[#334155] hover:text-[#3EB14A]'
-		}`;
+		return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-black hover:text-[#77D37F]'}`;
 	};
 
 	const mobileNavBaseClass =
-		'border-b border-transparent px-4 py-3.5 !text-lg !font-semibold [font-weight:600] nav-menu-font leading-[1.2] tracking-[0.002em] text-[var(--ink)]';
+		'border-b border-transparent px-4 py-3.5 !text-[1.1875rem] !font-medium [font-weight:500] nav-menu-font leading-[1.2] tracking-[0.002em]';
 
 	const mobileLinkClass = (isActive = false) =>
-		`block menu-item-static ${mobileNavBaseClass} ${
-			isActive ? 'text-[var(--ink)]' : 'transition-colors hover:text-[#3EB14A]'
-		}`;
+		`block menu-item-static ${mobileNavBaseClass} ${isActive ? 'text-[#77D37F]' : 'text-black'}`;
 
 	const mobileLayananClass = (isActive = false) =>
 		`flex w-full items-center justify-between menu-item-static ${mobileNavBaseClass} appearance-none border-0 bg-transparent text-left ${
-			isActive ? 'text-[var(--ink)]' : 'transition-colors hover:text-[#3EB14A]'
+			isActive ? 'text-[#77D37F]' : 'text-black'
 		}`;
 
 	const logoClass = () =>
@@ -235,10 +231,10 @@
 		}`;
 
 	const loginButtonClass = () =>
-		`hidden h-11 lg:h-10 items-center rounded-lg border px-5 lg:px-4 text-base lg:text-[1rem] font-semibold transition-colors lg:inline-flex ${
+		`hidden h-11 lg:h-10 items-center justify-center gap-2 rounded-lg border px-5 lg:px-4 text-base lg:text-[1rem] font-medium transition-colors lg:inline-flex ${
 			useLightNav()
 				? 'border-white/30 bg-white/10 text-white'
-				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
+				: 'border-[#64AD31] bg-[#64AD31] text-white'
 		}`;
 </script>
 
@@ -251,7 +247,7 @@
 />
 
 <nav class={navClass()}>
-	<div class="nav-shell py-3 lg:py-3">
+		<div class="nav-shell py-3 lg:py-3.5">
 		<div
 			class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
@@ -265,14 +261,13 @@
 
 			{#if showNavMenus}
 				<ul class="hidden items-center gap-9 lg:flex lg:justify-self-center">
-					<li>
-						<a
-							href={navHref('beranda')}
-							class={desktopLinkClass(isBerandaActive())}
-							aria-current={isBerandaActive() ? 'page' : undefined}
-							onclick={handleBerandaClick}
-						>
-							Beranda
+						<li>
+							<a
+								href={navHref('beranda')}
+								class={desktopLinkClass(false)}
+								onclick={handleBerandaClick}
+							>
+								Beranda
 						</a>
 					</li>
 
@@ -287,24 +282,29 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isLayananActive())} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
+								class={`${desktopLinkClass(isLayananActive())} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
 								aria-expanded={isLayananOpen}
 								aria-haspopup="true"
 								onclick={() => (isLayananOpen ? closeLayananMenu() : openLayananMenu())}
 							>
-								Layanan
+								<span>Layanan</span>
+								<ChevronDown
+									class={`h-4 w-4 transition-transform duration-200 ${isLayananOpen ? 'rotate-180' : ''}`}
+									strokeWidth={2.2}
+									aria-hidden="true"
+								/>
 							</button>
 
 							{#if isLayananOpen}
 								<div
-									class="absolute top-[calc(100%+1.25rem)] left-1/2 w-[min(92vw,21rem)] -translate-x-1/2 rounded-xl border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,18.5rem)] -translate-x-1/2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
 								>
 									<div class="space-y-1">
 										{#each layananItems as item}
 											{#if item.href}
 												<a
 													href={mapSectionHref(item.href)}
-													class="menu-item-static block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.96rem] font-semibold text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-medium text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handleLayananItemClick}
 												>
 													{item.title}
@@ -312,7 +312,7 @@
 											{:else}
 												<button
 													type="button"
-													class="menu-item-static block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.96rem] font-semibold text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-medium text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												>
 													{item.title}
 												</button>
@@ -355,7 +355,10 @@
 					<Search class="h-4 w-4 lg:h-4.5 lg:w-4.5" strokeWidth={2} aria-hidden="true" />
 				</button>
 
-				<a href="/login" class={loginButtonClass()}> Login </a>
+				<a href="/login" class={`${loginButtonClass()} nav-menu-font`}>
+					<LogIn class="h-4 w-4 lg:h-[1.05rem] lg:w-[1.05rem]" strokeWidth={2.15} aria-hidden="true" />
+					<span>Login</span>
+				</a>
 
 				{#if showNavMenus}
 					<button
@@ -391,7 +394,7 @@
 		transition:fly={{ x: 24, duration: 170 }}
 	>
 		<div class="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
-			<p class="text-lg font-semibold text-[var(--ink)]">Menu</p>
+			<p class="nav-menu-font text-[1.1875rem] font-medium text-[var(--ink)]">Menu</p>
 
 			<button
 				type="button"
@@ -404,11 +407,11 @@
 		</div>
 
 		<div class="mt-5 space-y-1.5">
-			<a
-				href={navHref('beranda')}
-				class={mobileLinkClass(isBerandaActive())}
-				onclick={handleBerandaClick}
-			>
+				<a
+					href={navHref('beranda')}
+					class={mobileLinkClass(false)}
+					onclick={handleBerandaClick}
+				>
 				Beranda
 			</a>
 
@@ -418,7 +421,7 @@
 				aria-expanded={isMobileLayananOpen}
 				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 			>
-				<span class="nav-menu-font text-lg font-semibold tracking-[0.002em]">Layanan</span>
+				<span class="nav-menu-font text-[1.1875rem] font-medium tracking-[0.002em]">Layanan</span>
 				<ChevronDown
 					class={`h-4 w-4 transition-transform ${isMobileLayananOpen ? 'rotate-180' : ''}`}
 					strokeWidth={2.2}
@@ -430,20 +433,22 @@
 				<div class="mt-1.5 space-y-1 pl-4" transition:fade={{ duration: 120 }}>
 					{#each layananItems as item}
 						{#if item.href}
-							<a
-								href={mapSectionHref(item.href)}
-								class="menu-item-static nav-menu-font block w-full rounded-md px-3 py-2 text-left text-[0.95rem] font-semibold text-[#475467] transition-colors hover:bg-[#f8fafc] hover:text-[#3EB14A]"
-								onclick={handleLayananItemClick}
-							>
-								{item.title}
-							</a>
-						{:else}
-							<button
-								type="button"
-								class="menu-item-static nav-menu-font block w-full appearance-none rounded-md border-0 bg-transparent px-3 py-2 text-left text-[0.95rem] font-semibold text-[#475467] transition-colors hover:bg-[#f8fafc] hover:text-[#3EB14A]"
-							>
-								{item.title}
-							</button>
+								<a
+									href={mapSectionHref(item.href)}
+									class={`menu-item-static nav-menu-font block w-full rounded-md px-3 py-2 text-left text-[0.95rem] font-medium ${
+										isPathActive(item.href) ? 'text-[#77D37F]' : 'text-black'
+									}`}
+									onclick={handleLayananItemClick}
+								>
+									{item.title}
+								</a>
+							{:else}
+								<button
+									type="button"
+									class="menu-item-static nav-menu-font block w-full appearance-none rounded-md border-0 bg-transparent px-3 py-2 text-left text-[0.95rem] font-medium text-black"
+								>
+									{item.title}
+								</button>
 						{/if}
 					{/each}
 				</div>
@@ -457,13 +462,14 @@
 			</a>
 		</div>
 
-		<a
-			href="/login"
-			class="mt-auto inline-flex w-full items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-base font-semibold text-[var(--ink)] transition-colors"
-			onclick={closeMenus}
-		>
-			Login
-		</a>
+			<a
+				href="/login"
+				class="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#64AD31] bg-[#64AD31] px-4 py-3 text-[1.1875rem] font-medium text-white transition-colors nav-menu-font"
+				onclick={closeMenus}
+			>
+				<LogIn class="h-[1.2rem] w-[1.2rem]" strokeWidth={2.15} aria-hidden="true" />
+				<span>Login</span>
+			</a>
 	</aside>
 {/if}
 
@@ -531,7 +537,7 @@
 
 <style>
 	:global(.nav-menu-font) {
-		font-family: 'Open Sans', 'Segoe UI', sans-serif;
+		font-family: 'Roboto', 'Segoe UI', sans-serif;
 	}
 
 	:global(.menu-item-static:hover),
