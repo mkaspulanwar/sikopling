@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/state';
 	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
@@ -17,11 +18,32 @@
 		}
 		window.scrollTo(0, 0);
 	});
+
+	const pageTitle = $derived.by(() => {
+		const pathname = page.url.pathname.replace(/\/+$/, '') || '/';
+
+		switch (pathname) {
+			case '/':
+				return 'Sikopling Kalsel';
+			case '/layanan/dokling':
+				return 'Antrian Dokumen Lingkungan';
+			case '/layanan/pertek':
+				return 'Antrian Persetujuan Teknis';
+			case '/tentang':
+				return 'Tentang Sikopling';
+			case '/kontak':
+				return 'Kontak Sikopling';
+			case '/login':
+				return 'Login Sikopling';
+			default:
+				return 'Sikopling Kalsel';
+		}
+	});
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
-	<title>SIKOPLING KALSEL | Informasi Antrean Perizinan Lingkungan</title>
+	<title>{pageTitle}</title>
 	<meta
 		name="description"
 		content="Portal informasi antrean pengajuan perizinan lingkungan Provinsi Kalimantan Selatan oleh Dinas Lingkungan Hidup."

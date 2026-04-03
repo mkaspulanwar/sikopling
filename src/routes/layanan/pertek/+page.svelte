@@ -418,7 +418,6 @@
 </script>
 
 <svelte:head>
-	<title>Antrian Persetujuan Teknis | SIKOPLING</title>
 	<meta
 		name="description"
 		content="Halaman pelacakan antrian persetujuan teknis untuk memantau status progress pengajuan."
@@ -442,56 +441,56 @@
 		<div class="mt-0 space-y-4">
 			<div class="space-y-2.5 border-b border-[#e6ebf2] pb-3.5">
 				<div class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
-				<label
-					for="search-antrian"
-					class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:px-4 md:max-w-[30rem]"
-				>
-					<Search class="h-4.5 w-4.5 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
-					<input
-						id="search-antrian"
-						type="text"
-						bind:value={searchQuery}
-						oninput={resetExpandedAndFirstPage}
-						placeholder="Cari instansi atau kegiatan"
-						class="h-full w-full border-0 bg-transparent px-0 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] focus:ring-0 focus:outline-none"
-					/>
-				</label>
-
-				<div class="grid grid-cols-2 gap-2 sm:flex sm:items-center md:shrink-0">
-					<button
-						type="button"
-						bind:this={filterToggleButton}
-						onclick={toggleFilterPanel}
-						aria-expanded={isFilterPanelOpen}
-						aria-controls="pertek-filter-panel"
-						class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none sm:px-4 sm:w-auto"
+					<label
+						for="search-antrian"
+						class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:max-w-[30rem] md:px-4"
 					>
-						<ListFilterPlus class="h-4 w-4" strokeWidth={2.1} />
-						<span>Filter</span>
-						{#if activeAdvancedFilterCount > 0}
-							<span
-								class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#20232A] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
-							>
-								{activeAdvancedFilterCount}
-							</span>
-						{/if}
-						<ChevronDown
-							class={`h-4 w-4 text-[var(--muted)] transition-transform ${isFilterPanelOpen ? 'rotate-180' : ''}`}
-							strokeWidth={2.1}
+						<Search class="h-4.5 w-4.5 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
+						<input
+							id="search-antrian"
+							type="text"
+							bind:value={searchQuery}
+							oninput={resetExpandedAndFirstPage}
+							placeholder="Cari instansi atau kegiatan"
+							class="h-full w-full border-0 bg-transparent px-0 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] focus:ring-0 focus:outline-none"
 						/>
-					</button>
+					</label>
 
-					<button
-						type="button"
-						onclick={exportFilteredRows}
-						disabled={totalFilteredRows === 0}
-						class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f6f7f8] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:w-auto"
-					>
-						<Download class="h-4 w-4" strokeWidth={2.2} />
-						Download
-					</button>
+					<div class="grid grid-cols-2 gap-2 sm:flex sm:items-center md:shrink-0">
+						<button
+							type="button"
+							bind:this={filterToggleButton}
+							onclick={toggleFilterPanel}
+							aria-expanded={isFilterPanelOpen}
+							aria-controls="pertek-filter-panel"
+							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none sm:w-auto sm:px-4"
+						>
+							<ListFilterPlus class="h-4 w-4" strokeWidth={2.1} />
+							<span>Filter</span>
+							{#if activeAdvancedFilterCount > 0}
+								<span
+									class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#20232A] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
+								>
+									{activeAdvancedFilterCount}
+								</span>
+							{/if}
+							<ChevronDown
+								class={`h-4 w-4 text-[var(--muted)] transition-transform ${isFilterPanelOpen ? 'rotate-180' : ''}`}
+								strokeWidth={2.1}
+							/>
+						</button>
+
+						<button
+							type="button"
+							onclick={exportFilteredRows}
+							disabled={totalFilteredRows === 0}
+							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f6f7f8] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-4"
+						>
+							<Download class="h-4 w-4" strokeWidth={2.2} />
+							Download
+						</button>
+					</div>
 				</div>
-			</div>
 			</div>
 
 			{#if isFilterPanelOpen}
@@ -549,7 +548,10 @@
 						</div>
 
 						<div>
-							<label for="status-filter" class="mb-1 block text-xs font-semibold text-[var(--muted)]">
+							<label
+								for="status-filter"
+								class="mb-1 block text-xs font-semibold text-[var(--muted)]"
+							>
 								Status Progress
 							</label>
 							<div class="relative" bind:this={statusDropdownElement}>
@@ -596,7 +598,10 @@
 						</div>
 
 						<div>
-							<label for="position-filter" class="mb-1 block text-xs font-semibold text-[var(--muted)]">
+							<label
+								for="position-filter"
+								class="mb-1 block text-xs font-semibold text-[var(--muted)]"
+							>
 								Jenis Perling
 							</label>
 							<div class="relative" bind:this={positionDropdownElement}>
@@ -643,7 +648,9 @@
 						</div>
 					</div>
 
-					<div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#edf1f6] pt-3">
+					<div
+						class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#edf1f6] pt-3"
+					>
 						<p class="text-xs text-[var(--muted)]">
 							Urutan aktif:
 							<span class="font-semibold text-[var(--ink)]">{sortOption}</span>
@@ -770,9 +777,7 @@
 		</div>
 
 		<div class="mt-6 hidden md:block">
-			<div
-				class="overflow-x-auto rounded-xl border-y border-[#d7dee8] bg-transparent"
-			>
+			<div class="overflow-x-auto rounded-xl border-y border-[#d7dee8] bg-transparent">
 				<table class="w-full min-w-[980px] border-collapse">
 					<thead class="bg-[#20232A]">
 						<tr>
@@ -830,13 +835,9 @@
 									<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">
 										{pageStartIndex + index + 1}
 									</td>
-									<td class="px-6 py-4 text-sm text-[#20232A]"
-										>{formatDate(row.receivedDate)}</td
-									>
+									<td class="px-6 py-4 text-sm text-[#20232A]">{formatDate(row.receivedDate)}</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">{row.agency}</td>
-									<td class="px-6 py-4 text-sm leading-relaxed text-[#20232A]"
-										>{row.activity}</td
-									>
+									<td class="px-6 py-4 text-sm leading-relaxed text-[#20232A]">{row.activity}</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">{row.documentType}</td>
 									<td class="w-32 px-4 py-4 text-sm leading-snug text-[#20232A]">
 										<span
@@ -856,9 +857,7 @@
 			</div>
 		</div>
 
-		<div
-			class="mt-6 overflow-hidden rounded-xl border-y border-[#d7dee8] bg-transparent md:hidden"
-		>
+		<div class="mt-6 overflow-hidden rounded-xl border-y border-[#d7dee8] bg-transparent md:hidden">
 			<div
 				class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
@@ -921,9 +920,7 @@
 								<div class="border-t border-[var(--line)] bg-transparent px-4 py-4">
 									<dl class="space-y-4">
 										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
+											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">
 												Tanggal Masuk
 											</dt>
 											<dd class="mt-1 text-sm text-[#20232A]">
@@ -931,9 +928,7 @@
 											</dd>
 										</div>
 										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
+											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">
 												Kegiatan
 											</dt>
 											<dd class="mt-1 text-sm leading-relaxed text-[#20232A]">
@@ -941,17 +936,13 @@
 											</dd>
 										</div>
 										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
+											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">
 												Jenis Perling
 											</dt>
 											<dd class="mt-1 text-sm text-[#20232A]">{row.documentType}</dd>
 										</div>
 										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
+											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">
 												Tanggal Update
 											</dt>
 											<dd class="mt-1 text-sm text-[#20232A]">
@@ -973,49 +964,49 @@
 					aria-label="Navigasi halaman antrian persetujuan teknis"
 					class="mx-auto flex flex-wrap items-center justify-center gap-1.5"
 				>
-						<button
-							type="button"
-							onclick={goToFirstPage}
-							disabled={currentPage === 1}
-							class="inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
-						>
-							Awal
-						</button>
+					<button
+						type="button"
+						onclick={goToFirstPage}
+						disabled={currentPage === 1}
+						class="inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						Awal
+					</button>
 
-						<button
-							type="button"
-							onclick={goToPreviousPage}
-							disabled={currentPage === 1}
-							aria-label="Halaman sebelumnya"
-							class="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
-						>
-							<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
-						</button>
+					<button
+						type="button"
+						onclick={goToPreviousPage}
+						disabled={currentPage === 1}
+						aria-label="Halaman sebelumnya"
+						class="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
+					</button>
 
-						<div
-							class="inline-flex h-9 min-w-[4.5rem] items-center justify-center px-1.5 text-xs font-semibold tabular-nums text-[#20232A]"
-						>
-							{currentPage} / {totalPages}
-						</div>
+					<div
+						class="inline-flex h-9 min-w-[4.5rem] items-center justify-center px-1.5 text-xs font-semibold text-[#20232A] tabular-nums"
+					>
+						{currentPage} / {totalPages}
+					</div>
 
-						<button
-							type="button"
-							onclick={goToNextPage}
-							disabled={currentPage === totalPages}
-							aria-label="Halaman berikutnya"
-							class="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
-						>
-							<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
-						</button>
+					<button
+						type="button"
+						onclick={goToNextPage}
+						disabled={currentPage === totalPages}
+						aria-label="Halaman berikutnya"
+						class="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
+					</button>
 
-						<button
-							type="button"
-							onclick={goToLastPage}
-							disabled={currentPage === totalPages}
-							class="inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
-						>
-							Akhir
-						</button>
+					<button
+						type="button"
+						onclick={goToLastPage}
+						disabled={currentPage === totalPages}
+						class="inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						Akhir
+					</button>
 				</nav>
 			</div>
 		{/if}

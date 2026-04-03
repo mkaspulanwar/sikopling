@@ -1,5 +1,4 @@
 <svelte:head>
-	<title>Tentang | SIKOPLING</title>
 	<meta
 		name="description"
 		content="Halaman dummy tentang SIKOPLING. Konten lengkap akan segera tersedia."
