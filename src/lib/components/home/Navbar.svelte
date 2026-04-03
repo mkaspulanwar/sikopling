@@ -304,7 +304,7 @@
 											{#if item.href}
 												<a
 													href={mapSectionHref(item.href)}
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-medium text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handleLayananItemClick}
 												>
 													{item.title}
@@ -312,7 +312,7 @@
 											{:else}
 												<button
 													type="button"
-													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-medium text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												>
 													{item.title}
 												</button>
@@ -435,7 +435,7 @@
 						{#if item.href}
 								<a
 									href={mapSectionHref(item.href)}
-									class={`menu-item-static nav-menu-font block w-full rounded-md px-3 py-2 text-left text-[0.95rem] font-medium ${
+									class={`menu-item-static nav-menu-font block w-full rounded-md px-3 py-2 text-left text-[0.95rem] [font-weight:350] ${
 										isPathActive(item.href) ? 'text-[#77D37F]' : 'text-black'
 									}`}
 									onclick={handleLayananItemClick}
@@ -445,7 +445,7 @@
 							{:else}
 								<button
 									type="button"
-									class="menu-item-static nav-menu-font block w-full appearance-none rounded-md border-0 bg-transparent px-3 py-2 text-left text-[0.95rem] font-medium text-black"
+									class="menu-item-static nav-menu-font block w-full appearance-none rounded-md border-0 bg-transparent px-3 py-2 text-left text-[0.95rem] [font-weight:350] text-black"
 								>
 									{item.title}
 								</button>
