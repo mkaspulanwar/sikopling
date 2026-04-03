@@ -3,14 +3,19 @@
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import Download from 'lucide-svelte/icons/download';
+	import ListFilterPlus from 'lucide-svelte/icons/list-filter-plus';
 	import Search from 'lucide-svelte/icons/search';
+	import X from 'lucide-svelte/icons/x';
 
 	type ProgressStatus =
-		| 'Menunggu Verifikasi'
-		| 'Penilaian Teknis'
-		| 'Perbaikan Dokumen'
-		| 'Penerbitan Persetujuan'
-		| 'Selesai';
+		| 'SK terbit'
+		| 'Perbaikan Uji Administrasi'
+		| 'Pasca Sidang'
+		| 'Penilaian KA'
+		| 'Penjadwalan Rapat'
+		| 'Dikembalikan'
+		| 'Ditolak'
+		| 'Submit';
 	type QueuePosition = 'Penyusun' | 'Pemrakarsa' | 'Sekretariat TU';
 
 	type QueueRow = {
@@ -39,6 +44,7 @@
 		| 'Update terlama'
 		| 'Instansi A-Z'
 		| 'Instansi Z-A';
+	type FilterChipKey = 'search' | 'sort' | 'status' | 'position';
 
 	const queueTemplates: Array<
 		Omit<QueueRow, 'registrationNo' | 'receivedDate' | 'progressUpdatedDate' | 'position'>
@@ -47,61 +53,61 @@
 			agency: 'PT Mitra Agro Banua',
 			activity: 'Pengembangan Kawasan Industri Pengolahan Hasil Pertanian',
 			documentType: 'Andal',
-			progressStatus: 'Penilaian Teknis'
+			progressStatus: 'Penilaian KA'
 		},
 		{
 			agency: 'Dinas PUPR Kab. Banjar',
 			activity: 'Normalisasi Sungai dan Penguatan Tanggul',
 			documentType: 'UKP-UPL',
-			progressStatus: 'Perbaikan Dokumen'
+			progressStatus: 'Perbaikan Uji Administrasi'
 		},
 		{
 			agency: 'PT Karya Borneo Energi',
 			activity: 'Pembangunan Fasilitas Penyimpanan Limbah B3',
 			documentType: 'DPLH',
-			progressStatus: 'Penerbitan Persetujuan'
+			progressStatus: 'Penjadwalan Rapat'
 		},
 		{
 			agency: 'PT Sinar Khatulistiwa Mineral',
 			activity: 'Perluasan Area Stockpile Batubara',
 			documentType: 'Andal',
-			progressStatus: 'Penilaian Teknis'
+			progressStatus: 'Pasca Sidang'
 		},
 		{
 			agency: 'PT Tirta Kalimantan Sejahtera',
 			activity: 'Instalasi Pengolahan Air Limbah Kawasan',
 			documentType: 'UKP-UPL',
-			progressStatus: 'Selesai'
+			progressStatus: 'SK terbit'
 		},
 		{
 			agency: 'Pemkab Tanah Laut',
 			activity: 'Revitalisasi TPA dan Sistem Pengelolaan Sampah Terpadu',
 			documentType: 'DELH',
-			progressStatus: 'Penerbitan Persetujuan'
+			progressStatus: 'Pasca Sidang'
 		},
 		{
 			agency: 'PT Samudra Pangan Nusantara',
 			activity: 'Pembangunan Pabrik Pengolahan Hasil Laut',
 			documentType: 'UKP-UPL',
-			progressStatus: 'Menunggu Verifikasi'
+			progressStatus: 'Submit'
 		},
 		{
 			agency: 'PT Angkasa Banua Logistik',
 			activity: 'Pembangunan Gudang Logistik Terintegrasi',
 			documentType: 'DPLH',
-			progressStatus: 'Perbaikan Dokumen'
+			progressStatus: 'Dikembalikan'
 		},
 		{
 			agency: 'PT Borneo Kencana Pulp',
 			activity: 'Penyesuaian Kapasitas Produksi dan Emisi Udara',
 			documentType: 'DELH',
-			progressStatus: 'Penilaian Teknis'
+			progressStatus: 'Penilaian KA'
 		},
 		{
 			agency: 'PT Nusantara Konstruksi Raya',
 			activity: 'Addendum Dokumen Pengelolaan Lingkungan Kawasan Komersial',
 			documentType: 'Addendum',
-			progressStatus: 'Menunggu Verifikasi'
+			progressStatus: 'Ditolak'
 		}
 	];
 
@@ -133,27 +139,70 @@
 		month: 'long',
 		year: 'numeric'
 	});
+	const numberFormatter = new Intl.NumberFormat('id-ID');
 
 	let searchQuery = $state('');
 	let sortOption = $state<SortOption>('Terbaru');
 	let statusFilter = $state<'Semua Status' | ProgressStatus>('Semua Status');
 	let positionFilter = $state<PositionFilter>('Semua Posisi');
+	let isFilterPanelOpen = $state(false);
+	let filterToggleButton = $state<HTMLButtonElement | null>(null);
+	let filterPanelElement = $state<HTMLDivElement | null>(null);
+	let isSortDropdownOpen = $state(false);
+	let isStatusDropdownOpen = $state(false);
+	let isPositionDropdownOpen = $state(false);
+	let isRowsDropdownOpen = $state(false);
+	let sortDropdownElement = $state<HTMLDivElement | null>(null);
+	let statusDropdownElement = $state<HTMLDivElement | null>(null);
+	let positionDropdownElement = $state<HTMLDivElement | null>(null);
+	let rowsDropdownElement = $state<HTMLDivElement | null>(null);
 	let expandedRows = $state<string[]>([]);
 	const rowsPerPageOptions = [5, 10, 20] as const;
 	type RowsPerPage = (typeof rowsPerPageOptions)[number];
 	let rowsPerPage = $state<RowsPerPage>(10);
 	let currentPage = $state(1);
+	const sortOptions: SortOption[] = [
+		'Terbaru',
+		'Terlama',
+		'Update terbaru',
+		'Update terlama',
+		'Instansi A-Z',
+		'Instansi Z-A'
+	];
+	const statusOptions: Array<'Semua Status' | ProgressStatus> = [
+		'Semua Status',
+		'SK terbit',
+		'Perbaikan Uji Administrasi',
+		'Pasca Sidang',
+		'Penilaian KA',
+		'Penjadwalan Rapat',
+		'Dikembalikan',
+		'Ditolak',
+		'Submit'
+	];
+	const positionFilterOptions: Array<{ label: string; value: PositionFilter }> = [
+		{ label: 'Semua Jenis', value: 'Semua Posisi' },
+		{ label: 'Andal', value: 'Andal' },
+		{ label: 'DELH', value: 'DELH' },
+		{ label: 'Addendum', value: 'Addendum' },
+		{ label: 'UKP-UPL', value: 'UKP-UPL' },
+		{ label: 'DPLH', value: 'DPLH' }
+	];
 
 	const toTimestamp = (value: string) => new Date(`${value}T00:00:00`).getTime();
 	const formatDate = (value: string) => dateFormatter.format(new Date(`${value}T00:00:00`));
+	const formatNumber = (value: number) => numberFormatter.format(value);
 	const normalize = (value: string) => value.trim().toLowerCase();
 	const escapeCsvValue = (value: string) => `"${value.replaceAll('"', '""')}"`;
 	const statusBadgeClassMap: Record<ProgressStatus, string> = {
-		'Menunggu Verifikasi': 'border-[#d9c489] bg-[#fff8e3] text-[#8a6a1c]',
-		'Penilaian Teknis': 'border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]',
-		'Perbaikan Dokumen': 'border-[#e3b2a8] bg-[#fff1ee] text-[#8f3d2f]',
-		'Penerbitan Persetujuan': 'border-[#9fcaa9] bg-[#edf9f0] text-[#24613a]',
-		Selesai: 'border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]'
+		'SK terbit': 'border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]',
+		'Perbaikan Uji Administrasi': 'border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]',
+		'Pasca Sidang': 'border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]',
+		'Penilaian KA': 'border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]',
+		'Penjadwalan Rapat': 'border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]',
+		Dikembalikan: 'border-[#d9a98a] bg-[#fff1e8] text-[#8a4522]',
+		Ditolak: 'border-[#e1a5a5] bg-[#fff0f0] text-[#8c2f2f]',
+		Submit: 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]'
 	};
 	const getStatusBadgeClass = (status: ProgressStatus) => statusBadgeClassMap[status];
 	const resolvePositionCategory = (
@@ -225,21 +274,133 @@
 	const paginatedRows = $derived(sortedRows.slice(pageStartIndex, pageEndIndex));
 	const visibleRangeStart = $derived(totalFilteredRows === 0 ? 0 : pageStartIndex + 1);
 	const visibleRangeEnd = $derived(Math.min(pageEndIndex, totalFilteredRows));
+	const activeAdvancedFilterCount = $derived(
+		(sortOption !== 'Terbaru' ? 1 : 0) +
+			(statusFilter !== 'Semua Status' ? 1 : 0) +
+			(positionFilter !== 'Semua Posisi' ? 1 : 0)
+	);
+	const activeFilterChips = $derived.by(() => {
+		const chips: Array<{ key: FilterChipKey; label: string; value: string }> = [];
+		if (searchQuery.trim()) {
+			chips.push({ key: 'search', label: 'Pencarian', value: searchQuery.trim() });
+		}
+		if (sortOption !== 'Terbaru') {
+			chips.push({ key: 'sort', label: 'Urutkan', value: sortOption });
+		}
+		if (statusFilter !== 'Semua Status') {
+			chips.push({ key: 'status', label: 'Status', value: statusFilter });
+		}
+		if (positionFilter !== 'Semua Posisi') {
+			chips.push({ key: 'position', label: 'Jenis', value: positionFilter });
+		}
+		return chips;
+	});
 
 	const isRowExpanded = (registrationNo: string) => expandedRows.includes(registrationNo);
 	const resetExpandedAndFirstPage = () => {
 		expandedRows = [];
 		currentPage = 1;
 	};
-	const handleRowsPerPageChange = (event: Event) => {
-		const target = event.currentTarget as HTMLSelectElement;
-		rowsPerPage = Number(target.value) as RowsPerPage;
+	const closeAllDropdownMenus = () => {
+		isSortDropdownOpen = false;
+		isStatusDropdownOpen = false;
+		isPositionDropdownOpen = false;
+		isRowsDropdownOpen = false;
+	};
+	const toggleSortDropdown = () => {
+		isSortDropdownOpen = !isSortDropdownOpen;
+		isStatusDropdownOpen = false;
+		isPositionDropdownOpen = false;
+	};
+	const toggleStatusDropdown = () => {
+		isStatusDropdownOpen = !isStatusDropdownOpen;
+		isSortDropdownOpen = false;
+		isPositionDropdownOpen = false;
+	};
+	const togglePositionDropdown = () => {
+		isPositionDropdownOpen = !isPositionDropdownOpen;
+		isSortDropdownOpen = false;
+		isStatusDropdownOpen = false;
+	};
+	const toggleRowsDropdown = () => {
+		isRowsDropdownOpen = !isRowsDropdownOpen;
+	};
+	const selectSortOption = (value: SortOption) => {
+		sortOption = value;
 		resetExpandedAndFirstPage();
+		isSortDropdownOpen = false;
+	};
+	const selectStatusFilter = (value: 'Semua Status' | ProgressStatus) => {
+		statusFilter = value;
+		resetExpandedAndFirstPage();
+		isStatusDropdownOpen = false;
+	};
+	const selectPositionFilter = (value: PositionFilter) => {
+		positionFilter = value;
+		resetExpandedAndFirstPage();
+		isPositionDropdownOpen = false;
+	};
+	const selectRowsPerPage = (value: RowsPerPage) => {
+		rowsPerPage = value;
+		resetExpandedAndFirstPage();
+		isRowsDropdownOpen = false;
 	};
 	const toggleRowExpanded = (registrationNo: string) => {
 		expandedRows = isRowExpanded(registrationNo)
 			? expandedRows.filter((item) => item !== registrationNo)
 			: [...expandedRows, registrationNo];
+	};
+	const toggleFilterPanel = () => {
+		isFilterPanelOpen = !isFilterPanelOpen;
+		if (!isFilterPanelOpen) {
+			closeAllDropdownMenus();
+		}
+	};
+	const closeFilterPanel = () => {
+		isFilterPanelOpen = false;
+		closeAllDropdownMenus();
+	};
+	const clearFilterChip = (key: FilterChipKey) => {
+		switch (key) {
+			case 'search':
+				searchQuery = '';
+				break;
+			case 'sort':
+				sortOption = 'Terbaru';
+				break;
+			case 'status':
+				statusFilter = 'Semua Status';
+				break;
+			case 'position':
+				positionFilter = 'Semua Posisi';
+				break;
+		}
+		resetExpandedAndFirstPage();
+	};
+	const handleWindowClick = (event: MouseEvent) => {
+		const target = event.target as Node | null;
+		if (!target) return;
+		if (isSortDropdownOpen && !sortDropdownElement?.contains(target)) {
+			isSortDropdownOpen = false;
+		}
+		if (isStatusDropdownOpen && !statusDropdownElement?.contains(target)) {
+			isStatusDropdownOpen = false;
+		}
+		if (isPositionDropdownOpen && !positionDropdownElement?.contains(target)) {
+			isPositionDropdownOpen = false;
+		}
+		if (isRowsDropdownOpen && !rowsDropdownElement?.contains(target)) {
+			isRowsDropdownOpen = false;
+		}
+		if (!isFilterPanelOpen) return;
+		if (filterPanelElement?.contains(target)) return;
+		if (filterToggleButton?.contains(target)) return;
+		closeFilterPanel();
+	};
+	const handleWindowKeydown = (event: KeyboardEvent) => {
+		if (event.key !== 'Escape') return;
+		closeFilterPanel();
+		closeAllDropdownMenus();
 	};
 	const goToPreviousPage = () => {
 		if (currentPage === 1) return;
@@ -315,8 +476,17 @@
 		sortOption = 'Terbaru';
 		statusFilter = 'Semua Status';
 		positionFilter = 'Semua Posisi';
+		isFilterPanelOpen = false;
+		closeAllDropdownMenus();
 		expandedRows = [];
 		currentPage = 1;
+	};
+	const resetAdvancedFilters = () => {
+		sortOption = 'Terbaru';
+		statusFilter = 'Semua Status';
+		positionFilter = 'Semua Posisi';
+		closeAllDropdownMenus();
+		resetExpandedAndFirstPage();
 	};
 </script>
 
@@ -328,24 +498,26 @@
 	/>
 </svelte:head>
 
+<svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
+
 <section class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-16 sm:pt-32 sm:pb-20">
 	<div class="nav-shell relative">
-		<header class="mb-7 sm:mb-8">
-			<div class="mx-auto max-w-3xl text-center">
-				<h1 class="text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-5xl">
+		<header class="mb-5 sm:mb-6">
+			<div class="max-w-3xl">
+				<h1
+					class="text-[clamp(1.75rem,7.2vw,2.65rem)] leading-[1.12] font-semibold tracking-[-0.015em] text-[var(--ink)]"
+				>
 					Antrian Dokumen Lingkungan
 				</h1>
-				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-					Pantau status, posisi, dan perkembangan pengajuan dokumen lingkungan secara berkala.
-				</p>
 			</div>
 		</header>
 
-		<div class="mt-0">
-			<div class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_12rem_12rem_12rem]">
+		<div class="mt-0 space-y-4">
+			<div class="space-y-2.5 border-b border-[#e6ebf2] pb-3.5">
+				<div class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between">
 				<label
 					for="search-antrian"
-					class="flex h-12 items-center gap-3 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4"
+					class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:px-4 md:max-w-[30rem]"
 				>
 					<Search class="h-4.5 w-4.5 text-[var(--muted)]" strokeWidth={2} aria-hidden="true" />
 					<input
@@ -353,100 +525,328 @@
 						type="text"
 						bind:value={searchQuery}
 						oninput={resetExpandedAndFirstPage}
-						placeholder="Cari no registrasi, instansi, kegiatan, atau status..."
+						placeholder="Cari registrasi atau instansi"
 						class="h-full w-full border-0 bg-transparent px-0 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] focus:ring-0 focus:outline-none"
 					/>
 				</label>
 
-				<label for="sort-option" class="sr-only">Urutkan data</label>
-				<select
-					id="sort-option"
-					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
-					bind:value={sortOption}
-					onchange={resetExpandedAndFirstPage}
-				>
-					<option value="Terbaru">Terbaru</option>
-					<option value="Terlama">Terlama</option>
-					<option value="Update terbaru">Update terbaru</option>
-					<option value="Update terlama">Update terlama</option>
-					<option value="Instansi A-Z">Instansi A-Z</option>
-					<option value="Instansi Z-A">Instansi Z-A</option>
-				</select>
+				<div class="grid grid-cols-2 gap-2 sm:flex sm:items-center md:shrink-0">
+					<button
+						type="button"
+						bind:this={filterToggleButton}
+						onclick={toggleFilterPanel}
+						aria-expanded={isFilterPanelOpen}
+						aria-controls="dokling-filter-panel"
+						class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none sm:px-4 sm:w-auto"
+					>
+						<ListFilterPlus class="h-4 w-4" strokeWidth={2.1} />
+						<span>Filter</span>
+						{#if activeAdvancedFilterCount > 0}
+							<span
+								class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#20232A] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
+							>
+								{activeAdvancedFilterCount}
+							</span>
+						{/if}
+						<ChevronDown
+							class={`h-4 w-4 text-[var(--muted)] transition-transform ${isFilterPanelOpen ? 'rotate-180' : ''}`}
+							strokeWidth={2.1}
+						/>
+					</button>
 
-				<label for="status-filter" class="sr-only">Filter status progress</label>
-				<select
-					id="status-filter"
-					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
-					bind:value={statusFilter}
-					onchange={resetExpandedAndFirstPage}
-				>
-					<option value="Semua Status">Semua Status</option>
-					<option value="Menunggu Verifikasi">Menunggu Verifikasi</option>
-					<option value="Penilaian Teknis">Penilaian Teknis</option>
-					<option value="Perbaikan Dokumen">Perbaikan Dokumen</option>
-					<option value="Penerbitan Persetujuan">Penerbitan Persetujuan</option>
-					<option value="Selesai">Selesai</option>
-				</select>
-
-				<label for="position-filter" class="sr-only">Filter jenis dokumen</label>
-				<select
-					id="position-filter"
-					class="h-12 rounded-md border border-[#c9d1dd] bg-[#ffffff] px-4 text-sm font-medium text-[var(--ink)] focus:border-[#8ea26d] focus:ring-0"
-					bind:value={positionFilter}
-					onchange={resetExpandedAndFirstPage}
-				>
-					<option value="Semua Posisi">Semua Jenis</option>
-					<option value="Andal">Andal</option>
-					<option value="DELH">DELH</option>
-					<option value="Addendum">Addendum</option>
-					<option value="UKP-UPL">UKP-UPL</option>
-					<option value="DPLH">DPLH</option>
-				</select>
-			</div>
-
-			<div class="mt-3 flex flex-wrap items-center justify-between gap-3 pb-3">
-				<p class="text-xs font-medium text-[var(--muted)] sm:text-sm">
-					Menampilkan
-					<span class="font-semibold text-[var(--ink)]">{visibleRangeStart}</span>
-					-
-					<span class="font-semibold text-[var(--ink)]">{visibleRangeEnd}</span>
-					dari
-					<span class="font-semibold text-[var(--ink)]">{totalFilteredRows}</span>
-					hasil filter, total
-					<span class="font-semibold text-[var(--ink)]">{queueRows.length}</span> pengajuan dokumen
-				</p>
-
-				<div class="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:justify-end">
 					<button
 						type="button"
 						onclick={exportFilteredRows}
 						disabled={totalFilteredRows === 0}
-						class="inline-flex h-9 items-center justify-center gap-1.5 rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-50"
+						class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f6f7f8] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:w-auto"
 					>
-						<Download class="h-3.5 w-3.5" strokeWidth={2.2} />
-						Export CSV
+						<Download class="h-4 w-4" strokeWidth={2.2} />
+						Download
 					</button>
+				</div>
+			</div>
+			</div>
 
-					{#if
-						searchQuery ||
-						sortOption !== 'Terbaru' ||
-						statusFilter !== 'Semua Status' ||
-						positionFilter !== 'Semua Posisi'}
-						<button
-							type="button"
-							class="inline-flex h-9 items-center justify-center rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[var(--muted)] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] hover:text-[var(--ink)]"
-							onclick={resetFilter}
+			{#if isFilterPanelOpen}
+				<div
+					id="dokling-filter-panel"
+					bind:this={filterPanelElement}
+					class="rounded-lg border border-[#d7dee8] bg-[#ffffff] p-3 sm:p-4"
+				>
+					<div class="grid gap-3 md:grid-cols-3">
+						<div>
+							<label for="sort-option" class="mb-1 block text-xs font-semibold text-[var(--muted)]">
+								Urutkan
+							</label>
+							<div class="relative" bind:this={sortDropdownElement}>
+								<button
+									id="sort-option"
+									type="button"
+									onclick={toggleSortDropdown}
+									aria-haspopup="listbox"
+									aria-expanded={isSortDropdownOpen}
+									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-[var(--ink)] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
+								>
+									<span class="truncate">{sortOption}</span>
+									<ChevronDown
+										class={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`}
+										strokeWidth={2.2}
+									/>
+								</button>
+								{#if isSortDropdownOpen}
+									<ul
+										role="listbox"
+										aria-labelledby="sort-option"
+										class="absolute z-30 mt-1.5 max-h-56 w-full overflow-auto rounded-lg border border-[#d1d9e5] bg-white p-1 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.45)]"
+									>
+										{#each sortOptions as option}
+											<li>
+												<button
+													type="button"
+													role="option"
+													aria-selected={sortOption === option}
+													onclick={() => selectSortOption(option)}
+													class={`flex w-full items-center rounded-md px-2.5 py-2 text-left text-sm transition-colors ${
+														sortOption === option
+															? 'bg-[#eef6e8] font-semibold text-[#1f4d1f]'
+															: 'text-[#20232A] hover:bg-[#f6f7f8]'
+													}`}
+												>
+													{option}
+												</button>
+											</li>
+										{/each}
+									</ul>
+								{/if}
+							</div>
+						</div>
+
+						<div>
+							<label for="status-filter" class="mb-1 block text-xs font-semibold text-[var(--muted)]">
+								Status Progress
+							</label>
+							<div class="relative" bind:this={statusDropdownElement}>
+								<button
+									id="status-filter"
+									type="button"
+									onclick={toggleStatusDropdown}
+									aria-haspopup="listbox"
+									aria-expanded={isStatusDropdownOpen}
+									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-[var(--ink)] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
+								>
+									<span class="truncate">{statusFilter}</span>
+									<ChevronDown
+										class={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isStatusDropdownOpen ? 'rotate-180' : ''}`}
+										strokeWidth={2.2}
+									/>
+								</button>
+								{#if isStatusDropdownOpen}
+									<ul
+										role="listbox"
+										aria-labelledby="status-filter"
+										class="absolute z-30 mt-1.5 max-h-56 w-full overflow-auto rounded-lg border border-[#d1d9e5] bg-white p-1 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.45)]"
+									>
+										{#each statusOptions as option}
+											<li>
+												<button
+													type="button"
+													role="option"
+													aria-selected={statusFilter === option}
+													onclick={() => selectStatusFilter(option)}
+													class={`flex w-full items-center rounded-md px-2.5 py-2 text-left text-sm transition-colors ${
+														statusFilter === option
+															? 'bg-[#eef6e8] font-semibold text-[#1f4d1f]'
+															: 'text-[#20232A] hover:bg-[#f6f7f8]'
+													}`}
+												>
+													{option}
+												</button>
+											</li>
+										{/each}
+									</ul>
+								{/if}
+							</div>
+						</div>
+
+						<div>
+							<label for="position-filter" class="mb-1 block text-xs font-semibold text-[var(--muted)]">
+								Jenis Dokumen
+							</label>
+							<div class="relative" bind:this={positionDropdownElement}>
+								<button
+									id="position-filter"
+									type="button"
+									onclick={togglePositionDropdown}
+									aria-haspopup="listbox"
+									aria-expanded={isPositionDropdownOpen}
+									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-[var(--ink)] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
+								>
+									<span class="truncate"
+										>{positionFilter === 'Semua Posisi' ? 'Semua Jenis' : positionFilter}</span
+									>
+									<ChevronDown
+										class={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isPositionDropdownOpen ? 'rotate-180' : ''}`}
+										strokeWidth={2.2}
+									/>
+								</button>
+								{#if isPositionDropdownOpen}
+									<ul
+										role="listbox"
+										aria-labelledby="position-filter"
+										class="absolute z-30 mt-1.5 max-h-56 w-full overflow-auto rounded-lg border border-[#d1d9e5] bg-white p-1 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.45)]"
+									>
+										{#each positionFilterOptions as option}
+											<li>
+												<button
+													type="button"
+													role="option"
+													aria-selected={positionFilter === option.value}
+													onclick={() => selectPositionFilter(option.value)}
+													class={`flex w-full items-center rounded-md px-2.5 py-2 text-left text-sm transition-colors ${
+														positionFilter === option.value
+															? 'bg-[#eef6e8] font-semibold text-[#1f4d1f]'
+															: 'text-[#20232A] hover:bg-[#f6f7f8]'
+													}`}
+												>
+													{option.label}
+												</button>
+											</li>
+										{/each}
+									</ul>
+								{/if}
+							</div>
+						</div>
+					</div>
+
+					<div class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#edf1f6] pt-3">
+						<p class="text-xs text-[var(--muted)]">
+							Urutan aktif:
+							<span class="font-semibold text-[var(--ink)]">{sortOption}</span>
+						</p>
+
+						<div class="flex flex-wrap items-center gap-2">
+							{#if activeAdvancedFilterCount > 0}
+								<button
+									type="button"
+									class="inline-flex h-9 items-center justify-center rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[var(--muted)] transition-colors hover:bg-[#f3f5f8] hover:text-[var(--ink)]"
+									onclick={resetAdvancedFilters}
+								>
+									Reset Filter
+								</button>
+							{/if}
+						</div>
+					</div>
+				</div>
+			{/if}
+
+			{#if activeFilterChips.length > 0}
+				<div class="flex flex-wrap items-center gap-2">
+					{#each activeFilterChips as chip}
+						<span
+							class="inline-flex items-center gap-1 rounded-md border border-[#d7dee8] bg-[#f8fafd] px-2 py-1 text-[0.72rem] text-[#334155]"
 						>
-							Reset Filter
-						</button>
-					{/if}
+							<span class="font-medium text-[#64748b]">{chip.label}:</span>
+							<span class="font-semibold text-[#0f172a]">{chip.value}</span>
+							<button
+								type="button"
+								class="inline-flex h-4.5 w-4.5 items-center justify-center rounded-full text-[#64748b] transition-colors hover:bg-[#e8edf5] hover:text-[#0f172a]"
+								onclick={() => clearFilterChip(chip.key)}
+								aria-label={`Hapus filter ${chip.label}`}
+							>
+								<X class="h-3 w-3" strokeWidth={2.3} />
+							</button>
+						</span>
+					{/each}
+				</div>
+			{/if}
+
+			<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+				<div class="space-y-1">
+					<p class="text-xs text-[var(--muted)] md:hidden">
+						Menampilkan
+						<span class="font-semibold text-[var(--ink)]"
+							>{formatNumber(visibleRangeStart)}-{formatNumber(visibleRangeEnd)}</span
+						>
+						dari
+						<span class="font-semibold text-[var(--ink)]">{formatNumber(totalFilteredRows)}</span>
+						hasil
+					</p>
+					<p class="text-[0.72rem] text-[var(--muted)] md:hidden">
+						Total pengajuan:
+						<span class="font-semibold text-[var(--ink)]">{formatNumber(queueRows.length)}</span>
+					</p>
+					<div
+						class="hidden flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[var(--muted)] sm:text-sm md:flex"
+					>
+						<p>
+							Rentang
+							<span class="font-semibold text-[var(--ink)]"
+								>{formatNumber(visibleRangeStart)}-{formatNumber(visibleRangeEnd)}</span
+							>
+						</p>
+						<p>
+							Hasil Filter
+							<span class="font-semibold text-[var(--ink)]">{formatNumber(totalFilteredRows)}</span>
+						</p>
+						<p>
+							Total Pengajuan
+							<span class="font-semibold text-[var(--ink)]">{formatNumber(queueRows.length)}</span>
+						</p>
+					</div>
+				</div>
+
+				<div class="flex flex-wrap items-center gap-2 md:justify-end">
+					<div class="inline-flex items-center gap-2 text-xs text-[var(--muted)] sm:text-sm">
+						<label for="rows-per-page" class="font-medium">Tampilkan:</label>
+						<div class="relative" bind:this={rowsDropdownElement}>
+							<button
+								id="rows-per-page"
+								type="button"
+								onclick={toggleRowsDropdown}
+								aria-haspopup="listbox"
+								aria-expanded={isRowsDropdownOpen}
+								class="flex h-8 w-[3.6rem] items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-2 pl-2.5 text-xs font-semibold text-[#20232A] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none sm:h-9 sm:w-[3.9rem] sm:pr-2.5"
+							>
+								<span>{rowsPerPage}</span>
+								<ChevronDown
+									class={`h-3 w-3 text-[var(--muted)] transition-transform sm:h-3.5 sm:w-3.5 ${isRowsDropdownOpen ? 'rotate-180' : ''}`}
+									strokeWidth={2.2}
+								/>
+							</button>
+							{#if isRowsDropdownOpen}
+								<ul
+									role="listbox"
+									aria-labelledby="rows-per-page"
+									class="absolute right-0 z-30 mt-1.5 w-[3.6rem] overflow-hidden rounded-lg border border-[#d1d9e5] bg-white p-1 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.45)] sm:w-[3.9rem]"
+								>
+									{#each rowsPerPageOptions as option}
+										<li>
+											<button
+												type="button"
+												role="option"
+												aria-selected={rowsPerPage === option}
+												onclick={() => selectRowsPerPage(option)}
+												class={`flex w-full items-center justify-center rounded-md px-2 py-1.5 text-xs transition-colors ${
+													rowsPerPage === option
+														? 'bg-[#eef6e8] font-semibold text-[#1f4d1f]'
+														: 'text-[#20232A] hover:bg-[#f6f7f8]'
+												}`}
+											>
+												{option}
+											</button>
+										</li>
+									{/each}
+								</ul>
+							{/if}
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 
 		<div class="mt-6 hidden md:block">
 			<div
-				class="overflow-x-auto rounded-2xl border-y border-[#d7dee8] bg-transparent"
+				class="overflow-x-auto rounded-xl border-y border-[#d7dee8] bg-transparent"
 			>
 				<table class="w-full min-w-[1180px] border-collapse">
 					<thead class="bg-[#20232A]">
@@ -512,10 +912,10 @@
 						{:else}
 							{#each paginatedRows as row, index}
 								<tr class="border-t border-[#e9edf3] align-top">
-									<td class="w-14 px-3 py-4 text-center text-sm font-semibold text-[#20232A]">
+									<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">
 										{pageStartIndex + index + 1}
 									</td>
-									<td class="px-6 py-4 text-sm font-semibold text-[#20232A]"
+									<td class="px-6 py-4 text-sm text-[#20232A]"
 										>{row.registrationNo}</td
 									>
 									<td class="px-6 py-4 text-sm text-[#20232A]"
@@ -528,7 +928,11 @@
 									<td class="px-6 py-4 text-sm text-[#20232A]">{row.documentType}</td>
 									<td class="w-28 px-4 py-4 text-sm text-[#20232A]">{row.position}</td>
 									<td class="w-32 px-4 py-4 text-sm leading-snug text-[#20232A]">
-										{row.progressStatus}
+										<span
+											class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.progressStatus)}`}
+										>
+											{row.progressStatus}
+										</span>
 									</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">
 										{formatDate(row.progressUpdatedDate)}
@@ -542,12 +946,13 @@
 		</div>
 
 		<div
-			class="mt-6 overflow-hidden rounded-2xl border-y border-[#d7dee8] bg-transparent md:hidden"
+			class="mt-6 overflow-hidden rounded-xl border-y border-[#d7dee8] bg-transparent md:hidden"
 		>
 			<div
-				class="border-b border-[#323944] bg-[#20232A] px-3 py-3.5 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
+				class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
-				<span>Daftar Antrian</span>
+				<span class="text-center">No</span>
+				<span class="text-sm">Detail Dokumen</span>
 			</div>
 
 			{#if totalFilteredRows === 0}
@@ -585,7 +990,7 @@
 													{row.documentType}
 												</span>
 												<span
-													class={`inline-flex items-center rounded-full border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.progressStatus)}`}
+													class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.progressStatus)}`}
 												>
 													{row.progressStatus}
 												</span>
@@ -652,39 +1057,16 @@
 		</div>
 
 		{#if totalFilteredRows > 0}
-			<div class="mt-5 pt-4">
-				<div class="flex w-full flex-wrap items-center justify-between gap-3">
-					<div
-						class="inline-flex h-9 items-center gap-2 rounded-md border border-[#d3dbe7] bg-[#ffffff] pr-2 pl-3 shadow-[0_1px_2px_rgba(15,23,42,0.04)]"
-					>
-						<span class="text-xs font-semibold text-[var(--muted)]">Baris</span>
-						<label for="rows-per-page" class="sr-only">Jumlah baris</label>
-						<div class="relative">
-							<select
-								id="rows-per-page"
-								class="h-8 min-w-[4.25rem] appearance-none rounded-md border-0 bg-transparent bg-none py-0 pr-7 pl-2 text-xs font-semibold text-[#20232A] [background-image:none] focus:ring-0 focus:outline-none"
-								value={rowsPerPage}
-								onchange={handleRowsPerPageChange}
-							>
-								{#each rowsPerPageOptions as option}
-									<option value={option}>{option}</option>
-								{/each}
-							</select>
-							<span
-								class="pointer-events-none absolute top-1/2 right-2 -translate-y-1/2 text-[var(--muted)]"
-								aria-hidden="true"
-							>
-								<ChevronDown class="h-3.5 w-3.5" strokeWidth={2.2} />
-							</span>
-						</div>
-					</div>
-
-					<div class="inline-flex w-full items-center justify-end gap-1.5 sm:w-auto">
+			<div class="mt-6 pt-2">
+				<nav
+					aria-label="Navigasi halaman antrian dokumen"
+					class="mx-auto flex flex-wrap items-center justify-center gap-1.5"
+				>
 						<button
 							type="button"
 							onclick={goToFirstPage}
 							disabled={currentPage === 1}
-							class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+							class="inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							Awal
 						</button>
@@ -694,13 +1076,13 @@
 							onclick={goToPreviousPage}
 							disabled={currentPage === 1}
 							aria-label="Halaman sebelumnya"
-							class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+							class="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
 						</button>
 
 						<div
-							class="inline-flex h-9 min-w-[5.75rem] items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#f8fafc] px-3 text-xs font-semibold text-[#20232A]"
+							class="inline-flex h-9 min-w-[4.5rem] items-center justify-center px-1.5 text-xs font-semibold tabular-nums text-[#20232A]"
 						>
 							{currentPage} / {totalPages}
 						</div>
@@ -710,7 +1092,7 @@
 							onclick={goToNextPage}
 							disabled={currentPage === totalPages}
 							aria-label="Halaman berikutnya"
-							class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+							class="inline-flex h-9 w-9 items-center justify-center rounded-md text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
 						</button>
@@ -719,12 +1101,11 @@
 							type="button"
 							onclick={goToLastPage}
 							disabled={currentPage === totalPages}
-							class="inline-flex h-9 items-center justify-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[#20232A] shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors hover:bg-[#f3f5f8] disabled:cursor-not-allowed disabled:opacity-45"
+							class="inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold text-[#475467] transition-colors hover:bg-[#f4f8f0] hover:text-[#20232A] disabled:cursor-not-allowed disabled:opacity-40"
 						>
 							Akhir
 						</button>
-					</div>
-				</div>
+				</nav>
 			</div>
 		{/if}
 	</div>
