@@ -1,8 +1,6 @@
-<script lang="ts">
+﻿<script lang="ts">
 import { onDestroy } from 'svelte';
-import { cubicOut } from 'svelte/easing';
-import { fly, scale } from 'svelte/transition';
-import Clock3 from 'lucide-svelte/icons/clock-3';
+import { fly } from 'svelte/transition';
 import ChevronRight from 'lucide-svelte/icons/chevron-right';
 import X from 'lucide-svelte/icons/x';
 import { siWhatsapp } from 'simple-icons';
@@ -116,7 +114,7 @@ function toggleFaq(id: string) {
 <svelte:window onkeydown={handleWindowKeydown} />
 
 <div
-	class={`pointer-events-none fixed right-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 px-3 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8 ${
+	class={`pointer-events-none fixed right-0 bottom-[max(1.35rem,env(safe-area-inset-bottom))] left-0 px-3 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8 ${
 		isOpen ? 'z-[60]' : 'z-30'
 	}`}
 >
@@ -128,41 +126,35 @@ function toggleFaq(id: string) {
 				in:fly={{ y: 14, duration: 190 }}
 				out:fly={{ y: 10, duration: 140 }}
 			>
-				<div class="border-b border-[#eef1f5] bg-white px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-3.5 sm:pt-4">
+				<div class="border-b border-[#eef1f5] bg-white px-6 pt-[max(2.25rem,env(safe-area-inset-top))] pb-4 sm:px-4 sm:pt-4 sm:pb-3.5">
 					<div class="flex items-start justify-between gap-2.5">
 						<div>
-							<p class="text-[1.35rem] font-semibold text-[#0f172a]">Pusat Bantuan</p>
-							<p class="mt-1 text-[0.82rem] leading-relaxed text-[#475467]">
+							<p class="text-[1.52rem] leading-tight font-semibold text-[#0f172a] sm:text-[1.35rem]">Pusat Bantuan</p>
+							<p class="mt-1.5 text-[0.92rem] leading-relaxed text-[#475467] sm:mt-1 sm:text-[0.82rem]">
 								Silakan sampaikan pertanyaan Anda, kami siap membantu informasi layanan dan antrean perizinan lingkungan.
 							</p>
-							<div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[0.72rem] text-[#667085]">
-								<Clock3 class="h-3.5 w-3.5 text-[#98A2B3]" strokeWidth={2.2} aria-hidden="true" />
-								<span class="font-medium text-[#475467]">Jam operasional</span>
-								<span class="text-[#98A2B3]">•</span>
-								<span>Senin-Jumat, 09.00-15.00 WITA</span>
-							</div>
 						</div>
 						<div class="pt-0.5">
 							<button
 								type="button"
-								class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e4e7ec] bg-white text-[#475467] transition-colors hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:hidden"
+								class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[#e4e7ec] bg-white text-[#475467] transition-colors hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:hidden"
 								aria-label="Tutup popup bantuan"
 								onclick={closePopup}
 							>
-								<X class="h-4.5 w-4.5" strokeWidth={2.3} aria-hidden="true" />
+								<X class="h-5 w-5" strokeWidth={2.3} aria-hidden="true" />
 							</button>
 						</div>
 					</div>
 				</div>
 
-				<div class="space-y-4 bg-white px-3 py-3.5 sm:py-3.5">
-					<section class="space-y-2.5">
-						<p class="px-1 text-[0.78rem] font-semibold text-[#344054]">Pilih Kanal Bantuan</p>
+				<div class="space-y-5 bg-white px-6 py-4 sm:space-y-4 sm:px-3 sm:py-3.5">
+					<section class="space-y-3">
+						<p class="px-1 text-[0.9rem] font-semibold text-[#344054] sm:text-[0.78rem]">Pilih Kanal Bantuan</p>
 						<div class="space-y-2">
 							{#each supportChannels as channel (channel.id)}
 								<button
 									type="button"
-									class="w-full rounded-xl border border-[#e4e7ec] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f9fafb]"
+									class="w-full rounded-xl border border-[#e4e7ec] bg-white px-3.5 py-3.5 text-left transition-colors hover:bg-[#f9fafb] sm:px-3 sm:py-3"
 									onclick={() => openWhatsApp(channel)}
 								>
 									<span class="flex items-start gap-2.5">
@@ -172,11 +164,11 @@ function toggleFaq(id: string) {
 											</svg>
 										</span>
 										<span class="min-w-0 flex-1">
-											<span class="block text-sm font-semibold text-[#101828]">{channel.title}</span>
-											<span class="mt-0.5 block text-[0.72rem] leading-relaxed text-[#667085]">
+											<span class="block text-[0.96rem] font-semibold text-[#101828] sm:text-sm">{channel.title}</span>
+											<span class="mt-0.5 block text-[0.8rem] leading-relaxed text-[#667085] sm:text-[0.72rem]">
 												{channel.description}
 											</span>
-											<span class="mt-2 inline-flex items-center gap-1 text-[0.72rem] font-medium text-[#344054]">
+											<span class="mt-2 inline-flex items-center gap-1 text-[0.8rem] font-medium text-[#344054] sm:text-[0.72rem]">
 												Mulai Percakapan
 												<ChevronRight class="h-3.5 w-3.5" strokeWidth={2.2} aria-hidden="true" />
 											</span>
@@ -187,20 +179,20 @@ function toggleFaq(id: string) {
 						</div>
 					</section>
 
-					<section class="space-y-2.5">
+					<section class="space-y-3">
 						<div class="px-1">
-							<p class="text-[0.78rem] font-semibold text-[#344054]">FAQ Singkat</p>
+							<p class="text-[0.9rem] font-semibold text-[#344054] sm:text-[0.78rem]">FAQ Singkat</p>
 						</div>
 						<div class="overflow-hidden rounded-xl border border-[#e4e7ec] bg-white">
 							{#each faqItems as faq (faq.id)}
 								<div>
 									<button
 										type="button"
-										class="flex w-full items-center justify-between gap-2.5 px-3 py-2.5 text-left"
+										class="flex w-full items-center justify-between gap-2.5 px-3.5 py-3 text-left sm:px-3 sm:py-2.5"
 										onclick={() => toggleFaq(faq.id)}
 										aria-expanded={activeFaqId === faq.id}
 									>
-										<span class="text-xs leading-relaxed font-medium text-[#101828]">{faq.question}</span>
+										<span class="text-[0.84rem] leading-relaxed font-medium text-[#101828] sm:text-xs">{faq.question}</span>
 										<span
 											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-[#e4e7ec] bg-[#f9fafb] text-[#667085] transition-transform duration-200 ${
 												activeFaqId === faq.id ? 'rotate-90' : ''
@@ -210,7 +202,7 @@ function toggleFaq(id: string) {
 										</span>
 									</button>
 									{#if activeFaqId === faq.id}
-										<p class="px-3 py-2 text-[0.72rem] leading-relaxed text-[#475467]">
+										<p class="px-3.5 py-2.5 text-[0.8rem] leading-relaxed text-[#475467] sm:px-3 sm:py-2 sm:text-[0.72rem]">
 											{faq.answer}
 										</p>
 									{/if}
@@ -218,7 +210,7 @@ function toggleFaq(id: string) {
 							{/each}
 							<a
 								href="/kontak"
-								class="block border-t border-[#eef1f5] px-3 py-2.5 text-[0.78rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb] hover:text-[#1f8f3a]"
+								class="block border-t border-[#eef1f5] px-3.5 py-3 text-[0.86rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb] hover:text-[#1f8f3a] sm:px-3 sm:py-2.5 sm:text-[0.78rem]"
 							>
 								<span>Lihat selengkapnya</span>
 							</a>
@@ -226,7 +218,7 @@ function toggleFaq(id: string) {
 					</section>
 				</div>
 
-				<div class="border-t border-[#eef1f5] bg-white px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:py-2.5">
+				<div class="border-t border-[#eef1f5] bg-white px-6 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-4 sm:py-2.5">
 					<p class="text-center text-[11px] text-[#98A2B3]">Powered By Sikopling</p>
 				</div>
 			</section>
@@ -246,34 +238,24 @@ function toggleFaq(id: string) {
 		>
 			<span
 				class={`relative block ${
-					isOpen ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-12 w-12 sm:h-16 sm:w-16'
+					isOpen ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-[3.35rem] w-[3.35rem] sm:h-16 sm:w-16'
 				}`}
 				aria-hidden="true"
 			>
-				{#key isOpen}
-					{#if isOpen}
-						<span
-							class="block h-full w-full"
-							in:scale={{ start: 0.55, duration: 160, easing: cubicOut }}
-							out:scale={{ start: 1, duration: 120, easing: cubicOut }}
-						>
-							<X class="h-full w-full" strokeWidth={2.45} aria-hidden="true" />
-						</span>
-					{:else}
-						<span
-							class="block h-full w-full"
-							in:scale={{ start: 0.55, duration: 160, easing: cubicOut }}
-							out:scale={{ start: 1, duration: 120, easing: cubicOut }}
-						>
-							<img
-								src="/layout/chatbot.svg"
-								alt=""
-								class="h-full w-full origin-center scale-[1.35] object-contain sm:scale-[1.3]"
-								aria-hidden="true"
-							/>
-						</span>
-					{/if}
-				{/key}
+				{#if isOpen}
+					<span class="hidden h-full w-full sm:block">
+						<X class="h-full w-full" strokeWidth={2.45} aria-hidden="true" />
+					</span>
+				{:else}
+					<span class="block h-full w-full">
+						<img
+							src="/layout/chatbot.svg"
+							alt=""
+							class="h-full w-full origin-center scale-[1.42] object-contain sm:scale-[1.3]"
+							aria-hidden="true"
+						/>
+					</span>
+				{/if}
 			</span>
 		</button>
 	</div>
@@ -299,3 +281,4 @@ function toggleFaq(id: string) {
 		}
 	}
 </style>
+
