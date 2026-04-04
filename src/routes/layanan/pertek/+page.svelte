@@ -779,40 +779,40 @@
 		<div class="mt-6 hidden md:block">
 			<div class="overflow-x-auto rounded-xl border-y border-[#d7dee8] bg-transparent">
 				<table class="w-full min-w-[980px] border-collapse">
-					<thead class="bg-[#20232A]">
+					<thead class="bg-[#64AD31]">
 						<tr>
 							<th
-								class="w-14 border-b border-[#323944] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white"
+								class="w-14 border-b border-[#64AD31] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								No
 							</th>
 							<th
-								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Tanggal Masuk
 							</th>
 							<th
-								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Instansi
 							</th>
 							<th
-								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Kegiatan
 							</th>
 							<th
-								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Jenis Perling
 							</th>
 							<th
-								class="w-32 border-b border-[#323944] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="w-32 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Status Progress
 							</th>
 							<th
-								class="border-b border-[#323944] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								Tanggal Update
 							</th>
@@ -859,7 +859,7 @@
 
 		<div class="mt-6 overflow-hidden rounded-xl border-y border-[#d7dee8] bg-transparent md:hidden">
 			<div
-				class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#323944] bg-[#20232A] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
+				class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
 				<span class="text-center">No</span>
 				<span class="text-sm">Detail Pertek</span>
