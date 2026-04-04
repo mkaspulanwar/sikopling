@@ -114,7 +114,7 @@ function toggleFaq(id: string) {
 <svelte:window onkeydown={handleWindowKeydown} />
 
 <div
-	class={`pointer-events-none fixed right-0 bottom-[max(1.35rem,env(safe-area-inset-bottom))] left-0 px-4 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8 ${
+	class={`pointer-events-none fixed right-0 bottom-[max(1.35rem,env(safe-area-inset-bottom))] left-0 px-4 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-4 lg:bottom-8 ${
 		isOpen ? 'z-[60]' : 'z-30'
 	}`}
 >
