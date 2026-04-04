@@ -1,7 +1,8 @@
 <script lang="ts">
-	import { onDestroy } from 'svelte';
-	import { cubicOut } from 'svelte/easing';
+import { onDestroy } from 'svelte';
+import { cubicOut } from 'svelte/easing';
 import { fly, scale } from 'svelte/transition';
+import Clock3 from 'lucide-svelte/icons/clock-3';
 import ChevronRight from 'lucide-svelte/icons/chevron-right';
 import X from 'lucide-svelte/icons/x';
 import { siWhatsapp } from 'simple-icons';
@@ -44,11 +45,6 @@ const faqItems: FaqItem[] = [
 		answer: 'Pilih Chatbot WhatsApp lalu kirim nomor registrasi pengajuan.'
 	},
 	{
-		id: 'jam-layanan',
-		question: 'Kapan admin merespons pertanyaan?',
-		answer: 'Senin-Jumat pukul 09.00-15.00 WITA.'
-	},
-	{
 		id: 'eskalasi',
 		question: 'Kapan harus menghubungi Customer Service?',
 		answer: 'Saat perlu pendampingan lanjutan atau mengalami kendala teknis.'
@@ -62,17 +58,12 @@ const faqItems: FaqItem[] = [
 		id: 'lupa-nomor',
 		question: 'Bagaimana jika lupa nomor registrasi?',
 		answer: 'Hubungi Customer Service dan sertakan data identitas pengajuan yang Anda miliki.'
-	},
-	{
-		id: 'pengaduan',
-		question: 'Apakah bisa menyampaikan kendala atau pengaduan?',
-		answer: 'Bisa, silakan gunakan kanal Customer Service agar ditindaklanjuti oleh petugas.'
 	}
 ];
 
 let isOpen = $state(false);
 let buttonAnimating = $state(false);
-let activeFaqId = $state<string | null>(faqItems[0]?.id ?? null);
+let activeFaqId = $state<string | null>(null);
 let buttonAnimationTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	function triggerButtonAnimation() {
@@ -133,29 +124,22 @@ function toggleFaq(id: string) {
 		{#if isOpen}
 			<section
 				id="chatbot-popup"
-				class="fixed inset-0 z-40 flex h-[100dvh] w-screen flex-col overflow-hidden bg-white sm:static sm:mb-3 sm:h-[29rem] sm:w-[min(92vw,24rem)] sm:max-w-[24rem] sm:rounded-2xl sm:border sm:border-[#e4e7ec] sm:shadow-[0_24px_34px_-24px_rgba(15,23,42,0.35)]"
+				class="fixed inset-0 z-40 flex h-[100dvh] w-screen flex-col overflow-y-auto overscroll-contain bg-white sm:static sm:mb-3 sm:h-[29rem] sm:w-[min(92vw,24rem)] sm:max-w-[24rem] sm:rounded-2xl sm:border sm:border-[#e4e7ec] sm:shadow-[0_24px_34px_-24px_rgba(15,23,42,0.35)]"
 				in:fly={{ y: 14, duration: 190 }}
 				out:fly={{ y: 10, duration: 140 }}
 			>
 				<div class="border-b border-[#eef1f5] bg-white px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-3.5 sm:pt-4">
 					<div class="flex items-start justify-between gap-2.5">
 						<div>
-							<p class="text-[1.2rem] font-semibold text-[#0f172a]">Halo!</p>
+							<p class="text-[1.35rem] font-semibold text-[#0f172a]">Pusat Bantuan</p>
 							<p class="mt-1 text-[0.82rem] leading-relaxed text-[#475467]">
-								Terima kasih telah mengunjungi SIKOPLING! Ada yang bisa kami bantu untuk kebutuhan layanan lingkungan Anda?
+								Silakan sampaikan pertanyaan Anda, kami siap membantu informasi layanan dan antrean perizinan lingkungan.
 							</p>
-							<div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[0.68rem]">
-								<span
-									class="inline-flex items-center gap-1.5 rounded-full border border-[#dbe4d3] bg-[#f8fbf5] px-2.5 py-1 font-semibold text-[#3d6f2f]"
-								>
-									<span class="h-1.5 w-1.5 rounded-full bg-[#64AD31]"></span>
-									Online
-								</span>
-								<span
-									class="inline-flex items-center rounded-full border border-[#e4e7ec] bg-[#fafafa] px-2.5 py-1 font-medium text-[#667085]"
-								>
-									Senin-Jumat, 09.00-15.00 WITA
-								</span>
+							<div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[0.72rem] text-[#667085]">
+								<Clock3 class="h-3.5 w-3.5 text-[#98A2B3]" strokeWidth={2.2} aria-hidden="true" />
+								<span class="font-medium text-[#475467]">Jam operasional</span>
+								<span class="text-[#98A2B3]">•</span>
+								<span>Senin-Jumat, 09.00-15.00 WITA</span>
 							</div>
 						</div>
 						<div class="pt-0.5">
@@ -171,7 +155,7 @@ function toggleFaq(id: string) {
 					</div>
 				</div>
 
-				<div class="flex-1 space-y-4 overflow-y-auto overscroll-contain bg-white px-3 py-3.5 sm:py-3.5">
+				<div class="space-y-4 bg-white px-3 py-3.5 sm:py-3.5">
 					<section class="space-y-2.5">
 						<p class="px-1 text-[0.78rem] font-semibold text-[#344054]">Pilih Kanal Bantuan</p>
 						<div class="space-y-2">
@@ -182,13 +166,7 @@ function toggleFaq(id: string) {
 									onclick={() => openWhatsApp(channel)}
 								>
 									<span class="flex items-start gap-2.5">
-										<span
-											class={`mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${
-												channel.id === 'cs'
-													? 'border-[#c9dfb7] bg-[#eff8e6] text-[#1FA855]'
-													: 'border-[#cfe3bc] bg-[#f2f9ec] text-[#25D366]'
-											}`}
-										>
+										<span class="mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#cfe3bc] bg-[#f2f9ec] text-[#25D366]">
 											<svg viewBox="0 0 24 24" class="h-4.5 w-4.5" aria-hidden="true">
 												<path d={siWhatsapp.path} fill="currentColor"></path>
 											</svg>
@@ -214,8 +192,8 @@ function toggleFaq(id: string) {
 							<p class="text-[0.78rem] font-semibold text-[#344054]">FAQ Singkat</p>
 						</div>
 						<div class="overflow-hidden rounded-xl border border-[#e4e7ec] bg-white">
-							{#each faqItems as faq, index (faq.id)}
-								<div class={index > 0 ? 'border-t border-[#eef1f5]' : ''}>
+							{#each faqItems as faq (faq.id)}
+								<div>
 									<button
 										type="button"
 										class="flex w-full items-center justify-between gap-2.5 px-3 py-2.5 text-left"
@@ -232,12 +210,18 @@ function toggleFaq(id: string) {
 										</span>
 									</button>
 									{#if activeFaqId === faq.id}
-										<p class="border-t border-[#eef1f5] px-3 py-2 text-[0.72rem] leading-relaxed text-[#475467]">
+										<p class="px-3 py-2 text-[0.72rem] leading-relaxed text-[#475467]">
 											{faq.answer}
 										</p>
 									{/if}
 								</div>
 							{/each}
+							<a
+								href="/kontak"
+								class="block border-t border-[#eef1f5] px-3 py-2.5 text-[0.78rem] font-semibold text-[#344054] transition-colors hover:bg-[#f9fafb] hover:text-[#1f8f3a]"
+							>
+								<span>Lihat selengkapnya</span>
+							</a>
 						</div>
 					</section>
 				</div>
@@ -284,7 +268,7 @@ function toggleFaq(id: string) {
 							<img
 								src="/layout/chatbot.svg"
 								alt=""
-								class="h-full w-full origin-center scale-125 object-contain sm:scale-[1.3]"
+								class="h-full w-full origin-center scale-[1.35] object-contain sm:scale-[1.3]"
 								aria-hidden="true"
 							/>
 						</span>
