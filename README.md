@@ -18,7 +18,7 @@ README ini disinkronkan dengan kondisi kode pada **4 April 2026**.
 
 ## Ringkasan
 
-SIKOPLING dibangun sebagai frontend portal informasi layanan persetujuan lingkungan DLH Provinsi Kalimantan Selatan.
+SIKOPLING adalah aplikasi frontend berbasis SvelteKit untuk portal informasi layanan dan pelacakan antrian.
 
 Fokus implementasi saat ini:
 
@@ -54,7 +54,7 @@ Fokus implementasi saat ini:
   - export CSV.
 - Halaman antrian persetujuan teknis dengan fitur tabel serupa.
 - Floating chatbot widget untuk memilih kanal WhatsApp (Chatbot / Customer Service).
-- Footer informasi instansi, sosial media, dan kontak.
+- Footer dengan informasi kontak dan tautan sosial.
 - Integrasi `@vercel/analytics` di root layout.
 
 ## Tech Stack
