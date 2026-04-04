@@ -9,41 +9,53 @@ Portal antarmuka layanan informasi persetujuan lingkungan (internal project).
 ![Vite](https://img.shields.io/badge/Vite-7-646cff?logo=vite&logoColor=white)
 ![Vitest](https://img.shields.io/badge/Vitest-4-6e9f18?logo=vitest&logoColor=white)
 ![Playwright](https://img.shields.io/badge/Playwright-1.58-2ead33?logo=playwright&logoColor=white)
-![ESLint](https://img.shields.io/badge/ESLint-9-4b32c3?logo=eslint&logoColor=white)
-![Prettier](https://img.shields.io/badge/Prettier-3-f7b93e?logo=prettier&logoColor=1a2b34)
-![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs&logoColor=white)
 
 ## Status
 
 `Internal / Confidential` - repo ini ditujukan untuk penggunaan internal tim.
 
-## Overview
+README ini disinkronkan dengan kondisi kode pada **4 April 2026**.
 
-SIKOPLING dibangun sebagai frontend portal informasi layanan dengan fokus pada:
+## Ringkasan
 
-- tampilan beranda informatif dan mudah dibaca,
-- navigasi responsif (desktop + mobile),
-- halaman login (UI preview),
-- komponen chatbot visual untuk akses cepat bantuan.
+SIKOPLING dibangun sebagai frontend portal informasi layanan persetujuan lingkungan DLH Provinsi Kalimantan Selatan.
 
-## Halaman Aktif
+Fokus implementasi saat ini:
 
-- `/` - landing page utama.
-- `/login` - halaman login (dummy UI, siap dihubungkan ke autentikasi real).
+- landing page informatif,
+- halaman antrian layanan (dokling dan pertek),
+- navigasi responsif desktop/mobile,
+- universal search lintas halaman,
+- chatbot bantuan berbasis WhatsApp,
+- fondasi testing/linting untuk pengembangan lanjutan.
+
+## Route Aktif
+
+| Route | Status | Keterangan |
+| --- | --- | --- |
+| `/` | Aktif | Landing page dengan statistik, daftar layanan, dan alur percepatan |
+| `/layanan/dokling` | Aktif | Tabel antrian dokumen lingkungan (mock data) |
+| `/layanan/pertek` | Aktif | Tabel antrian persetujuan teknis (mock data) |
+| `/tentang` | Placeholder | Halaman dummy |
+| `/kontak` | Placeholder | Halaman dummy |
+| `/login` | Placeholder | Halaman dummy |
 
 ## Fitur Utama
 
-- Navbar dinamis dan responsif dengan menu desktop/mobile.
-- Hero section berbasis video (`hero-mobile.mp4` dan `hero-desktop.webm`).
-- Section statistik layanan, jenis layanan dokumen, dan alur percepatan.
-- Chatbot widget mengambang dengan quick suggestions.
-- Site footer terintegrasi.
-- Styling berbasis Tailwind CSS v4 + plugin forms.
-
-## Asset
-
-- Asset lokal statis ada di direktori `static/`.
-- Asset reference (akses terbatas): [SIKOPLING Asset Drive](https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6)
+- Navbar fixed dengan mode desktop/mobile, dropdown layanan, dan state aktif route.
+- Universal search modal (`Ctrl/Cmd + K`) dengan indeks dinamis dari halaman aplikasi.
+- Landing page dengan hero video, statistik animasi (IntersectionObserver), jenis dokumen, dan alur layanan.
+- Halaman antrian dokumen lingkungan:
+  - pencarian,
+  - filter lanjutan,
+  - sorting,
+  - pagination,
+  - expandable row (mobile),
+  - export CSV.
+- Halaman antrian persetujuan teknis dengan fitur tabel serupa.
+- Floating chatbot widget untuk memilih kanal WhatsApp (Chatbot / Customer Service).
+- Footer informasi instansi, sosial media, dan kontak.
+- Integrasi `@vercel/analytics` di root layout.
 
 ## Tech Stack
 
@@ -51,19 +63,19 @@ SIKOPLING dibangun sebagai frontend portal informasi layanan dengan fokus pada:
 - `svelte` (Svelte 5 + runes)
 - `typescript`
 - `tailwindcss` + `@tailwindcss/forms` + `@tailwindcss/vite`
-- `vite`
+- `lucide-svelte`
+- `simple-icons`
 - `@vercel/analytics`
 - `vitest` + `vitest-browser-svelte`
 - `@playwright/test`
-- `eslint` + `eslint-plugin-svelte`
-- `prettier` + `prettier-plugin-svelte` + `prettier-plugin-tailwindcss`
+- `eslint` + `prettier`
 
 ## Struktur Proyek
 
 ```text
 src/
-  app.html
   app.d.ts
+  app.html
   lib/
     assets/
       favicon.svg
@@ -76,18 +88,26 @@ src/
     +layout.svelte
     +page.svelte
     layout.css
+    kontak/
+      +page.svelte
+    layanan/
+      dokling/
+        +page.svelte
+      pertek/
+        +page.svelte
     login/
+      +page.svelte
+    tentang/
       +page.svelte
 
 static/
   home/
     heading.svg
-    hero-mobile.mp4
-    hero-desktop.webm
+    hero-video.webm
   layout/
     chatbot.svg
     logo_sikopling.svg
-  logo_dlh.png
+    maskot.svg
   robots.txt
 ```
 
@@ -103,7 +123,7 @@ npm install
 npm run dev
 ```
 
-App default berjalan di URL dev Vite (contoh: `http://localhost:5173`).
+Development server default: `http://localhost:5173`.
 
 ## NPM Scripts
 
@@ -116,31 +136,34 @@ App default berjalan di URL dev Vite (contoh: `http://localhost:5173`).
 | `npm run check:watch` | Type check mode watch |
 | `npm run lint` | Cek format + lint |
 | `npm run format` | Auto format dengan Prettier |
-| `npm run test:unit` | Menjalankan test unit/component |
-| `npm run test:e2e` | Menjalankan test end-to-end Playwright |
+| `npm run test:unit` | Menjalankan unit/component test (Vitest) |
+| `npm run test:e2e` | Menjalankan e2e test (Playwright) |
 | `npm run test` | Menjalankan unit test lalu e2e test |
 
-## Quality Gate Sebelum Rilis
+## Testing Saat Ini
 
-```bash
-npm run check
-npm run lint
-npm run test
-```
+- Konfigurasi Vitest dan Playwright sudah tersedia.
+- Saat ini belum ada file test aplikasi (`src/**/*.test.*`, `src/**/*.spec.*`, `*.e2e.*`).
+
+## Catatan Implementasi
+
+- Data antrian pada halaman layanan masih berupa mock data yang di-generate di sisi frontend.
+- Tautan footer `/kebijakan-privasi` dan `/ketentuan-layanan` sudah dipasang, tetapi route halamannya belum tersedia.
+- Halaman `tentang`, `kontak`, dan `login` masih placeholder.
 
 ## Observability (Vercel)
 
-Integrasi Web Analytics sudah ditanamkan di root layout aplikasi.
+Analytics diaktifkan melalui `injectAnalytics()` pada layout aplikasi.
 
-Aktivasi agar data masuk:
+Agar data analytics masuk:
 
-1. Enable **Web Analytics** di project Vercel.
+1. Aktifkan **Web Analytics** pada project Vercel.
 2. Deploy ke Vercel (tracking tidak aktif pada mode development lokal).
 
 ## Kontribusi
 
-Ikuti panduan kontribusi di [contributing.md](contributing.md).
+Ikuti panduan kontribusi di [contributing.md](./contributing.md).
 
 ## Lisensi
 
-Project ini mengikuti lisensi pada file [LICENSE](LICENSE).
+Project ini mengikuti lisensi pada file [LICENSE](./LICENSE).
