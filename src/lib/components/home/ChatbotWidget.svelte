@@ -1,41 +1,79 @@
 <script lang="ts">
 	import { onDestroy } from 'svelte';
 	import { cubicOut } from 'svelte/easing';
-	import { fly, scale } from 'svelte/transition';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import MessageCircle from 'lucide-svelte/icons/message-circle';
-	import Phone from 'lucide-svelte/icons/phone';
-	import X from 'lucide-svelte/icons/x';
-	import { siWhatsapp } from 'simple-icons';
+import { fly, scale } from 'svelte/transition';
+import ChevronRight from 'lucide-svelte/icons/chevron-right';
+import X from 'lucide-svelte/icons/x';
+import { siWhatsapp } from 'simple-icons';
 
-	type SupportChannel = {
-		id: 'chatbot' | 'cs';
-		title: string;
-		description: string;
-		phone: string;
-		prefill: string;
-	};
+type SupportChannel = {
+	id: 'chatbot' | 'cs';
+	title: string;
+	description: string;
+	phone: string;
+	prefill: string;
+};
 
-	const supportChannels: SupportChannel[] = [
+type FaqItem = {
+	id: string;
+	question: string;
+	answer: string;
+};
+
+const supportChannels: SupportChannel[] = [
 		{
 			id: 'chatbot',
 			title: 'Chatbot WhatsApp',
-			description: 'Untuk pertanyaan cepat seperti status dokumen, alur layanan, dan persyaratan umum.',
+			description: 'Pertanyaan cepat seputar layanan dan status dokumen.',
 			phone: '+6282118314634',
 			prefill: 'Halo Chatbot SI-KOPLING, saya ingin menanyakan informasi layanan.'
 		},
 		{
 			id: 'cs',
 			title: 'Customer Service',
-			description: 'Untuk bantuan lanjutan, kendala pengajuan, atau konsultasi langsung dengan petugas.',
+			description: 'Bantuan lanjutan langsung dari tim admin SI-KOPLING.',
 			phone: '+62882022795669',
 			prefill: 'Halo CS SI-KOPLING, saya butuh bantuan terkait layanan.'
-		}
-	];
+	}
+];
 
-	let isOpen = $state(false);
-	let buttonAnimating = $state(false);
-	let buttonAnimationTimeout: ReturnType<typeof setTimeout> | null = null;
+const faqItems: FaqItem[] = [
+	{
+		id: 'status-dokumen',
+		question: 'Bagaimana cara cek status dokumen?',
+		answer: 'Pilih Chatbot WhatsApp lalu kirim nomor registrasi pengajuan.'
+	},
+	{
+		id: 'jam-layanan',
+		question: 'Kapan admin merespons pertanyaan?',
+		answer: 'Senin-Jumat pukul 09.00-15.00 WITA.'
+	},
+	{
+		id: 'eskalasi',
+		question: 'Kapan harus menghubungi Customer Service?',
+		answer: 'Saat perlu pendampingan lanjutan atau mengalami kendala teknis.'
+	},
+	{
+		id: 'jenis-layanan',
+		question: 'Layanan apa saja yang bisa ditanyakan?',
+		answer: 'Antrian dokumen lingkungan, persetujuan teknis, dan alur pengajuan layanan.'
+	},
+	{
+		id: 'lupa-nomor',
+		question: 'Bagaimana jika lupa nomor registrasi?',
+		answer: 'Hubungi Customer Service dan sertakan data identitas pengajuan yang Anda miliki.'
+	},
+	{
+		id: 'pengaduan',
+		question: 'Apakah bisa menyampaikan kendala atau pengaduan?',
+		answer: 'Bisa, silakan gunakan kanal Customer Service agar ditindaklanjuti oleh petugas.'
+	}
+];
+
+let isOpen = $state(false);
+let buttonAnimating = $state(false);
+let activeFaqId = $state<string | null>(faqItems[0]?.id ?? null);
+let buttonAnimationTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	function triggerButtonAnimation() {
 		buttonAnimating = true;
@@ -60,12 +98,16 @@
 		triggerButtonAnimation();
 	}
 
-	function openWhatsApp(channel: SupportChannel) {
+function openWhatsApp(channel: SupportChannel) {
 		const phone = channel.phone.replace(/\D/g, '');
 		const text = encodeURIComponent(channel.prefill);
 		window.open(`https://wa.me/${phone}?text=${text}`, '_blank', 'noopener,noreferrer');
-		closePopup();
-	}
+	closePopup();
+}
+
+function toggleFaq(id: string) {
+	activeFaqId = activeFaqId === id ? null : id;
+}
 
 	function handleWindowKeydown(event: KeyboardEvent) {
 		if (event.key === 'Escape' && isOpen) {
@@ -83,81 +125,147 @@
 <svelte:window onkeydown={handleWindowKeydown} />
 
 <div
-	class="pointer-events-none fixed right-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 z-30 px-3 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8"
+	class={`pointer-events-none fixed right-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 px-3 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8 ${
+		isOpen ? 'z-[60]' : 'z-30'
+	}`}
 >
 	<div class="pointer-events-auto flex w-full flex-col items-end sm:w-auto">
 		{#if isOpen}
 			<section
 				id="chatbot-popup"
-				class="mb-3 w-full max-w-[24rem] overflow-hidden rounded-xl border border-[#d7ded0] bg-[var(--surface)] shadow-[0_20px_36px_-24px_rgba(15,23,42,0.46)] sm:w-[min(92vw,24rem)]"
+				class="fixed inset-0 z-40 flex h-[100dvh] w-screen flex-col overflow-hidden bg-white sm:static sm:mb-3 sm:h-[29rem] sm:w-[min(92vw,24rem)] sm:max-w-[24rem] sm:rounded-2xl sm:border sm:border-[#e4e7ec] sm:shadow-[0_24px_34px_-24px_rgba(15,23,42,0.35)]"
 				in:fly={{ y: 14, duration: 190 }}
 				out:fly={{ y: 10, duration: 140 }}
 			>
-				<div class="border-b border-[#e2e8db] bg-[#fbfcfa] px-4 py-3.5">
-					<div>
-						<p class="text-[0.95rem] font-semibold text-[var(--ink)]">Bantuan SI-KOPLING</p>
-						<p class="mt-1 text-xs leading-relaxed text-[var(--muted)]">
-							Pilih kanal bantuan, lalu lanjut chat via WhatsApp.
-						</p>
+				<div class="border-b border-[#eef1f5] bg-white px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-3.5 sm:pt-4">
+					<div class="flex items-start justify-between gap-2.5">
+						<div>
+							<p class="text-[1.2rem] font-semibold text-[#0f172a]">Halo!</p>
+							<p class="mt-1 text-[0.82rem] leading-relaxed text-[#475467]">
+								Terima kasih telah mengunjungi SIKOPLING! Ada yang bisa kami bantu untuk kebutuhan layanan lingkungan Anda?
+							</p>
+							<div class="mt-2.5 flex flex-wrap items-center gap-1.5 text-[0.68rem]">
+								<span
+									class="inline-flex items-center gap-1.5 rounded-full border border-[#dbe4d3] bg-[#f8fbf5] px-2.5 py-1 font-semibold text-[#3d6f2f]"
+								>
+									<span class="h-1.5 w-1.5 rounded-full bg-[#64AD31]"></span>
+									Online
+								</span>
+								<span
+									class="inline-flex items-center rounded-full border border-[#e4e7ec] bg-[#fafafa] px-2.5 py-1 font-medium text-[#667085]"
+								>
+									Senin-Jumat, 09.00-15.00 WITA
+								</span>
+							</div>
+						</div>
+						<div class="pt-0.5">
+							<button
+								type="button"
+								class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#e4e7ec] bg-white text-[#475467] transition-colors hover:bg-[#f8fafc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:hidden"
+								aria-label="Tutup popup bantuan"
+								onclick={closePopup}
+							>
+								<X class="h-4.5 w-4.5" strokeWidth={2.3} aria-hidden="true" />
+							</button>
+						</div>
 					</div>
 				</div>
 
-				<div class="space-y-2.5 bg-[#fbfcfa] px-3 py-3">
-					{#each supportChannels as channel (channel.id)}
-						<button
-							type="button"
-							class="w-full rounded-lg border border-[#dbe2d4] bg-[var(--surface)] px-3.5 py-3.5 text-left transition-colors hover:bg-[#f8fbf6]"
-							onclick={() => openWhatsApp(channel)}
-						>
-							<span class="flex items-start gap-3">
-								<span
-									class={`mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border ${
-										channel.id === 'cs'
-											? 'border-[#b7e7cb] bg-[#e8f8ef] text-[#1FA855]'
-											: 'border-[#cfe3bc] bg-[#f2f9ec] text-[#25D366]'
-									}`}
+				<div class="flex-1 space-y-4 overflow-y-auto overscroll-contain bg-white px-3 py-3.5 sm:py-3.5">
+					<section class="space-y-2.5">
+						<p class="px-1 text-[0.78rem] font-semibold text-[#344054]">Pilih Kanal Bantuan</p>
+						<div class="space-y-2">
+							{#each supportChannels as channel (channel.id)}
+								<button
+									type="button"
+									class="w-full rounded-xl border border-[#e4e7ec] bg-white px-3 py-3 text-left transition-colors hover:bg-[#f9fafb]"
+									onclick={() => openWhatsApp(channel)}
 								>
-									<svg viewBox="0 0 24 24" class="h-4.5 w-4.5" aria-hidden="true">
-										<path d={siWhatsapp.path} fill="currentColor"></path>
-									</svg>
-								</span>
-								<span class="min-w-0 flex-1">
-									<span class="block text-sm font-semibold text-[var(--ink)]">{channel.title}</span>
-									<span class="mt-1 block text-xs leading-relaxed text-[var(--muted)]">{channel.description}</span>
-									<span class="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#1E7A42]">
-										<Phone class="h-3.5 w-3.5" strokeWidth={1.8} aria-hidden="true" />
-										{channel.phone}
+									<span class="flex items-start gap-2.5">
+										<span
+											class={`mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border ${
+												channel.id === 'cs'
+													? 'border-[#c9dfb7] bg-[#eff8e6] text-[#1FA855]'
+													: 'border-[#cfe3bc] bg-[#f2f9ec] text-[#25D366]'
+											}`}
+										>
+											<svg viewBox="0 0 24 24" class="h-4.5 w-4.5" aria-hidden="true">
+												<path d={siWhatsapp.path} fill="currentColor"></path>
+											</svg>
+										</span>
+										<span class="min-w-0 flex-1">
+											<span class="block text-sm font-semibold text-[#101828]">{channel.title}</span>
+											<span class="mt-0.5 block text-[0.72rem] leading-relaxed text-[#667085]">
+												{channel.description}
+											</span>
+											<span class="mt-2 inline-flex items-center gap-1 text-[0.72rem] font-medium text-[#344054]">
+												Mulai Percakapan
+												<ChevronRight class="h-3.5 w-3.5" strokeWidth={2.2} aria-hidden="true" />
+											</span>
+										</span>
 									</span>
-								</span>
-								<span class="mt-1 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#d5decb] bg-[var(--surface)] text-[#5f7640]">
-									<ChevronRight class="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
-								</span>
-							</span>
-						</button>
-					{/each}
+								</button>
+							{/each}
+						</div>
+					</section>
+
+					<section class="space-y-2.5">
+						<div class="px-1">
+							<p class="text-[0.78rem] font-semibold text-[#344054]">FAQ Singkat</p>
+						</div>
+						<div class="overflow-hidden rounded-xl border border-[#e4e7ec] bg-white">
+							{#each faqItems as faq, index (faq.id)}
+								<div class={index > 0 ? 'border-t border-[#eef1f5]' : ''}>
+									<button
+										type="button"
+										class="flex w-full items-center justify-between gap-2.5 px-3 py-2.5 text-left"
+										onclick={() => toggleFaq(faq.id)}
+										aria-expanded={activeFaqId === faq.id}
+									>
+										<span class="text-xs leading-relaxed font-medium text-[#101828]">{faq.question}</span>
+										<span
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border border-[#e4e7ec] bg-[#f9fafb] text-[#667085] transition-transform duration-200 ${
+												activeFaqId === faq.id ? 'rotate-90' : ''
+											}`}
+										>
+											<ChevronRight class="h-3.5 w-3.5" strokeWidth={2.2} aria-hidden="true" />
+										</span>
+									</button>
+									{#if activeFaqId === faq.id}
+										<p class="border-t border-[#eef1f5] px-3 py-2 text-[0.72rem] leading-relaxed text-[#475467]">
+											{faq.answer}
+										</p>
+									{/if}
+								</div>
+							{/each}
+						</div>
+					</section>
 				</div>
 
-				<div class="border-t border-[#e2e8db] bg-[#fbfcfa] px-4 py-2.5">
-					<p class="text-[11px] text-[var(--muted)]">
-						Jam layanan: Senin-Jumat, 09.00-15.00 WITA
-					</p>
+				<div class="border-t border-[#eef1f5] bg-white px-4 pt-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:py-2.5">
+					<p class="text-center text-[11px] text-[#98A2B3]">Powered By Sikopling</p>
 				</div>
 			</section>
 		{/if}
 
 		<button
 			type="button"
-			class={`chatbot-trigger mt-0.5 inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-[0_16px_30px_-16px_rgba(100,173,49,0.82)] transition-[transform,background-color,box-shadow] duration-300 hover:scale-[1.03] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:h-16 sm:w-16 ${
+			class={`chatbot-trigger mt-0.5 inline-flex h-14 w-14 items-center justify-center transition-[transform,background-color,box-shadow] duration-300 hover:scale-[1.03] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:h-16 sm:w-16 ${
 				isOpen
-					? 'bg-[#EB9E27] shadow-[0_16px_30px_-16px_rgba(235,158,39,0.9)] hover:bg-[#CF8921]'
-					: 'bg-[#64AD31] hover:bg-[#548F29]'
-			} ${buttonAnimating ? 'chatbot-trigger--bounce' : ''}`}
+					? 'rounded-full border border-[#d88b1f] bg-[#EB9E27] text-white shadow-[0_14px_28px_-14px_rgba(235,158,39,0.82),0_6px_12px_-8px_rgba(15,23,42,0.3)] hover:bg-[#CF8921]'
+					: 'bg-transparent text-[#20232A] shadow-none'
+			} ${isOpen ? 'hidden sm:inline-flex' : 'inline-flex'} ${buttonAnimating ? 'chatbot-trigger--bounce' : ''}`}
 			aria-label={isOpen ? 'Tutup pilihan bantuan' : 'Buka pilihan bantuan'}
 			aria-expanded={isOpen}
 			aria-controls="chatbot-popup"
 			onclick={togglePopup}
 		>
-			<span class="relative block h-6 w-6 sm:h-7 sm:w-7" aria-hidden="true">
+			<span
+				class={`relative block ${
+					isOpen ? 'h-8 w-8 sm:h-9 sm:w-9' : 'h-12 w-12 sm:h-16 sm:w-16'
+				}`}
+				aria-hidden="true"
+			>
 				{#key isOpen}
 					{#if isOpen}
 						<span
@@ -173,7 +281,12 @@
 							in:scale={{ start: 0.55, duration: 160, easing: cubicOut }}
 							out:scale={{ start: 1, duration: 120, easing: cubicOut }}
 						>
-							<MessageCircle class="h-full w-full" strokeWidth={2.15} aria-hidden="true" />
+							<img
+								src="/layout/chatbot.svg"
+								alt=""
+								class="h-full w-full origin-center scale-125 object-contain sm:scale-[1.3]"
+								aria-hidden="true"
+							/>
 						</span>
 					{/if}
 				{/key}
