@@ -535,7 +535,7 @@
 							<span>Filter</span>
 							{#if activeAdvancedFilterCount > 0}
 								<span
-									class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#20232A] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
+									class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#64AD31] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
 								>
 									{activeAdvancedFilterCount}
 								</span>
