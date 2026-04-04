@@ -114,7 +114,7 @@ function toggleFaq(id: string) {
 <svelte:window onkeydown={handleWindowKeydown} />
 
 <div
-	class={`pointer-events-none fixed right-0 bottom-[max(1.35rem,env(safe-area-inset-bottom))] left-0 px-3 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8 ${
+	class={`pointer-events-none fixed right-0 bottom-[max(1.35rem,env(safe-area-inset-bottom))] left-0 px-4 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-8 lg:bottom-8 ${
 		isOpen ? 'z-[60]' : 'z-30'
 	}`}
 >
@@ -130,7 +130,7 @@ function toggleFaq(id: string) {
 					<div class="flex items-start justify-between gap-2.5">
 						<div>
 							<p class="text-[1.52rem] leading-tight font-semibold text-[#0f172a] sm:text-[1.35rem]">Pusat Bantuan</p>
-							<p class="mt-1.5 text-[0.92rem] leading-relaxed text-[#475467] sm:mt-1 sm:text-[0.82rem]">
+							<p class="mt-2.5 text-[0.92rem] leading-relaxed text-[#475467] sm:mt-1.5 sm:text-[0.82rem]">
 								Silakan sampaikan pertanyaan Anda, kami siap membantu informasi layanan dan antrean perizinan lingkungan.
 							</p>
 						</div>
@@ -228,7 +228,7 @@ function toggleFaq(id: string) {
 			type="button"
 			class={`chatbot-trigger mt-0.5 inline-flex h-14 w-14 items-center justify-center transition-[transform,background-color,box-shadow] duration-300 hover:scale-[1.03] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 sm:h-16 sm:w-16 ${
 				isOpen
-					? 'rounded-full border border-[#d88b1f] bg-[#EB9E27] text-white shadow-[0_14px_28px_-14px_rgba(235,158,39,0.82),0_6px_12px_-8px_rgba(15,23,42,0.3)] hover:bg-[#CF8921]'
+					? 'sm:rounded-full sm:border sm:border-[#d88b1f] sm:bg-[#EB9E27] sm:text-white sm:shadow-[0_14px_28px_-14px_rgba(235,158,39,0.82),0_6px_12px_-8px_rgba(15,23,42,0.3)] sm:hover:bg-[#CF8921]'
 					: 'bg-transparent text-[#20232A] shadow-none'
 			} ${isOpen ? 'hidden sm:inline-flex' : 'inline-flex'} ${buttonAnimating ? 'chatbot-trigger--bounce' : ''}`}
 			aria-label={isOpen ? 'Tutup pilihan bantuan' : 'Buka pilihan bantuan'}
