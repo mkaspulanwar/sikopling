@@ -484,7 +484,7 @@
 							type="button"
 							onclick={exportFilteredRows}
 							disabled={totalFilteredRows === 0}
-							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f6f7f8] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-4"
+							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-4"
 						>
 							<Download class="h-4 w-4" strokeWidth={2.2} />
 							Download
