@@ -125,14 +125,8 @@
 	</div>
 
 	<div class="border-t border-[#3EB14A]/25 bg-white">
-		<div
-			class="nav-shell flex flex-col items-center gap-2 py-5 text-center text-sm text-black sm:flex-row sm:items-center sm:justify-between sm:text-left"
-		>
+		<div class="nav-shell pt-5 pb-16 text-center text-sm text-black sm:py-5">
 			<p>&copy; {currentYear} Dinas Lingkungan Hidup Provinsi Kalimantan Selatan</p>
-			<div class="flex items-center justify-center gap-5">
-				<a href="/kebijakan-privasi" class="font-medium text-black hover:underline">Kebijakan Privasi</a>
-				<a href="/ketentuan-layanan" class="font-medium text-black hover:underline">Ketentuan Layanan</a>
-			</div>
 		</div>
 	</div>
 </footer>
