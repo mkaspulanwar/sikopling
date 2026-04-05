@@ -427,7 +427,7 @@
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
 <section class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-16 sm:pt-32 sm:pb-20">
-	<div class="nav-shell relative">
+	<div class="nav-shell nav-shell-desktop-spacious relative">
 		<header class="mb-5 sm:mb-6">
 			<div class="max-w-3xl">
 				<h1

@@ -84,24 +84,6 @@
 			content: 'Persetujuan teknis, air limbah, progres evaluasi dokumen dan penjadwalan rapat.',
 			keywords: ['pertek', 'persetujuan teknis', 'air', 'limbah', 'lingkungan'],
 			priority: 97
-		}),
-		buildSearchDocument({
-			title: 'Capaian SI-KOPLING Secara Ringkas',
-			description: 'Ringkasan statistik layanan konsultasi dan persetujuan lingkungan.',
-			href: '/#layanan-dashboard',
-			category: 'Bagian',
-			content: 'Total konsultasi, dokumen disetujui, waktu pemrosesan, indeks kepuasan masyarakat.',
-			keywords: ['statistik', 'layanan', 'lingkungan', 'konsultasi'],
-			priority: 92
-		}),
-		buildSearchDocument({
-			title: 'Jenis Dokumen yang Dapat Diproses',
-			description: 'Daftar AMDAL, UKL-UPL, DELH, DPLH, Addendum, dan persetujuan teknis.',
-			href: '/#layanan-dokumen',
-			category: 'Bagian',
-			content: 'Layanan dokumen lingkungan SI-KOPLING untuk berbagai jenis kegiatan.',
-			keywords: ['dokumen', 'lingkungan', 'amdal', 'ukl-upl', 'delh', 'dplh', 'addendum'],
-			priority: 91
 		})
 	];
 
@@ -528,7 +510,7 @@
 />
 
 <nav class={navClass()}>
-	<div class="nav-shell py-3 lg:py-3.5">
+	<div class="nav-shell nav-shell-desktop-spacious py-3 lg:py-3.5">
 		<div
 			class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>

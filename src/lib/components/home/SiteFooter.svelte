@@ -8,7 +8,7 @@
 </script>
 
 <footer id="kontak" class="mt-16 bg-white">
-	<div class="nav-shell pb-4">
+	<div class="nav-shell nav-shell-desktop-spacious pb-4">
 		<div
 			class="relative overflow-visible rounded-[1.5rem] bg-[#64AD31] px-4 pt-6 pb-6 sm:px-8 sm:pt-10 lg:h-[400px] lg:px-10"
 		>
@@ -126,7 +126,7 @@
 
 	<div class="border-t border-[#3EB14A]/25 bg-white">
 		<div
-			class="nav-shell pt-5 pb-10 text-left text-xs text-black sm:flex sm:items-center sm:justify-between sm:py-5"
+			class="nav-shell nav-shell-desktop-spacious pt-5 pb-10 text-left text-xs text-black sm:flex sm:items-center sm:justify-between sm:py-5"
 		>
 			<p>&copy; 2026 Dinas Lingkungan Hidup Kalimantan Selatan</p>
 			<div class="mt-2 flex items-center justify-start gap-4 text-[11px] sm:mt-0 sm:justify-end sm:text-xs">

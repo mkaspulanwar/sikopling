@@ -59,6 +59,10 @@ h6 {
 	.nav-shell {
 		padding-inline: clamp(0.9rem, 2vw, 1.8rem);
 	}
+
+	.nav-shell-desktop-spacious {
+		padding-inline: clamp(1.25rem, 2.35vw, 2.25rem);
+	}
 }
 
 @media (max-width: 640px) {
@@ -151,9 +155,40 @@ h6 {
 	}
 }
 
+@keyframes document-swap {
+	from {
+		opacity: 0;
+		transform: translateY(14px) scale(0.988);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+@keyframes document-mascot-float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-5px);
+	}
+}
+
+.animate-document-swap {
+	animation: document-swap 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.home-document-mascot img {
+	animation: document-mascot-float 3.2s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.hero-scroll-arrow,
-	.hero-scroll-arrow svg {
+	.hero-scroll-arrow svg,
+	.animate-document-swap,
+	.home-document-mascot img {
 		animation: none;
 	}
 }

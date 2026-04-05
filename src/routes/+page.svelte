@@ -1,209 +1,178 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	type HomeFaqItem = {
+		id: string;
+		question: string;
+		answer: string;
+	};
 
-	type StatItem = {
-		key: string;
+	type HomeDocumentItem = {
+		id: string;
+		title: string;
+		description: string;
+		mascot: string;
+		mascotScale?: number;
+	};
+
+	type HomeMetricItem = {
+		id: string;
 		label: string;
-		target: number;
-		suffix: string;
-		description: string;
-		note?: string;
+		value: string;
 	};
 
-	type DocumentService = {
-		title: string;
-		description: string;
-	};
-
-	type StepItem = {
-		title: string;
-		description: string;
-	};
-
-	const statItems: StatItem[] = [
+	const homeDocumentItems: HomeDocumentItem[] = [
 		{
-			key: 'konsultasi',
-			label: 'Total Konsultasi Selesai',
-			target: 1248,
-			suffix: '+',
-			description: 'Pemrakarsa yang telah dibantu melalui kanal konsultasi interaktif SI-KOPLING.'
-		},
-		{
-			key: 'dokumen',
-			label: 'Dokumen Disetujui',
-			target: 836,
-			suffix: '+',
-			description: 'Persetujuan lingkungan terbit dari berbagai jenis dokumen layanan.'
-		},
-		{
-			key: 'waktu',
-			label: 'Rata-rata Waktu Pemrosesan',
-			target: 7,
-			suffix: ' Hari Kerja',
-			description: 'Kecepatan layanan untuk mendukung proses pengajuan yang mudah dan cepat.',
-			note: 'Rentang SLA: 5-10 hari kerja sesuai jenis dokumen.'
-		},
-		{
-			key: 'kepuasan',
-			label: 'Indeks Kepuasan Masyarakat',
-			target: 98,
-			suffix: '%',
-			description: 'Persentase tingkat kepuasan pemrakarsa berdasarkan survei layanan SI-KOPLING.'
-		}
-	];
-
-	const documentServices: DocumentService[] = [
-		{
+			id: 'doc-amdal',
 			title: 'AMDAL',
-			description: 'Penyusunan dan penilaian dokumen Analisis Mengenai Dampak Lingkungan.'
+			description:
+				'Kajian lingkungan untuk rencana usaha atau kegiatan yang berpotensi menimbulkan dampak penting terhadap lingkungan.',
+			mascot: '/documents/amdal.svg',
+			mascotScale: 0.88
 		},
 		{
+			id: 'doc-addendum',
+			title: 'Addendum',
+			description:
+				'Perubahan atau penyempurnaan dokumen AMDAL akibat adanya penyesuaian pada rencana usaha atau kegiatan.',
+			mascot: '/documents/addendum.svg',
+			mascotScale: 1
+		},
+		{
+			id: 'doc-ukl-upl',
 			title: 'UKL-UPL',
-			description: 'Pengelolaan dan pemantauan lingkungan untuk kegiatan non-AMDAL.'
+			description:
+				'Dokumen pengelolaan dan pemantauan lingkungan untuk kegiatan yang tidak wajib AMDAL namun tetap berdampak pada lingkungan.',
+			mascot: '/documents/ukl.svg',
+			mascotScale: 1
 		},
 		{
+			id: 'doc-delh-dplh',
 			title: 'DELH / DPLH',
-			description: 'Dokumen evaluasi atau pengelolaan lingkungan bagi kegiatan eksisting.'
+			description:
+				'Dokumen evaluasi lingkungan untuk kegiatan yang sudah berjalan dan digunakan sebagai dasar penyesuaian kewajiban lingkungan.',
+			mascot: '/documents/delh.svg',
+			mascotScale: 1
 		},
 		{
-			title: 'ADDENDUM',
-			description: 'Perubahan dokumen lingkungan sesuai pembaruan kegiatan dan ketentuan.'
-		},
-		{
-			title: 'Rincian Teknis Limbah B3',
-			description: 'Pemenuhan persyaratan teknis pengelolaan limbah B3 secara terukur.'
-		},
-		{
-			title: 'Persetujuan Teknis Air Limbah',
-			description: 'Verifikasi teknis pembuangan dan pengelolaan air limbah kegiatan usaha.'
-		},
-		{
-			title: 'Persetujuan Teknis Emisi Udara',
-			description: 'Penilaian pemenuhan baku mutu emisi udara pada sumber kegiatan.'
+			id: 'doc-pertek',
+			title: 'Pertek',
+			description:
+				'Persetujuan teknis yang mengatur pemenuhan standar teknis pengelolaan lingkungan sesuai jenis kegiatan.',
+			mascot: '/documents/pertek.svg',
+			mascotScale: 1
 		}
 	];
 
-	const serviceSteps: StepItem[] = [
+	const homeMetricItems: HomeMetricItem[] = [
 		{
-			title: 'Media Interaktif',
-			description:
-				'Pemrakarsa wajib masuk dan melakukan konsultasi melalui chat CS SI-KOPLING sebelum proses lanjutan.'
+			id: 'metric-total',
+			label: 'Total Pengajuan',
+			value: '1.248'
 		},
 		{
-			title: 'Pertemuan Daring',
-			description:
-				'Seluruh konsultasi dan rapat, termasuk penilaian AMDAL dan pembahasan Pertek, dilakukan secara online tanpa tatap muka.'
+			id: 'metric-approved',
+			label: 'Pengajuan Disetujui',
+			value: '836'
 		},
 		{
-			title: 'Pantau Progres',
-			description:
-				'Tersedia tautan pemantauan untuk melihat perkembangan dokumen pemrakarsa secara berkala.'
+			id: 'metric-progress',
+			label: 'Pengajuan Diproses',
+			value: '412'
 		},
 		{
-			title: 'Biaya Cashless',
-			description:
-				'Pembayaran kegiatan rapat dikelola menggunakan metode non-tunai untuk transparansi.'
-		},
-		{
-			title: 'Waktu Terukur',
-			description:
-				'Proses selesai dalam 10 hari kerja untuk AMDAL/DELH dan 5 hari kerja untuk UKL-UPL/DPLH setelah administrasi lengkap.'
-		},
-		{
-			title: 'Pengiriman Langsung',
-			description:
-				'Dokumen fisik SK dikirimkan langsung kepada pemrakarsa melalui layanan ekspedisi resmi.'
-		},
-		{
-			title: 'Bebas Gratifikasi',
-			description:
-				'Diterapkan larangan keras memberi atau menerima gratifikasi dalam bentuk apa pun selama proses layanan.'
-		},
-		{
-			title: 'Ramah Lingkungan',
-			description:
-				'Pelayanan mengedepankan prinsip paperless, zero waste, hemat energi, dan rendah karbon.'
+			id: 'metric-time',
+			label: 'Waktu Proses',
+			value: '7 Hari'
 		}
 	];
 
-	let statSection: HTMLElement | null = $state(null);
-	let isCounterStarted = $state(false);
-	let animationFrameId = 0;
-	let statValues = $state<Record<string, number>>(
-		Object.fromEntries(statItems.map((item) => [item.key, 0]))
-	);
+	const homeFaqItems: HomeFaqItem[] = [
+		{
+			id: 'faq-layanan',
+			question: 'Apa itu SIKOPLING dan layanan apa yang tersedia?',
+			answer:
+				'SIKOPLING adalah saluran interaktif konsultasi persetujuan lingkungan DLH Kalimantan Selatan. Layanan mencakup konsultasi dokumen AMDAL, UKL-UPL, DELH/DPLH, addendum, serta persetujuan teknis limbah B3, air limbah, dan emisi udara.'
+		},
+		{
+			id: 'faq-proses',
+			question: 'Apakah proses konsultasi harus tatap muka?',
+			answer:
+				'Tidak. Konsultasi, pembahasan teknis, dan rapat penilaian dilakukan secara daring. Pendekatan ini dirancang agar proses lebih efisien, terdokumentasi, dan mudah diakses oleh pemrakarsa dari berbagai lokasi.'
+		},
+		{
+			id: 'faq-durasi',
+			question: 'Berapa estimasi waktu pemrosesan dokumen?',
+			answer:
+				'Setelah persyaratan administrasi dinyatakan lengkap, estimasi proses adalah 10 hari kerja untuk AMDAL/DELH dan 5 hari kerja untuk UKL-UPL/DPLH, menyesuaikan jenis layanan yang diajukan.'
+		},
+		{
+			id: 'faq-pantau',
+			question: 'Bagaimana cara memantau progres dokumen?',
+			answer:
+				'Setiap pemrakarsa memperoleh tautan pemantauan untuk melihat tahapan dokumen secara berkala. Jika membutuhkan penjelasan lebih lanjut, Anda dapat menghubungi kanal Chatbot atau Customer Service SIKOPLING.'
+		}
+	];
 
-	const numberFormatter = new Intl.NumberFormat('id-ID');
+	const HOME_DOCUMENT_SWIPE_THRESHOLD = 46;
 
-	const getTargetValues = () =>
-		Object.fromEntries(statItems.map((item) => [item.key, item.target])) as Record<string, number>;
+	let activeHomeDocumentIndex = $state(0);
+	let activeHomeFaqId = $state<string | null>(null);
+	let homeDocumentTouchStartX = $state<number | null>(null);
+	let homeDocumentTouchStartY = $state<number | null>(null);
 
-	const startCounterAnimation = () => {
-		if (isCounterStarted) return;
-		isCounterStarted = true;
+	const activeHomeDocument = $derived(homeDocumentItems[activeHomeDocumentIndex]);
 
-		if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-			statValues = getTargetValues();
-			return;
+	const showPrevHomeDocument = () => {
+		activeHomeDocumentIndex =
+			(activeHomeDocumentIndex - 1 + homeDocumentItems.length) % homeDocumentItems.length;
+	};
+
+	const showNextHomeDocument = () => {
+		activeHomeDocumentIndex = (activeHomeDocumentIndex + 1) % homeDocumentItems.length;
+	};
+
+	const setActiveHomeDocument = (index: number) => {
+		activeHomeDocumentIndex = index;
+	};
+
+	const handleHomeDocumentTouchStart = (event: TouchEvent) => {
+		const touch = event.changedTouches[0];
+		if (!touch) return;
+		homeDocumentTouchStartX = touch.clientX;
+		homeDocumentTouchStartY = touch.clientY;
+	};
+
+	const handleHomeDocumentTouchEnd = (event: TouchEvent) => {
+		if (homeDocumentTouchStartX === null || homeDocumentTouchStartY === null) return;
+
+		const touch = event.changedTouches[0];
+		if (!touch) return;
+
+		const deltaX = touch.clientX - homeDocumentTouchStartX;
+		const deltaY = touch.clientY - homeDocumentTouchStartY;
+		const horizontalDistance = Math.abs(deltaX);
+		const verticalDistance = Math.abs(deltaY);
+
+		if (horizontalDistance >= HOME_DOCUMENT_SWIPE_THRESHOLD && horizontalDistance > verticalDistance) {
+			if (deltaX < 0) {
+				showNextHomeDocument();
+			} else {
+				showPrevHomeDocument();
+			}
 		}
 
-		const startedAt = performance.now();
-		const duration = 3400;
-		const stagger = 280;
-
-		const tick = (now: number) => {
-			const nextValues: Record<string, number> = {};
-			let isCompleted = true;
-
-			for (const [index, item] of statItems.entries()) {
-				const localElapsed = now - startedAt - index * stagger;
-				const progress = Math.min(Math.max(localElapsed / duration, 0), 1);
-				const easedProgress = 1 - Math.pow(1 - progress, 4);
-				nextValues[item.key] = item.target * easedProgress;
-				if (progress < 1) {
-					isCompleted = false;
-				}
-			}
-
-			statValues = nextValues;
-
-			if (!isCompleted) {
-				animationFrameId = requestAnimationFrame(tick);
-			}
-		};
-
-		animationFrameId = requestAnimationFrame(tick);
+		homeDocumentTouchStartX = null;
+		homeDocumentTouchStartY = null;
 	};
 
-	const formatStatValue = (item: StatItem) => {
-		const roundedValue = Math.round(statValues[item.key] ?? 0);
-		return `${numberFormatter.format(roundedValue)}${item.suffix}`;
+	const toggleHomeFaq = (id: string) => {
+		activeHomeFaqId = activeHomeFaqId === id ? null : id;
 	};
-
-	onMount(() => {
-		if (!statSection) return;
-
-		const observer = new IntersectionObserver(
-			(entries) => {
-				if (!entries.some((entry) => entry.isIntersecting)) return;
-				startCounterAnimation();
-				observer.disconnect();
-			},
-			{
-				threshold: 0.35
-			}
-		);
-
-		observer.observe(statSection);
-
-		return () => {
-			observer.disconnect();
-			cancelAnimationFrame(animationFrameId);
-		};
-	});
 </script>
 
-<section id="beranda" class="relative isolate h-[100svh] min-h-[100svh] overflow-hidden">
+<section
+	id="beranda"
+	class="relative isolate h-[100svh] min-h-[100svh] overflow-hidden rounded-none"
+>
 	<video
 		class="absolute inset-0 h-full w-full object-cover"
 		autoplay
@@ -249,106 +218,241 @@
 	</div>
 </section>
 
-<section id="layanan-dashboard" class="scroll-mt-28 bg-[var(--canvas)] py-16 sm:py-20">
-	<div class="page-shell" bind:this={statSection}>
-		<div class="mx-auto max-w-3xl text-center">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
-				Statistik Layanan
-			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
-				Capaian SI-KOPLING Secara Ringkas
-			</h2>
-			<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan performa layanan konsultasi dan
-				persetujuan lingkungan yang semakin responsif.
-			</p>
-		</div>
+<section id="metrik-layanan" class="scroll-mt-28 bg-transparent py-16 sm:py-20">
+	<div class="nav-shell nav-shell-desktop-spacious">
+		<div class="grid items-start gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-12">
+			<div class="max-w-lg">
+				<p class="text-xs font-semibold tracking-[0.16em] text-[#5f7343] uppercase">
+					Statistik Layanan
+				</p>
+				<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[#15243f] sm:text-4xl">
+					Capaian Layanan SIKOPLING
+				</h2>
+				<p class="mt-4 text-base leading-relaxed text-[#4b5b74] sm:text-lg">
+					Ikhtisar metrik utama layanan untuk memantau performa pengajuan secara konsisten dan
+					transparan.
+				</p>
+			</div>
 
-		<dl
-			class="mt-10 grid gap-x-8 gap-y-8 border-y border-[var(--line)] py-8 sm:grid-cols-2 xl:grid-cols-4"
-		>
-			{#each statItems as item}
-				<div>
-					<dt class="text-xs font-semibold tracking-[0.08em] text-[var(--muted)] uppercase">
-						{item.label}
-					</dt>
-					<dd
-						class="font-hero-title mt-2 text-[clamp(2rem,4.3vw,2.9rem)] leading-none font-bold text-[var(--ink)]"
-					>
-						{formatStatValue(item)}
-					</dd>
-					<p class="mt-3 text-sm leading-relaxed text-[var(--muted)]">{item.description}</p>
-					{#if item.note}
-						<p class="mt-2 text-xs font-medium text-[#5d7b33]">{item.note}</p>
-					{/if}
-				</div>
-			{/each}
-		</dl>
+			<div class="grid gap-4 sm:grid-cols-2">
+				{#each homeMetricItems as metric}
+					<article class="rounded-xl border border-[#dce4ef] bg-white p-5 shadow-[0_8px_20px_rgba(20,36,63,0.06)]">
+						<p class="text-[0.72rem] font-semibold tracking-[0.14em] text-[#5f7343] uppercase">
+							{metric.label}
+						</p>
+						<p class="mt-2 text-[2rem] leading-none font-bold tracking-tight text-[#15243f] sm:text-[2.15rem]">
+							{metric.value}
+						</p>
+					</article>
+				{/each}
+			</div>
+		</div>
 	</div>
 </section>
 
-<section id="layanan-dokumen" class="scroll-mt-28 bg-[#f8fafc] py-16 sm:py-20">
-	<div class="page-shell">
-		<div class="mx-auto max-w-3xl text-center">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
-				Layanan Dokumen Lingkungan
-			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
-				Jenis Dokumen yang Dapat Diproses
-			</h2>
-			<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Pilih jenis dokumen sesuai kebutuhan kegiatan untuk memulai konsultasi dan proses
-				persetujuan lingkungan.
-			</p>
-		</div>
-
-		<div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each documentServices as service}
-				<article
-					class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[#c9d8b8] hover:bg-[#fbfdf9] sm:p-6"
+<section id="jenis-dokumen" class="scroll-mt-28 bg-white py-16 sm:py-20">
+	<div class="nav-shell nav-shell-desktop-spacious">
+		<div class="mx-auto max-w-5xl">
+			<div class="mx-auto max-w-3xl text-center">
+				<h2
+					class="text-3xl font-semibold tracking-tight text-[#15243f] sm:text-4xl lg:text-[2.9rem]"
 				>
-					<h3 class="text-lg font-semibold tracking-tight text-[var(--ink)]">{service.title}</h3>
-					<p class="mt-2.5 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-						{service.description}
-					</p>
-				</article>
-			{/each}
-		</div>
-	</div>
-</section>
+					Jenis Dokumen
+					<span class="block">yang Dapat Diproses</span>
+				</h2>
+				<p class="mx-auto mt-4 max-w-2xl text-[1.05rem] leading-relaxed text-[#4b5b74] sm:text-[1.12rem]">
+					Telusuri jenis dokumen yang dapat diproses melalui layanan SIKOPLING dan pahami fungsi
+					utamanya secara ringkas.
+				</p>
+			</div>
 
-<section id="alur-percepatan" class="scroll-mt-28 bg-[var(--canvas)] py-16 sm:py-20">
-	<div class="page-shell">
-		<div class="mx-auto max-w-3xl text-center">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
-				8 Langkah Percepatan
-			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
-				Alur Kerja Pelayanan Persetujuan Lingkungan
-			</h2>
-			<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Alur ini dirancang agar proses layanan lebih transparan, terukur, dan efisien bagi
-				pemrakarsa.
-			</p>
-		</div>
+			<div class="sr-only" aria-hidden="true">
+				{#each homeDocumentItems as item}
+					<img src={item.mascot} alt="" loading="eager" decoding="async" />
+				{/each}
+			</div>
 
-		<ol class="mt-10 space-y-6">
-			{#each serviceSteps as step, index}
-				<li class="relative pl-14 sm:pl-16">
-					<div
-						class="absolute top-0 left-0 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#b9cca3] bg-[#eef5e7] text-sm font-semibold text-[#58703a]"
+			<div class="mt-10 lg:grid lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center lg:gap-3">
+				<button
+					type="button"
+					class="hidden h-11 w-11 items-center justify-center rounded-full bg-[#64AD31] text-white transition-transform duration-200 hover:-translate-x-0.5 hover:bg-[#56972a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 lg:inline-flex"
+					onclick={showPrevHomeDocument}
+					aria-label="Tampilkan jenis dokumen sebelumnya"
+				>
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						aria-hidden="true"
 					>
-						{index + 1}
+						<path
+							d="M14.5 6.5L9 12L14.5 17.5"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</button>
+
+				<article
+					class="animate-document-swap mx-auto grid w-full max-w-4xl gap-6 overflow-hidden rounded-[2rem] border border-[#e2e8f0] bg-white p-6 shadow-[0_20px_50px_rgba(20,36,63,0.1)] sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-10"
+					ontouchstart={handleHomeDocumentTouchStart}
+					ontouchend={handleHomeDocumentTouchEnd}
+				>
+					<div
+						class={`order-2 space-y-4 ${
+							activeHomeDocumentIndex % 2 === 0 ? 'lg:order-1' : 'lg:order-2'
+						}`}
+					>
+						<p class="text-xs font-semibold tracking-[0.2em] text-[#5f7343] uppercase">
+							Dokumen {activeHomeDocumentIndex + 1}/{homeDocumentItems.length}
+						</p>
+						<h3 class="text-4xl font-bold tracking-tight text-[#111b2d] sm:text-[2.85rem]">
+							{activeHomeDocument.title}
+						</h3>
+						<p class="max-w-xl text-lg leading-relaxed text-[#2a344a] sm:text-xl">
+							{activeHomeDocument.description}
+						</p>
 					</div>
-					{#if index < serviceSteps.length - 1}
-						<span class="absolute top-10 bottom-0 left-5 w-px bg-[var(--line)]"></span>
-					{/if}
-					<h3 class="text-lg font-semibold tracking-tight text-[var(--ink)]">{step.title}</h3>
-					<p class="mt-2 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-						{step.description}
-					</p>
-				</li>
-			{/each}
-		</ol>
+
+					<div
+						class={`home-document-mascot order-1 flex min-h-[16rem] items-center justify-center lg:min-h-[19rem] ${
+							activeHomeDocumentIndex % 2 === 0 ? 'lg:order-2' : 'lg:order-1'
+						}`}
+					>
+						<img
+							src={activeHomeDocument.mascot}
+							alt={`Maskot dokumen ${activeHomeDocument.title}`}
+							class="h-auto max-h-[18.5rem] w-auto max-w-[100%] object-contain drop-shadow-[0_20px_34px_rgba(15,23,42,0.18)] sm:max-h-[21rem] lg:max-h-[22.5rem]"
+							loading="eager"
+							decoding="async"
+							style={`transform: scale(${activeHomeDocument.mascotScale ?? 1}); transform-origin: center bottom;`}
+						/>
+					</div>
+				</article>
+
+				<button
+					type="button"
+					class="hidden h-11 w-11 items-center justify-center rounded-full bg-[#64AD31] text-white transition-transform duration-200 hover:translate-x-0.5 hover:bg-[#56972a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 lg:inline-flex"
+					onclick={showNextHomeDocument}
+					aria-label="Tampilkan jenis dokumen berikutnya"
+				>
+					<svg
+						viewBox="0 0 24 24"
+						fill="none"
+						xmlns="http://www.w3.org/2000/svg"
+						class="h-5 w-5"
+						aria-hidden="true"
+					>
+						<path
+							d="M9.5 6.5L15 12L9.5 17.5"
+							stroke="currentColor"
+							stroke-width="2"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						/>
+					</svg>
+				</button>
+			</div>
+
+			<div class="mt-5 flex items-center justify-center gap-3 lg:hidden">
+				<div class="flex items-center justify-center gap-2.5">
+					{#each homeDocumentItems as item, index}
+							<button
+								type="button"
+								class={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${
+									index === activeHomeDocumentIndex
+										? 'w-6 bg-[#64AD31]'
+										: 'bg-[#ccd9c1] hover:bg-[#b8caa8]'
+								}`}
+								onclick={() => setActiveHomeDocument(index)}
+								aria-label={`Tampilkan dokumen ${item.title}`}
+							aria-current={index === activeHomeDocumentIndex ? 'true' : undefined}
+						></button>
+					{/each}
+				</div>
+			</div>
+
+			<div class="mt-6 hidden items-center justify-center gap-2.5 sm:mt-7 lg:flex">
+				{#each homeDocumentItems as item, index}
+					<button
+						type="button"
+						class={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${
+							index === activeHomeDocumentIndex
+								? 'w-6 bg-[#64AD31]'
+								: 'bg-[#ccd9c1] hover:bg-[#b8caa8]'
+						}`}
+						onclick={() => setActiveHomeDocument(index)}
+						aria-label={`Tampilkan dokumen ${item.title}`}
+						aria-current={index === activeHomeDocumentIndex ? 'true' : undefined}
+					></button>
+				{/each}
+			</div>
+		</div>
 	</div>
 </section>
+
+<section id="faq" class="scroll-mt-28 bg-white py-16 sm:py-20">
+	<div class="nav-shell nav-shell-desktop-spacious">
+		<div class="grid gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:gap-12">
+			<div class="lg:pt-2">
+				<h2 class="max-w-md text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
+					Pertanyaan yang Sering Diajukan
+				</h2>
+			</div>
+
+			<div>
+				<div class="space-y-3.5 sm:space-y-4">
+				{#each homeFaqItems as item}
+					<article class="overflow-hidden rounded-[1.55rem] border border-[#e4e7ec] bg-white">
+						<h3>
+							<button
+								type="button"
+								class="flex w-full items-center justify-between gap-4 px-5 py-4.5 text-left transition-colors hover:bg-[#f8faf6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f864f] focus-visible:ring-inset sm:px-7 sm:py-5"
+								onclick={() => toggleHomeFaq(item.id)}
+								aria-expanded={activeHomeFaqId === item.id}
+								aria-controls={`${item.id}-answer`}
+							>
+								<span
+									class="text-[1.05rem] leading-snug font-semibold tracking-tight text-[var(--ink)] sm:text-[1.12rem]"
+								>
+									{item.question}
+								</span>
+								<span
+									class={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-2xl leading-none transition-transform duration-300 ${
+										activeHomeFaqId === item.id
+											? 'rotate-45 border-[#c9d8b8] text-[#5d7b33]'
+											: 'border-[#d8dde5] text-[#2f4f77]'
+									}`}
+									aria-hidden="true"
+								>
+									+
+								</span>
+							</button>
+						</h3>
+						{#if activeHomeFaqId === item.id}
+							<div
+								id={`${item.id}-answer`}
+								class="border-t border-[#edf0f4] px-5 pt-3.5 pb-5 text-sm leading-relaxed text-[var(--muted)] sm:px-7 sm:pt-4 sm:pb-6 sm:text-base"
+							>
+								{item.answer}
+							</div>
+						{/if}
+					</article>
+				{/each}
+				</div>
+				<div class="mt-4 text-left sm:mt-5 sm:text-right">
+					<a
+						href="/kontak"
+						class="inline-flex items-center text-sm font-semibold text-[#5d7b33] transition-colors hover:text-[#476028]"
+					>
+						Lihat selengkapnya
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
