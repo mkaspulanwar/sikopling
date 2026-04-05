@@ -87,21 +87,26 @@
 
 	let activeHomeDocumentIndex = $state(0);
 	let activeHomeFaqId = $state<string | null>(null);
+	let homeDocumentSlideDirection = $state<'next' | 'prev'>('next');
 	let homeDocumentTouchStartX = $state<number | null>(null);
 	let homeDocumentTouchStartY = $state<number | null>(null);
 
 	const activeHomeDocument = $derived(homeDocumentItems[activeHomeDocumentIndex]);
 
 	const showPrevHomeDocument = () => {
+		homeDocumentSlideDirection = 'prev';
 		activeHomeDocumentIndex =
 			(activeHomeDocumentIndex - 1 + homeDocumentItems.length) % homeDocumentItems.length;
 	};
 
 	const showNextHomeDocument = () => {
+		homeDocumentSlideDirection = 'next';
 		activeHomeDocumentIndex = (activeHomeDocumentIndex + 1) % homeDocumentItems.length;
 	};
 
 	const setActiveHomeDocument = (index: number) => {
+		if (index === activeHomeDocumentIndex) return;
+		homeDocumentSlideDirection = index > activeHomeDocumentIndex ? 'next' : 'prev';
 		activeHomeDocumentIndex = index;
 	};
 
@@ -138,6 +143,17 @@
 	const toggleHomeFaq = (id: string) => {
 		activeHomeFaqId = activeHomeFaqId === id ? null : id;
 	};
+
+	$effect(() => {
+		for (const item of homeDocumentItems) {
+			const image = new Image();
+			image.src = item.mascot;
+			image.decoding = 'async';
+			image.decode().catch(() => {
+				/* ignore decode errors; browser cache preload is still useful */
+			});
+		}
+	});
 </script>
 
 <section
@@ -235,42 +251,96 @@
 					</svg>
 				</button>
 
-				<article
-					class="animate-document-swap mx-auto grid w-full max-w-4xl gap-6 overflow-hidden rounded-[2rem] border border-[#e2e8f0] bg-white p-6 shadow-[0_20px_50px_rgba(20,36,63,0.1)] sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-10"
-					ontouchstart={handleHomeDocumentTouchStart}
-					ontouchend={handleHomeDocumentTouchEnd}
-				>
-					<div
-						class={`order-2 space-y-4 ${
-							activeHomeDocumentIndex % 2 === 0 ? 'lg:order-1' : 'lg:order-2'
-						}`}
-					>
-						<p class="text-xs font-semibold tracking-[0.2em] text-[#5f7343] uppercase">
-							Dokumen {activeHomeDocumentIndex + 1}/{homeDocumentItems.length}
-						</p>
-						<h3 class="text-4xl font-bold tracking-tight text-[#111b2d] sm:text-[2.85rem]">
-							{activeHomeDocument.title}
-						</h3>
-						<p class="max-w-xl text-lg leading-relaxed text-[#2a344a] sm:text-xl">
-							{activeHomeDocument.description}
-						</p>
-					</div>
+				<div class="home-document-card-wrap relative mx-auto w-full max-w-4xl">
+					{#key activeHomeDocument.id}
+						<article
+							class={`animate-document-swap mx-auto grid w-full gap-6 overflow-hidden rounded-[2rem] border border-[#e2e8f0] bg-white p-6 shadow-[0_20px_50px_rgba(20,36,63,0.1)] sm:p-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-10 ${
+								homeDocumentSlideDirection === 'next'
+									? 'home-document-slide-next'
+									: 'home-document-slide-prev'
+							}`}
+							ontouchstart={handleHomeDocumentTouchStart}
+							ontouchend={handleHomeDocumentTouchEnd}
+						>
+							<div
+								class={`order-2 space-y-4 ${
+									activeHomeDocumentIndex % 2 === 0 ? 'lg:order-1' : 'lg:order-2'
+								}`}
+							>
+								<p class="text-xs font-semibold tracking-[0.2em] text-[#5f7343] uppercase">
+									Dokumen {activeHomeDocumentIndex + 1}/{homeDocumentItems.length}
+								</p>
+								<h3 class="text-4xl font-bold tracking-tight text-[#111b2d] sm:text-[2.85rem]">
+									{activeHomeDocument.title}
+								</h3>
+								<p class="max-w-xl text-lg leading-relaxed text-[#2a344a] sm:text-xl">
+									{activeHomeDocument.description}
+								</p>
+							</div>
 
-					<div
-						class={`home-document-mascot order-1 flex min-h-[16rem] items-center justify-center lg:min-h-[19rem] ${
-							activeHomeDocumentIndex % 2 === 0 ? 'lg:order-2' : 'lg:order-1'
-						}`}
+							<div
+								class={`home-document-mascot order-1 flex min-h-[16rem] items-center justify-center lg:min-h-[19rem] ${
+									activeHomeDocumentIndex % 2 === 0 ? 'lg:order-2' : 'lg:order-1'
+								}`}
+							>
+								<img
+									src={activeHomeDocument.mascot}
+									alt={`Maskot dokumen ${activeHomeDocument.title}`}
+									class="h-auto max-h-[18.5rem] w-auto max-w-[100%] object-contain sm:max-h-[21rem] lg:max-h-[22.5rem]"
+									loading="eager"
+									decoding="async"
+									style={`transform: scale(${activeHomeDocument.mascotScale ?? 1}); transform-origin: center bottom;`}
+								/>
+							</div>
+						</article>
+					{/key}
+
+					<button
+						type="button"
+						class="home-document-mobile-arrow home-document-mobile-arrow-left absolute top-1/2 -left-2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#64AD31] text-white shadow-[0_10px_24px_rgba(30,90,10,0.28)] transition-transform duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 lg:hidden"
+						onclick={showPrevHomeDocument}
+						aria-label="Tampilkan jenis dokumen sebelumnya"
 					>
-						<img
-							src={activeHomeDocument.mascot}
-							alt={`Maskot dokumen ${activeHomeDocument.title}`}
-							class="h-auto max-h-[18.5rem] w-auto max-w-[100%] object-contain drop-shadow-[0_20px_34px_rgba(15,23,42,0.18)] sm:max-h-[21rem] lg:max-h-[22.5rem]"
-							loading="eager"
-							decoding="async"
-							style={`transform: scale(${activeHomeDocument.mascotScale ?? 1}); transform-origin: center bottom;`}
-						/>
-					</div>
-				</article>
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							aria-hidden="true"
+						>
+							<path
+								d="M14.5 6.5L9 12L14.5 17.5"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</button>
+
+					<button
+						type="button"
+						class="home-document-mobile-arrow home-document-mobile-arrow-right absolute top-1/2 -right-2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-[#64AD31] text-white shadow-[0_10px_24px_rgba(30,90,10,0.28)] transition-transform duration-200 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#64AD31] focus-visible:ring-offset-2 lg:hidden"
+						onclick={showNextHomeDocument}
+						aria-label="Tampilkan jenis dokumen berikutnya"
+					>
+						<svg
+							viewBox="0 0 24 24"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							class="h-5 w-5"
+							aria-hidden="true"
+						>
+							<path
+								d="M9.5 6.5L15 12L9.5 17.5"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							/>
+						</svg>
+					</button>
+				</div>
 
 				<button
 					type="button"
@@ -299,15 +369,15 @@
 			<div class="mt-5 flex items-center justify-center gap-3 lg:hidden">
 				<div class="flex items-center justify-center gap-2.5">
 					{#each homeDocumentItems as item, index}
-							<button
-								type="button"
-								class={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${
-									index === activeHomeDocumentIndex
-										? 'w-6 bg-[#64AD31]'
-										: 'bg-[#ccd9c1] hover:bg-[#b8caa8]'
-								}`}
-								onclick={() => setActiveHomeDocument(index)}
-								aria-label={`Tampilkan dokumen ${item.title}`}
+						<button
+							type="button"
+							class={`h-2.5 w-2.5 rounded-full transition-all duration-200 ${
+								index === activeHomeDocumentIndex
+									? 'w-6 bg-[#64AD31]'
+									: 'bg-[#ccd9c1] hover:bg-[#b8caa8]'
+							}`}
+							onclick={() => setActiveHomeDocument(index)}
+							aria-label={`Tampilkan dokumen ${item.title}`}
 							aria-current={index === activeHomeDocumentIndex ? 'true' : undefined}
 						></button>
 					{/each}
