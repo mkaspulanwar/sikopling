@@ -13,12 +13,6 @@
 		mascotScale?: number;
 	};
 
-	type HomeMetricItem = {
-		id: string;
-		label: string;
-		value: string;
-	};
-
 	const homeDocumentItems: HomeDocumentItem[] = [
 		{
 			id: 'doc-amdal',
@@ -59,29 +53,6 @@
 				'Persetujuan teknis yang mengatur pemenuhan standar teknis pengelolaan lingkungan sesuai jenis kegiatan.',
 			mascot: '/documents/pertek.svg',
 			mascotScale: 1
-		}
-	];
-
-	const homeMetricItems: HomeMetricItem[] = [
-		{
-			id: 'metric-total',
-			label: 'Total Pengajuan',
-			value: '1.248'
-		},
-		{
-			id: 'metric-approved',
-			label: 'Pengajuan Disetujui',
-			value: '836'
-		},
-		{
-			id: 'metric-progress',
-			label: 'Pengajuan Diproses',
-			value: '412'
-		},
-		{
-			id: 'metric-time',
-			label: 'Waktu Proses',
-			value: '7 Hari'
 		}
 	];
 
@@ -215,38 +186,6 @@
 				/>
 			</svg>
 		</span>
-	</div>
-</section>
-
-<section id="metrik-layanan" class="scroll-mt-28 bg-transparent py-16 sm:py-20">
-	<div class="nav-shell nav-shell-desktop-spacious">
-		<div class="grid items-start gap-8 lg:grid-cols-[minmax(0,0.88fr)_minmax(0,1.12fr)] lg:gap-12">
-			<div class="max-w-lg">
-				<p class="text-xs font-semibold tracking-[0.16em] text-[#5f7343] uppercase">
-					Statistik Layanan
-				</p>
-				<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[#15243f] sm:text-4xl">
-					Capaian Layanan SIKOPLING
-				</h2>
-				<p class="mt-4 text-base leading-relaxed text-[#4b5b74] sm:text-lg">
-					Ikhtisar metrik utama layanan untuk memantau performa pengajuan secara konsisten dan
-					transparan.
-				</p>
-			</div>
-
-			<div class="grid gap-4 sm:grid-cols-2">
-				{#each homeMetricItems as metric}
-					<article class="rounded-xl border border-[#dce4ef] bg-white p-5 shadow-[0_8px_20px_rgba(20,36,63,0.06)]">
-						<p class="text-[0.72rem] font-semibold tracking-[0.14em] text-[#5f7343] uppercase">
-							{metric.label}
-						</p>
-						<p class="mt-2 text-[2rem] leading-none font-bold tracking-tight text-[#15243f] sm:text-[2.15rem]">
-							{metric.value}
-						</p>
-					</article>
-				{/each}
-			</div>
-		</div>
 	</div>
 </section>
 
