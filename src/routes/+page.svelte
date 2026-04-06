@@ -18,14 +18,14 @@
 		note?: string;
 	};
 
-	type DocumentService = {
+	type StepItem = {
 		title: string;
 		description: string;
 	};
 
-	type StepItem = {
-		title: string;
-		description: string;
+	type DesktopFlowStep = StepItem & {
+		left: string;
+		top: string;
 	};
 
 	const statItems: StatItem[] = [
@@ -147,6 +147,17 @@
 			description:
 				'Pelayanan mengedepankan prinsip paperless, zero waste, hemat energi, dan rendah karbon.'
 		}
+	];
+
+	const desktopFlowSteps: DesktopFlowStep[] = [
+		{ left: '17%', top: '18%', ...serviceSteps[0] },
+		{ left: '58%', top: '18%', ...serviceSteps[1] },
+		{ left: '17%', top: '39%', ...serviceSteps[3] },
+		{ left: '58%', top: '39%', ...serviceSteps[2] },
+		{ left: '17%', top: '60%', ...serviceSteps[4] },
+		{ left: '58%', top: '60%', ...serviceSteps[5] },
+		{ left: '17%', top: '81%', ...serviceSteps[7] },
+		{ left: '58%', top: '81%', ...serviceSteps[6] }
 	];
 	let activeHomeFaqId = $state<string | null>(null);
 	let statSection: HTMLElement | null = $state(null);
@@ -277,7 +288,7 @@
 	};
 
 	const scrollToDashboard = () => {
-		const targetSection = document.getElementById('layanan-dashboard');
+		const targetSection = document.getElementById('layanan-statistik');
 		if (!targetSection) return;
 
 		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -326,6 +337,8 @@
 	<link rel="preload" href="/home/heading.svg" as="image" type="image/svg+xml" />
 	<link rel="preload" href="/layout/daun-kiri.svg" as="image" type="image/svg+xml" />
 	<link rel="preload" href="/layout/daun-kanan.svg" as="image" type="image/svg+xml" />
+	<link rel="preload" href="/layout/line-number.svg" as="image" type="image/svg+xml" />
+	<link rel="preload" href="/layout/daun-line-2.svg" as="image" type="image/svg+xml" />
 	<link rel="preload" href="/layout/tree.lottie" as="fetch" type="application/octet-stream" />
 </svelte:head>
 
@@ -385,7 +398,22 @@
 	</button>
 </section>
 
-	<section class="scroll-mt-28 bg-[var(--canvas)] py-7 sm:py-20">
+<style>
+	.stat-tree-lottie {
+		background-color: transparent;
+	}
+
+	.stat-tree-lottie :global(canvas),
+	.stat-tree-lottie :global(svg),
+	.stat-tree-lottie :global(dotlottie-player) {
+		width: 100% !important;
+		height: 100% !important;
+		display: block;
+		background-color: transparent !important;
+	}
+</style>
+
+	<section id="layanan-dashboard" class="scroll-mt-28 bg-[var(--canvas)] py-7 sm:py-20">
 		<div class="page-shell" bind:this={statSection}>
 			<div class="mx-auto max-w-3xl text-center">
 				<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
@@ -394,99 +422,85 @@
 				<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
 					Capaian SI-KOPLING Secara Ringkas
 				</h2>
-				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+				<p id="layanan-statistik" class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
 					Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan performa layanan konsultasi dan
 					persetujuan lingkungan yang semakin responsif.
 				</p>
 			</div>
 
-					<div
-						class="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(9.6rem,11.8rem)_minmax(0,1fr)] items-center gap-x-2.9 gap-y-2.9 sm:mt-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:gap-x-2"
-					>
-						<div class="grid gap-2 sm:gap-2 lg:gap-2">
-							{#each leftLeafStats as item}
-								<article class="mx-auto grid w-full max-w-[12.2rem] overflow-hidden bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
-									<div class="flex min-h-[3.15rem] items-end justify-center px-1.5 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
-										<h3 class="text-[0.76rem] leading-[1.15] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
-											{item.label}
-										</h3>
-									</div>
-									<div class="relative -mt-5 flex min-h-[5rem] items-center justify-center px-0 py-0 sm:-mt-2 sm:min-h-[6.2rem] lg:-mt-20 lg:min-h-[8.2rem]">
-										<img
-											src="/layout/daun-kiri.svg"
-											alt=""
-											loading="eager"
-											decoding="async"
-											fetchpriority="high"
-											aria-hidden="true"
-											class="h-[7.2rem] w-full max-w-[12rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
-										/>
-										<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
-											<p
-												class="font-hero-title text-[1.09rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
-											>
-												{formatLeafStatValue(item)}
-											</p>
-										</div>
-									</div>
-									<div class="flex min-h-[1.2rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
-										<p
-											class="-mt-8 sm:-mt-12 lg:-mt-20 text-[0.51rem] leading-tight font-semibold tracking-[0.05em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
-										>
-											{statLeafSubtitles[item.key]}
-										</p>
+			<div
+				class="-mx-2 mt-3 grid grid-cols-[minmax(0,1fr)_minmax(7.2rem,8.6rem)_minmax(0,1fr)] items-start gap-x-1 gap-y-1.5 sm:mx-0 sm:mt-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:items-center lg:gap-x-2"
+			>
+				<div class="grid gap-1.5 sm:gap-3 lg:gap-6">
+					{#each leftLeafStats as item}
+						<article class="mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
+							<div class="flex min-h-[2rem] items-end justify-center px-1 py-0 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
+								<h3 class="text-[0.82rem] leading-[1.12] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
+									{item.label}
+								</h3>
+							</div>
+							<div class="relative -mt-2 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]">
+								<img
+									src="/layout/daun-kiri.svg"
+									alt=""
+									aria-hidden="true"
+									class="h-[5.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+								/>
+								<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
+									<p class="font-hero-title text-[1.22rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]">
+										{formatLeafStatValue(item)}
+									</p>
 								</div>
-							</article>
-						{/each}
-					</div>
+							</div>
+							<div class="flex min-h-[0.9rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
+								<p class="-mt-10 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm">
+									{statLeafSubtitles[item.key]}
+								</p>
+							</div>
+						</article>
+					{/each}
+				</div>
 
-						<div class="relative z-20 mx-auto -my-2 flex w-full justify-center sm:my-0">
-							<div id="layanan-dashboard" class="pointer-events-none aspect-square w-[clamp(12.2rem,42vw,14.6rem)] sm:w-[clamp(10rem,34vw,14rem)] lg:w-[clamp(20rem,28vw,34rem)]">
-								<DotLottieSvelte
-									src="/layout/tree.lottie"
-									autoplay={false}
-								dotLottieRefCallback={setDotLottieRef}
-							/>
-						</div>
-					</div>
-
-						<div class="grid gap-2 sm:gap-5 lg:gap-6">
-							{#each rightLeafStats as item}
-								<article class="mx-auto grid w-full max-w-[12.2rem] overflow-hidden bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
-									<div class="flex min-h-[3.15rem] items-end justify-center px-1.5 py-1 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
-										<h3 class="text-[0.76rem] leading-[1.15] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
-											{item.label}
-										</h3>
-									</div>
-									<div class="relative -mt-1 flex min-h-[5rem] items-center justify-center px-0 py-0 sm:-mt-2 sm:min-h-[6.2rem] lg:-mt-20 lg:min-h-[8.2rem]">
-										<img
-											src="/layout/daun-kanan.svg"
-											alt=""
-											loading="eager"
-											decoding="async"
-											fetchpriority="high"
-											aria-hidden="true"
-											class="h-[6.2rem] w-full max-w-[12rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
-										/>
-										<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
-											<p
-												class="font-hero-title text-[1.09rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
-											>
-												{formatLeafStatValue(item)}
-											</p>
-										</div>
-									</div>
-									<div class="flex min-h-[1.2rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
-										<p
-											class="sm:-mt-12 lg:-mt-20 text-[0.51rem] leading-tight font-semibold tracking-[0.05em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
-										>
-											{statLeafSubtitles[item.key]}
-										</p>
-								</div>
-							</article>
-						{/each}
+				<div class="pointer-events-none relative z-20 mx-auto flex w-full self-center items-center justify-center overflow-visible">
+					<div class="stat-tree-lottie aspect-square w-[clamp(12rem,58vw,20.5rem)] sm:w-[clamp(12rem,34vw,14rem)] lg:w-[clamp(20rem,28vw,34rem)]">
+						<DotLottieSvelte 
+							src="/layout/tree.lottie"
+							autoplay={false}
+							dotLottieRefCallback={setDotLottieRef}
+						/>
 					</div>
 				</div>
+
+				<div class="grid gap-1.5 sm:gap-3 lg:gap-6">
+					{#each rightLeafStats as item}
+						<article class="mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
+							<div class="flex min-h-[2rem] items-end justify-center px-1 py-0 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
+								<h3 class="text-[0.82rem] leading-[1.12] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
+									{item.label}
+								</h3>
+							</div>
+							<div class="relative -mt-2 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]">
+								<img
+									src="/layout/daun-kanan.svg"
+									alt=""
+									aria-hidden="true"
+									class="h-[5.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+								/>
+								<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
+									<p class="font-hero-title text-[1.22rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]">
+										{formatLeafStatValue(item)}
+									</p>
+								</div>
+							</div>
+							<div class="flex min-h-[0.9rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
+								<p class="-mt-10 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm">
+									{statLeafSubtitles[item.key]}
+								</p>
+							</div>
+						</article>
+					{/each}
+				</div>
+			</div>
 		</div>
 	</section>
 
@@ -521,24 +535,71 @@
 			</p>
 		</div>
 
-		<ol class="mt-10 space-y-6">
+		<ol class="mt-8 space-y-3.5 lg:hidden">
 			{#each serviceSteps as step, index}
-				<li class="relative pl-14 sm:pl-16">
-					<div
-						class="absolute top-0 left-0 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#b9cca3] bg-[#eef5e7] text-sm font-semibold text-[#58703a]"
+				<li class="rounded-2xl border border-[var(--line)] bg-white p-4 sm:p-5">
+					<span
+						class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#43b556] text-lg font-bold text-white"
 					>
 						{index + 1}
-					</div>
-					{#if index < serviceSteps.length - 1}
-						<span class="absolute top-10 bottom-0 left-5 w-px bg-[var(--line)]"></span>
-					{/if}
-					<h3 class="text-lg font-semibold tracking-tight text-[var(--ink)]">{step.title}</h3>
-					<p class="mt-2 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+					</span>
+					<h3 class="mt-2.5 text-lg font-semibold tracking-tight text-[var(--ink)]">{step.title}</h3>
+					<p class="mt-1.5 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
 						{step.description}
 					</p>
 				</li>
 			{/each}
 		</ol>
+
+			<div class="relative mt-12 hidden lg:block">
+				<div class="relative mx-auto aspect-[1343/1954] max-w-[68rem] overflow-visible">
+					<img
+						src="/layout/line-number.svg"
+						alt=""
+						aria-hidden="true"
+						class="absolute inset-0 h-full w-full object-contain"
+					/>
+					<img
+						src="/layout/daun-line-2.svg"
+						alt=""
+						aria-hidden="true"
+						class="absolute top-[-4%] right-[14%] w-[9.5rem] rotate-[10deg] opacity-95"
+					/>
+					<img
+						src="/layout/daun-line-2.svg"
+						alt=""
+						aria-hidden="true"
+						class="absolute top-[42%] right-[-9%] w-[10.5rem] -scale-x-100 rotate-[8deg] opacity-95"
+					/>
+					<img
+						src="/layout/daun-line-2.svg"
+						alt=""
+						aria-hidden="true"
+						class="absolute top-[57%] left-[-11%] w-[11.5rem] rotate-[186deg] opacity-95"
+					/>
+					<img
+						src="/layout/daun-line-2.svg"
+						alt=""
+						aria-hidden="true"
+						class="absolute right-[6%] bottom-[0%] w-[12.8rem] rotate-[278deg] opacity-95"
+					/>
+					<ol class="absolute inset-0">
+						{#each desktopFlowSteps as step}
+							<li
+								class="absolute ml-25 w-[clamp(12rem,18vw,17rem)] -translate-x-1/2"
+								style={`left:${step.left}; top:${step.top};`}
+							>
+								<h3 class="text-[2rem] leading-none font-semibold tracking-tight text-[var(--ink)]">
+									{step.title}
+								</h3>
+								<p class="mt-2 text-[1rem] leading-snug text-[#2f3137]">
+								{step.description}
+							</p>
+						</li>
+					{/each}
+				</ol>
+			</div>
+		</div>
 	</div>
 </section>
 <section id="faq" class="scroll-mt-28 bg-white py-16 sm:py-20">
