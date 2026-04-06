@@ -39,7 +39,6 @@ Jalankan ini sebelum membuat PR:
 
 ```bash
 npm run check
-npm run lint
 ```
 
 Jika perubahan menyentuh behavior penting, jalankan juga:
@@ -53,7 +52,7 @@ npm run test
 - Perubahan fokus pada satu tujuan.
 - Tidak ada data sensitif dalam diff.
 - README/dokumentasi diperbarui jika diperlukan.
-- Hasil check/lint/test dicantumkan di deskripsi PR.
+- Hasil check/test dicantumkan di deskripsi PR.
 
 ## Review Policy
 

@@ -249,7 +249,7 @@ function toggleFaq(id: string) {
 				{:else}
 					<span class="block h-full w-full">
 						<img
-							src="/layout/chatbot.svg"
+							src="/layout/chatbot.png"
 							alt=""
 							class="h-full w-full origin-center scale-[1.42] object-contain sm:scale-[1.3]"
 							aria-hidden="true"
