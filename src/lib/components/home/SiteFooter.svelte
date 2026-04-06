@@ -40,7 +40,7 @@
 
 					<div class="mt-5">
 						<h3 class="text-base font-semibold tracking-[0.09em] uppercase sm:text-lg">Sosial Media</h3>
-						<div class="mt-2.5 flex items-center gap-2.5">
+						<div class="footer-social-links mt-2.5 flex items-center gap-2.5">
 							<a
 								href="https://instagram.com/sikopling.kalsel"
 								target="_blank"
@@ -189,6 +189,11 @@
 
 			.maskot-image {
 				max-width: var(--maskot-img-w-mobile);
+			}
+
+			.footer-social-links {
+				max-width: calc(100% - var(--maskot-zone-w-mobile) - 1rem);
+				flex-wrap: wrap;
 			}
 
 			.site-footer-contact > div {

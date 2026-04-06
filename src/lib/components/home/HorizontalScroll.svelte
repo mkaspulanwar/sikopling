@@ -1,114 +1,119 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+  import { onMount } from "svelte";
+  import type { Snippet } from "svelte";
 
-	type Cleanup = () => void;
+  type Cleanup = () => void;
 
-	const cards = [
-		{ src: '/home/Group 13.png', alt: 'Card 1' },
-		{ src: '/home/Group 9.png', alt: 'Card 2' },
-		{ src: '/home/Group 10.png', alt: 'Card 3' },
-		{ src: '/home/Group 11.png', alt: 'Card 4' },
-		{ src: '/home/Group 12.png', alt: 'Card 5' }
-	];
+  const cards = [
+    { src: "/home/Group 13.png", alt: "Card 1" },
+    { src: "/home/Group 9.png", alt: "Card 2" },
+    { src: "/home/Group 10.png", alt: "Card 3" },
+    { src: "/home/Group 11.png", alt: "Card 4" },
+    { src: "/home/Group 12.png", alt: "Card 5" },
+  ];
 
-	const MAIN_TRIGGER_ID = 'home-horizontal-scroll-main';
+  const MAIN_TRIGGER_ID = "home-horizontal-scroll-main";
+  const { header }: { header?: Snippet } = $props();
 
-	let sectionEl: HTMLElement | null = null;
-	let horizontalEl: HTMLElement | null = null;
+  let sectionEl: HTMLElement | null = null;
+  let horizontalEl: HTMLElement | null = null;
 
-	const initHorizontalScroll = async (): Promise<Cleanup> => {
-		if (!sectionEl || !horizontalEl) return () => {};
-		if (!window.matchMedia('(min-width: 768px)').matches) return () => {};
+  const initHorizontalScroll = async (): Promise<Cleanup> => {
+    if (!sectionEl || !horizontalEl) return () => {};
+    if (!window.matchMedia("(min-width: 768px)").matches) return () => {};
 
-		const [gsapModule, scrollTriggerModule, lenisModule] = await Promise.all([
-			import('gsap'),
-			import('gsap/ScrollTrigger'),
-			import('lenis')
-		]);
+    const [gsapModule, scrollTriggerModule, lenisModule] = await Promise.all([
+      import("gsap"),
+      import("gsap/ScrollTrigger"),
+      import("lenis"),
+    ]);
 
-		const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
-		const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ?? scrollTriggerModule.default) as any;
-		const Lenis = lenisModule.default as any;
+    const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
+    const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ??
+      scrollTriggerModule.default) as any;
+    const Lenis = lenisModule.default as any;
 
-		gsap.registerPlugin(ScrollTrigger);
-		ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
+    gsap.registerPlugin(ScrollTrigger);
+    ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
 
-		const lenis = new Lenis();
-		lenis.on('scroll', ScrollTrigger.update);
+    const lenis = new Lenis();
+    lenis.on("scroll", ScrollTrigger.update);
 
-		const tickerFn = (time: number) => lenis.raf(time * 1000);
-		gsap.ticker.add(tickerFn);
-		gsap.ticker.lagSmoothing(0);
+    const tickerFn = (time: number) => lenis.raf(time * 1000);
+    gsap.ticker.add(tickerFn);
+    gsap.ticker.lagSmoothing(0);
 
-		const mainTween = gsap.to(horizontalEl, {
-			x: () => -(horizontalEl!.scrollWidth - window.innerWidth),
-			ease: 'none',
-			scrollTrigger: {
-				id: MAIN_TRIGGER_ID,
-				trigger: horizontalEl,
-				start: 'center center',
-				end: () => '+=' + horizontalEl!.scrollWidth,
-				pin: sectionEl,
-				scrub: true,
-				invalidateOnRefresh: true
-			}
-		});
+    const mainTween = gsap.to(horizontalEl, {
+      x: () => -(horizontalEl!.scrollWidth - window.innerWidth),
+      ease: "none",
+      scrollTrigger: {
+        id: MAIN_TRIGGER_ID,
+        trigger: horizontalEl,
+        start: "center center",
+        end: () => "+=" + horizontalEl!.scrollWidth,
+        pin: sectionEl,
+        scrub: true,
+        invalidateOnRefresh: true,
+      },
+    });
 
-		const cardTweens = Array.from(horizontalEl.querySelectorAll<HTMLElement>('.card')).map((card) =>
-			gsap.from(card, {
-				x: 250,
-				duration: 0.6,
-				scrollTrigger: {
-					trigger: card,
-					start: 'top bottom',
-					toggleActions: 'play none none reverse'
-				}
-			})
-		);
+    const cardTweens = Array.from(
+      horizontalEl.querySelectorAll<HTMLElement>(".card"),
+    ).map((card) =>
+      gsap.from(card, {
+        x: 250,
+        duration: 0.6,
+        scrollTrigger: {
+          trigger: card,
+          start: "top bottom",
+          toggleActions: "play none none reverse",
+        },
+      }),
+    );
 
-		const refresh = () => ScrollTrigger.refresh();
-		window.addEventListener('load', refresh);
-		requestAnimationFrame(refresh);
+    const refresh = () => ScrollTrigger.refresh();
+    window.addEventListener("load", refresh);
+    requestAnimationFrame(refresh);
 
-		return () => {
-			window.removeEventListener('load', refresh);
+    return () => {
+      window.removeEventListener("load", refresh);
 
-			mainTween?.scrollTrigger?.kill();
-			mainTween?.kill();
+      mainTween?.scrollTrigger?.kill();
+      mainTween?.kill();
 
-			cardTweens.forEach((tween) => {
-				tween.scrollTrigger?.kill();
-				tween.kill();
-			});
+      cardTweens.forEach((tween) => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      });
 
-			gsap.ticker.remove(tickerFn);
-			lenis.destroy();
-		};
-	};
+      gsap.ticker.remove(tickerFn);
+      lenis.destroy();
+    };
+  };
 
-	onMount(() => {
-		let isUnmounted = false;
-		let cleanup: Cleanup = () => {};
+  onMount(() => {
+    let isUnmounted = false;
+    let cleanup: Cleanup = () => {};
 
-		void initHorizontalScroll().then((teardown) => {
-			if (isUnmounted) {
-				teardown();
-				return;
-			}
-			cleanup = teardown;
-		});
+    void initHorizontalScroll().then((teardown) => {
+      if (isUnmounted) {
+        teardown();
+        return;
+      }
+      cleanup = teardown;
+    });
 
-		return () => {
-			isUnmounted = true;
-			cleanup();
-		};
-	});
+    return () => {
+      isUnmounted = true;
+      cleanup();
+    };
+  });
 </script>
 
 <section id="horizontal-scroll" bind:this={sectionEl}>
-	<div class="horizontal-scroll-header">
-		<slot name="header" />
-	</div>
+  <div class="horizontal-scroll-header">
+    {@render header?.()}
+  </div>
   <div class="horizontal-scroll-wrapper">
     <div class="horizontal" bind:this={horizontalEl}>
       {#each cards as card}
@@ -213,7 +218,9 @@
     );
     transform: translateX(0) rotate(14deg);
     opacity: 0;
-    transition: transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1), opacity 260ms ease;
+    transition:
+      transform 700ms cubic-bezier(0.2, 0.7, 0.2, 1),
+      opacity 260ms ease;
     pointer-events: none;
     z-index: 2;
   }
@@ -233,7 +240,9 @@
   @media (hover: hover) and (pointer: fine) {
     .horizontal .card:hover {
       transform: translateY(-10px) scale(1.03);
-      box-shadow: 0 24px 45px rgba(28, 72, 46, 0.26), 0 0 0 1px rgba(255, 255, 255, 0.22);
+      box-shadow:
+        0 24px 45px rgba(28, 72, 46, 0.26),
+        0 0 0 1px rgba(255, 255, 255, 0.22);
       filter: saturate(1.08);
     }
 
