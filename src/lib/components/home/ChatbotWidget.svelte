@@ -122,7 +122,7 @@ function toggleFaq(id: string) {
 		{#if isOpen}
 			<section
 				id="chatbot-popup"
-				class="fixed inset-0 z-40 flex h-[100dvh] w-screen flex-col overflow-y-auto overscroll-contain bg-white sm:static sm:mb-3 sm:h-[29rem] sm:w-[min(92vw,24rem)] sm:max-w-[24rem] sm:rounded-2xl sm:border sm:border-[#e4e7ec] sm:shadow-[0_24px_34px_-24px_rgba(15,23,42,0.35)]"
+				class="fixed inset-0 z-40 flex h-[100dvh] w-full flex-col overflow-y-auto overscroll-contain bg-white sm:static sm:mb-3 sm:h-[29rem] sm:w-[min(92vw,24rem)] sm:max-w-[24rem] sm:rounded-2xl sm:border sm:border-[#e4e7ec] sm:shadow-[0_24px_34px_-24px_rgba(15,23,42,0.35)]"
 				in:fly={{ y: 14, duration: 190 }}
 				out:fly={{ y: 10, duration: 140 }}
 			>

@@ -1,79 +1,107 @@
-<script>
-  import { onMount } from "svelte";
+<script lang="ts">
+	import { onMount } from 'svelte';
 
-  const cards = [
-    { src: "/home/Group 13.png", alt: "Card 1" },
-    { src: "/home/Group 9.png", alt: "Card 2" },
-    { src: "/home/Group 10.png", alt: "Card 3" },
-    { src: "/home/Group 11.png", alt: "Card 4" },
-    { src: "/home/Group 12.png", alt: "Card 5" }
-  ];
+	type Cleanup = () => void;
 
-  let sectionEl;
-  let horizontalEl;
-  let lenis;
-  let tickerFn;
-  let horizontalTween;
-  let cardTweens = [];
+	const cards = [
+		{ src: '/home/Group 13.png', alt: 'Card 1' },
+		{ src: '/home/Group 9.png', alt: 'Card 2' },
+		{ src: '/home/Group 10.png', alt: 'Card 3' },
+		{ src: '/home/Group 11.png', alt: 'Card 4' },
+		{ src: '/home/Group 12.png', alt: 'Card 5' }
+	];
 
-  onMount(async () => {
-    const gsapModule = await import("gsap");
-    const scrollTriggerModule = await import("gsap/ScrollTrigger");
-    const lenisModule = await import("lenis");
+	const MAIN_TRIGGER_ID = 'home-horizontal-scroll-main';
 
-    const gsap = gsapModule.default || gsapModule.gsap;
-    const ScrollTrigger = scrollTriggerModule.ScrollTrigger || scrollTriggerModule.default;
-    const Lenis = lenisModule.default;
+	let sectionEl: HTMLElement | null = null;
+	let horizontalEl: HTMLElement | null = null;
 
-    gsap.registerPlugin(ScrollTrigger);
+	const initHorizontalScroll = async (): Promise<Cleanup> => {
+		if (!sectionEl || !horizontalEl) return () => {};
 
-    lenis = new Lenis();
-    lenis.on("scroll", ScrollTrigger.update);
+		const [gsapModule, scrollTriggerModule, lenisModule] = await Promise.all([
+			import('gsap'),
+			import('gsap/ScrollTrigger'),
+			import('lenis')
+		]);
 
-    tickerFn = (time) => lenis.raf(time * 1000);
-    gsap.ticker.add(tickerFn);
-    gsap.ticker.lagSmoothing(0);
+		const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
+		const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ?? scrollTriggerModule.default) as any;
+		const Lenis = lenisModule.default as any;
 
-    horizontalTween = gsap.to(horizontalEl, {
-      x: () => -(horizontalEl.scrollWidth - window.innerWidth),
-      ease: "none",
-      scrollTrigger: {
-        trigger: horizontalEl,
-        start: "center center",
-        end: () => "+=" + horizontalEl.scrollWidth,
-        pin: sectionEl,
-        scrub: true,
-        invalidateOnRefresh: true
-      }
-    });
+		gsap.registerPlugin(ScrollTrigger);
+		ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
 
-    horizontalEl.querySelectorAll(".card").forEach((card) => {
-      const tween = gsap.from(card, {
-        x: 250,
-        duration: 0.6,
-        scrollTrigger: {
-          trigger: card,
-          start: "top bottom",
-          toggleActions: "play none none reverse"
-        }
-      });
+		const lenis = new Lenis();
+		lenis.on('scroll', ScrollTrigger.update);
 
-      cardTweens.push(tween);
-    });
+		const tickerFn = (time: number) => lenis.raf(time * 1000);
+		gsap.ticker.add(tickerFn);
+		gsap.ticker.lagSmoothing(0);
 
-    return () => {
-      horizontalTween?.scrollTrigger?.kill();
-      horizontalTween?.kill();
+		const mainTween = gsap.to(horizontalEl, {
+			x: () => -(horizontalEl!.scrollWidth - window.innerWidth),
+			ease: 'none',
+			scrollTrigger: {
+				id: MAIN_TRIGGER_ID,
+				trigger: horizontalEl,
+				start: 'center center',
+				end: () => '+=' + horizontalEl!.scrollWidth,
+				pin: sectionEl,
+				scrub: true,
+				invalidateOnRefresh: true
+			}
+		});
 
-      cardTweens.forEach((tween) => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      });
+		const cardTweens = Array.from(horizontalEl.querySelectorAll<HTMLElement>('.card')).map((card) =>
+			gsap.from(card, {
+				x: 250,
+				duration: 0.6,
+				scrollTrigger: {
+					trigger: card,
+					start: 'top bottom',
+					toggleActions: 'play none none reverse'
+				}
+			})
+		);
 
-      gsap.ticker.remove(tickerFn);
-      lenis?.destroy();
-    };
-  });
+		const refresh = () => ScrollTrigger.refresh();
+		window.addEventListener('load', refresh);
+		requestAnimationFrame(refresh);
+
+		return () => {
+			window.removeEventListener('load', refresh);
+
+			mainTween?.scrollTrigger?.kill();
+			mainTween?.kill();
+
+			cardTweens.forEach((tween) => {
+				tween.scrollTrigger?.kill();
+				tween.kill();
+			});
+
+			gsap.ticker.remove(tickerFn);
+			lenis.destroy();
+		};
+	};
+
+	onMount(() => {
+		let isUnmounted = false;
+		let cleanup: Cleanup = () => {};
+
+		void initHorizontalScroll().then((teardown) => {
+			if (isUnmounted) {
+				teardown();
+				return;
+			}
+			cleanup = teardown;
+		});
+
+		return () => {
+			isUnmounted = true;
+			cleanup();
+		};
+	});
 </script>
 
 <section id="horizontal-scroll" bind:this={sectionEl}>
@@ -92,7 +120,7 @@
 
 <style>
   #horizontal-scroll {
-    padding: 160px 0;
+    padding-top: 96px;
   }
 
   .horizontal-scroll-wrapper {
@@ -161,7 +189,7 @@
     position: absolute;
     top: -145%;
     left: -35%;
-    width: 34%;
+    width: 44%;
     height: 320%;
     background: linear-gradient(
       120deg,

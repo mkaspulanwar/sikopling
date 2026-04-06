@@ -508,7 +508,7 @@
 		}`;
 
 	const logoClass = () =>
-		`h-[1.85rem] w-auto object-contain transition-[filter] duration-300 lg:h-[2.2rem] ${
+		`h-auto w-[7.2rem] object-contain transition-[filter] duration-300 sm:w-[8.4rem] lg:w-[13rem] ${
 			useLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
 		}`;
 
