@@ -18,6 +18,7 @@
 
 	const initHorizontalScroll = async (): Promise<Cleanup> => {
 		if (!sectionEl || !horizontalEl) return () => {};
+		if (!window.matchMedia('(min-width: 768px)').matches) return () => {};
 
 		const [gsapModule, scrollTriggerModule, lenisModule] = await Promise.all([
 			import('gsap'),
@@ -253,6 +254,75 @@
   @media (hover: none) {
     .horizontal .card:active {
       transform: scale(0.985);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1279px) {
+    .horizontal-scroll-wrapper {
+      height: clamp(32rem, 78dvh, 52rem);
+    }
+
+    .horizontal {
+      align-items: center;
+      padding-left: 18vw;
+    }
+
+    .horizontal > div {
+      margin: 0 2.5vw;
+    }
+
+    .horizontal > div:last-child {
+      margin: 0 10vw 0 2.5vw;
+    }
+
+    .horizontal .card {
+      width: min(74vw, 34rem);
+      border-radius: 20px;
+      padding: clamp(16px, 2.8vw, 28px) clamp(18px, 3vw, 34px);
+    }
+  }
+
+  @media (max-width: 767px) {
+    #horizontal-scroll {
+      overflow: visible;
+    }
+
+    .horizontal-scroll-header {
+      position: static;
+      z-index: auto;
+      margin-bottom: 1rem;
+    }
+
+    .horizontal-scroll-wrapper {
+      height: auto;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .horizontal-scroll-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    .horizontal {
+      align-items: stretch;
+      height: auto;
+      min-width: max-content;
+      padding: 0 1rem 0.25rem;
+    }
+
+    .horizontal > div {
+      margin: 0 0.75rem 0 0;
+    }
+
+    .horizontal > div:last-child {
+      margin: 0 1rem 0 0;
+    }
+
+    .horizontal .card {
+      width: min(88vw, 25rem);
+      padding: clamp(14px, 3.4vw, 24px) clamp(16px, 4vw, 28px);
     }
   }
 </style>
