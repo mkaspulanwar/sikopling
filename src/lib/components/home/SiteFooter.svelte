@@ -8,14 +8,14 @@
 </script>
 
 <footer id="kontak" class="mt-16 bg-white">
-	<div class="nav-shell nav-shell-desktop-spacious pb-4">
-		<div
-			class="relative overflow-visible rounded-[1.5rem] bg-[#64AD31] pt-6 pr-0 pb-6 pl-4 sm:pt-10 sm:pr-0 sm:pl-8 lg:h-[400px] lg:px-10"
-		>
+		<div class="nav-shell nav-shell-desktop-spacious pb-4">
 			<div
-				class="grid grid-cols-[minmax(0,1fr)_15rem] items-start gap-5 sm:grid-cols-[minmax(0,1fr)_17rem] sm:gap-7 lg:h-full lg:grid-cols-[minmax(0,1fr)_minmax(16.5rem,24.75rem)_minmax(0,1fr)] lg:items-start lg:gap-8"
+				class="site-footer-shell relative overflow-visible rounded-[1.5rem] bg-[#64AD31] pt-6 pr-0 pb-6 pl-4 sm:pt-10 sm:pr-0 sm:pl-8 xl:h-[400px] xl:px-10"
 			>
-				<section class="order-1 col-start-1 row-start-1 text-white lg:order-1 lg:col-start-1 lg:row-start-1">
+				<div
+					class="site-footer-grid grid items-start gap-5 sm:gap-7 xl:h-full xl:grid-cols-[minmax(0,1fr)_minmax(16.5rem,24.75rem)_minmax(0,1fr)] xl:items-start xl:gap-8"
+				>
+				<section class="order-1 col-start-1 row-start-1 text-white xl:order-1 xl:col-start-1 xl:row-start-1">
 					<div
 						class="tagline-badge inline-flex items-center rounded-[0.72rem] border-2 border-[#bce96a] bg-linear-to-b from-[#16ce22] to-[#f39d2c] px-3 py-1 shadow-[0_3px_0_rgba(20,88,190,0.45)]"
 					>
@@ -89,47 +89,47 @@
 					</div>
 				</section>
 
-				<figure
-					class="order-3 col-start-2 row-start-1 row-span-2 w-full justify-self-stretch self-center lg:absolute lg:-bottom-6 lg:left-1/2 lg:z-20 lg:h-[25rem] lg:w-[20rem] lg:-translate-x-1/2"
-				>
-					<div
-						class="flex min-h-68 items-end justify-center rounded-l-[1.75rem] rounded-r-none bg-[#676767] pt-3 sm:min-h-[18rem] sm:px-3 lg:h-full lg:min-h-0 lg:rounded-none lg:bg-transparent lg:p-0"
+					<figure
+						class="maskot-figure order-3 col-start-2 row-start-1 row-span-2 w-full justify-self-stretch self-center xl:absolute xl:-bottom-6 xl:left-1/2 xl:z-20 xl:h-[25rem] xl:w-[20rem] xl:-translate-x-1/2"
 					>
-						<img
-							src="/layout/maskot.svg"
-							alt="Maskot Sikopling"
-							class="block h-auto w-full max-w-[10.5rem] object-contain sm:max-w-[12rem] lg:h-full lg:w-full lg:max-w-none lg:-translate-y-6 lg:object-contain"
-						/>
-					</div>
-				</figure>
+						<div
+							class="maskot-panel flex items-end justify-center rounded-l-[1.75rem] rounded-r-none bg-[#676767] pt-3 sm:px-3 xl:h-full xl:min-h-0 xl:rounded-none xl:bg-transparent xl:p-0"
+						>
+							<img
+								src="/layout/maskot.svg"
+								alt="Maskot Sikopling"
+								class="maskot-image block h-auto w-full object-contain xl:h-full xl:w-full xl:max-w-none xl:-translate-y-6 xl:object-contain"
+							/>
+						</div>
+					</figure>
 
-				<section class="order-2 col-start-1 row-start-2 text-white lg:order-3 lg:col-start-3 lg:row-start-1 lg:self-start">
+					<section class="site-footer-contact order-2 col-start-1 row-start-2 mt-5 text-white xl:order-3 xl:col-start-3 xl:row-start-1 xl:mt-0 xl:self-start">
 					<div class="pt-4 text-sm leading-relaxed sm:border-0 sm:pt-0 sm:text-[0.95rem]">
 						<h3 class="text-base font-semibold tracking-[0.09em] uppercase sm:text-lg">Kontak Kami</h3>
-						<div class="mt-2.5 space-y-2.5">
-							<p class="flex items-start gap-2">
-								<Phone class="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
-								<span>
-									<span class="block font-semibold">Layanan Pelanggan</span>
-									<a href="https://wa.me/6282155667788" class="mt-0.5 block hover:underline">
-										+62 821-5566-7788
-									</a>
-								</span>
-							</p>
-							<p class="flex items-start gap-2">
-								<Mail class="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
-								<span>
-									<span class="block font-semibold">ChatBot</span>
-									<a href="https://wa.me/6282155667799" class="mt-0.5 block hover:underline">
-										+62 821-5566-7799
-									</a>
-								</span>
-							</p>
-							<p class="flex items-start gap-2">
-								<MapPin class="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
-								<span>
-									<span class="block font-semibold">Alamat</span>
-									<span class="mt-0.5 block">
+							<div class="footer-contact-list mt-2.5 space-y-2.5">
+								<p class="footer-contact-item footer-contact-item-main flex items-start gap-2">
+									<Phone class="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+									<span>
+										<span class="block font-semibold">Layanan Pelanggan</span>
+										<a href="https://wa.me/6282155667788" class="mt-0.5 block hover:underline">
+											+62 821-5566-7788
+										</a>
+									</span>
+								</p>
+								<p class="footer-contact-item footer-contact-item-chat flex items-start gap-2">
+									<Mail class="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+									<span>
+										<span class="block font-semibold">ChatBot</span>
+										<a href="https://wa.me/6282155667799" class="mt-0.5 block hover:underline">
+											+62 821-5566-7799
+										</a>
+									</span>
+								</p>
+								<p class="footer-contact-item footer-contact-item-address flex items-start gap-2">
+									<MapPin class="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
+									<span>
+										<span class="block font-semibold">Alamat</span>
+										<span class="mt-0.5 block">
 										Jl Bangun Praja Kawasan Perkantoran PemerintahProvinsi Kalimantan Selatan,
 										Palam, Kec. Cemp., Kota Banjar Baru, Kalimantan Selatan 70732
 									</span>
@@ -155,10 +155,91 @@
 	</div>
 </footer>
 
-<style>
-	.tagline-badge {
-		will-change: border-radius, transform;
-		transform-origin: left center;
+	<style>
+		.site-footer-shell {
+			--maskot-zone-w-mobile: 13rem;
+			--maskot-zone-h-mobile: 10rem;
+			--maskot-img-w-mobile: 10.5rem;
+			--maskot-zone-raise-mobile: 5.25rem;
+			--maskot-zone-w-sm: 22rem;
+			--maskot-zone-h-sm: 16rem;
+			--maskot-img-w-sm: 12rem;
+		}
+
+		@media (max-width: 639px) {
+			.site-footer-grid {
+				display: block;
+			}
+
+			.site-footer-grid::after {
+				content: '';
+				display: block;
+				clear: both;
+			}
+
+			.maskot-figure {
+				float: right;
+				width: var(--maskot-zone-w-mobile);
+				margin: calc(var(--maskot-zone-raise-mobile) * -1) 0 0.85rem 0.85rem;
+			}
+
+			.maskot-panel {
+				min-height: var(--maskot-zone-h-mobile);
+			}
+
+			.maskot-image {
+				max-width: var(--maskot-img-w-mobile);
+			}
+
+			.site-footer-contact > div {
+				padding-top: 0;
+			}
+		}
+
+		@media (min-width: 640px) and (max-width: 1279px) {
+			.site-footer-grid {
+				grid-template-columns: minmax(0, 1fr) var(--maskot-zone-w-sm);
+			}
+
+			.maskot-panel {
+				min-height: var(--maskot-zone-h-sm);
+			}
+
+			.maskot-image {
+				max-width: var(--maskot-img-w-sm);
+			}
+
+			.footer-contact-list {
+				display: grid;
+				grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
+				column-gap: 1rem;
+				row-gap: 0.7rem;
+				align-items: start;
+			}
+
+			.footer-contact-item {
+				margin: 0;
+			}
+
+			.footer-contact-item-main {
+				grid-column: 1;
+				grid-row: 1;
+			}
+
+			.footer-contact-item-chat {
+				grid-column: 1;
+				grid-row: 2;
+			}
+
+			.footer-contact-item-address {
+				grid-column: 2;
+				grid-row: 1 / span 2;
+			}
+		}
+
+		.tagline-badge {
+			will-change: border-radius, transform;
+			transform-origin: left center;
 		animation: tagline-badge-morph 3s ease-in-out infinite;
 	}
 	.tagline-rotator {

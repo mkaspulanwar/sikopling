@@ -150,14 +150,14 @@
 	];
 
 	const desktopFlowSteps: DesktopFlowStep[] = [
-		{ left: '17%', top: '18%', ...serviceSteps[0] },
-		{ left: '58%', top: '18%', ...serviceSteps[1] },
-		{ left: '17%', top: '39%', ...serviceSteps[3] },
-		{ left: '58%', top: '39%', ...serviceSteps[2] },
-		{ left: '17%', top: '60%', ...serviceSteps[4] },
-		{ left: '58%', top: '60%', ...serviceSteps[5] },
-		{ left: '17%', top: '81%', ...serviceSteps[7] },
-		{ left: '58%', top: '81%', ...serviceSteps[6] }
+		{ left: '27%', top: '18%', ...serviceSteps[0] },
+		{ left: '75%', top: '18%', ...serviceSteps[1] },
+		{ left: '27%', top: '39%', ...serviceSteps[3] },
+		{ left: '75%', top: '39%', ...serviceSteps[2] },
+		{ left: '27%', top: '61%', ...serviceSteps[4] },
+		{ left: '76%', top: '61%', ...serviceSteps[5] },
+		{ left: '27%', top: '82%', ...serviceSteps[7] },
+		{ left: '76%', top: '82%', ...serviceSteps[6] }
 	];
 	let activeHomeFaqId = $state<string | null>(null);
 	let statSection: HTMLElement | null = $state(null);
@@ -338,7 +338,7 @@
 	<link rel="preload" href="/layout/daun-kiri.svg" as="image" type="image/svg+xml" />
 	<link rel="preload" href="/layout/daun-kanan.svg" as="image" type="image/svg+xml" />
 	<link rel="preload" href="/layout/line-number.svg" as="image" type="image/svg+xml" />
-	<link rel="preload" href="/layout/daun-line-2.svg" as="image" type="image/svg+xml" />
+	<link rel="preload" href="/layout/daun-line.svg" as="image" type="image/svg+xml" />
 	<link rel="preload" href="/layout/tree.lottie" as="fetch" type="application/octet-stream" />
 </svelte:head>
 
@@ -504,20 +504,22 @@
 		</div>
 	</section>
 
-<section id="layanan-dokumen" class="border-t border-[#64AD31]/25 scroll-mt-28 bg-[#fff] py-6 sm:py-8">
-	<div class="page-shell">
-		<div class="mx-auto max-w-3xl text-center">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
-				Layanan Dokumen Lingkungan
-			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[--ink] sm:text-4xl">
-				Jenis Dokumen yang Dapat Diproses
-			</h2>
+<section
+	id="layanan-dokumen"
+	class=" scroll-mt-28"
+>
+	<HorizontalScroll>
+		<div slot="header" class="pt-6 sm:pt-8">
+			<div class="mx-auto max-w-5xl text-center">
+				<p class="mt-1 text-xs font-semibold tracking-[0.12em] text-[#c7ffc6] uppercase">
+					Layanan Dokumen Lingkungan
+				</p>
+				<h2 class="mt-2 text-[clamp(1rem,3vw,4rem)] font-semibold leading-tight tracking-tight text-white">
+					Jenis Dokumen yang Dapat Diproses
+				</h2>
+			</div>
 		</div>
-	</div>
-	<div class="-mt-20 relative w-full overflow-x-clip">
-		<HorizontalScroll />
-	</div>
+	</HorizontalScroll>
 </section>
 
 <section id="alur-percepatan" class="scroll-mt-28 bg-[var(--canvas)] py-6 sm:py-14">
@@ -560,33 +562,33 @@
 						class="absolute inset-0 h-full w-full object-contain"
 					/>
 					<img
-						src="/layout/daun-line-2.svg"
+						src="/layout/daun-line.svg"
 						alt=""
 						aria-hidden="true"
-						class="absolute top-[-4%] right-[14%] w-[9.5rem] rotate-[10deg] opacity-95"
+						class="absolute top-[-5%] right-[14%] w-[7.5rem] rotate-[60deg] opacity-95"
 					/>
 					<img
-						src="/layout/daun-line-2.svg"
+						src="/layout/daun-line.svg"
 						alt=""
 						aria-hidden="true"
-						class="absolute top-[42%] right-[-9%] w-[10.5rem] -scale-x-100 rotate-[8deg] opacity-95"
+						class="absolute top-[42%] right-[-9%] w-[10rem] -scale-x-100 rotate-[8deg] opacity-95"
 					/>
 					<img
-						src="/layout/daun-line-2.svg"
+						src="/layout/daun-line.svg"
 						alt=""
 						aria-hidden="true"
-						class="absolute top-[57%] left-[-11%] w-[11.5rem] rotate-[186deg] opacity-95"
+						class="absolute top-[57%] left-[-11%] w-[11.9rem] rotate-[26deg] opacity-95"
 					/>
 					<img
-						src="/layout/daun-line-2.svg"
+						src="/layout/daun-line.svg"
 						alt=""
 						aria-hidden="true"
-						class="absolute right-[6%] bottom-[0%] w-[12.8rem] rotate-[278deg] opacity-95"
+						class="absolute right-[7%] bottom-[0%] w-[12.8rem] rotate-[278deg] opacity-95"
 					/>
 					<ol class="absolute inset-0">
 						{#each desktopFlowSteps as step}
 							<li
-								class="absolute ml-25 w-[clamp(12rem,18vw,17rem)] -translate-x-1/2"
+								class="absolute mt-2 w-[clamp(12rem,18vw,17rem)] -translate-x-1/2"
 								style={`left:${step.left}; top:${step.top};`}
 							>
 								<h3 class="text-[2rem] leading-none font-semibold tracking-tight text-[var(--ink)]">

@@ -105,6 +105,9 @@
 </script>
 
 <section id="horizontal-scroll" bind:this={sectionEl}>
+	<div class="horizontal-scroll-header">
+		<slot name="header" />
+	</div>
   <div class="horizontal-scroll-wrapper">
     <div class="horizontal" bind:this={horizontalEl}>
       {#each cards as card}
@@ -120,16 +123,26 @@
 
 <style>
   #horizontal-scroll {
-    padding-top: 96px;
+    position: relative;
+    overflow: hidden;
+    background-image: url("/home/gradient-texture.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  .horizontal-scroll-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 5;
   }
 
   .horizontal-scroll-wrapper {
     overflow: hidden;
     height: 100dvh;
-    background-image: url("/home/gradient-texture.png");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: transparent;
   }
 
   .horizontal {
