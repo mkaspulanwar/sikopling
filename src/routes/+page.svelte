@@ -45,7 +45,7 @@
 		},
 		{
 			key: 'waktu',
-			label: 'Rata-rata Waktu Pemrosesan',
+			label: 'Rata-rata Waktu Proses',
 			target: 7,
 			suffix: ' Hari Kerja',
 			description: 'Kecepatan layanan untuk mendukung proses pengajuan yang mudah dan cepat.',
@@ -159,12 +159,22 @@
 
 	let dotLottie: DotLottie | null = null;
 	let isLottieLoaded = false;
+	let isStatSectionVisible = false;
 	let removeLottieListeners: (() => void) | null = null;
 
 	const numberFormatter = new Intl.NumberFormat('id-ID');
 
 	const getTargetValues = () =>
 		Object.fromEntries(statItems.map((item) => [item.key, item.target])) as Record<string, number>;
+
+	const syncLottiePlayback = () => {
+		if (!dotLottie || !isLottieLoaded) return;
+		if (isStatSectionVisible) {
+			dotLottie.play();
+			return;
+		}
+		dotLottie.pause();
+	};
 
 	const startCounterAnimation = () => {
 		if (isCounterStarted) return;
@@ -176,8 +186,8 @@
 		}
 
 		const startedAt = performance.now();
-		const duration = 3400;
-		const stagger = 280;
+		const duration = 1800;
+		const stagger = 140;
 
 		const tick = (now: number) => {
 			const nextValues: Record<string, number> = {};
@@ -226,7 +236,7 @@
 
 		const handleLoad = () => {
 			isLottieLoaded = true;
-			instance.stop(); // tetap diam walaupun file sudah selesai dimuat
+			syncLottiePlayback();
 		};
 
 		instance.addEventListener('load', handleLoad);
@@ -292,18 +302,15 @@
 		if (!statSection) return;
 
 		const observer = new IntersectionObserver(
-	([entry]) => {
-		if (!dotLottie || !isLottieLoaded) return;
-
-		if (entry.isIntersecting) {
-			startCounterAnimation();
-			dotLottie.play();
-		} else {
-			dotLottie.pause();
-		}
-	},
-	{ threshold: 0.1 }
-);
+			([entry]) => {
+				isStatSectionVisible = entry.isIntersecting;
+				if (entry.isIntersecting) {
+					startCounterAnimation();
+				}
+				syncLottiePlayback();
+			},
+			{ threshold: 0.01, rootMargin: '180px 0px -80px 0px' }
+		);
 
 		observer.observe(statSection);
 
@@ -317,6 +324,9 @@
 
 <svelte:head>
 	<link rel="preload" href="/home/heading.svg" as="image" type="image/svg+xml" />
+	<link rel="preload" href="/layout/daun-kiri.svg" as="image" type="image/svg+xml" />
+	<link rel="preload" href="/layout/daun-kanan.svg" as="image" type="image/svg+xml" />
+	<link rel="preload" href="/layout/tree.lottie" as="fetch" type="application/octet-stream" />
 </svelte:head>
 
 <section id="beranda" class="relative isolate h-[31rem] overflow-hidden bg-black sm:h-[100svh] lg:h-[100dvh]">
@@ -329,6 +339,7 @@
 			playsinline
 			preload="metadata"
 		>
+			<source src="/home/hero-video-mobile.webm" type="video/webm" media="(max-width: 640px)" />
 			<source src="/home/hero-video.webm" type="video/webm" />
 		</video>
 		<div class="absolute inset-0 bg-black/15"></div>
@@ -374,7 +385,7 @@
 	</button>
 </section>
 
-	<section class="scroll-mt-28 bg-[var(--canvas)] py-16 sm:py-20">
+	<section class="scroll-mt-28 bg-[var(--canvas)] py-7 sm:py-20">
 		<div class="page-shell" bind:this={statSection}>
 			<div class="mx-auto max-w-3xl text-center">
 				<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
@@ -390,22 +401,25 @@
 			</div>
 
 					<div
-						class="mt-8 grid grid-cols-[minmax(0,1fr)_minmax(9.6rem,11.8rem)_minmax(0,1fr)] items-center gap-x-2.9 gap-y-2.9 sm:mt-10 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:gap-x-2"
+						class="mt-2 grid grid-cols-[minmax(0,1fr)_minmax(9.6rem,11.8rem)_minmax(0,1fr)] items-center gap-x-2.9 gap-y-2.9 sm:mt-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:gap-x-2"
 					>
 						<div class="grid gap-2 sm:gap-2 lg:gap-2">
 							{#each leftLeafStats as item}
 								<article class="mx-auto grid w-full max-w-[12.2rem] overflow-hidden bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
-									<div class="flex min-h-[3.15rem] items-end justify-center px-1.5 py-1 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
+									<div class="flex min-h-[3.15rem] items-end justify-center px-1.5 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
 										<h3 class="text-[0.76rem] leading-[1.15] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
 											{item.label}
 										</h3>
 									</div>
-									<div class="relative -mt-1 flex min-h-[5rem] items-center justify-center px-0 py-0 sm:-mt-2 sm:min-h-[6.2rem] lg:-mt-20 lg:min-h-[8.2rem]">
+									<div class="relative -mt-5 flex min-h-[5rem] items-center justify-center px-0 py-0 sm:-mt-2 sm:min-h-[6.2rem] lg:-mt-20 lg:min-h-[8.2rem]">
 										<img
 											src="/layout/daun-kiri.svg"
 											alt=""
+											loading="eager"
+											decoding="async"
+											fetchpriority="high"
 											aria-hidden="true"
-											class="h-[6.2rem] w-full max-w-[12rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+											class="h-[7.2rem] w-full max-w-[12rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
 										/>
 										<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
 											<p
@@ -417,7 +431,7 @@
 									</div>
 									<div class="flex min-h-[1.2rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
 										<p
-											class="sm:-mt-12 lg:-mt-20 text-[0.51rem] leading-tight font-semibold tracking-[0.05em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
+											class="-mt-8 sm:-mt-12 lg:-mt-20 text-[0.51rem] leading-tight font-semibold tracking-[0.05em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
 										>
 											{statLeafSubtitles[item.key]}
 										</p>
@@ -448,6 +462,9 @@
 										<img
 											src="/layout/daun-kanan.svg"
 											alt=""
+											loading="eager"
+											decoding="async"
+											fetchpriority="high"
 											aria-hidden="true"
 											class="h-[6.2rem] w-full max-w-[12rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
 										/>
