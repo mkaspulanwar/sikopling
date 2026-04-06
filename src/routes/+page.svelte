@@ -439,7 +439,7 @@
 									{item.label}
 								</h3>
 							</div>
-							<div class="relative -mt-2 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]">
+							<div class="relative -mt-4 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]">
 								<img
 									src="/layout/daun-kiri.svg"
 									alt=""
@@ -479,7 +479,7 @@
 									{item.label}
 								</h3>
 							</div>
-							<div class="relative -mt-2 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]">
+							<div class="relative -mt-4 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]">
 								<img
 									src="/layout/daun-kanan.svg"
 									alt=""

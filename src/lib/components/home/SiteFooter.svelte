@@ -157,9 +157,9 @@
 
 	<style>
 		.site-footer-shell {
-			--maskot-zone-w-mobile: 13rem;
-			--maskot-zone-h-mobile: 10rem;
-			--maskot-img-w-mobile: 10.5rem;
+			--maskot-zone-w-mobile: 10rem;
+			--maskot-zone-h-mobile: 8rem;
+			--maskot-img-w-mobile: 8.5rem;
 			--maskot-zone-raise-mobile: 5.25rem;
 			--maskot-zone-w-sm: 22rem;
 			--maskot-zone-h-sm: 16rem;
