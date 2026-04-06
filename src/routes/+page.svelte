@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-
+	import { DotLottieSvelte } from '@lottiefiles/dotlottie-svelte';
+	import type { DotLottie } from '@lottiefiles/dotlottie-svelte';
+	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	type StatItem = {
 		key: string;
 		label: string;
@@ -51,6 +53,26 @@
 			description: 'Persentase tingkat kepuasan pemrakarsa berdasarkan survei layanan SI-KOPLING.'
 		}
 	];
+
+	const statLeafLayout = {
+		left: ['dokumen', 'kepuasan'],
+		right: ['konsultasi', 'waktu']
+	} as const;
+
+	const statLeafSubtitles: Record<string, string> = {
+		dokumen: 'Persetujuan',
+		kepuasan: 'Tingkat Kepuasan',
+		konsultasi: 'Per Pemrakarsa',
+		waktu: 'Waktu Layanan'
+	};
+
+	const pickStatItem = (key: string) => statItems.find((item) => item.key === key);
+	const leftLeafStats = statLeafLayout.left
+		.map((key) => pickStatItem(key))
+		.filter((item): item is StatItem => Boolean(item));
+	const rightLeafStats = statLeafLayout.right
+		.map((key) => pickStatItem(key))
+		.filter((item): item is StatItem => Boolean(item));
 
 	const documentServices: DocumentService[] = [
 		{
@@ -128,10 +150,15 @@
 
 	let statSection: HTMLElement | null = $state(null);
 	let isCounterStarted = $state(false);
-	let animationFrameId = 0;
 	let statValues = $state<Record<string, number>>(
 		Object.fromEntries(statItems.map((item) => [item.key, 0]))
 	);
+
+	let animationFrameId = 0;
+
+	let dotLottie: DotLottie | null = null;
+	let isLottieLoaded = false;
+	let removeLottieListeners: (() => void) | null = null;
 
 	const numberFormatter = new Intl.NumberFormat('id-ID');
 
@@ -159,7 +186,9 @@
 				const localElapsed = now - startedAt - index * stagger;
 				const progress = Math.min(Math.max(localElapsed / duration, 0), 1);
 				const easedProgress = 1 - Math.pow(1 - progress, 4);
+
 				nextValues[item.key] = item.target * easedProgress;
+
 				if (progress < 1) {
 					isCompleted = false;
 				}
@@ -175,33 +204,117 @@
 		animationFrameId = requestAnimationFrame(tick);
 	};
 
-	const formatStatValue = (item: StatItem) => {
+	const formatLeafStatValue = (item: StatItem) => {
 		const roundedValue = Math.round(statValues[item.key] ?? 0);
+		if (item.key === 'waktu') {
+			return `${numberFormatter.format(roundedValue)} Hari`;
+		}
 		return `${numberFormatter.format(roundedValue)}${item.suffix}`;
+	};
+
+	const setDotLottieRef = (instance: DotLottie | null) => {
+		removeLottieListeners?.();
+		removeLottieListeners = null;
+
+		dotLottie = instance;
+		isLottieLoaded = false;
+
+		if (!instance) return;
+
+		instance.stop(); // pastikan dari awal tidak jalan duluan
+
+		const handleLoad = () => {
+			isLottieLoaded = true;
+			instance.stop(); // tetap diam walaupun file sudah selesai dimuat
+		};
+
+		instance.addEventListener('load', handleLoad);
+
+		removeLottieListeners = () => {
+			instance.removeEventListener('load', handleLoad);
+		};
+	};
+
+	const easeInOutCubic = (progress: number) =>
+		progress < 0.5
+			? 4 * Math.pow(progress, 3)
+			: 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+	const animateWindowScrollTo = (targetY: number, duration = 640) => {
+		const startY = window.scrollY;
+		const distanceY = targetY - startY;
+		if (Math.abs(distanceY) < 1) {
+			window.scrollTo({ top: targetY });
+			return;
+		}
+
+		const startedAt = performance.now();
+
+		const step = (currentTime: number) => {
+			const elapsed = currentTime - startedAt;
+			const progress = Math.min(elapsed / duration, 1);
+			const easedProgress = easeInOutCubic(progress);
+
+			window.scrollTo({ top: startY + distanceY * easedProgress });
+
+			if (progress < 1) {
+				requestAnimationFrame(step);
+			}
+		};
+
+		requestAnimationFrame(step);
+	};
+
+	const scrollToDashboard = () => {
+		const targetSection = document.getElementById('layanan-dashboard');
+		if (!targetSection) return;
+
+		const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		const navElement = document.querySelector('nav');
+		const navHeight = navElement instanceof HTMLElement ? navElement.getBoundingClientRect().height : 0;
+		const targetY = Math.max(
+			0,
+			window.scrollY + targetSection.getBoundingClientRect().top - navHeight - 16
+		);
+
+		if (prefersReducedMotion) {
+			window.scrollTo({ top: targetY, behavior: 'auto' });
+			return;
+		}
+
+		animateWindowScrollTo(targetY);
 	};
 
 	onMount(() => {
 		if (!statSection) return;
 
 		const observer = new IntersectionObserver(
-			(entries) => {
-				if (!entries.some((entry) => entry.isIntersecting)) return;
-				startCounterAnimation();
-				observer.disconnect();
-			},
-			{
-				threshold: 0.35
-			}
-		);
+	([entry]) => {
+		if (!dotLottie || !isLottieLoaded) return;
+
+		if (entry.isIntersecting) {
+			startCounterAnimation();
+			dotLottie.play();
+		} else {
+			dotLottie.pause();
+		}
+	},
+	{ threshold: 0.1 }
+);
 
 		observer.observe(statSection);
 
 		return () => {
 			observer.disconnect();
 			cancelAnimationFrame(animationFrameId);
+			removeLottieListeners?.();
 		};
 	});
 </script>
+
+<svelte:head>
+	<link rel="preload" href="/home/heading.svg" as="image" type="image/svg+xml" />
+</svelte:head>
 
 <section id="beranda" class="relative isolate h-[100svh] min-h-[100svh] overflow-hidden">
 	<video
@@ -222,9 +335,11 @@
 			<img
 				src="/home/heading.svg"
 				alt="SIKOPLING"
+				loading="eager"
+				decoding="sync"
+				fetchpriority="high"
 				class="w-full max-w-[20rem] object-contain sm:max-w-[30rem] lg:max-w-[33rem]"
 			/>
-
 			<p
 				class="font-hero-copy mx-auto mt-4 max-w-[22rem] text-[clamp(0.98rem,2.1vw,1.55rem)] leading-relaxed font-medium text-white/95 drop-shadow-[0_8px_22px_rgba(2,6,23,0.45)] sm:mt-5 sm:max-w-4xl"
 			>
@@ -233,7 +348,12 @@
 			</p>
 		</div>
 	</div>
-	<div class="hero-scroll-indicator" aria-hidden="true">
+	<button
+		type="button"
+		class="hero-scroll-indicator"
+		aria-label="Scroll ke bagian Statistik Layanan"
+		onclick={scrollToDashboard}
+	>
 		<span class="hero-scroll-label">Scroll to Explore</span>
 		<span class="hero-scroll-arrow" aria-hidden="true">
 			<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -246,78 +366,125 @@
 				/>
 			</svg>
 		</span>
-	</div>
+	</button>
 </section>
 
-<section id="layanan-dashboard" class="scroll-mt-28 bg-[var(--canvas)] py-16 sm:py-20">
-	<div class="page-shell" bind:this={statSection}>
-		<div class="mx-auto max-w-3xl text-center">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
-				Statistik Layanan
-			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
-				Capaian SI-KOPLING Secara Ringkas
-			</h2>
-			<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan performa layanan konsultasi dan
-				persetujuan lingkungan yang semakin responsif.
-			</p>
-		</div>
+	<section class="scroll-mt-28 bg-[var(--canvas)] py-16 sm:py-20">
+		<div class="page-shell" bind:this={statSection}>
+			<div class="mx-auto max-w-3xl text-center">
+				<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
+					Statistik Layanan
+				</p>
+				<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
+					Capaian SI-KOPLING Secara Ringkas
+				</h2>
+				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+					Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan performa layanan konsultasi dan
+					persetujuan lingkungan yang semakin responsif.
+				</p>
+			</div>
 
-		<dl
-			class="mt-10 grid gap-x-8 gap-y-8 border-y border-[var(--line)] py-8 sm:grid-cols-2 xl:grid-cols-4"
-		>
-			{#each statItems as item}
-				<div>
-					<dt class="text-xs font-semibold tracking-[0.08em] text-[var(--muted)] uppercase">
-						{item.label}
-					</dt>
-					<dd
-						class="font-hero-title mt-2 text-[clamp(2rem,4.3vw,2.9rem)] leading-none font-bold text-[var(--ink)]"
-					>
-						{formatStatValue(item)}
-					</dd>
-					<p class="mt-3 text-sm leading-relaxed text-[var(--muted)]">{item.description}</p>
-					{#if item.note}
-						<p class="mt-2 text-xs font-medium text-[#5d7b33]">{item.note}</p>
-					{/if}
+				<div
+					class="mt-8 grid grid-cols-[minmax(0,1fr)_minmax(7.25rem,9.25rem)_minmax(0,1fr)] items-center gap-x-2 gap-y-2 sm:mt-10 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:gap-x-2"
+				>
+					<div class="grid gap-1 sm:gap-2 lg:gap-2">
+						{#each leftLeafStats as item}
+							<article class="mx-auto grid w-full max-w-[9.5rem] overflow-hidden bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
+								<div class="flex min-h-[2.75rem] items-end justify-center px-1 py-1 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
+									<h3 class="text-[0.55rem] leading-[1.1] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
+										{item.label}
+									</h3>
+								</div>
+								<div class="relative -mt-1 flex min-h-[4.3rem] items-center justify-center px-0 py-0 sm:-mt-2 sm:min-h-[6.2rem] lg:-mt-20 lg:min-h-[8.2rem]">
+									<img
+										src="/layout/daun-kiri.svg"
+										alt=""
+										aria-hidden="true"
+										class="h-[4.55rem] w-full max-w-[9.3rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+									/>
+									<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
+										<p
+											class="font-hero-title text-[0.72rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
+										>
+											{formatLeafStatValue(item)}
+										</p>
+									</div>
+								</div>
+								<div class="flex min-h-[1rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
+									<p
+										class="sm:-mt-12 lg:-mt-20 text-[0.29rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
+									>
+										{statLeafSubtitles[item.key]}
+									</p>
+								</div>
+							</article>
+						{/each}
+					</div>
+
+					<div class="mx-auto flex w-full justify-center">
+						<div id="layanan-dashboard" class="aspect-square w-[clamp(7.25rem,27vw,9.25rem)] sm:w-[clamp(10rem,34vw,14rem)] lg:w-[clamp(20rem,28vw,34rem)]">
+							<DotLottieSvelte
+								src="/layout/tree.lottie"
+								autoplay={false}
+								dotLottieRefCallback={setDotLottieRef}
+							/>
+						</div>
+					</div>
+
+					<div class="grid gap-4 sm:gap-5 lg:gap-6">
+						{#each rightLeafStats as item}
+							<article class="mx-auto grid w-full max-w-[9.5rem] overflow-hidden bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]">
+								<div class="flex min-h-[2.75rem] items-end justify-center px-1 py-1 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]">
+									<h3 class="text-[0.55rem] leading-[1.1] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl">
+										{item.label}
+									</h3>
+								</div>
+								<div class="relative -mt-1 flex min-h-[4.3rem] items-center justify-center px-0 py-0 sm:-mt-2 sm:min-h-[6.2rem] lg:-mt-20 lg:min-h-[8.2rem]">
+									<img
+										src="/layout/daun-kanan.svg"
+										alt=""
+										aria-hidden="true"
+										class="h-[4.55rem] w-full max-w-[9.3rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+									/>
+									<div class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4">
+										<p
+											class="font-hero-title text-[0.72rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
+										>
+											{formatLeafStatValue(item)}
+										</p>
+									</div>
+								</div>
+								<div class="flex min-h-[1rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
+									<p
+										class="sm:-mt-12 lg:-mt-20 text-[0.29rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
+									>
+										{statLeafSubtitles[item.key]}
+									</p>
+								</div>
+							</article>
+						{/each}
+					</div>
 				</div>
-			{/each}
-		</dl>
-	</div>
-</section>
+		</div>
+	</section>
 
-<section id="layanan-dokumen" class="scroll-mt-28 bg-[#f8fafc] py-16 sm:py-20">
+<section id="layanan-dokumen" class="border-t border-[#64AD31]/25 scroll-mt-28 bg-[#fff] py-6 sm:py-8">
 	<div class="page-shell">
 		<div class="mx-auto max-w-3xl text-center">
 			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">
 				Layanan Dokumen Lingkungan
 			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
+			<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[--ink] sm:text-4xl">
 				Jenis Dokumen yang Dapat Diproses
 			</h2>
-			<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Pilih jenis dokumen sesuai kebutuhan kegiatan untuk memulai konsultasi dan proses
-				persetujuan lingkungan.
-			</p>
 		</div>
-
-		<div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-			{#each documentServices as service}
-				<article
-					class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-5 transition-colors hover:border-[#c9d8b8] hover:bg-[#fbfdf9] sm:p-6"
-				>
-					<h3 class="text-lg font-semibold tracking-tight text-[var(--ink)]">{service.title}</h3>
-					<p class="mt-2.5 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
-						{service.description}
-					</p>
-				</article>
-			{/each}
-		</div>
+	</div>
+	<div class="-mt-20 relative w-screen">
+		<HorizontalScroll />
 	</div>
 </section>
 
-<section id="alur-percepatan" class="scroll-mt-28 bg-[var(--canvas)] py-16 sm:py-20">
+<section id="alur-percepatan" class="scroll-mt-28 bg-[var(--canvas)] py-6 sm:py-14">
 	<div class="page-shell">
 		<div class="mx-auto max-w-3xl text-center">
 			<p class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase">

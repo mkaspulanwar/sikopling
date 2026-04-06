@@ -115,6 +115,7 @@
 	let hasHydratedSearchIndex = $state(false);
 	let universalSearchDocuments = $state<SearchDocument[]>(fallbackSearchDocuments);
 	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
+	let isHeroVisible = $state(true);
 	let currentHash = $state('');
 	let layananDropdown = $state<HTMLDivElement | null>(null);
 	let layananCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -402,6 +403,20 @@
 	const updateScrollState = () => {
 		if (typeof window === 'undefined') return;
 		isScrolled = window.scrollY > 18;
+
+		if (!isLandingPage()) {
+			isHeroVisible = true;
+			return;
+		}
+
+		const heroSection = document.getElementById('beranda');
+		if (!heroSection) {
+			isHeroVisible = true;
+			return;
+		}
+
+		const heroRect = heroSection.getBoundingClientRect();
+		isHeroVisible = heroRect.bottom > 84;
 	};
 
 	const updateHashState = () => {
@@ -472,8 +487,19 @@
 		};
 	});
 
+	$effect(() => {
+		page.url.pathname;
+		if (typeof window === 'undefined') return;
+		const frameId = requestAnimationFrame(updateScrollState);
+		return () => cancelAnimationFrame(frameId);
+	});
+
+	const shouldShowNav = () => !isLandingPage() || isHeroVisible || isMobileOpen || isSearchOpen;
+
 	const navClass = () =>
-		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color] duration-300 ${
+		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-300 ${
+			shouldShowNav() ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
+		} ${
 			useLightNav()
 				? 'bg-transparent text-white shadow-none'
 				: 'bg-[var(--surface)] text-[var(--ink)] shadow-none'

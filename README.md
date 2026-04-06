@@ -27,18 +27,18 @@ Fokus implementasi saat ini:
 - navigasi responsif desktop/mobile,
 - universal search lintas halaman,
 - chatbot bantuan berbasis WhatsApp,
-- fondasi testing/linting untuk pengembangan lanjutan.
+- fondasi testing untuk pengembangan lanjutan.
 
 ## Route Aktif
 
-| Route | Status | Keterangan |
-| --- | --- | --- |
-| `/` | Aktif | Landing page dengan statistik, daftar layanan, dan alur percepatan |
-| `/layanan/dokling` | Aktif | Tabel antrian dokumen lingkungan (mock data) |
-| `/layanan/pertek` | Aktif | Tabel antrian persetujuan teknis (mock data) |
-| `/tentang` | Placeholder | Halaman dummy |
-| `/kontak` | Placeholder | Halaman dummy |
-| `/login` | Placeholder | Halaman dummy |
+| Route              | Status      | Keterangan                                                         |
+| ------------------ | ----------- | ------------------------------------------------------------------ |
+| `/`                | Aktif       | Landing page dengan statistik, daftar layanan, dan alur percepatan |
+| `/layanan/dokling` | Aktif       | Tabel antrian dokumen lingkungan (mock data)                       |
+| `/layanan/pertek`  | Aktif       | Tabel antrian persetujuan teknis (mock data)                       |
+| `/tentang`         | Placeholder | Halaman dummy                                                      |
+| `/kontak`          | Placeholder | Halaman dummy                                                      |
+| `/login`           | Placeholder | Halaman dummy                                                      |
 
 ## Fitur Utama
 
@@ -68,7 +68,6 @@ Fokus implementasi saat ini:
 - `@vercel/analytics`
 - `vitest` + `vitest-browser-svelte`
 - `@playwright/test`
-- `eslint` + `prettier`
 
 ## Struktur Proyek
 
@@ -127,18 +126,16 @@ Development server default: `http://localhost:5173`.
 
 ## NPM Scripts
 
-| Script | Fungsi |
-| --- | --- |
-| `npm run dev` | Menjalankan development server |
-| `npm run build` | Build produksi |
-| `npm run preview` | Menjalankan preview hasil build |
-| `npm run check` | Sinkronisasi SvelteKit + type check |
-| `npm run check:watch` | Type check mode watch |
-| `npm run lint` | Cek format + lint |
-| `npm run format` | Auto format dengan Prettier |
-| `npm run test:unit` | Menjalankan unit/component test (Vitest) |
-| `npm run test:e2e` | Menjalankan e2e test (Playwright) |
-| `npm run test` | Menjalankan unit test lalu e2e test |
+| Script                | Fungsi                                   |
+| --------------------- | ---------------------------------------- |
+| `npm run dev`         | Menjalankan development server           |
+| `npm run build`       | Build produksi                           |
+| `npm run preview`     | Menjalankan preview hasil build          |
+| `npm run check`       | Sinkronisasi SvelteKit + type check      |
+| `npm run check:watch` | Type check mode watch                    |
+| `npm run test:unit`   | Menjalankan unit/component test (Vitest) |
+| `npm run test:e2e`    | Menjalankan e2e test (Playwright)        |
+| `npm run test`        | Menjalankan unit test lalu e2e test      |
 
 ## Testing Saat Ini
 

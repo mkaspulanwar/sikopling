@@ -18,12 +18,25 @@
 	--accent-ink: #ffffff;
 }
 
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
+
 body {
-	margin: 0;
 	background: var(--canvas);
 	color: var(--ink);
 	font-family: var(--font-body);
 	line-height: 1.55;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+}
+
+:where(img, picture, video, canvas) {
+	display: block;
+	max-width: 100%;
+	height: auto;
 }
 
 h1,
@@ -39,6 +52,7 @@ h6 {
 
 :where(button, input, textarea, select) {
 	font: inherit;
+	color: inherit;
 }
 
 .page-shell {
@@ -105,9 +119,20 @@ h6 {
 	align-items: center;
 	gap: 0.42rem;
 	transform: translateX(-50%);
+	border: 0;
+	background: transparent;
+	padding: 0;
+	font: inherit;
 	color: rgba(255, 255, 255, 0.96);
 	text-shadow: 0 4px 14px rgba(0, 0, 0, 0.44);
-	pointer-events: none;
+	pointer-events: auto;
+	cursor: pointer;
+}
+
+.hero-scroll-indicator:focus-visible {
+	outline: 2px solid rgba(255, 255, 255, 0.9);
+	outline-offset: 0.38rem;
+	border-radius: 0.45rem;
 }
 
 .hero-scroll-label {
