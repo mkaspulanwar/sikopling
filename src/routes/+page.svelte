@@ -422,7 +422,7 @@
 				<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
 					Capaian SI-KOPLING Secara Ringkas
 				</h2>
-				<p id="layanan-statistik" class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
+				<p id="layanan-statistik" class="mt-3 hidden sm:block text-base leading-relaxed text-[var(--muted)] sm:text-lg">
 					Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan performa layanan konsultasi dan
 					persetujuan lingkungan yang semakin responsif.
 				</p>
@@ -453,7 +453,7 @@
 								</div>
 							</div>
 							<div class="flex min-h-[0.9rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
-								<p class="-mt-10 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm">
+								<p class="-mt-8 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm">
 									{statLeafSubtitles[item.key]}
 								</p>
 							</div>
@@ -493,7 +493,7 @@
 								</div>
 							</div>
 							<div class="flex min-h-[0.9rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]">
-								<p class="-mt-10 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm">
+								<p class="-mt-8 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm">
 									{statLeafSubtitles[item.key]}
 								</p>
 							</div>
