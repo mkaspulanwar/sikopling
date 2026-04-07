@@ -17,78 +17,90 @@
 
   let sectionEl: HTMLElement | null = null;
   let horizontalEl: HTMLElement | null = null;
+  let isEnhanced = $state(false);
 
   const initHorizontalScroll = async (): Promise<Cleanup> => {
     if (!sectionEl || !horizontalEl) return () => {};
-    if (!window.matchMedia("(min-width: 768px)").matches) return () => {};
+    if (!window.matchMedia("(min-width: 768px)").matches) {
+      isEnhanced = false;
+      return () => {};
+    }
 
-    const [gsapModule, scrollTriggerModule, lenisModule] = await Promise.all([
-      import("gsap"),
-      import("gsap/ScrollTrigger"),
-      import("lenis"),
-    ]);
+    try {
+      const [gsapModule, scrollTriggerModule, lenisModule] = await Promise.all([
+        import("gsap"),
+        import("gsap/ScrollTrigger"),
+        import("lenis"),
+      ]);
 
-    const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
-    const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ??
-      scrollTriggerModule.default) as any;
-    const Lenis = lenisModule.default as any;
+      const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
+      const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ??
+        scrollTriggerModule.default) as any;
+      const Lenis = lenisModule.default as any;
 
-    gsap.registerPlugin(ScrollTrigger);
-    ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
+      gsap.registerPlugin(ScrollTrigger);
+      ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
 
-    const lenis = new Lenis();
-    lenis.on("scroll", ScrollTrigger.update);
+      const lenis = new Lenis();
+      lenis.on("scroll", ScrollTrigger.update);
 
-    const tickerFn = (time: number) => lenis.raf(time * 1000);
-    gsap.ticker.add(tickerFn);
-    gsap.ticker.lagSmoothing(0);
+      const tickerFn = (time: number) => lenis.raf(time * 1000);
+      gsap.ticker.add(tickerFn);
+      gsap.ticker.lagSmoothing(0);
 
-    const mainTween = gsap.to(horizontalEl, {
-      x: () => -(horizontalEl!.scrollWidth - window.innerWidth),
-      ease: "none",
-      scrollTrigger: {
-        id: MAIN_TRIGGER_ID,
-        trigger: horizontalEl,
-        start: "center center",
-        end: () => "+=" + horizontalEl!.scrollWidth,
-        pin: sectionEl,
-        scrub: true,
-        invalidateOnRefresh: true,
-      },
-    });
-
-    const cardTweens = Array.from(
-      horizontalEl.querySelectorAll<HTMLElement>(".card"),
-    ).map((card) =>
-      gsap.from(card, {
-        x: 250,
-        duration: 0.6,
+      const mainTween = gsap.to(horizontalEl, {
+        x: () => -(horizontalEl!.scrollWidth - window.innerWidth),
+        ease: "none",
         scrollTrigger: {
-          trigger: card,
-          start: "top bottom",
-          toggleActions: "play none none reverse",
+          id: MAIN_TRIGGER_ID,
+          trigger: horizontalEl,
+          start: "center center",
+          end: () => "+=" + horizontalEl!.scrollWidth,
+          pin: sectionEl,
+          scrub: true,
+          invalidateOnRefresh: true,
         },
-      }),
-    );
-
-    const refresh = () => ScrollTrigger.refresh();
-    window.addEventListener("load", refresh);
-    requestAnimationFrame(refresh);
-
-    return () => {
-      window.removeEventListener("load", refresh);
-
-      mainTween?.scrollTrigger?.kill();
-      mainTween?.kill();
-
-      cardTweens.forEach((tween) => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
       });
 
-      gsap.ticker.remove(tickerFn);
-      lenis.destroy();
-    };
+      const cardTweens = Array.from(
+        horizontalEl.querySelectorAll<HTMLElement>(".card"),
+      ).map((card) =>
+        gsap.from(card, {
+          x: 250,
+          duration: 0.6,
+          scrollTrigger: {
+            trigger: card,
+            start: "top bottom",
+            toggleActions: "play none none reverse",
+          },
+        }),
+      );
+
+      const refresh = () => ScrollTrigger.refresh();
+      window.addEventListener("load", refresh);
+      requestAnimationFrame(refresh);
+      isEnhanced = true;
+
+      return () => {
+        window.removeEventListener("load", refresh);
+
+        mainTween?.scrollTrigger?.kill();
+        mainTween?.kill();
+
+        cardTweens.forEach((tween) => {
+          tween.scrollTrigger?.kill();
+          tween.kill();
+        });
+
+        gsap.ticker.remove(tickerFn);
+        lenis.destroy();
+        isEnhanced = false;
+      };
+    } catch (error) {
+      console.error("Horizontal scroll enhancement failed:", error);
+      isEnhanced = false;
+      return () => {};
+    }
   };
 
   onMount(() => {
@@ -110,7 +122,7 @@
   });
 </script>
 
-<section id="horizontal-scroll" bind:this={sectionEl}>
+<section id="horizontal-scroll" class:enhanced={isEnhanced} bind:this={sectionEl}>
   <div class="horizontal-scroll-header">
     {@render header?.()}
   </div>
@@ -288,6 +300,50 @@
       width: min(74vw, 34rem);
       border-radius: 20px;
       padding: clamp(16px, 2.8vw, 28px) clamp(18px, 3vw, 34px);
+    }
+  }
+
+  @media (min-width: 768px) {
+    #horizontal-scroll:not(.enhanced) {
+      overflow: visible;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal-scroll-header {
+      position: static;
+      z-index: auto;
+      margin-bottom: 1rem;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal-scroll-wrapper {
+      height: auto;
+      overflow-x: auto;
+      overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal-scroll-wrapper::-webkit-scrollbar {
+      display: none;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal {
+      align-items: stretch;
+      height: auto;
+      min-width: max-content;
+      padding: 0 1.5rem 0.25rem;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal > div {
+      margin: 0 1rem 0 0;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal > div:last-child {
+      margin: 0 1.5rem 0 0;
+    }
+
+    #horizontal-scroll:not(.enhanced) .horizontal .card {
+      width: min(70vw, 32rem);
+      padding: clamp(16px, 2.4vw, 28px) clamp(18px, 2.6vw, 34px);
     }
   }
 
