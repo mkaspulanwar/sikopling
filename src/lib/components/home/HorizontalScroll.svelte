@@ -13,6 +13,7 @@
   ];
 
   const MAIN_TRIGGER_ID = "home-horizontal-scroll-main";
+  const ENHANCE_MIN_WIDTH = 1024;
   const { header }: { header?: Snippet } = $props();
 
   let sectionEl: HTMLElement | null = null;
@@ -21,7 +22,7 @@
 
   const initHorizontalScroll = async (): Promise<Cleanup> => {
     if (!sectionEl || !horizontalEl) return () => {};
-    if (!window.matchMedia("(min-width: 768px)").matches) {
+    if (!window.matchMedia(`(min-width: ${ENHANCE_MIN_WIDTH}px)`).matches) {
       isEnhanced = false;
       return () => {};
     }
