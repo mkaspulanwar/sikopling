@@ -522,7 +522,7 @@
 								src="/layout/daun-kiri.svg"
 								alt=""
 								aria-hidden="true"
-								class="h-[5.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+								class="h-[6.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
 							/>
 							<div
 								class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4"
@@ -584,7 +584,7 @@
 								src="/layout/daun-kanan.svg"
 								alt=""
 								aria-hidden="true"
-								class="h-[5.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+								class="h-[6.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
 							/>
 							<div
 								class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4"

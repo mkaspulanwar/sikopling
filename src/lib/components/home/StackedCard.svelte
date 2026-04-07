@@ -259,21 +259,51 @@
             padding: 5rem 1.25rem 6rem;
         }
 
+        .quality-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .quality-title {
+            max-width: 100%;
+        }
+
+        .quality-description {
+            max-width: 34ch;
+        }
+
         .quality-cards-wrapper {
             display: grid;
             gap: 1rem;
+            justify-items: center;
             min-height: 0;
         }
 
         .quality-card {
+            align-items: center;
             margin-left: 0;
-            min-height: 20rem;
+            min-height: 14.5rem;
             padding: 1.5rem;
+            text-align: center;
         }
 
         .card-two,
         .card-three {
             position: static;
+        }
+
+        .quality-number {
+            font-size: clamp(2.8rem, 11vw, 3.8rem);
+            margin-bottom: 0.65rem;
+        }
+
+        .quality-subtitle {
+            font-size: clamp(1.35rem, 5.5vw, 1.8rem);
+        }
+
+        .quality-copy {
+            font-size: clamp(1.02rem, 4vw, 1.2rem);
+            line-height: 1.45;
         }
     }
 </style>
