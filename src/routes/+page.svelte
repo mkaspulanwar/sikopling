@@ -1,6 +1,6 @@
 <script lang="ts">
+	import { browser } from "$app/environment";
 	import { onMount } from "svelte";
-	import { DotLottieSvelte } from "@lottiefiles/dotlottie-svelte";
 	import type { DotLottie } from "@lottiefiles/dotlottie-svelte";
 	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	import StackedCard from "$lib/components/home/StackedCard.svelte";
@@ -170,6 +170,7 @@
 	let animationFrameId = 0;
 
 	let dotLottie: DotLottie | null = null;
+	let DotLottieComponent = $state<any>(null);
 	let isLottieLoaded = false;
 	let isStatSectionVisible = false;
 	let removeLottieListeners: (() => void) | null = null;
@@ -324,7 +325,22 @@
 		activeHomeFaqId = activeHomeFaqId === id ? null : id;
 	};
 	onMount(() => {
-		if (!statSection) return;
+		let isUnmounted = false;
+
+		if (browser) {
+			void import("@lottiefiles/dotlottie-svelte").then((module) => {
+				if (!isUnmounted) {
+					DotLottieComponent = module.DotLottieSvelte;
+				}
+			});
+		}
+
+		if (!statSection) {
+			return () => {
+				isUnmounted = true;
+				removeLottieListeners?.();
+			};
+		}
 
 		const observer = new IntersectionObserver(
 			([entry]) => {
@@ -340,6 +356,7 @@
 		observer.observe(statSection);
 
 		return () => {
+			isUnmounted = true;
 			observer.disconnect();
 			cancelAnimationFrame(animationFrameId);
 			removeLottieListeners?.();
@@ -536,11 +553,13 @@
 				<div
 					class="stat-tree-lottie aspect-square w-[clamp(12rem,58vw,20.5rem)] sm:w-[clamp(12rem,34vw,14rem)] lg:w-[clamp(20rem,28vw,34rem)]"
 				>
-					<DotLottieSvelte
-						src="/layout/tree.lottie"
-						autoplay={false}
-						dotLottieRefCallback={setDotLottieRef}
-					/>
+					{#if DotLottieComponent}
+						<DotLottieComponent
+							src="/layout/tree.lottie"
+							autoplay={false}
+							dotLottieRefCallback={setDotLottieRef}
+						/>
+					{/if}
 				</div>
 			</div>
 

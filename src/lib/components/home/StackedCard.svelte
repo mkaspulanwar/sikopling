@@ -1,9 +1,5 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { gsap } from "gsap";
-    import { ScrollTrigger } from "gsap/ScrollTrigger";
-
-    gsap.registerPlugin(ScrollTrigger);
 
     let sectionEl: HTMLElement | null = null;
     let cardOneEl: HTMLElement | null = null;
@@ -11,37 +7,58 @@
     let cardThreeEl: HTMLElement | null = null;
 
     onMount(() => {
-        const cards = [cardOneEl, cardTwoEl, cardThreeEl].filter(Boolean);
+        let isUnmounted = false;
+        let tl: any = null;
 
-        cards.forEach((card, i) => {
-            gsap.set(card, {
-                y: "180%",
-                rotate: i % 2 === 0 ? -10 : 10,
+        void (async () => {
+            if (!sectionEl) return;
+
+            const [gsapModule, scrollTriggerModule] = await Promise.all([
+                import("gsap"),
+                import("gsap/ScrollTrigger"),
+            ]);
+
+            if (isUnmounted || !sectionEl) return;
+
+            const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
+            const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ??
+                scrollTriggerModule.default) as any;
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            const cards = [cardOneEl, cardTwoEl, cardThreeEl].filter(Boolean);
+
+            cards.forEach((card, i) => {
+                gsap.set(card, {
+                    y: "180%",
+                    rotate: i % 2 === 0 ? -10 : 10,
+                });
             });
-        });
 
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: sectionEl,
-                start: "top top",
-                end: "+=300%",
-                scrub: 1,
-                pin: true,
-                anticipatePin: 1,
-            },
-        });
+            tl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: sectionEl,
+                    start: "top top",
+                    end: "+=300%",
+                    scrub: 1,
+                    pin: true,
+                    anticipatePin: 1,
+                },
+            });
 
-        tl.to(cards, {
-            y: 0,
-            rotate: 0,
-            duration: 2,
-            stagger: 1,
-            ease: "power2.out",
-        });
+            tl.to(cards, {
+                y: 0,
+                rotate: 0,
+                duration: 2,
+                stagger: 1,
+                ease: "power2.out",
+            });
+        })();
 
         return () => {
-            tl.scrollTrigger?.kill();
-            tl.kill();
+            isUnmounted = true;
+            tl?.scrollTrigger?.kill();
+            tl?.kill();
         };
     });
 </script>
