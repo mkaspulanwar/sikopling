@@ -405,7 +405,7 @@
 
 <section
 	id="beranda"
-	class="relative isolate h-[31rem] overflow-hidden bg-black sm:h-[100svh] lg:h-[100dvh]"
+	class="relative isolate min-h-[100svh] overflow-hidden bg-black lg:min-h-[100dvh]"
 >
 	<div class="hero-media absolute inset-0" aria-hidden="true">
 		<video
@@ -426,7 +426,7 @@
 		<div class="absolute inset-0 bg-black/15"></div>
 	</div>
 	<div
-		class="relative z-10 flex h-[31rem] items-center justify-center px-6 pt-24 pb-24 text-center sm:h-[100svh] sm:px-10 sm:pt-0 sm:pb-0 lg:h-[100dvh]"
+		class="relative z-10 flex min-h-[100svh] items-center justify-center px-6 pt-[max(6rem,calc(env(safe-area-inset-top)+3.75rem))] pb-[max(5.25rem,calc(env(safe-area-inset-bottom)+1.75rem))] text-center sm:px-10 sm:pt-0 sm:pb-0 lg:min-h-[100dvh]"
 	>
 		<div class="mx-auto flex w-full max-w-5xl flex-col items-center">
 			<img
@@ -435,10 +435,10 @@
 				loading="eager"
 				decoding="sync"
 				fetchpriority="high"
-				class="w-full max-w-[20rem] object-contain sm:max-w-[30rem] lg:max-w-[33rem]"
+				class="mx-auto w-[min(90vw,19rem)] object-contain sm:w-[min(74vw,23rem)] lg:w-[45rem] xl:w-[48rem]"
 			/>
 			<p
-				class="font-hero-copy mx-auto mt-4 max-w-[22rem] text-[clamp(0.98rem,2.1vw,1.55rem)] leading-relaxed font-medium text-white/95 drop-shadow-[0_8px_22px_rgba(2,6,23,0.45)] sm:mt-5 sm:max-w-4xl"
+				class="font-hero-copy mx-auto mt-4 max-w-[21.5rem] text-[0.98rem] leading-relaxed font-medium text-white/95 drop-shadow-[0_8px_22px_rgba(2,6,23,0.45)] sm:mt-5 sm:max-w-[38rem] sm:text-[1.08rem] lg:max-w-[47rem] lg:text-[1.24rem] xl:max-w-[50rem] xl:text-[1.3rem]"
 			>
 				Saluran Interaktif Konsultasi Persetujuan Lingkungan Dinas
 				Lingkungan Hidup Provinsi Kalimantan Selatan
