@@ -114,11 +114,11 @@ function toggleFaq(id: string) {
 <svelte:window onkeydown={handleWindowKeydown} />
 
 <div
-	class={`pointer-events-none fixed right-0 bottom-[max(1.35rem,env(safe-area-inset-bottom))] left-0 px-4 sm:right-6 sm:bottom-6 sm:left-auto sm:px-0 lg:right-4 lg:bottom-8 ${
+	class={`pointer-events-none fixed right-[max(1.25rem,calc(env(safe-area-inset-right)+0.8rem))] bottom-[max(2rem,calc(env(safe-area-inset-bottom)+0.9rem))] left-auto px-0 sm:right-6 sm:bottom-6 lg:right-4 lg:bottom-8 ${
 		isOpen ? 'z-[60]' : 'z-30'
 	}`}
 >
-	<div class="pointer-events-auto flex w-full flex-col items-end sm:w-auto">
+	<div class="pointer-events-auto flex w-auto flex-col items-end">
 		{#if isOpen}
 			<section
 				id="chatbot-popup"

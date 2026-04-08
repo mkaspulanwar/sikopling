@@ -508,12 +508,12 @@
 		}`;
 
 	const logoClass = () =>
-		`h-auto w-[7.2rem] object-contain transition-[filter] duration-300 sm:w-[8.4rem] lg:w-[13rem] ${
+		`h-auto w-[11.4rem] object-contain transition-[filter] duration-300 sm:w-[12rem] lg:w-[13rem] ${
 			useLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
 		}`;
 
 	const actionButtonClass = () =>
-		`inline-flex h-9 w-9 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
+		`inline-flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
 			useLightNav()
 				? 'border-white/25 bg-white/10 text-white'
 				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
@@ -536,7 +536,7 @@
 />
 
 <nav class={navClass()}>
-	<div class="nav-shell nav-shell-desktop-spacious py-3 lg:py-3.5">
+	<div class="nav-shell nav-shell-desktop-spacious py-4 lg:py-3.5">
 		<div
 			class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
 		>
@@ -643,7 +643,7 @@
 					aria-expanded={isSearchOpen}
 					onclick={() => void openSearchModal()}
 				>
-					<Search class="h-4 w-4 lg:h-4.5 lg:w-4.5" strokeWidth={2} aria-hidden="true" />
+					<Search class="h-5 w-5 lg:h-4.5 lg:w-4.5" strokeWidth={2} aria-hidden="true" />
 				</button>
 
 				<a href="/login" class={`${loginButtonClass()} nav-menu-font`}>
@@ -664,9 +664,9 @@
 						onclick={toggleMobileMenu}
 					>
 						{#if isMobileOpen}
-							<X class="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+							<X class="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
 						{:else}
-							<Menu class="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+							<Menu class="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
 						{/if}
 					</button>
 				{/if}
@@ -688,7 +688,7 @@
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="universal-search-heading"
-		class="fixed inset-x-4 top-[4.55rem] z-[86] mx-auto w-auto max-w-3xl sm:inset-x-6 sm:top-[5.15rem] sm:w-full"
+		class="fixed inset-x-4 top-[5.15rem] z-[86] mx-auto w-auto max-w-3xl sm:inset-x-6 sm:top-[5.15rem] sm:w-full"
 		transition:fly={{ y: -10, duration: 170 }}
 	>
 		<div
