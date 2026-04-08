@@ -5,20 +5,39 @@
     let cardOneEl: HTMLElement | null = null;
     let cardTwoEl: HTMLElement | null = null;
     let cardThreeEl: HTMLElement | null = null;
+    const DESKTOP_MEDIA_QUERY = "(min-width: 1101px)";
 
     onMount(() => {
         let isUnmounted = false;
-        let tl: any = null;
+        let teardownDesktopAnimation: (() => void) | null = null;
+        let syncToken = 0;
+        const desktopMedia = window.matchMedia(DESKTOP_MEDIA_QUERY);
 
-        void (async () => {
-            if (!sectionEl) return;
+        const getCards = () =>
+            [cardOneEl, cardTwoEl, cardThreeEl].filter(
+                (card): card is HTMLElement => Boolean(card),
+            );
+
+        const resetCardsToStaticState = () => {
+            getCards().forEach((card) => {
+                card.style.removeProperty("transform");
+                card.style.removeProperty("will-change");
+            });
+        };
+
+        const createDesktopAnimation = async () => {
+            if (!sectionEl) {
+                return () => {};
+            }
 
             const [gsapModule, scrollTriggerModule] = await Promise.all([
                 import("gsap"),
                 import("gsap/ScrollTrigger"),
             ]);
 
-            if (isUnmounted || !sectionEl) return;
+            if (isUnmounted || !sectionEl || !desktopMedia.matches) {
+                return () => {};
+            }
 
             const gsap = (gsapModule.default ?? gsapModule.gsap) as any;
             const ScrollTrigger = (scrollTriggerModule.ScrollTrigger ??
@@ -26,20 +45,22 @@
 
             gsap.registerPlugin(ScrollTrigger);
 
-            const cards = [cardOneEl, cardTwoEl, cardThreeEl].filter(Boolean);
+            const cards = getCards();
+            if (!cards.length) {
+                return () => {};
+            }
 
-            cards.forEach((card, i) => {
-                gsap.set(card, {
-                    y: "180%",
-                    rotate: i % 2 === 0 ? -10 : 10,
-                });
+            gsap.set(cards, {
+                yPercent: 120,
+                rotate: (i: number) => (i % 2 === 0 ? -10 : 10),
+                willChange: "transform",
             });
 
-            tl = gsap.timeline({
+            const tl = gsap.timeline({
                 scrollTrigger: {
                     trigger: sectionEl,
                     start: "top top",
-                    end: "+=300%",
+                    end: "+=280%",
                     scrub: 1,
                     pin: true,
                     anticipatePin: 1,
@@ -47,18 +68,50 @@
             });
 
             tl.to(cards, {
-                y: 0,
+                yPercent: 0,
                 rotate: 0,
                 duration: 2,
-                stagger: 1,
+                stagger: 0.9,
                 ease: "power2.out",
             });
-        })();
+
+            return () => {
+                tl.scrollTrigger?.kill(true);
+                tl.kill();
+                gsap.set(cards, { clearProps: "transform,will-change" });
+            };
+        };
+
+        const syncAnimationByViewport = async () => {
+            const currentToken = ++syncToken;
+            teardownDesktopAnimation?.();
+            teardownDesktopAnimation = null;
+            resetCardsToStaticState();
+
+            if (!desktopMedia.matches) {
+                return;
+            }
+
+            const teardown = await createDesktopAnimation();
+            if (isUnmounted || currentToken !== syncToken) {
+                teardown();
+                return;
+            }
+            teardownDesktopAnimation = teardown;
+        };
+
+        void syncAnimationByViewport();
+
+        const handleViewportChange = () => {
+            void syncAnimationByViewport();
+        };
+
+        desktopMedia.addEventListener("change", handleViewportChange);
 
         return () => {
             isUnmounted = true;
-            tl?.scrollTrigger?.kill();
-            tl?.kill();
+            desktopMedia.removeEventListener("change", handleViewportChange);
+            teardownDesktopAnimation?.();
         };
     });
 </script>
@@ -77,13 +130,16 @@
         </div>
 
         <div class="quality-cards-wrapper">
-            <article class="quality-card card-blue" bind:this={cardOneEl}>
+            <article
+                class="quality-card card-blue"
+                bind:this={cardOneEl}
+            >
                 <div>
                     <p class="quality-number">3 Langkah</p>
                     <p class="quality-subtitle">Mudah</p>
                 </div>
                 <p class="quality-copy">
-                    Daftar • Upload • Pantau
+                    Daftar &bull; Upload &bull; Pantau
                 </p>
             </article>
 
@@ -92,7 +148,7 @@
                 bind:this={cardTwoEl}
             >
                 <div>
-                    <p class="quality-number">≤ 5 Hari</p>
+                    <p class="quality-number">&le; 5 Hari</p>
                     <p class="quality-subtitle">Proses Pengajuan</p>
                 </div>
                 <p class="quality-copy">
@@ -111,6 +167,8 @@
                 <p class="quality-copy">Dari mana saja. Tanpa perlu datang ke kantor.</p>
             </article>
         </div>
+
+        <p class="mobile-swipe-hint">Geser kartu untuk melihat semua kemudahan.</p>
     </div>
 </section>
 
@@ -171,6 +229,10 @@
         position: relative;
     }
 
+    .mobile-swipe-hint {
+        display: none;
+    }
+
     .quality-card {
         border-radius: 1.5rem;
         box-sizing: border-box;
@@ -181,6 +243,7 @@
         margin-left: auto;
         max-width: 28.75rem;
         min-height: 28rem;
+        position: relative;
         padding: 2.5rem;
         width: 100%;
     }
@@ -246,64 +309,93 @@
         }
 
         .quality-cards-wrapper {
-            min-height: 40rem;
-        }
-
-        .quality-card {
-            max-width: 100%;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .quality-section {
-            padding: 5rem 1.25rem 6rem;
-        }
-
-        .quality-content {
-            align-items: center;
-            text-align: center;
-        }
-
-        .quality-title {
-            max-width: 100%;
-        }
-
-        .quality-description {
-            max-width: 34ch;
-        }
-
-        .quality-cards-wrapper {
             display: grid;
             gap: 1rem;
-            justify-items: center;
             min-height: 0;
         }
 
         .quality-card {
-            align-items: center;
             margin-left: 0;
-            min-height: 14.5rem;
-            padding: 1.5rem;
-            text-align: center;
+            max-width: 100%;
+            min-height: 16rem;
         }
 
         .card-two,
         .card-three {
             position: static;
         }
+    }
+
+    @media (max-width: 768px) {
+        .quality-section {
+            background: linear-gradient(180deg, #f9f6ee 0%, #ffffff 100%);
+            padding-top: 4.5rem;
+            padding-bottom: 5.5rem;
+            padding-inline: clamp(1.05rem, 2.4vw, 2.25rem);
+        }
+
+        .quality-grid {
+            gap: 2rem;
+        }
+
+        .quality-content {
+            align-items: flex-start;
+            gap: 1rem;
+            text-align: left;
+        }
+
+        .quality-title {
+            font-size: clamp(2rem, 10vw, 2.8rem);
+            max-width: 16ch;
+        }
+
+        .quality-description {
+            font-size: 1rem;
+            line-height: 1.55;
+            max-width: 100%;
+        }
+
+        .quality-cards-wrapper {
+            display: grid;
+            gap: 0.85rem;
+            margin-inline: 0;
+            overflow: visible;
+            padding: 0;
+        }
+
+        .quality-card {
+            align-items: flex-start;
+            border-radius: 1.25rem;
+            box-shadow: 0 12px 30px rgba(11, 18, 30, 0.12);
+            min-height: 13rem;
+            padding: 1.25rem;
+            text-align: left;
+            width: 100%;
+        }
 
         .quality-number {
-            font-size: clamp(2.8rem, 11vw, 3.8rem);
-            margin-bottom: 0.65rem;
+            font-size: clamp(2.3rem, 10.5vw, 3.2rem);
+            margin-bottom: 0.5rem;
         }
 
         .quality-subtitle {
-            font-size: clamp(1.35rem, 5.5vw, 1.8rem);
+            font-size: clamp(1.1rem, 5vw, 1.4rem);
         }
 
         .quality-copy {
-            font-size: clamp(1.02rem, 4vw, 1.2rem);
+            font-size: 0.96rem;
             line-height: 1.45;
+        }
+
+        .mobile-swipe-hint {
+            display: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .quality-section {
+            padding-left: max(1.3rem, calc(env(safe-area-inset-left) + 0.8rem));
+            padding-right: max(1.3rem, calc(env(safe-area-inset-right) + 0.8rem));
         }
     }
 </style>
