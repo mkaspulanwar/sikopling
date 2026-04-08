@@ -97,7 +97,8 @@
 	let hasHydratedSearchIndex = $state(false);
 	let universalSearchDocuments = $state<SearchDocument[]>(fallbackSearchDocuments);
 	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
-	let isHeroVisible = $state(true);
+	let isNavVisible = $state(true);
+	let lastScrollY = $state(typeof window !== 'undefined' ? window.scrollY : 0);
 	let currentHash = $state('');
 	let layananDropdown = $state<HTMLDivElement | null>(null);
 	let layananCloseTimer: ReturnType<typeof setTimeout> | null = null;
@@ -384,21 +385,17 @@
 
 	const updateScrollState = () => {
 		if (typeof window === 'undefined') return;
-		isScrolled = window.scrollY > 18;
+		const currentScrollY = Math.max(window.scrollY, 0);
+		const scrollDelta = currentScrollY - lastScrollY;
+		isScrolled = currentScrollY > 18;
 
-		if (!isLandingPage()) {
-			isHeroVisible = true;
-			return;
+		if (currentScrollY <= 8) {
+			isNavVisible = true;
+		} else if (Math.abs(scrollDelta) >= 4) {
+			isNavVisible = scrollDelta < 0;
 		}
 
-		const heroSection = document.getElementById('beranda');
-		if (!heroSection) {
-			isHeroVisible = true;
-			return;
-		}
-
-		const heroRect = heroSection.getBoundingClientRect();
-		isHeroVisible = heroRect.bottom > 84;
+		lastScrollY = currentScrollY;
 	};
 
 	const updateHashState = () => {
@@ -407,6 +404,8 @@
 	};
 
 	onMount(() => {
+		lastScrollY = typeof window !== 'undefined' ? Math.max(window.scrollY, 0) : 0;
+		isNavVisible = true;
 		updateScrollState();
 		updateHashState();
 		void hydrateUniversalSearchIndex();
@@ -472,11 +471,14 @@
 	$effect(() => {
 		page.url.pathname;
 		if (typeof window === 'undefined') return;
+		lastScrollY = Math.max(window.scrollY, 0);
+		isNavVisible = true;
 		const frameId = requestAnimationFrame(updateScrollState);
 		return () => cancelAnimationFrame(frameId);
 	});
 
-	const shouldShowNav = () => !isLandingPage() || isHeroVisible || isMobileOpen || isSearchOpen;
+	const shouldShowNav = () =>
+		isNavVisible || isMobileOpen || isSearchOpen || isLayananOpen || isMobileLayananOpen;
 
 	const navClass = () =>
 		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-300 ${
