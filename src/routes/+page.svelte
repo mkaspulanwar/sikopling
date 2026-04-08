@@ -522,13 +522,13 @@
 								src="/layout/daun-kiri.svg"
 								alt=""
 								aria-hidden="true"
-								class="h-[6.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+								class="h-[8.4rem] w-full max-w-[14.2rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
 							/>
 							<div
 								class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4"
 							>
 								<p
-									class="font-hero-title text-[1.22rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
+									class="font-hero-title text-[1rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
 								>
 									{formatLeafStatValue(item)}
 								</p>
@@ -584,13 +584,13 @@
 								src="/layout/daun-kanan.svg"
 								alt=""
 								aria-hidden="true"
-								class="h-[6.95rem] w-full max-w-[12.4rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
+								class="h-[8.4rem] w-full max-w-[14.2rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
 							/>
 							<div
 								class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4"
 							>
 								<p
-									class="font-hero-title text-[1.22rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
+									class="font-hero-title text-[1rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
 								>
 									{formatLeafStatValue(item)}
 								</p>
