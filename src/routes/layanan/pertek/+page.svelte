@@ -13,6 +13,7 @@
 		| 'Penjadwalan Rapat'
 		| 'Dikembalikan'
 		| 'Submit';
+	type QueuePosition = 'Penyusun' | 'Sekretariat TU' | 'Pemrakarsa';
 
 	type QueueRow = {
 		registrationNo: string;
@@ -20,6 +21,7 @@
 		agency: string;
 		activity: string;
 		documentType: string;
+		position: QueuePosition;
 		progressStatus: ProgressStatus;
 		progressUpdatedDate: string;
 	};
@@ -65,6 +67,7 @@
 		'Dikembalikan',
 		'Submit'
 	];
+	const positionSeeds: QueuePosition[] = ['Penyusun', 'Sekretariat TU', 'Pemrakarsa'];
 
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 	const addDaysUtc = (isoDate: string, offsetDays: number) => {
@@ -85,6 +88,7 @@
 			agency: agencySeeds[index % agencySeeds.length],
 			activity: activitySeeds[index % activitySeeds.length],
 			documentType: 'Air',
+			position: positionSeeds[index % positionSeeds.length],
 			progressStatus: statusSeeds[index % statusSeeds.length]
 		};
 	});
@@ -171,6 +175,7 @@
 				row.agency,
 				row.activity,
 				row.documentType,
+				row.position,
 				row.progressStatus,
 				formatDate(row.receivedDate),
 				formatDate(row.progressUpdatedDate)
@@ -365,20 +370,24 @@
 		if (sortedRows.length === 0) return;
 
 		const header = [
+			'No Registrasi',
 			'Tanggal Masuk',
 			'Instansi',
 			'Kegiatan',
 			'Jenis Perling',
-			'Status Progress',
+			'Posisi',
+			'Status',
 			'Tanggal Update'
 		];
 
 		const lines = sortedRows.map((row) =>
 			[
+				row.registrationNo,
 				formatDate(row.receivedDate),
 				row.agency,
 				row.activity,
 				row.documentType,
+				row.position,
 				row.progressStatus,
 				formatDate(row.progressUpdatedDate)
 			]
@@ -778,13 +787,18 @@
 
 		<div class="mt-6 hidden md:block">
 			<div class="overflow-x-auto rounded-xl border-y border-[#d7dee8] bg-transparent">
-				<table class="w-full min-w-[980px] border-collapse">
+				<table class="w-full min-w-[1180px] border-collapse">
 					<thead class="bg-[#64AD31]">
 						<tr>
 							<th
 								class="w-14 border-b border-[#64AD31] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white"
 							>
 								No
+							</th>
+							<th
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+							>
+								No Registrasi
 							</th>
 							<th
 								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
@@ -807,9 +821,14 @@
 								Jenis Perling
 							</th>
 							<th
+								class="w-28 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+							>
+								Posisi
+							</th>
+							<th
 								class="w-32 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
-								Status Progress
+								Status
 							</th>
 							<th
 								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
@@ -822,7 +841,7 @@
 					<tbody>
 						{#if totalFilteredRows === 0}
 							<tr>
-								<td colspan="7" class="px-6 py-12 text-center">
+								<td colspan="9" class="px-6 py-12 text-center">
 									<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
 									<p class="mt-1 text-sm text-[var(--muted)]">
 										Coba ubah kata kunci pencarian atau reset filter.
@@ -835,10 +854,12 @@
 									<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">
 										{pageStartIndex + index + 1}
 									</td>
+									<td class="px-6 py-4 text-sm text-[#20232A]">{row.registrationNo}</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">{formatDate(row.receivedDate)}</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">{row.agency}</td>
 									<td class="px-6 py-4 text-sm leading-relaxed text-[#20232A]">{row.activity}</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]">{row.documentType}</td>
+									<td class="w-28 px-4 py-4 text-sm text-[#20232A]">{row.position}</td>
 									<td class="w-32 px-4 py-4 text-sm leading-snug text-[#20232A]">
 										<span
 											class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.progressStatus)}`}
@@ -862,7 +883,7 @@
 				class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
 				<span class="text-center">No</span>
-				<span class="text-sm">Detail Pertek</span>
+				<span class="text-sm">Detail Dokumen</span>
 			</div>
 
 			{#if totalFilteredRows === 0}
@@ -892,8 +913,8 @@
 											<p class="truncate pr-1 text-sm leading-snug font-semibold text-[#20232A]">
 												{row.agency}
 											</p>
-											<p class="mt-1 text-[0.75rem] leading-tight text-[var(--muted)]">
-												Masuk: {formatDate(row.receivedDate)}
+											<p class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]">
+												{row.registrationNo}
 											</p>
 											<div class="mt-2 flex flex-wrap items-center gap-1.5">
 												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
@@ -937,9 +958,9 @@
 										</div>
 										<div>
 											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">
-												Jenis Perling
+												Posisi
 											</dt>
-											<dd class="mt-1 text-sm text-[#20232A]">{row.documentType}</dd>
+											<dd class="mt-1 text-sm text-[#20232A]">{row.position}</dd>
 										</div>
 										<div>
 											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">
