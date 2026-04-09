@@ -469,7 +469,72 @@
 		</span>
 	</button>
 </section>
-<section id="layanan-dokumen" class=" scroll-mt-28">
+<section
+	id="product-demo-loop"
+	class="relative overflow-hidden bg-[#060a12] bg-cover bg-center py-14 sm:py-20 lg:py-24"
+	style="background-image: url('/home/gradient-texture.png');"
+>
+	<div class="absolute inset-0 -z-10 bg-black/24"></div>
+	<div
+		class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_12%_18%,rgba(107,232,122,0.24),transparent_46%),radial-gradient(circle_at_86%_88%,rgba(73,141,214,0.22),transparent_44%)]"
+	></div>
+
+	<div class="page-shell">
+		<div class="mx-auto max-w-3xl text-center text-white">
+			<p class="text-xs font-semibold tracking-[0.12em] text-[#c8ffc6] uppercase">
+				Product Demo Loop
+			</p>
+			<h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.7rem]">
+				Overview Layanan SI-KOPLING Dalam Satu Tampilan
+			</h2>
+			<p class="mt-3 text-base leading-relaxed text-white/86 sm:text-lg">
+				Cuplikan ringkas alur layanan, pemantauan progres dokumen, dan navigasi utama yang tersedia
+				di website SI-KOPLING.
+			</p>
+		</div>
+
+		<div class="demo-stage relative mx-auto mt-8 w-full max-w-[76rem] sm:mt-10 lg:mt-12">
+			<div
+				class="demo-stage-glow absolute top-[18%] left-1/2 h-[24%] w-[84%] -translate-x-1/2 rounded-full bg-[rgba(88,192,103,0.44)]"
+				aria-hidden="true"
+			></div>
+			<div
+				class="demo-frame-ring pointer-events-none absolute inset-[2.8%] rounded-[1.7rem] border border-white/20"
+				aria-hidden="true"
+			></div>
+			<div class="demo-browser-shell relative aspect-[1345/772] w-full">
+				<div class="demo-browser-viewport absolute z-10 overflow-hidden">
+					<video
+						class="demo-loop-video h-full w-full object-cover"
+						autoplay
+						muted
+						loop
+						playsinline
+						preload="metadata"
+					>
+						<source src="/home/0409.mp4" type="video/mp4" />
+					</video>
+				</div>
+
+				<img
+					src="/home/safari-big-sur-light-cutout-clean.png"
+					alt="Frame browser Safari untuk menampilkan demo produk SI-KOPLING"
+					loading="lazy"
+					decoding="async"
+					class="demo-frame-overlay pointer-events-none absolute inset-0 z-20 h-full w-full select-none object-contain rounded-5"
+				/>
+			</div>
+		</div>
+
+		<div class="mt-6 flex flex-wrap items-center justify-center gap-2.5 text-[0.72rem] font-semibold tracking-[0.08em] text-white/76 uppercase sm:text-xs">
+			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">Antrian Dokumen</span>
+			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">Persetujuan Teknis</span>
+			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">Universal Search</span>
+			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">WhatsApp Assist</span>
+		</div>
+	</div>
+</section>
+<section class=" scroll-mt-28">
 	<StackedCard />
 </section>
 <section
@@ -818,5 +883,78 @@
 		height: 100% !important;
 		display: block;
 		background-color: transparent !important;
+	}
+
+	.demo-stage {
+		isolation: isolate;
+	}
+
+	.demo-stage-glow {
+		filter: blur(72px);
+		animation: demo-glow-pulse 7.2s ease-in-out infinite;
+	}
+
+	.demo-loop-video {
+		transform-origin: center top;
+		transform: translateZ(0) scale(1.075);
+	}
+
+	.demo-browser-shell {
+		will-change: transform;
+		animation: demo-frame-float 8.6s ease-in-out infinite;
+	}
+
+	.demo-browser-viewport {
+		inset: 11.49% 3.79% 7.94% 3.79%;
+		border-radius: 0.4rem;
+		background: #f4f5f7;
+	}
+
+	.demo-frame-overlay {
+		will-change: transform;
+	}
+
+	@keyframes demo-glow-pulse {
+		0%,
+		100% {
+			opacity: 0.5;
+			transform: translateX(-50%) scale(0.95);
+		}
+		50% {
+			opacity: 0.88;
+			transform: translateX(-50%) scale(1.03);
+		}
+	}
+
+	@keyframes demo-frame-float {
+		0%,
+		100% {
+			transform: translate3d(0, 0, 0);
+		}
+		50% {
+			transform: translate3d(0, -5px, 0);
+		}
+	}
+
+	@media (max-width: 640px) {
+		.demo-stage-glow {
+			filter: blur(48px);
+		}
+
+		.demo-browser-viewport {
+			inset: 11.49% 3.79% 7.94% 3.79%;
+			border-radius: 0.25rem;
+		}
+
+		.demo-loop-video {
+			transform: translateZ(0) scale(1.065);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.demo-stage-glow,
+		.demo-browser-shell {
+			animation: none;
+		}
 	}
 </style>
