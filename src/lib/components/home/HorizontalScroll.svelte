@@ -5,11 +5,11 @@
   type Cleanup = () => void;
 
   const cards = [
-    { src: "/home/Group 13.png", alt: "Card 1" },
-    { src: "/home/Group 9.png", alt: "Card 2" },
-    { src: "/home/Group 10.png", alt: "Card 3" },
-    { src: "/home/Group 11.png", alt: "Card 4" },
-    { src: "/home/Group 12.png", alt: "Card 5" },
+    { src: "/home/amdal.png", alt: "Card 1" },
+    { src: "/home/ukl.png", alt: "Card 2" },
+    { src: "/home/delh.png", alt: "Card 3" },
+    { src: "/home/addendum.png", alt: "Card 4" },
+    { src: "/home/pertek.png", alt: "Card 5" },
   ];
 
   const MAIN_TRIGGER_ID = "home-horizontal-scroll-main";
