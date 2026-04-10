@@ -1,4 +1,7 @@
 <script lang="ts">
+    import Clock3 from "lucide-svelte/icons/clock-3";
+    import FileText from "lucide-svelte/icons/file-text";
+    import Route from "lucide-svelte/icons/route";
     import { onMount } from "svelte";
 
     let sectionEl: HTMLElement | null = null;
@@ -123,52 +126,70 @@
                 Kemudahan dalam Setiap
                 <span class="text-green">Proses</span>
             </h2>
-
             <p class="quality-description">
-                Kami menghadirkan sistem yang mempermudah pengajuan dokumen lingkungan dengan alur yang jelas, transparan, dan terintegrasi.
+                Kami menghadirkan sistem yang mempermudah pengajuan dokumen
+                lingkungan dengan alur yang jelas, transparan, dan terintegrasi.
             </p>
         </div>
 
         <div class="quality-cards-wrapper">
             <article
-                class="quality-card card-blue"
+                class="quality-card card-green-light card-one"
                 bind:this={cardOneEl}
             >
-                <div>
-                    <p class="quality-number">3 Langkah</p>
-                    <p class="quality-subtitle">Mudah</p>
+                <div class="quality-card-top">
+                    <div>
+                        <p class="quality-number">3 Cara</p>
+                        <p class="quality-subtitle">Mudah</p>
+                    </div>
+                    <span
+                        class="quality-card-icon quality-card-icon-route"
+                        aria-hidden="true"
+                    >
+                        <Route />
+                    </span>
                 </div>
-                <p class="quality-copy">
-                    Daftar &bull; Upload &bull; Pantau
-                </p>
+                <p class="quality-copy">Daftar &bull; Upload &bull; Pantau</p>
             </article>
 
             <article
-                class="quality-card card-yellow card-two"
+                class="quality-card card-green card-two"
                 bind:this={cardTwoEl}
             >
-                <div>
-                    <p class="quality-number">&le; 5 Hari</p>
-                    <p class="quality-subtitle">Proses Pengajuan</p>
+                <div class="quality-card-top">
+                    <div>
+                        <p class="quality-number">&le; 5 Hari</p>
+                        <p class="quality-subtitle">Proses Pengajuan</p>
+                    </div>
+                    <span class="quality-card-icon" aria-hidden="true">
+                        <Clock3 />
+                    </span>
                 </div>
-                <p class="quality-copy">
-                    Lebih cepat dan terukur.
-                </p>
+                <p class="quality-copy">Lebih cepat dan terukur.</p>
             </article>
 
             <article
-                class="quality-card card-green card-three"
+                class="quality-card card-orange card-three"
                 bind:this={cardThreeEl}
             >
-                <div>
-                    <p class="quality-number">100%</p>
-                    <p class="quality-subtitle">Pengajuan dokumen online</p>
+                <div class="quality-card-top">
+                    <div>
+                        <p class="quality-number">100%</p>
+                        <p class="quality-subtitle">Pengajuan online</p>
+                    </div>
+                    <span class="quality-card-icon" aria-hidden="true">
+                        <FileText />
+                    </span>
                 </div>
-                <p class="quality-copy">Dari mana saja. Tanpa perlu datang ke kantor.</p>
+                <p class="quality-copy">
+                    Dari mana saja. Tanpa perlu datang ke kantor.
+                </p>
             </article>
         </div>
 
-        <p class="mobile-swipe-hint">Geser kartu untuk melihat semua kemudahan.</p>
+        <p class="mobile-swipe-hint">
+            Geser kartu untuk melihat semua kemudahan.
+        </p>
     </div>
 </section>
 
@@ -176,10 +197,11 @@
     :global(:root) {
         --color-beige: #f5f0e4;
         --color-black: #2c2c2c;
-        --color-blue: #77D37F;
-        --color-yellow: #64AD31;
-        --color-green: #EB9E27;
-        --color-green-theme: #64AD31;
+        --color-green-light: #77d37f;
+        --color-green: #64ad31;
+        --color-orange: #eb9e27;
+        --color-green-theme: #64ad31;
+        --muted: #475467;
     }
 
     .quality-section {
@@ -216,6 +238,7 @@
     }
 
     .quality-description {
+        color: var(--muted);
         font-size: 1.125rem;
         font-weight: 500;
         line-height: 1.6;
@@ -248,16 +271,64 @@
         width: 100%;
     }
 
-    .card-blue {
-        background: var(--color-blue);
+    .quality-card-top {
+        align-items: flex-start;
+        display: flex;
+        gap: 1.25rem;
+        justify-content: space-between;
+        width: 100%;
     }
 
-    .card-yellow {
-        background: var(--color-yellow);
+    .quality-card-icon {
+        align-items: center;
+        --icon-size: clamp(1.6rem, 3.1vw, 2.6rem);
+        background: rgba(255, 255, 255, 0.14);
+        border: 2px solid rgba(255, 255, 255, 0.32);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.95);
+        display: inline-flex;
+        flex-shrink: 0;
+        height: clamp(3.8rem, 7vw, 5.8rem);
+        justify-content: center;
+        box-shadow: 0 10px 22px rgba(21, 34, 53, 0.16);
+        width: clamp(3.8rem, 7vw, 5.8rem);
+    }
+
+    .quality-card-icon :global(svg) {
+        display: block;
+        height: var(--icon-size);
+        stroke-width: 2.35;
+        width: var(--icon-size);
+    }
+
+    .card-green-light {
+        background: var(--color-green-light);
+    }
+
+    .card-green-light .quality-card-icon {
+        background: rgba(235, 255, 238, 0.2);
+        border-color: rgba(230, 255, 235, 0.52);
+        box-shadow: 0 10px 22px rgba(36, 113, 58, 0.2);
     }
 
     .card-green {
         background: var(--color-green);
+    }
+
+    .card-green .quality-card-icon {
+        background: rgba(236, 255, 226, 0.14);
+        border-color: rgba(235, 255, 224, 0.42);
+        box-shadow: 0 10px 22px rgba(28, 83, 13, 0.26);
+    }
+
+    .card-orange {
+        background: var(--color-orange);
+    }
+
+    .card-orange .quality-card-icon {
+        background: rgba(255, 245, 223, 0.18);
+        border-color: rgba(255, 247, 228, 0.45);
+        box-shadow: 0 10px 22px rgba(138, 82, 8, 0.26);
     }
 
     .card-two {
@@ -341,12 +412,13 @@
         .quality-content {
             align-items: flex-start;
             gap: 1rem;
-            text-align: left;
+            text-align: center;
         }
 
         .quality-title {
-            font-size: clamp(2rem, 10vw, 2.8rem);
-            max-width: 16ch;
+            font-size: clamp(3rem, 12vw, 3.8rem);
+            max-width: 20ch;
+            text-align: center;
         }
 
         .quality-description {
@@ -358,6 +430,7 @@
         .quality-cards-wrapper {
             display: grid;
             gap: 0.85rem;
+            justify-items: start;
             margin-inline: 0;
             overflow: visible;
             padding: 0;
@@ -367,10 +440,22 @@
             align-items: flex-start;
             border-radius: 1.25rem;
             box-shadow: 0 12px 30px rgba(11, 18, 30, 0.12);
-            min-height: 13rem;
-            padding: 1.25rem;
+            min-height: 11.5rem;
+            max-width: 100%;
+            padding: 1rem 1.05rem;
             text-align: left;
-            width: 100%;
+            width: min(100%, 20.5rem);
+        }
+
+        .quality-card-icon {
+            --icon-size: clamp(1.35rem, 5vw, 1.7rem);
+            border-width: 1.5px;
+            height: clamp(3.2rem, 13vw, 3.8rem);
+            width: clamp(3.2rem, 13vw, 3.8rem);
+        }
+
+        .quality-card-icon-route :global(svg) {
+            transform: translateY(1px);
         }
 
         .quality-number {
@@ -392,10 +477,80 @@
         }
     }
 
+    @media (min-width: 641px) and (max-width: 768px) {
+        .quality-content {
+            align-items: center;
+            text-align: center;
+        }
+
+        .quality-cards-wrapper {
+            justify-items: center;
+            gap: 1rem;
+        }
+
+        .quality-card {
+            width: min(100%, 24rem);
+            min-height: 12.5rem;
+            padding: 1.2rem 1.25rem;
+        }
+
+        .quality-number {
+            font-size: clamp(2.5rem, 8vw, 3.4rem);
+        }
+
+        .quality-subtitle {
+            font-size: clamp(1.15rem, 3.2vw, 1.5rem);
+        }
+
+        .quality-copy {
+            font-size: 1rem;
+        }
+    }
+
     @media (max-width: 640px) {
         .quality-section {
             padding-left: max(1.3rem, calc(env(safe-area-inset-left) + 0.8rem));
-            padding-right: max(1.3rem, calc(env(safe-area-inset-right) + 0.8rem));
+            padding-right: max(
+                1.3rem,
+                calc(env(safe-area-inset-right) + 0.8rem)
+            );
+        }
+
+        .quality-card {
+            width: min(100%, 19rem);
+        }
+        .quality-content {
+            align-items: flex-start;
+            gap: 1rem;
+            text-align: center;
+        }
+        .quality-title {
+            font-size: clamp(2rem, 9vw, 2.4rem);
+            max-width: 17ch;
+        }
+        .quality-description {
+            font-size: 0.9rem;
+            line-height: 1.4;
+            max-width: 100%;
+        }
+        .quality-cards-wrapper {
+            display: grid;
+            gap: 0.85rem;
+            align-items: center;
+            justify-items: center;
+            margin-inline: 0;
+            overflow: visible;
+            padding: 0;
+        }
+
+        .quality-card-icon {
+            --icon-size: 1.25rem;
+            height: 3rem;
+            width: 3rem;
+        }
+
+        .quality-card-icon-route :global(svg) {
+            transform: translateY(0.5px);
         }
     }
 </style>

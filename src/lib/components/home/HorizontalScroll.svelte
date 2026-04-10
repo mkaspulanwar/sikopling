@@ -351,6 +351,7 @@
   @media (max-width: 767px) {
     #horizontal-scroll {
       overflow: visible;
+      padding-bottom: 2rem;
     }
 
     .horizontal-scroll-header {

@@ -712,10 +712,10 @@
 			<h2
 				class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
 			>
-				Alur Kerja Pelayanan Persetujuan Lingkungan
+				Alur Persetujuan Lingkungan
 			</h2>
 			<p
-				class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg"
+				class="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-lg"
 			>
 				Alur ini dirancang agar proses layanan lebih transparan,
 				terukur, dan efisien bagi pemrakarsa.
