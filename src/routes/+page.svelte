@@ -295,7 +295,7 @@
 	};
 
 	const scrollToDashboard = () => {
-		const targetSection = document.getElementById("layanan-statistik");
+		const targetSection = document.getElementById("overview-section");
 		if (!targetSection) return;
 
 		const prefersReducedMotion = window.matchMedia(
@@ -350,7 +350,7 @@
 				}
 				syncLottiePlayback();
 			},
-			{ threshold: 0.01, rootMargin: "180px 0px -80px 0px" },
+			{ threshold: 0.4, rootMargin: "100px 0px -80px 0px" },
 		);
 
 		observer.observe(statSection);
@@ -405,7 +405,7 @@
 
 <section
 	id="beranda"
-	class="relative isolate min-h-[100svh] overflow-hidden bg-black lg:min-h-[100dvh]"
+	class="hero-parallax relative isolate min-h-[100svh] overflow-hidden bg-black lg:min-h-[100dvh]"
 >
 	<div class="hero-media absolute inset-0" aria-hidden="true">
 		<video
@@ -426,7 +426,7 @@
 		<div class="absolute inset-0 bg-black/15"></div>
 	</div>
 	<div
-		class="relative z-10 flex min-h-[100svh] items-center justify-center px-6 pt-[max(6rem,calc(env(safe-area-inset-top)+3.75rem))] pb-[max(5.25rem,calc(env(safe-area-inset-bottom)+1.75rem))] text-center sm:px-10 sm:pt-0 sm:pb-0 lg:min-h-[100dvh]"
+		class="hero-parallax-copy relative z-10 flex min-h-[100svh] items-center justify-center px-6 pt-[max(6rem,calc(env(safe-area-inset-top)+3.75rem))] pb-[max(5.25rem,calc(env(safe-area-inset-bottom)+1.75rem))] text-center sm:px-10 sm:pt-0 sm:pb-0 lg:min-h-[100dvh]"
 	>
 		<div class="mx-auto flex w-full max-w-5xl flex-col items-center">
 			<img
@@ -481,19 +481,27 @@
 
 	<div class="page-shell">
 		<div class="mx-auto max-w-3xl text-center text-white">
-			<p class="text-xs font-semibold tracking-[0.12em] text-[#c8ffc6] uppercase">
+			<p
+				class="text-xs font-semibold tracking-[0.12em] text-[#c8ffc6] uppercase"
+			>
 				Product Demo Loop
 			</p>
-			<h2 class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.7rem]">
+			<h2 id="overview-section"
+				class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.7rem]"
+			>
 				Overview Layanan SI-KOPLING Dalam Satu Tampilan
 			</h2>
-			<p class="mt-3 text-base leading-relaxed text-white/86 sm:text-lg">
-				Cuplikan ringkas alur layanan, pemantauan progres dokumen, dan navigasi utama yang tersedia
-				di website SI-KOPLING.
+			<p
+				class="mt-3 text-base leading-relaxed text-white/86 sm:text-lg"
+			>
+				Cuplikan ringkas alur layanan, pemantauan progres dokumen, dan
+				navigasi utama yang tersedia di website SI-KOPLING.
 			</p>
 		</div>
 
-		<div class="demo-stage relative mx-auto mt-8 w-full max-w-[76rem] sm:mt-10 lg:mt-12">
+		<div
+			class="demo-stage relative mx-auto mt-8 w-full max-w-[76rem] sm:mt-10 lg:mt-12"
+		>
 			<div
 				class="demo-stage-glow absolute top-[18%] left-1/2 h-[24%] w-[84%] -translate-x-1/2 rounded-full bg-[rgba(88,192,103,0.44)]"
 				aria-hidden="true"
@@ -503,7 +511,9 @@
 				aria-hidden="true"
 			></div>
 			<div class="demo-browser-shell relative aspect-[1345/772] w-full">
-				<div class="demo-browser-viewport absolute z-10 overflow-hidden">
+				<div
+					class="demo-browser-viewport absolute z-10 overflow-hidden"
+				>
 					<video
 						class="demo-loop-video h-full w-full object-cover"
 						autoplay
@@ -526,11 +536,25 @@
 			</div>
 		</div>
 
-		<div class="mt-6 flex flex-wrap items-center justify-center gap-2.5 text-[0.72rem] font-semibold tracking-[0.08em] text-white/76 uppercase sm:text-xs">
-			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">Antrian Dokumen</span>
-			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">Persetujuan Teknis</span>
-			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">Universal Search</span>
-			<span class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5">WhatsApp Assist</span>
+		<div
+			class="mt-6 flex flex-wrap items-center justify-center gap-2.5 text-[0.72rem] font-semibold tracking-[0.08em] text-white/76 uppercase sm:text-xs"
+		>
+			<span
+				class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5"
+				>Antrian Dokumen</span
+			>
+			<span
+				class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5"
+				>Persetujuan Teknis</span
+			>
+			<span
+				class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5"
+				>Universal Search</span
+			>
+			<span
+				class="rounded-full border border-white/24 bg-white/8 px-3 py-1.5"
+				>WhatsApp Assist</span
+			>
 		</div>
 	</div>
 </section>
@@ -554,7 +578,6 @@
 				Capaian SI-KOPLING Secara Ringkas
 			</h2>
 			<p
-				id="layanan-statistik"
 				class="mt-3 hidden sm:block text-base leading-relaxed text-[var(--muted)] sm:text-lg"
 			>
 				Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan
@@ -567,9 +590,11 @@
 			class="-mx-2 mt-3 grid grid-cols-[minmax(0,1fr)_minmax(7.2rem,8.6rem)_minmax(0,1fr)] items-start gap-x-1 gap-y-1.5 sm:mx-0 sm:mt-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:items-center lg:gap-x-2"
 		>
 			<div class="grid gap-1.5 sm:gap-3 lg:gap-6">
-				{#each leftLeafStats as item}
+				{#each leftLeafStats as item, index}
 					<article
-						class="mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]"
+						class="stat-leaf-card mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]"
+						class:stat-leaf-card-visible={isCounterStarted}
+						style={`--stat-delay: ${index * 110}ms;`}
 					>
 						<div
 							class="flex min-h-[2rem] items-end justify-center px-1 py-0 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]"
@@ -629,9 +654,11 @@
 			</div>
 
 			<div class="grid gap-1.5 sm:gap-3 lg:gap-6">
-				{#each rightLeafStats as item}
+				{#each rightLeafStats as item, index}
 					<article
-						class="mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]"
+						class="stat-leaf-card mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]"
+						class:stat-leaf-card-visible={isCounterStarted}
+						style={`--stat-delay: ${(index + leftLeafStats.length) * 110}ms;`}
 					>
 						<div
 							class="flex min-h-[2rem] items-end justify-center px-1 py-0 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]"
@@ -872,6 +899,20 @@
 </section>
 
 <style>
+	.hero-parallax {
+		background-color: #000;
+	}
+
+	.hero-media {
+		pointer-events: none;
+	}
+
+	.hero-media-video {
+		height: 100%;
+		width: 100%;
+		object-fit: cover;
+	}
+
 	.stat-tree-lottie {
 		background-color: transparent;
 	}
@@ -936,6 +977,33 @@
 		}
 	}
 
+	@keyframes stat-leaf-reveal {
+		0% {
+			opacity: 0;
+			transform: translate3d(0, 22px, 0) scale(0.97);
+			filter: blur(8px);
+		}
+		100% {
+			opacity: 1;
+			transform: translate3d(0, 0, 0) scale(1);
+			filter: blur(0);
+		}
+	}
+
+	@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+		.stat-leaf-card {
+			opacity: 0;
+			transform: translate3d(0, 22px, 0) scale(0.97);
+			filter: blur(8px);
+			will-change: transform, opacity, filter;
+		}
+
+		.stat-leaf-card-visible {
+			animation: stat-leaf-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1)
+				var(--stat-delay, 0ms) both;
+		}
+	}
+
 	@media (max-width: 640px) {
 		.demo-stage-glow {
 			filter: blur(48px);
@@ -948,6 +1016,23 @@
 
 		.demo-loop-video {
 			transform: translateZ(0) scale(1.065);
+		}
+	}
+
+	@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+		.hero-parallax {
+			clip-path: inset(0);
+		}
+
+		.hero-parallax .hero-media {
+			position: fixed;
+			inset: 0;
+		}
+
+		.hero-parallax .hero-parallax-copy {
+			position: fixed;
+			inset: 0;
+			pointer-events: none;
 		}
 	}
 
