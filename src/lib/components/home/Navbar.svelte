@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { fade, fly } from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
+	import { fade, fly, slide } from 'svelte/transition';
 	import { page } from '$app/state';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import LogIn from 'lucide-svelte/icons/log-in';
-	import Menu from 'lucide-svelte/icons/menu';
 	import Search from 'lucide-svelte/icons/search';
 	import X from 'lucide-svelte/icons/x';
 
@@ -422,6 +422,7 @@
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
 	const useLightNav = () => isLandingPage() && !isScrolled;
+	const shouldUseLightNav = () => useLightNav() && !isMobileOpen;
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
 	const scrollToBeranda = () => {
@@ -462,7 +463,7 @@
 	$effect(() => {
 		if (typeof document === 'undefined') return;
 		const previousOverflow = document.body.style.overflow;
-		document.body.style.overflow = isMobileOpen ? 'hidden' : '';
+		document.body.style.overflow = isSearchOpen ? 'hidden' : '';
 		return () => {
 			document.body.style.overflow = previousOverflow;
 		};
@@ -484,46 +485,55 @@
 		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-300 ${
 			shouldShowNav() ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
 		} ${
-			useLightNav()
-				? 'bg-transparent text-white shadow-none'
+			isMobileOpen
+				? 'bg-white text-[var(--ink)] shadow-[0_20px_38px_-30px_rgba(15,23,42,0.46)]'
+				: shouldUseLightNav()
+					? 'bg-transparent text-white shadow-none'
 				: 'bg-[var(--surface)] text-[var(--ink)] shadow-none'
 		}`;
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
 			'relative inline-flex items-center py-2.5 lg:py-2 text-base lg:text-[1rem] font-medium tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
-		if (useLightNav()) {
+		if (shouldUseLightNav()) {
 			return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-white hover:text-[#77D37F]'}`;
 		}
 		return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-black hover:text-[#77D37F]'}`;
 	};
 
 	const mobileNavBaseClass =
-		'border-b border-transparent px-4 py-3.5 !text-[1.1875rem] !font-medium [font-weight:500] nav-menu-font leading-[1.2] tracking-[0.002em]';
+		'menu-item-static nav-menu-font w-full rounded-lg px-4 py-3 text-center text-[1rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200';
 
 	const mobileLinkClass = (isActive = false) =>
-		`block menu-item-static ${mobileNavBaseClass} ${isActive ? 'text-[#77D37F]' : 'text-black'}`;
+		`block ${mobileNavBaseClass} ${
+			isActive ? 'bg-[#f1f8ea] text-[#2f8f2f]' : 'text-[#0f172a] hover:bg-[#f4f8fc]'
+		}`;
 
 	const mobileLayananClass = (isActive = false) =>
-		`flex w-full items-center justify-between menu-item-static ${mobileNavBaseClass} appearance-none border-0 bg-transparent text-left ${
-			isActive ? 'text-[#77D37F]' : 'text-black'
+		`flex w-full items-center justify-center gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} ${
+			isActive ? 'bg-[#f1f8ea] text-[#2f8f2f]' : 'text-[#0f172a] hover:bg-[#f4f8fc]'
+		}`;
+
+	const mobileLayananItemClass = (isActive = false) =>
+		`menu-item-static nav-menu-font block w-full px-3 py-2 text-center text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] transition-colors duration-200 ${
+			isActive ? 'text-[#2f8f2f]' : 'text-[#334155] hover:text-[#2f8f2f]'
 		}`;
 
 	const logoClass = () =>
 		`h-auto w-[11.4rem] object-contain transition-[filter] duration-300 sm:w-[12rem] lg:w-[13rem] ${
-			useLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
+			shouldUseLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
 		}`;
 
 	const actionButtonClass = () =>
 		`inline-flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
-			useLightNav()
+			shouldUseLightNav()
 				? 'border-white/25 bg-white/10 text-white'
 				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
 		}`;
 
 	const loginButtonClass = () =>
 		`hidden h-11 lg:h-10 items-center justify-center gap-2 rounded-lg border px-5 lg:px-4 text-base lg:text-[1rem] font-medium transition-colors lg:inline-flex ${
-			useLightNav()
+			shouldUseLightNav()
 				? 'border-white/30 bg-white/10 text-white'
 				: 'border-[#64AD31] bg-[#64AD31] text-white'
 		}`;
@@ -660,21 +670,86 @@
 				{#if showNavMenus}
 					<button
 						type="button"
-						class={`${actionButtonClass()} lg:hidden`}
+						class={`${actionButtonClass()} mobile-menu-toggle ${isMobileOpen ? 'is-open' : ''} lg:hidden`}
 						aria-expanded={isMobileOpen}
-						aria-label="Buka menu"
+						aria-label={isMobileOpen ? 'Tutup menu' : 'Buka menu'}
 						onclick={toggleMobileMenu}
 					>
-						{#if isMobileOpen}
-							<X class="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
-						{:else}
-							<Menu class="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
-						{/if}
+						<span class="sr-only">{isMobileOpen ? 'Tutup menu' : 'Buka menu'}</span>
+						<span class="mobile-menu-toggle__line line--top" aria-hidden="true"></span>
+						<span class="mobile-menu-toggle__line line--middle" aria-hidden="true"></span>
+						<span class="mobile-menu-toggle__line line--bottom" aria-hidden="true"></span>
 					</button>
 				{/if}
 			</div>
 		</div>
 	</div>
+
+	{#if showNavMenus && isMobileOpen}
+		<div
+			class="border-t border-[var(--line)] bg-white px-4 pt-3 pb-4 shadow-[0_26px_46px_-34px_rgba(15,23,42,0.56)] lg:hidden"
+			transition:slide={{ duration: 280, easing: cubicOut }}
+		>
+			<div class="mx-auto flex w-full max-w-[18.25rem] flex-col items-center gap-2.5">
+				<a href={navHref('beranda')} class={mobileLinkClass(false)} onclick={handleBerandaClick}>
+					Beranda
+				</a>
+
+				<button
+					type="button"
+					class={mobileLayananClass(isMobileLayananOpen || isLayananActive())}
+					aria-expanded={isMobileLayananOpen}
+					onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
+				>
+					<span class="font-semibold">Layanan</span>
+					<ChevronDown
+						class={`h-4 w-4 transition-transform duration-200 ${isMobileLayananOpen ? 'rotate-180' : ''}`}
+						strokeWidth={2.2}
+						aria-hidden="true"
+					/>
+				</button>
+
+				{#if isMobileLayananOpen}
+					<div
+						class="w-full space-y-0.5 py-0.5"
+						transition:slide={{ duration: 220, easing: cubicOut }}
+					>
+						{#each layananItems as item}
+							{#if item.href}
+								<a
+									href={mapSectionHref(item.href)}
+									class={mobileLayananItemClass(isPathActive(item.href))}
+									onclick={handleLayananItemClick}
+								>
+									{item.title}
+								</a>
+							{:else}
+								<button type="button" class={mobileLayananItemClass(false)}>
+									{item.title}
+								</button>
+							{/if}
+						{/each}
+					</div>
+				{/if}
+
+				<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
+					Tentang
+				</a>
+				<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
+					Kontak
+				</a>
+
+				<a
+					href="/login"
+					class="nav-menu-font mt-3 inline-flex min-w-[9.25rem] items-center justify-center gap-2 rounded-full bg-[#64AD31] px-6 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
+					onclick={closeMenus}
+				>
+					<LogIn class="h-[1.1rem] w-[1.1rem]" strokeWidth={2.15} aria-hidden="true" />
+					<span>Login</span>
+				</a>
+			</div>
+		</div>
+	{/if}
 </nav>
 
 {#if isSearchOpen}
@@ -805,98 +880,53 @@
 	</div>
 {/if}
 
-{#if showNavMenus && isMobileOpen}
-	<button
-		type="button"
-		class="fixed inset-0 z-[70] bg-slate-950/22 backdrop-blur-lg backdrop-saturate-150 [-webkit-backdrop-filter:blur(16px)] lg:hidden"
-		aria-label="Tutup menu"
-		onclick={closeMenus}
-		transition:fade={{ duration: 120 }}
-	></button>
-
-	<aside
-		class="fixed top-0 right-0 z-[75] flex h-dvh w-[min(76vw,18.75rem)] flex-col rounded-l-[1.4rem] border-l border-[var(--line)] bg-[var(--surface)] px-5 pt-5 pb-4 shadow-[0_28px_72px_-28px_rgba(15,23,42,0.52)] lg:hidden"
-		transition:fly={{ x: 24, duration: 170 }}
-	>
-		<div class="flex items-center justify-between gap-3 border-b border-[var(--line)] pb-4">
-			<p class="nav-menu-font text-[1.1875rem] font-medium text-[var(--ink)]">Menu</p>
-
-			<button
-				type="button"
-				class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]"
-				aria-label="Tutup menu"
-				onclick={closeMenus}
-			>
-				<X class="h-5 w-5" strokeWidth={2.2} aria-hidden="true" />
-			</button>
-		</div>
-
-		<div class="mt-5 space-y-1.5">
-			<a href={navHref('beranda')} class={mobileLinkClass(false)} onclick={handleBerandaClick}>
-				Beranda
-			</a>
-
-			<button
-				type="button"
-				class={mobileLayananClass(isMobileLayananOpen || isLayananActive())}
-				aria-expanded={isMobileLayananOpen}
-				onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
-			>
-				<span class="nav-menu-font text-[1.1875rem] font-medium tracking-[0.002em]">Layanan</span>
-				<ChevronDown
-					class={`h-4 w-4 transition-transform ${isMobileLayananOpen ? 'rotate-180' : ''}`}
-					strokeWidth={2.2}
-					aria-hidden="true"
-				/>
-			</button>
-
-			{#if isMobileLayananOpen}
-				<div class="mt-1.5 space-y-1 pl-4" transition:fade={{ duration: 120 }}>
-					{#each layananItems as item}
-						{#if item.href}
-							<a
-								href={mapSectionHref(item.href)}
-								class={`menu-item-static nav-menu-font block w-full rounded-md px-3 py-2 text-left text-[0.95rem] [font-weight:350] ${
-									isPathActive(item.href) ? 'text-[#77D37F]' : 'text-black'
-								}`}
-								onclick={handleLayananItemClick}
-							>
-								{item.title}
-							</a>
-						{:else}
-							<button
-								type="button"
-								class="menu-item-static nav-menu-font block w-full appearance-none rounded-md border-0 bg-transparent px-3 py-2 text-left text-[0.95rem] [font-weight:350] text-black"
-							>
-								{item.title}
-							</button>
-						{/if}
-					{/each}
-				</div>
-			{/if}
-
-			<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
-				Tentang
-			</a>
-			<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
-				Kontak
-			</a>
-		</div>
-
-		<a
-			href="/login"
-			class="nav-menu-font mt-auto inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#64AD31] bg-[#64AD31] px-4 py-3 text-[1.1875rem] font-medium text-white transition-colors"
-			onclick={closeMenus}
-		>
-			<LogIn class="h-[1.2rem] w-[1.2rem]" strokeWidth={2.15} aria-hidden="true" />
-			<span>Login</span>
-		</a>
-	</aside>
-{/if}
-
 <style>
 	:global(.nav-menu-font) {
 		font-family: 'Roboto', 'Segoe UI', sans-serif;
+	}
+
+	.mobile-menu-toggle {
+		position: relative;
+	}
+
+	.mobile-menu-toggle__line {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: 1.15rem;
+		height: 2px;
+		border-radius: 999px;
+		background-color: currentColor;
+		transform-origin: center;
+		will-change: transform, opacity;
+		transition:
+			transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+			opacity 220ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.mobile-menu-toggle__line.line--top {
+		transform: translate(-50%, calc(-50% - 5px));
+	}
+
+	.mobile-menu-toggle__line.line--middle {
+		transform: translate(-50%, -50%);
+	}
+
+	.mobile-menu-toggle__line.line--bottom {
+		transform: translate(-50%, calc(-50% + 5px));
+	}
+
+	.mobile-menu-toggle.is-open .mobile-menu-toggle__line.line--top {
+		transform: translate(-50%, -50%) rotate(45deg);
+	}
+
+	.mobile-menu-toggle.is-open .mobile-menu-toggle__line.line--middle {
+		opacity: 0;
+		transform: translate(-50%, -50%) scaleX(0.52);
+	}
+
+	.mobile-menu-toggle.is-open .mobile-menu-toggle__line.line--bottom {
+		transform: translate(-50%, -50%) rotate(-45deg);
 	}
 
 	:global(.menu-item-static:hover),
