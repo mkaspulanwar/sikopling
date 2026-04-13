@@ -421,7 +421,7 @@
 				type="video/mp4"
 				media="(max-width: 640px)"
 			/>
-			<source src="/home/output-hero.webm" type="video/webm" />
+			<source src="/home/video-hero.webm" type="video/webm" />
 		</video>
 		<div class="absolute inset-0 bg-black/15"></div>
 	</div>
