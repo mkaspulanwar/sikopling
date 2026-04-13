@@ -244,7 +244,7 @@ function toggleFaq(id: string) {
 			>
 				{#if isOpen}
 					<span class="hidden h-full w-full sm:block">
-						<X class="h-full w-full" strokeWidth={2.45} aria-hidden="true" />
+						<X class="h-full w-full text-white" color="#fff" strokeWidth={2.45} aria-hidden="true" />
 					</span>
 				{:else}
 					<span class="block h-full w-full">
