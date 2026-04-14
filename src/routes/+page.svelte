@@ -417,11 +417,12 @@
 			preload="metadata"
 		>
 			<source
-				src="/home/output-hero.mp4"
+				src="/home/video-hero.mp4"
 				type="video/mp4"
-				media="(max-width: 640px)"
+				media="(min-width: 641px)"
 			/>
 			<source src="/home/video-hero.webm" type="video/webm" />
+			<source src="/home/video-hero.mp4" type="video/mp4" />
 		</video>
 		<div class="absolute inset-0 bg-black/15"></div>
 	</div>

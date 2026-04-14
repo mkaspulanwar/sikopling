@@ -502,7 +502,7 @@
 	};
 
 	const mobileNavBaseClass =
-		'menu-item-static nav-menu-font w-full rounded-lg px-4 py-3 text-center text-[1rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200';
+		'menu-item-static nav-menu-font w-full rounded-lg px-4 py-3 text-left text-[1rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200';
 
 	const mobileLinkClass = (isActive = false) =>
 		`block ${mobileNavBaseClass} ${
@@ -510,12 +510,12 @@
 		}`;
 
 	const mobileLayananClass = (isActive = false) =>
-		`flex w-full items-center justify-center gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} ${
+		`flex w-full items-center justify-between gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} ${
 			isActive ? 'bg-[#f1f8ea] text-[#2f8f2f]' : 'text-[#0f172a] hover:bg-[#f4f8fc]'
 		}`;
 
 	const mobileLayananItemClass = (isActive = false) =>
-		`menu-item-static nav-menu-font block w-full px-3 py-2 text-center text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] transition-colors duration-200 ${
+		`menu-item-static nav-menu-font block w-full px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] transition-colors duration-200 ${
 			isActive ? 'text-[#2f8f2f]' : 'text-[#334155] hover:text-[#2f8f2f]'
 		}`;
 
@@ -690,7 +690,7 @@
 			class="border-t border-[var(--line)] bg-white px-4 pt-3 pb-4 shadow-[0_26px_46px_-34px_rgba(15,23,42,0.56)] lg:hidden"
 			transition:slide={{ duration: 280, easing: cubicOut }}
 		>
-			<div class="mx-auto flex w-full max-w-[18.25rem] flex-col items-center gap-2.5">
+			<div class="flex w-full flex-col items-start gap-2.5">
 				<a href={navHref('beranda')} class={mobileLinkClass(false)} onclick={handleBerandaClick}>
 					Beranda
 				</a>
@@ -703,7 +703,7 @@
 				>
 					<span class="font-semibold">Layanan</span>
 					<ChevronDown
-						class={`h-4 w-4 transition-transform duration-200 ${isMobileLayananOpen ? 'rotate-180' : ''}`}
+						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobileLayananOpen ? 'rotate-180' : ''}`}
 						strokeWidth={2.2}
 						aria-hidden="true"
 					/>
@@ -741,7 +741,7 @@
 
 				<a
 					href="/login"
-					class="nav-menu-font mt-3 inline-flex min-w-[9.25rem] items-center justify-center gap-2 rounded-full bg-[#64AD31] px-6 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
+					class="nav-menu-font mt-3 inline-flex min-w-[9.25rem] items-center justify-start gap-2 rounded-full bg-[#64AD31] px-5 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
 					onclick={closeMenus}
 				>
 					<LogIn class="h-[1.1rem] w-[1.1rem]" strokeWidth={2.15} aria-hidden="true" />
