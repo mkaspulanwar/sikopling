@@ -3,6 +3,7 @@
 	import { cubicOut } from 'svelte/easing';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { page } from '$app/state';
+	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
 	import LogIn from 'lucide-svelte/icons/log-in';
@@ -96,12 +97,14 @@
 	let isSearchIndexing = $state(false);
 	let hasHydratedSearchIndex = $state(false);
 	let universalSearchDocuments = $state<SearchDocument[]>(fallbackSearchDocuments);
+	let isMobileViewport = $state(false);
 	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
 	let isNavVisible = $state(true);
 	let lastScrollY = $state(typeof window !== 'undefined' ? window.scrollY : 0);
 	let currentHash = $state('');
 	let layananDropdown = $state<HTMLDivElement | null>(null);
 	let layananCloseTimer: ReturnType<typeof setTimeout> | null = null;
+	const desktopNavBreakpoint = 1024;
 
 	function cleanText(value: string) {
 		return value.replace(/\s+/g, ' ').trim();
@@ -383,11 +386,24 @@
 		}
 	};
 
+	const updateViewportState = () => {
+		if (typeof window === 'undefined') return;
+		isMobileViewport = window.innerWidth < desktopNavBreakpoint;
+		if (isMobileViewport) {
+			isNavVisible = true;
+		}
+	};
+
 	const updateScrollState = () => {
 		if (typeof window === 'undefined') return;
 		const currentScrollY = Math.max(window.scrollY, 0);
 		const scrollDelta = currentScrollY - lastScrollY;
 		isScrolled = currentScrollY > 18;
+		if (isMobileViewport) {
+			isNavVisible = true;
+			lastScrollY = currentScrollY;
+			return;
+		}
 
 		if (currentScrollY <= 8) {
 			isNavVisible = true;
@@ -405,12 +421,15 @@
 
 	onMount(() => {
 		lastScrollY = typeof window !== 'undefined' ? Math.max(window.scrollY, 0) : 0;
+		updateViewportState();
 		isNavVisible = true;
 		updateScrollState();
 		updateHashState();
 		void hydrateUniversalSearchIndex();
 		const frameId = requestAnimationFrame(updateScrollState);
+		window.addEventListener('resize', updateViewportState);
 		return () => {
+			window.removeEventListener('resize', updateViewportState);
 			cancelAnimationFrame(frameId);
 			clearLayananCloseTimer();
 		};
@@ -479,7 +498,12 @@
 	});
 
 	const shouldShowNav = () =>
-		isNavVisible || isMobileOpen || isSearchOpen || isLayananOpen || isMobileLayananOpen;
+		isMobileViewport ||
+		isNavVisible ||
+		isMobileOpen ||
+		isSearchOpen ||
+		isLayananOpen ||
+		isMobileLayananOpen;
 
 	const navClass = () =>
 		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-300 ${
@@ -505,7 +529,7 @@
 		'menu-item-static nav-menu-font w-full rounded-lg px-4 py-3 text-left text-[1rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200';
 
 	const mobileLinkClass = (isActive = false) =>
-		`block ${mobileNavBaseClass} ${
+		`flex w-full items-center justify-between gap-2 ${mobileNavBaseClass} ${
 			isActive ? 'bg-[#f1f8ea] text-[#2f8f2f]' : 'text-[#0f172a] hover:bg-[#f4f8fc]'
 		}`;
 
@@ -515,9 +539,13 @@
 		}`;
 
 	const mobileLayananItemClass = (isActive = false) =>
-		`menu-item-static nav-menu-font block w-full px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] transition-colors duration-200 ${
-			isActive ? 'text-[#2f8f2f]' : 'text-[#334155] hover:text-[#2f8f2f]'
+		`menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] transition-colors duration-200 ${
+			isActive
+				? 'bg-[#f1f8ea] text-[#2f8f2f]'
+				: 'text-[#334155] hover:bg-[#f4f8fc] hover:text-[#2f8f2f]'
 		}`;
+
+	const mobileArrowIconClass = 'h-3.5 w-3.5 shrink-0 opacity-80';
 
 	const logoClass = () =>
 		`h-auto w-[11.4rem] object-contain transition-[filter] duration-300 sm:w-[12rem] lg:w-[13rem] ${
@@ -692,7 +720,8 @@
 		>
 			<div class="flex w-full flex-col items-start gap-2.5">
 				<a href={navHref('beranda')} class={mobileLinkClass(false)} onclick={handleBerandaClick}>
-					Beranda
+					<span>Beranda</span>
+					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 				</a>
 
 				<button
@@ -711,7 +740,7 @@
 
 				{#if isMobileLayananOpen}
 					<div
-						class="w-full space-y-0.5 py-0.5"
+						class="ml-3 w-[calc(100%-0.75rem)] space-y-1 border-l border-[#dbe3ec] py-1 pl-3"
 						transition:slide={{ duration: 220, easing: cubicOut }}
 					>
 						{#each layananItems as item}
@@ -721,11 +750,13 @@
 									class={mobileLayananItemClass(isPathActive(item.href))}
 									onclick={handleLayananItemClick}
 								>
-									{item.title}
+									<span>{item.title}</span>
+									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 								</a>
 							{:else}
 								<button type="button" class={mobileLayananItemClass(false)}>
-									{item.title}
+									<span>{item.title}</span>
+									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 								</button>
 							{/if}
 						{/each}
@@ -733,15 +764,17 @@
 				{/if}
 
 				<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
-					Tentang
+					<span>Tentang</span>
+					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 				</a>
 				<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
-					Kontak
+					<span>Kontak</span>
+					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 				</a>
 
 				<a
 					href="/login"
-					class="nav-menu-font mt-3 inline-flex min-w-[9.25rem] items-center justify-start gap-2 rounded-full bg-[#64AD31] px-5 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
+					class="nav-menu-font mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#64AD31] px-5 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
 					onclick={closeMenus}
 				>
 					<LogIn class="h-[1.1rem] w-[1.1rem]" strokeWidth={2.15} aria-hidden="true" />
