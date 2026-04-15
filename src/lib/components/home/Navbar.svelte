@@ -528,22 +528,14 @@
 	const mobileNavBaseClass =
 		'menu-item-static nav-menu-font w-full rounded-lg px-4 py-3 text-left text-[1rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200';
 
-	const mobileLinkClass = (isActive = false) =>
-		`flex w-full items-center justify-between gap-2 ${mobileNavBaseClass} ${
-			isActive ? 'bg-[#f1f8ea] text-[#2f8f2f]' : 'text-[#0f172a] hover:bg-[#f4f8fc]'
-		}`;
+	const mobileLinkClass = () =>
+		`flex w-full items-center justify-between gap-2 ${mobileNavBaseClass} text-[#0f172a] hover:bg-[#f4f8fc]`;
 
-	const mobileLayananClass = (isActive = false) =>
-		`flex w-full items-center justify-between gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} ${
-			isActive ? 'bg-[#f1f8ea] text-[#2f8f2f]' : 'text-[#0f172a] hover:bg-[#f4f8fc]'
-		}`;
+	const mobileLayananClass = () =>
+		`flex w-full items-center justify-between gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} text-[#0f172a] hover:bg-[#f4f8fc]`;
 
-	const mobileLayananItemClass = (isActive = false) =>
-		`menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] transition-colors duration-200 ${
-			isActive
-				? 'bg-[#f1f8ea] text-[#2f8f2f]'
-				: 'text-[#334155] hover:bg-[#f4f8fc] hover:text-[#2f8f2f]'
-		}`;
+	const mobileLayananItemClass = () =>
+		'menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155] transition-colors duration-200 hover:bg-[#f4f8fc] hover:text-[#2f8f2f]';
 
 	const mobileArrowIconClass = 'h-3.5 w-3.5 shrink-0 opacity-80';
 
@@ -715,18 +707,18 @@
 
 	{#if showNavMenus && isMobileOpen}
 		<div
-			class="border-t border-[var(--line)] bg-white px-4 pt-3 pb-4 shadow-[0_26px_46px_-34px_rgba(15,23,42,0.56)] lg:hidden"
+			class="bg-white px-4 pt-3 pb-4 shadow-[0_26px_46px_-34px_rgba(15,23,42,0.56)] lg:hidden"
 			transition:slide={{ duration: 280, easing: cubicOut }}
 		>
 			<div class="flex w-full flex-col items-start gap-2.5">
-				<a href={navHref('beranda')} class={mobileLinkClass(false)} onclick={handleBerandaClick}>
+				<a href={navHref('beranda')} class={mobileLinkClass()} onclick={handleBerandaClick}>
 					<span>Beranda</span>
 					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 				</a>
 
 				<button
 					type="button"
-					class={mobileLayananClass(isMobileLayananOpen || isLayananActive())}
+					class={mobileLayananClass()}
 					aria-expanded={isMobileLayananOpen}
 					onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
 				>
@@ -747,14 +739,14 @@
 							{#if item.href}
 								<a
 									href={mapSectionHref(item.href)}
-									class={mobileLayananItemClass(isPathActive(item.href))}
+									class={mobileLayananItemClass()}
 									onclick={handleLayananItemClick}
 								>
 									<span>{item.title}</span>
 									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 								</a>
 							{:else}
-								<button type="button" class={mobileLayananItemClass(false)}>
+								<button type="button" class={mobileLayananItemClass()}>
 									<span>{item.title}</span>
 									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 								</button>
@@ -763,11 +755,11 @@
 					</div>
 				{/if}
 
-				<a href="/tentang" class={mobileLinkClass(isPathActive('/tentang'))} onclick={closeMenus}>
+				<a href="/tentang" class={mobileLinkClass()} onclick={closeMenus}>
 					<span>Tentang</span>
 					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 				</a>
-				<a href="/kontak" class={mobileLinkClass(isPathActive('/kontak'))} onclick={closeMenus}>
+				<a href="/kontak" class={mobileLinkClass()} onclick={closeMenus}>
 					<span>Kontak</span>
 					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
 				</a>
