@@ -194,7 +194,38 @@
 						Ringkasan berikut membantu Anda melihat hubungan antara kategori data, sumber, tujuan, dan
 						masa retensi.
 					</p>
-					<div class="mt-4 overflow-hidden rounded-2xl border border-[#dce8d8]">
+
+					<div class="mt-4 space-y-3 md:hidden">
+						{#each matrixRows as row}
+							<article class="rounded-2xl border border-[#dce8d8] bg-[#fbfdf9] p-4">
+								<p class="text-[0.68rem] font-semibold tracking-[0.12em] text-[#2e7c2a] uppercase">
+									{row.scope}
+								</p>
+								<dl class="mt-2 space-y-2">
+									<div class="rounded-xl border border-[#e4ece2] bg-white px-3 py-2.5">
+										<dt class="text-[0.68rem] font-semibold tracking-[0.08em] text-[#4d6a43] uppercase">
+											Sumber
+										</dt>
+										<dd class="mt-1 text-sm leading-relaxed text-[#495a6d]">{row.source}</dd>
+									</div>
+									<div class="rounded-xl border border-[#e4ece2] bg-white px-3 py-2.5">
+										<dt class="text-[0.68rem] font-semibold tracking-[0.08em] text-[#4d6a43] uppercase">
+											Tujuan Pemrosesan
+										</dt>
+										<dd class="mt-1 text-sm leading-relaxed text-[#495a6d]">{row.purpose}</dd>
+									</div>
+									<div class="rounded-xl border border-[#e4ece2] bg-white px-3 py-2.5">
+										<dt class="text-[0.68rem] font-semibold tracking-[0.08em] text-[#4d6a43] uppercase">
+											Retensi
+										</dt>
+										<dd class="mt-1 text-sm leading-relaxed text-[#495a6d]">{row.retention}</dd>
+									</div>
+								</dl>
+							</article>
+						{/each}
+					</div>
+
+					<div class="mt-4 hidden overflow-hidden rounded-2xl border border-[#dce8d8] md:block">
 						<div class="overflow-x-auto">
 							<table class="w-full min-w-[44rem] border-collapse text-left">
 								<thead class="bg-[#f3f9ef]">
