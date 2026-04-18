@@ -486,10 +486,18 @@
 
 	$effect(() => {
 		if (typeof document === 'undefined') return;
-		const previousOverflow = document.body.style.overflow;
-		document.body.style.overflow = isSearchOpen ? 'hidden' : '';
+		const previousBodyOverflow = document.body.style.overflow;
+		const previousHtmlOverflow = document.documentElement.style.overflow;
+		if (isSearchOpen) {
+			document.body.style.overflow = 'hidden';
+			document.documentElement.style.overflow = 'hidden';
+		} else {
+			document.body.style.overflow = '';
+			document.documentElement.style.overflow = '';
+		}
 		return () => {
-			document.body.style.overflow = previousOverflow;
+			document.body.style.overflow = previousBodyOverflow;
+			document.documentElement.style.overflow = previousHtmlOverflow;
 		};
 	});
 
@@ -795,6 +803,8 @@
 		role="dialog"
 		aria-modal="true"
 		aria-labelledby="universal-search-heading"
+		data-lenis-prevent
+		data-lenis-prevent-wheel
 		class="fixed inset-x-4 top-[5.15rem] z-[86] mx-auto w-auto max-w-3xl sm:inset-x-6 sm:top-[5.15rem] sm:w-full"
 		transition:fly={{ y: -10, duration: 170 }}
 	>
@@ -858,6 +868,8 @@
 			</div>
 
 			<div
+				data-lenis-prevent
+				data-lenis-prevent-wheel
 				class="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-xl border border-[var(--line)] bg-[var(--surface)]"
 			>
 				{#if searchResults.length > 0}
