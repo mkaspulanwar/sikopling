@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount, tick } from 'svelte';
-	import { cubicOut } from 'svelte/easing';
+	import { cubicInOut } from 'svelte/easing';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { page } from '$app/state';
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
@@ -134,6 +134,7 @@
 
 	let isLayananOpen = $state(false);
 	let isMobileOpen = $state(false);
+	let isMobileMenuAnimating = $state(false);
 	let isMobileLayananOpen = $state(false);
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
@@ -412,7 +413,6 @@
 	const openSearchModal = async () => {
 		isSearchOpen = true;
 		isMobileOpen = false;
-		isMobileLayananOpen = false;
 		isLayananOpen = false;
 		if (!shouldAutoFocusSearch()) return;
 		await tick();
@@ -477,7 +477,6 @@
 	const closeMenus = () => {
 		closeLayananMenu();
 		isMobileOpen = false;
-		isMobileLayananOpen = false;
 	};
 
 	const toggleMobileMenu = () => {
@@ -486,6 +485,22 @@
 		}
 		isMobileOpen = !isMobileOpen;
 		isLayananOpen = false;
+	};
+
+	const handleMobileMenuIntroStart = () => {
+		isMobileMenuAnimating = true;
+	};
+
+	const handleMobileMenuIntroEnd = () => {
+		isMobileMenuAnimating = false;
+	};
+
+	const handleMobileMenuOutroStart = () => {
+		isMobileMenuAnimating = true;
+	};
+
+	const handleMobileMenuOutroEnd = () => {
+		isMobileMenuAnimating = false;
 		if (!isMobileOpen) {
 			isMobileLayananOpen = false;
 		}
@@ -577,7 +592,8 @@
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
 	const useLightNav = () => isLandingPage() && !isScrolled;
-	const shouldUseLightNav = () => useLightNav() && !isMobileOpen;
+	const isMobileMenuActive = () => isMobileOpen || isMobileMenuAnimating;
+	const shouldUseLightNav = () => useLightNav() && !isMobileMenuActive();
 	const navHref = (sectionId: string) =>
 		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
 	const scrollToBeranda = () => {
@@ -644,16 +660,16 @@
 	const shouldShowNav = () =>
 		isMobileViewport ||
 		isNavVisible ||
-		isMobileOpen ||
+		isMobileMenuActive() ||
 		isSearchOpen ||
 		isLayananOpen ||
 		isMobileLayananOpen;
 
 	const navClass = () =>
-		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-300 ${
+		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
 			shouldShowNav() ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
 		} ${
-			isMobileOpen
+			isMobileMenuActive()
 				? 'bg-white text-[var(--ink)] shadow-[0_20px_38px_-30px_rgba(15,23,42,0.46)]'
 				: shouldUseLightNav()
 					? 'bg-transparent text-white shadow-none'
@@ -852,7 +868,11 @@
 	{#if showNavMenus && isMobileOpen}
 		<div
 			class="bg-white px-4 pt-3 pb-4 shadow-[0_26px_46px_-34px_rgba(15,23,42,0.56)] lg:hidden"
-			transition:slide={{ duration: 280, easing: cubicOut }}
+			transition:slide={{ duration: 360, easing: cubicInOut }}
+			onintrostart={handleMobileMenuIntroStart}
+			onintroend={handleMobileMenuIntroEnd}
+			onoutrostart={handleMobileMenuOutroStart}
+			onoutroend={handleMobileMenuOutroEnd}
 		>
 			<div class="flex w-full flex-col items-start gap-2.5">
 				<a href={navHref('beranda')} class={mobileLinkClass()} onclick={handleBerandaClick}>
@@ -877,7 +897,7 @@
 				{#if isMobileLayananOpen}
 					<div
 						class="ml-3 w-[calc(100%-0.75rem)] space-y-1 border-l border-[#dbe3ec] py-1 pl-3"
-						transition:slide={{ duration: 220, easing: cubicOut }}
+						transition:slide={{ duration: 280, easing: cubicInOut }}
 					>
 						{#each layananItems as item}
 							{#if item.href}
