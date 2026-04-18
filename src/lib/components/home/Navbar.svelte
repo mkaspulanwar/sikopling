@@ -831,7 +831,7 @@
 				</div>
 				<button
 					type="button"
-					class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--muted)] transition-colors hover:text-[var(--ink)]"
+					class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[var(--secondary)] bg-[var(--secondary-soft)] text-[var(--secondary)] transition-colors hover:bg-[#e3f4db] hover:text-[#2f8e39]"
 					aria-label="Tutup pencarian"
 					onclick={closeSearchModal}
 				>
@@ -860,7 +860,7 @@
 						</span>
 					{/if}
 					<kbd
-						class="hidden h-7 items-center rounded-md border border-[var(--line)] bg-[#f7f9fc] px-2 text-[0.7rem] font-medium tracking-[0.06em] text-[var(--muted)] uppercase sm:inline-flex"
+						class="hidden h-7 items-center rounded-md border border-[var(--secondary)] bg-[var(--secondary-soft)] px-2 text-[0.7rem] font-medium tracking-[0.06em] text-[var(--secondary)] uppercase sm:inline-flex"
 					>
 						Ctrl K
 					</kbd>
