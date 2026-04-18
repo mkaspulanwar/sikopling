@@ -42,7 +42,11 @@
       gsap.registerPlugin(ScrollTrigger);
       ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
 
-      const lenis = new Lenis();
+      const lenis = new Lenis({
+        // Allow native scroll inside modal/popup containers.
+        prevent: (node: Element | null) =>
+          Boolean(node?.closest?.("[data-lenis-prevent]")),
+      });
       lenis.on("scroll", ScrollTrigger.update);
 
       const tickerFn = (time: number) => lenis.raf(time * 1000);
