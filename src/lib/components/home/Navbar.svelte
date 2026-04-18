@@ -33,6 +33,11 @@
 		normalizedKeywords: string;
 		normalizedContent: string;
 	};
+	type SearchIndexCachePayload = {
+		version: number;
+		savedAt: number;
+		documents: SearchDocument[];
+	};
 
 	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen'];
 
@@ -48,6 +53,9 @@
 	];
 
 	const showNavMenus = true;
+	const SEARCH_INDEX_CACHE_KEY = 'sikopling:universal-search-index';
+	const SEARCH_INDEX_CACHE_VERSION = 1;
+	const SEARCH_INDEX_CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 	const searchableRoutes: SearchRoute[] = [
 		{ path: '/', title: 'Beranda', category: 'Halaman', priority: 96 },
 		{
@@ -68,6 +76,15 @@
 	];
 	const fallbackSearchDocuments: SearchDocument[] = [
 		buildSearchDocument({
+			title: 'Beranda',
+			description: 'Halaman utama SI-KOPLING dengan ringkasan layanan dan informasi terbaru.',
+			href: '/',
+			category: 'Halaman',
+			content: 'Beranda, informasi layanan, alur pengajuan, dan panduan SI-KOPLING.',
+			keywords: ['beranda', 'home', 'si-kopling', 'layanan lingkungan'],
+			priority: 96
+		}),
+		buildSearchDocument({
 			title: 'Antrian Dokumen Lingkungan',
 			description: 'Layanan pemantauan progres pengajuan dokumen lingkungan.',
 			href: '/layanan/dokling',
@@ -85,6 +102,33 @@
 			content: 'Persetujuan teknis, air limbah, progres evaluasi dokumen dan penjadwalan rapat.',
 			keywords: ['pertek', 'persetujuan teknis', 'air', 'limbah', 'lingkungan'],
 			priority: 97
+		}),
+		buildSearchDocument({
+			title: 'Tentang',
+			description: 'Profil SI-KOPLING, tujuan layanan, dan komitmen pelayanan lingkungan.',
+			href: '/tentang',
+			category: 'Halaman',
+			content: 'Tentang SI-KOPLING, visi misi, dan informasi umum layanan.',
+			keywords: ['tentang', 'profil', 'informasi layanan', 'si-kopling'],
+			priority: 66
+		}),
+		buildSearchDocument({
+			title: 'Kontak',
+			description: 'Informasi kontak untuk bantuan dan konsultasi layanan SI-KOPLING.',
+			href: '/kontak',
+			category: 'Halaman',
+			content: 'Kontak layanan, bantuan pengguna, dan kanal komunikasi resmi.',
+			keywords: ['kontak', 'bantuan', 'cs', 'layanan'],
+			priority: 64
+		}),
+		buildSearchDocument({
+			title: 'Login',
+			description: 'Masuk ke akun SI-KOPLING untuk mengakses layanan dan pemantauan dokumen.',
+			href: '/login',
+			category: 'Halaman',
+			content: 'Masuk akun, autentikasi pengguna, dan akses dashboard layanan.',
+			keywords: ['login', 'masuk', 'akun', 'autentikasi'],
+			priority: 60
 		})
 	];
 
@@ -95,7 +139,6 @@
 	let searchQuery = $state('');
 	let searchInput = $state<HTMLInputElement | null>(null);
 	let isSearchIndexing = $state(false);
-	let hasHydratedSearchIndex = $state(false);
 	let universalSearchDocuments = $state<SearchDocument[]>(fallbackSearchDocuments);
 	let isMobileViewport = $state(false);
 	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
@@ -164,6 +207,88 @@
 			}
 		}
 		return [...documentMap.values()];
+	};
+	const isSearchCategory = (value: unknown): value is SearchCategory =>
+		value === 'Halaman' || value === 'Bagian' || value === 'Layanan';
+	const toSearchDocument = (value: unknown): SearchDocument | null => {
+		if (!value || typeof value !== 'object') return null;
+		const candidate = value as Record<string, unknown>;
+		const title = typeof candidate.title === 'string' ? cleanText(candidate.title) : '';
+		const description = typeof candidate.description === 'string' ? cleanText(candidate.description) : '';
+		const href = typeof candidate.href === 'string' ? cleanText(candidate.href) : '';
+		const category = candidate.category;
+		const priority =
+			typeof candidate.priority === 'number' && Number.isFinite(candidate.priority)
+				? candidate.priority
+				: 70;
+		if (!title || !description || !href || !isSearchCategory(category)) return null;
+		const id =
+			typeof candidate.id === 'string' && candidate.id.trim()
+				? candidate.id
+				: createSearchId(`${href}-${title}`);
+		return {
+			id,
+			title,
+			description,
+			href,
+			category,
+			priority,
+			normalizedTitle:
+				typeof candidate.normalizedTitle === 'string'
+					? candidate.normalizedTitle
+					: normalizeSearchText(title),
+			normalizedDescription:
+				typeof candidate.normalizedDescription === 'string'
+					? candidate.normalizedDescription
+					: normalizeSearchText(description),
+			normalizedKeywords:
+				typeof candidate.normalizedKeywords === 'string' ? candidate.normalizedKeywords : '',
+			normalizedContent:
+				typeof candidate.normalizedContent === 'string' ? candidate.normalizedContent : ''
+		};
+	};
+	const readSearchIndexCache = () => {
+		if (typeof window === 'undefined') return null;
+		try {
+			const rawValue = window.localStorage.getItem(SEARCH_INDEX_CACHE_KEY);
+			if (!rawValue) return null;
+			const parsedValue = JSON.parse(rawValue) as Partial<SearchIndexCachePayload>;
+			const isExpired =
+				typeof parsedValue.savedAt !== 'number' ||
+				Date.now() - parsedValue.savedAt > SEARCH_INDEX_CACHE_TTL_MS;
+			if (parsedValue.version !== SEARCH_INDEX_CACHE_VERSION || isExpired) {
+				window.localStorage.removeItem(SEARCH_INDEX_CACHE_KEY);
+				return null;
+			}
+			if (!Array.isArray(parsedValue.documents)) {
+				window.localStorage.removeItem(SEARCH_INDEX_CACHE_KEY);
+				return null;
+			}
+			const cachedDocuments = parsedValue.documents
+				.map((document) => toSearchDocument(document))
+				.filter((document): document is SearchDocument => Boolean(document));
+			if (cachedDocuments.length === 0) {
+				window.localStorage.removeItem(SEARCH_INDEX_CACHE_KEY);
+				return null;
+			}
+			return dedupeSearchDocuments(cachedDocuments);
+		} catch (error) {
+			console.warn('Gagal membaca cache pencarian universal.', error);
+			return null;
+		}
+	};
+	const writeSearchIndexCache = (documents: SearchDocument[]) => {
+		if (typeof window === 'undefined') return;
+		const payload: SearchIndexCachePayload = {
+			version: SEARCH_INDEX_CACHE_VERSION,
+			savedAt: Date.now(),
+			documents: dedupeSearchDocuments(documents)
+		};
+		try {
+			window.localStorage.setItem(SEARCH_INDEX_CACHE_KEY, JSON.stringify(payload));
+		} catch (error) {
+			console.warn('Gagal menyimpan cache pencarian universal.', error);
+		}
 	};
 	const searchCategoryBadgeClass = (category: SearchCategory) => {
 		switch (category) {
@@ -250,25 +375,30 @@
 		return score + document.priority;
 	};
 	const hydrateUniversalSearchIndex = async () => {
-		if (isSearchIndexing || hasHydratedSearchIndex || typeof window === 'undefined') return;
+		if (isSearchIndexing || typeof window === 'undefined') return;
 		isSearchIndexing = true;
 
 		try {
-			const dynamicDocuments: SearchDocument[] = [];
-			for (const route of searchableRoutes) {
+			const routeFetches = searchableRoutes.map(async (route) => {
 				const response = await fetch(route.path);
-				if (!response.ok) continue;
+				if (!response.ok) return [];
 				const html = await response.text();
-				dynamicDocuments.push(...extractSearchDocumentsFromHtml(route, html));
+				return extractSearchDocumentsFromHtml(route, html);
+			});
+			const results = await Promise.allSettled(routeFetches);
+			const dynamicDocuments: SearchDocument[] = [];
+			for (const result of results) {
+				if (result.status === 'fulfilled') {
+					dynamicDocuments.push(...result.value);
+				}
 			}
 
-			if (dynamicDocuments.length > 0) {
-				universalSearchDocuments = dedupeSearchDocuments([
-					...fallbackSearchDocuments,
-					...dynamicDocuments
-				]);
-				hasHydratedSearchIndex = true;
-			}
+			const nextDocuments = dedupeSearchDocuments([
+				...fallbackSearchDocuments,
+				...dynamicDocuments
+			]);
+			universalSearchDocuments = nextDocuments;
+			writeSearchIndexCache(nextDocuments);
 		} catch (error) {
 			console.error('Gagal memperbarui indeks pencarian universal.', error);
 		} finally {
@@ -284,9 +414,6 @@
 		isMobileOpen = false;
 		isMobileLayananOpen = false;
 		isLayananOpen = false;
-		if (!hasHydratedSearchIndex && !isSearchIndexing) {
-			void hydrateUniversalSearchIndex();
-		}
 		if (!shouldAutoFocusSearch()) return;
 		await tick();
 		searchInput?.focus();
@@ -430,6 +557,10 @@
 		isNavVisible = true;
 		updateScrollState();
 		updateHashState();
+		const cachedSearchDocuments = readSearchIndexCache();
+		if (cachedSearchDocuments) {
+			universalSearchDocuments = cachedSearchDocuments;
+		}
 		void hydrateUniversalSearchIndex();
 		const frameId = requestAnimationFrame(updateScrollState);
 		window.addEventListener('resize', updateViewportState);
@@ -852,13 +983,6 @@
 				</div>
 
 				<div class="flex items-center gap-2">
-					{#if isSearchIndexing}
-						<span
-							class="text-[0.71rem] font-medium tracking-[0.08em] text-[var(--muted)] uppercase"
-						>
-							Memuat indeks
-						</span>
-					{/if}
 					<kbd
 						class="hidden h-7 items-center rounded-md border border-[#b3db8d] bg-[#eff8e3] px-2 text-[0.7rem] font-medium tracking-[0.06em] text-[#3f6e16] uppercase sm:inline-flex"
 					>
