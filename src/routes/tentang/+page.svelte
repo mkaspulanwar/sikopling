@@ -190,8 +190,8 @@
 			<figure class="relative">
 				<div class="tilt-right overflow-hidden rounded-[1.75rem] border border-[#d6e5ce] bg-white p-3 shadow-[0_38px_70px_-46px_rgba(15,23,42,0.55)] sm:p-4">
 					<img
-						src="/tentang/hero-human.svg"
-						alt="Ilustrasi tim SI-KOPLING yang membantu pemrakarsa secara interaktif"
+						src="/tentang/gedung_dlh.jpeg"
+						alt="Gedung Dinas Lingkungan Hidup Provinsi Kalimantan Selatan"
 						class="h-auto w-full rounded-[1.05rem]"
 					/>
 				</div>
@@ -220,8 +220,8 @@
 
 				<div class="mt-6 overflow-hidden rounded-[1.6rem] border border-[#d8e8cd] bg-white p-3 sm:p-4">
 					<img
-						src="/tentang/history-journey.svg"
-						alt="Ilustrasi perjalanan pengembangan layanan SI-KOPLING"
+						src="/tentang/0km_tower.jpg"
+						alt="Pemandangan kawasan 0 Kilometer sebagai bagian narasi perjalanan layanan"
 						class="h-auto w-full rounded-2xl"
 					/>
 				</div>
