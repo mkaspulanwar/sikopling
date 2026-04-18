@@ -1,0 +1,50 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="2560" viewBox="0 0 1440 2560" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="720" y1="0" x2="720" y2="2560" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10251A"/>
+      <stop offset="0.45" stop-color="#0E2A1A"/>
+      <stop offset="1" stop-color="#112F1B"/>
+    </linearGradient>
+    <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(360 420) rotate(36) scale(520 580)">
+      <stop stop-color="#77D768" stop-opacity="0.58"/>
+      <stop offset="1" stop-color="#77D768" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1080 780) rotate(132) scale(500 640)">
+      <stop stop-color="#5FAAD9" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#5FAAD9" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#99E66B"/>
+      <stop offset="1" stop-color="#3A9E42"/>
+    </linearGradient>
+    <linearGradient id="leafDark" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#2A6D3B"/>
+      <stop offset="1" stop-color="#163A24"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1440" height="2560" fill="url(#bg)"/>
+  <rect width="1440" height="2560" fill="url(#glowA)"/>
+  <rect width="1440" height="2560" fill="url(#glowB)"/>
+
+  <g opacity="0.95">
+    <path d="M-120 1820C80 1600 260 1500 520 1460C340 1680 230 1860 180 2070C40 2040-40 1960-120 1820Z" fill="url(#leafDark)"/>
+    <path d="M1420 1680C1180 1560 980 1500 760 1490C920 1670 1010 1860 1060 2060C1230 2000 1330 1890 1420 1680Z" fill="url(#leafDark)"/>
+    <path d="M220 1180C420 980 620 900 860 860C720 1040 620 1220 560 1420C380 1360 290 1290 220 1180Z" fill="url(#leafDark)"/>
+  </g>
+
+  <g opacity="0.86">
+    <path d="M-100 820C140 620 380 520 640 500C470 680 360 850 300 1090C120 1040 0 950-100 820Z" fill="url(#leaf)"/>
+    <path d="M1540 960C1300 760 1080 680 820 650C980 840 1090 1030 1160 1280C1330 1230 1450 1120 1540 960Z" fill="url(#leaf)"/>
+    <path d="M640 2020C840 1830 1060 1760 1280 1760C1140 1910 1050 2070 990 2240C840 2200 730 2140 640 2020Z" fill="url(#leaf)"/>
+  </g>
+
+  <g opacity="0.3" fill="#FFFFFF">
+    <circle cx="240" cy="360" r="4"/>
+    <circle cx="1220" cy="520" r="3"/>
+    <circle cx="1060" cy="1400" r="4"/>
+    <circle cx="380" cy="1740" r="3"/>
+    <circle cx="1240" cy="2080" r="5"/>
+    <circle cx="700" cy="2300" r="3"/>
+  </g>
+</svg>

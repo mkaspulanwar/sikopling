@@ -39,6 +39,11 @@
 				return 'Sikopling Kalsel';
 		}
 	});
+
+	const isLoginPage = $derived.by(() => {
+		const pathname = page.url.pathname.replace(/\/+$/, '') || '/';
+		return pathname === '/login';
+	});
 </script>
 
 <svelte:head>
@@ -51,10 +56,14 @@
 </svelte:head>
 
 <div class="min-h-[100dvh] bg-[var(--canvas)] text-[var(--ink)]">
-	<Navbar />
-	<main class="min-h-[40dvh]">
+	{#if !isLoginPage}
+		<Navbar />
+	{/if}
+	<main class={isLoginPage ? 'min-h-[100dvh]' : 'min-h-[40dvh]'}>
 		{@render children()}
 	</main>
-	<SiteFooter />
-	<ChatbotWidget />
+	{#if !isLoginPage}
+		<SiteFooter />
+		<ChatbotWidget />
+	{/if}
 </div>
