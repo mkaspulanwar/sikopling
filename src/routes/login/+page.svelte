@@ -49,7 +49,7 @@
 		<div class="hidden h-full lg:flex lg:items-end lg:px-12 lg:pb-11 xl:px-16">
 			<div class="max-w-lg text-white">
 				<img
-					src="/layout/logo_sikopling.svg"
+					src="/layout/logo_sikopling.png"
 					alt="Logo SIKOPLING"
 					class="h-auto w-[12rem] brightness-0 invert"
 				/>
