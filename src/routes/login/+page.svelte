@@ -1,4 +1,4 @@
-<svelte:head>
+﻿<svelte:head>
 	<meta
 		name="description"
 		content="Halaman dummy login SIKOPLING. Konten lengkap akan segera tersedia."
@@ -15,7 +15,7 @@
 				Halaman Login (Dummy)
 			</h1>
 			<p class="mt-4 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-				Halaman ini masih berupa placeholder. Konten login layanan SI-KOPLING akan ditambahkan pada
+				Halaman ini masih berupa placeholder. Konten login layanan SIKOPLING akan ditambahkan pada
 				tahap berikutnya.
 			</p>
 		</div>
@@ -36,3 +36,4 @@
 		</div>
 	</div>
 </section>
+

@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { cubicInOut } from 'svelte/easing';
 	import { fade, fly, slide } from 'svelte/transition';
@@ -77,11 +77,11 @@
 	const fallbackSearchDocuments: SearchDocument[] = [
 		buildSearchDocument({
 			title: 'Beranda',
-			description: 'Halaman utama SI-KOPLING dengan ringkasan layanan dan informasi terbaru.',
+			description: 'Halaman utama SIKOPLING dengan ringkasan layanan dan informasi terbaru.',
 			href: '/',
 			category: 'Halaman',
-			content: 'Beranda, informasi layanan, alur pengajuan, dan panduan SI-KOPLING.',
-			keywords: ['beranda', 'home', 'si-kopling', 'layanan lingkungan'],
+			content: 'Beranda, informasi layanan, alur pengajuan, dan panduan SIKOPLING.',
+			keywords: ['beranda', 'home', 'SIKOPLING', 'layanan lingkungan'],
 			priority: 96
 		}),
 		buildSearchDocument({
@@ -105,16 +105,16 @@
 		}),
 		buildSearchDocument({
 			title: 'Tentang',
-			description: 'Profil SI-KOPLING, tujuan layanan, dan komitmen pelayanan lingkungan.',
+			description: 'Profil SIKOPLING, tujuan layanan, dan komitmen pelayanan lingkungan.',
 			href: '/tentang',
 			category: 'Halaman',
-			content: 'Tentang SI-KOPLING, visi misi, dan informasi umum layanan.',
-			keywords: ['tentang', 'profil', 'informasi layanan', 'si-kopling'],
+			content: 'Tentang SIKOPLING, visi misi, dan informasi umum layanan.',
+			keywords: ['tentang', 'profil', 'informasi layanan', 'SIKOPLING'],
 			priority: 66
 		}),
 		buildSearchDocument({
 			title: 'Kontak',
-			description: 'Informasi kontak untuk bantuan dan konsultasi layanan SI-KOPLING.',
+			description: 'Informasi kontak untuk bantuan dan konsultasi layanan SIKOPLING.',
 			href: '/kontak',
 			category: 'Halaman',
 			content: 'Kontak layanan, bantuan pengguna, dan kanal komunikasi resmi.',
@@ -123,7 +123,7 @@
 		}),
 		buildSearchDocument({
 			title: 'Login',
-			description: 'Masuk ke akun SI-KOPLING untuk mengakses layanan dan pemantauan dokumen.',
+			description: 'Masuk ke akun SIKOPLING untuk mengakses layanan dan pemantauan dokumen.',
 			href: '/login',
 			category: 'Halaman',
 			content: 'Masuk akun, autentikasi pengguna, dan akses dashboard layanan.',
@@ -324,7 +324,7 @@
 					href: route.path,
 					category: route.category,
 					content: pageTextContent,
-					keywords: [route.title, route.category, 'SI-KOPLING', 'layanan lingkungan'],
+					keywords: [route.title, route.category, 'SIKOPLING', 'layanan lingkungan'],
 					priority: route.priority
 				})
 			);
@@ -1282,3 +1282,4 @@
 		}
 	}
 </style>
+

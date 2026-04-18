@@ -25,14 +25,14 @@ const supportChannels: SupportChannel[] = [
 			title: 'Chatbot WhatsApp',
 			description: 'Pertanyaan cepat seputar layanan dan status dokumen.',
 			phone: '+6282118314634',
-			prefill: 'Halo Chatbot SI-KOPLING, saya ingin menanyakan informasi layanan.'
+			prefill: 'Halo Chatbot SIKOPLING, saya ingin menanyakan informasi layanan.'
 		},
 		{
 			id: 'cs',
 			title: 'Customer Service',
-			description: 'Bantuan lanjutan langsung dari tim admin SI-KOPLING.',
+			description: 'Bantuan lanjutan langsung dari tim admin SIKOPLING.',
 			phone: '+62882022795669',
-			prefill: 'Halo CS SI-KOPLING, saya butuh bantuan terkait layanan.'
+			prefill: 'Halo CS SIKOPLING, saya butuh bantuan terkait layanan.'
 	}
 ];
 
@@ -283,4 +283,5 @@ function toggleFaq(id: string) {
 		}
 	}
 </style>
+
 

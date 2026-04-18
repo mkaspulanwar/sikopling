@@ -37,7 +37,7 @@
 	const contactChannels: ContactChannel[] = [
 		{
 			id: 'chatbot',
-			name: 'Chatbot SI-KOPLING',
+			name: 'Chatbot SIKOPLING',
 			value: '+62 821-1831-4634',
 			description:
 				'Titik awal konsultasi untuk informasi layanan, alur dokumen, dan arahan kebutuhan administrasi.',
@@ -46,7 +46,7 @@
 		},
 		{
 			id: 'cs',
-			name: 'Customer Service SI-KOPLING',
+			name: 'Customer Service SIKOPLING',
 			value: '+62 882-0227-95669',
 			description:
 				'Pendampingan lanjutan saat Anda membutuhkan klarifikasi teknis atau bantuan proses yang lebih spesifik.',
@@ -64,9 +64,9 @@
 	const faqItems: FaqItem[] = [
 		{
 			id: 'faq-01',
-			question: 'Apa itu SI-KOPLING?',
+			question: 'Apa itu SIKOPLING?',
 			answer:
-				'SI-KOPLING adalah Saluran Interaktif Konsultasi Persetujuan Lingkungan yang membantu pemrakarsa mendapatkan informasi, arahan, dan pendampingan proses persetujuan lingkungan.'
+				'SIKOPLING adalah Saluran Interaktif Konsultasi Persetujuan Lingkungan yang membantu pemrakarsa mendapatkan informasi, arahan, dan pendampingan proses persetujuan lingkungan.'
 		},
 		{
 			id: 'faq-02',
@@ -78,7 +78,7 @@
 			id: 'faq-03',
 			question: 'Apakah konsultasi dilakukan tatap muka?',
 			answer:
-				'Pendekatan SI-KOPLING mengutamakan konsultasi daring agar lebih efisien, terdokumentasi, dan mudah diakses dari berbagai lokasi.'
+				'Pendekatan SIKOPLING mengutamakan konsultasi daring agar lebih efisien, terdokumentasi, dan mudah diakses dari berbagai lokasi.'
 		},
 		{
 			id: 'faq-04',
@@ -90,7 +90,7 @@
 			id: 'faq-05',
 			question: 'Bagaimana cara memantau progres dokumen?',
 			answer:
-				'Pemrakarsa mendapatkan akses pemantauan progres dokumen. Untuk klarifikasi tahapan, silakan hubungi Chatbot atau Customer Service SI-KOPLING.'
+				'Pemrakarsa mendapatkan akses pemantauan progres dokumen. Untuk klarifikasi tahapan, silakan hubungi Chatbot atau Customer Service SIKOPLING.'
 		},
 		{
 			id: 'faq-06',
@@ -127,7 +127,7 @@
 <svelte:head>
 	<meta
 		name="description"
-		content="Kontak resmi SI-KOPLING: chatbot, customer service, jam operasional, peta lokasi kantor DLH Provinsi Kalimantan Selatan, dan FAQ lengkap."
+		content="Kontak resmi SIKOPLING: chatbot, customer service, jam operasional, peta lokasi kantor DLH Provinsi Kalimantan Selatan, dan FAQ lengkap."
 	/>
 </svelte:head>
 
@@ -140,13 +140,13 @@
 	<div class="page-shell">
 		<div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
 			<div>
-				<p class="text-xs font-semibold tracking-[0.12em] text-[#6d8e46] uppercase">Kontak SI-KOPLING</p>
+				<p class="text-xs font-semibold tracking-[0.12em] text-[#6d8e46] uppercase">Kontak SIKOPLING</p>
 				<h1 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-[3.25rem]">
 					Mari Terhubung Dengan Tim Kami
 				</h1>
 				<p class="mt-4 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:text-lg">
 					Kami siap membantu kebutuhan konsultasi persetujuan lingkungan secara cepat, jelas, dan
-					mudah diakses melalui kanal resmi SI-KOPLING.
+					mudah diakses melalui kanal resmi SIKOPLING.
 				</p>
 
 				<div class="mt-6 rounded-2xl border border-[#d7e6cd] bg-[#f2f9ec] px-4 py-3 text-sm leading-relaxed text-[#335a17] sm:text-base">
@@ -160,7 +160,7 @@
 						rel="noreferrer"
 						class="inline-flex items-center justify-center rounded-full bg-[#64AD31] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4c8823]"
 					>
-						<MessageCircleMore class="mr-2 h-4 w-4" /> Chatbot SI-KOPLING
+						<MessageCircleMore class="mr-2 h-4 w-4" /> Chatbot SIKOPLING
 					</a>
 					<a
 						href="#faq-lengkap"
@@ -174,8 +174,8 @@
 			<figure class="relative">
 				<div class="hero-card overflow-hidden rounded-[1.7rem] border border-[#d7e5ce] bg-white p-3 shadow-[0_34px_66px_-45px_rgba(15,23,42,0.56)] sm:p-4">
 					<img
-						src="/kontak/si-kopling-nomor.png"
-						alt="Informasi nomor layanan SI-KOPLING"
+						src="/kontak/sikopling-nomor.png"
+						alt="Informasi nomor layanan SIKOPLING"
 						class="h-auto w-full rounded-[1rem]"
 					/>
 				</div>
@@ -299,7 +299,7 @@
 					Pertanyaan yang Sering Ditanyakan
 				</h2>
 				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-					Ringkasan jawaban cepat untuk membantu Anda memahami alur layanan SI-KOPLING.
+					Ringkasan jawaban cepat untuk membantu Anda memahami alur layanan SIKOPLING.
 				</p>
 
 				<div class="mt-6 rounded-2xl border border-[#dbe7d3] bg-[#f4faee] p-4 sm:p-5">
@@ -374,3 +374,4 @@
 		}
 	}
 </style>
+

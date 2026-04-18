@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { browser } from "$app/environment";
 	import { onMount } from "svelte";
 	import type { DotLottie } from "@lottiefiles/dotlottie-svelte";
@@ -36,7 +36,7 @@
 			target: 1248,
 			suffix: "+",
 			description:
-				"Pemrakarsa yang telah dibantu melalui kanal konsultasi interaktif SI-KOPLING.",
+				"Pemrakarsa yang telah dibantu melalui kanal konsultasi interaktif SIKOPLING.",
 		},
 		{
 			key: "dokumen",
@@ -61,7 +61,7 @@
 			target: 98,
 			suffix: "%",
 			description:
-				"Persentase tingkat kepuasan pemrakarsa berdasarkan survei layanan SI-KOPLING.",
+				"Persentase tingkat kepuasan pemrakarsa berdasarkan survei layanan SIKOPLING.",
 		},
 	];
 	const homeFaqItems: HomeFaqItem[] = [
@@ -111,7 +111,7 @@
 		{
 			title: "Media Interaktif",
 			description:
-				"Pemrakarsa wajib masuk dan melakukan konsultasi melalui chat CS SI-KOPLING sebelum proses lanjutan.",
+				"Pemrakarsa wajib masuk dan melakukan konsultasi melalui chat CS SIKOPLING sebelum proses lanjutan.",
 		},
 		{
 			title: "Pertemuan Daring",
@@ -490,13 +490,13 @@
 			<h2 id="overview-section"
 				class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.7rem]"
 			>
-				Overview Layanan SI-KOPLING Dalam Satu Tampilan
+				Overview Layanan SIKOPLING Dalam Satu Tampilan
 			</h2>
 			<p
 				class="mt-3 text-base leading-relaxed text-white/86 sm:text-lg"
 			>
 				Cuplikan ringkas alur layanan, pemantauan progres dokumen, dan
-				navigasi utama yang tersedia di website SI-KOPLING.
+				navigasi utama yang tersedia di website SIKOPLING.
 			</p>
 		</div>
 
@@ -529,7 +529,7 @@
 
 				<img
 					src="/home/safari-big-sur-light-cutout-clean.png"
-					alt="Frame browser Safari untuk menampilkan demo produk SI-KOPLING"
+					alt="Frame browser Safari untuk menampilkan demo produk SIKOPLING"
 					loading="lazy"
 					decoding="async"
 					class="demo-frame-overlay pointer-events-none absolute inset-0 z-20 h-full w-full select-none object-contain rounded-5"
@@ -576,12 +576,12 @@
 			<h2
 				class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
 			>
-				Capaian SI-KOPLING Secara Ringkas
+				Capaian SIKOPLING Secara Ringkas
 			</h2>
 			<p
 				class="mt-3 hidden sm:block text-base leading-relaxed text-[var(--muted)] sm:text-lg"
 			>
-				Berdasarkan data SI-KOPLING, metrik berikut memperlihatkan
+				Berdasarkan data SIKOPLING, metrik berikut memperlihatkan
 				performa layanan konsultasi dan persetujuan lingkungan yang
 				semakin responsif.
 			</p>
@@ -1044,3 +1044,4 @@
 		}
 	}
 </style>
+

@@ -31,9 +31,9 @@
 		},
 		{
 			phase: 'Fase 02',
-			title: 'Lahirnya Kanal SI-KOPLING',
+			title: 'Lahirnya Kanal SIKOPLING',
 			description:
-				'SI-KOPLING hadir sebagai saluran interaktif untuk mempercepat komunikasi, memberi jawaban awal, dan mengarahkan pengguna ke petugas yang tepat.'
+				'SIKOPLING hadir sebagai saluran interaktif untuk mempercepat komunikasi, memberi jawaban awal, dan mengarahkan pengguna ke petugas yang tepat.'
 		},
 		{
 			phase: 'Fase 03',
@@ -45,7 +45,7 @@
 			phase: 'Fase 04',
 			title: 'Layanan Adaptif Berkelanjutan',
 			description:
-				'Saat ini SI-KOPLING terus diperkuat dengan prinsip cepat, transparan, non-tunai, anti gratifikasi, dan ramah lingkungan.'
+				'Saat ini SIKOPLING terus diperkuat dengan prinsip cepat, transparan, non-tunai, anti gratifikasi, dan ramah lingkungan.'
 		}
 	];
 
@@ -53,7 +53,7 @@
 		{
 			title: 'Kenalan',
 			description:
-				'Saat memulai chat, SI-KOPLING menyapa dan mengenalkan topik layanan persetujuan lingkungan yang bisa dibantu.'
+				'Saat memulai chat, SIKOPLING menyapa dan mengenalkan topik layanan persetujuan lingkungan yang bisa dibantu.'
 		},
 		{
 			title: 'Pilih Menu',
@@ -66,7 +66,7 @@
 		{
 			title: 'Terhubung Petugas',
 			description:
-				'Jika perlu pendalaman, SI-KOPLING meneruskan konsultasi ke petugas layanan yang kompeten.'
+				'Jika perlu pendalaman, SIKOPLING meneruskan konsultasi ke petugas layanan yang kompeten.'
 		}
 	];
 
@@ -93,7 +93,7 @@
 		},
 		{
 			label: 'Survei Kepuasan',
-			detail: 'Bantu kami meningkatkan mutu layanan SI-KOPLING.',
+			detail: 'Bantu kami meningkatkan mutu layanan SIKOPLING.',
 			href: 'https://bit.ly/SurveyKepuasanMasyarakatDLHprovkalsel',
 			linkLabel: 'Isi Survei'
 		}
@@ -104,7 +104,7 @@
 	const accelerationSteps: AccelerationStep[] = [
 		{
 			title: 'Media Interaktif',
-			summary: 'Pemrakarsa masuk SI-KOPLING dan chat dengan petugas layanan.'
+			summary: 'Pemrakarsa masuk SIKOPLING dan chat dengan petugas layanan.'
 		},
 		{
 			title: 'Pertemuan Daring',
@@ -140,7 +140,7 @@
 <svelte:head>
 	<meta
 		name="description"
-		content="Tentang SI-KOPLING DLH Kalimantan Selatan: sejarah layanan, alur konsultasi, ruang lingkup dokumen, dan komitmen percepatan persetujuan lingkungan."
+		content="Tentang SIKOPLING DLH Kalimantan Selatan: sejarah layanan, alur konsultasi, ruang lingkup dokumen, dan komitmen percepatan persetujuan lingkungan."
 	/>
 </svelte:head>
 
@@ -153,12 +153,12 @@
 	<div class="page-shell">
 		<div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
 			<div>
-				<p class="text-xs font-semibold tracking-[0.13em] text-[#6f8d46] uppercase">Tentang SI-KOPLING</p>
+				<p class="text-xs font-semibold tracking-[0.13em] text-[#6f8d46] uppercase">Tentang SIKOPLING</p>
 				<h1 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-[3.15rem]">
 					Layanan yang Dibangun untuk Mempermudah Pemrakarsa
 				</h1>
 				<p class="mt-4 max-w-2xl text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-					SI-KOPLING (Saluran Interaktif Konsultasi Persetujuan Lingkungan) membantu akses
+					SIKOPLING (Saluran Interaktif Konsultasi Persetujuan Lingkungan) membantu akses
 					informasi, mempercepat respons layanan, dan memperkuat kualitas pendampingan proses
 					persetujuan lingkungan di Kalimantan Selatan.
 				</p>
@@ -211,10 +211,10 @@
 			<div>
 				<p class="text-xs font-semibold tracking-[0.13em] text-[#6f8d46] uppercase">Sejarah</p>
 				<h2 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
-					Perjalanan SI-KOPLING
+					Perjalanan SIKOPLING
 				</h2>
 				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-					Bagian ini merangkum evolusi layanan SI-KOPLING dari semangat awal transformasi hingga
+					Bagian ini merangkum evolusi layanan SIKOPLING dari semangat awal transformasi hingga
 					komitmen pelayanan yang terus ditingkatkan.
 				</p>
 
@@ -250,7 +250,7 @@
 					Interaksi yang Sederhana, Hasil yang Jelas
 				</h2>
 				<p class="mt-3 text-base leading-relaxed text-[var(--muted)] sm:text-lg">
-					Alur SI-KOPLING dirancang agar pengguna merasa dibimbing dari pertanyaan awal sampai
+					Alur SIKOPLING dirancang agar pengguna merasa dibimbing dari pertanyaan awal sampai
 					penanganan teknis oleh petugas layanan.
 				</p>
 
@@ -273,7 +273,7 @@
 
 			<div class="space-y-4">
 				<figure class="tilt-right overflow-hidden rounded-[1.5rem] border border-[#dce8d5] bg-[#f8fbf6] p-4">
-					<img src="/layout/maskot.svg" alt="Maskot SI-KOPLING" class="mx-auto h-[18rem] w-auto sm:h-[20rem]" />
+					<img src="/layout/maskot.svg" alt="Maskot SIKOPLING" class="mx-auto h-[18rem] w-auto sm:h-[20rem]" />
 				</figure>
 				<div class="rounded-2xl border border-[#dce8d5] bg-[#f4faee] p-4 sm:p-5">
 					<p class="text-xs font-semibold tracking-[0.1em] text-[#6f8d46] uppercase">Catatan Layanan</p>
@@ -385,11 +385,11 @@
 			<div class="max-w-2xl">
 				<p class="text-xs font-semibold tracking-[0.13em] text-[#6f8d46] uppercase">Kolaborasi Layanan</p>
 				<h2 class="mt-2 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl">
-					SI-KOPLING Siap Mendampingi Proses Anda
+					SIKOPLING Siap Mendampingi Proses Anda
 				</h2>
 				<p class="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
 					Konsultasikan kebutuhan dokumen lingkungan Anda, pantau progresnya, dan dapatkan pendampingan
-					langsung melalui kanal resmi SI-KOPLING.
+					langsung melalui kanal resmi SIKOPLING.
 				</p>
 			</div>
 
@@ -456,3 +456,4 @@
 		}
 	}
 </style>
+
