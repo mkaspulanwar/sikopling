@@ -10,21 +10,39 @@
 </svelte:head>
 
 <section class="login-scene relative isolate overflow-hidden">
-	<div class="absolute inset-0 z-0 bg-slate-950/64" aria-hidden="true"></div>
+	<div class="login-media absolute inset-0 z-0" aria-hidden="true">
+		<video
+			class="login-media-video"
+			autoplay
+			muted
+			loop
+			playsinline
+			preload="metadata"
+		>
+			<source
+				src="/home/video-hero.mp4"
+				type="video/mp4"
+				media="(min-width: 641px)"
+			/>
+			<source src="/home/video-hero.webm" type="video/webm" />
+			<source src="/home/video-hero.mp4" type="video/mp4" />
+		</video>
+	</div>
+	<div class="absolute inset-0 z-10 bg-slate-950/64" aria-hidden="true"></div>
 	<div
-		class="absolute inset-0 z-0 bg-[radial-gradient(circle_at_14%_20%,rgba(109,206,116,0.2),transparent_42%),radial-gradient(circle_at_86%_68%,rgba(79,142,210,0.18),transparent_38%)]"
+		class="absolute inset-0 z-10 bg-[radial-gradient(circle_at_14%_20%,rgba(109,206,116,0.2),transparent_42%),radial-gradient(circle_at_86%_68%,rgba(79,142,210,0.18),transparent_38%)]"
 		aria-hidden="true"
 	></div>
 
 	<a
 		href="/"
-		class="absolute top-[max(0.95rem,calc(env(safe-area-inset-top)+0.45rem))] left-[max(0.95rem,calc(env(safe-area-inset-left)+0.45rem))] z-30 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/14 px-3.5 py-2 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/22"
+		class="absolute top-[max(0.95rem,calc(env(safe-area-inset-top)+0.45rem))] left-[max(0.95rem,calc(env(safe-area-inset-left)+0.45rem))] z-30 inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/14 px-3.5 py-2 text-sm font-semibold text-white backdrop-blur-md transition-colors hover:bg-white/22 lg:left-12 xl:left-16"
 	>
 		<ArrowLeft class="h-4 w-4" />
 		<span>Beranda</span>
 	</a>
 
-	<div class="relative z-10 h-full lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(25rem,34rem)]">
+	<div class="relative z-20 h-full lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(25rem,34rem)]">
 		<div class="hidden h-full lg:flex lg:items-end lg:px-12 lg:pb-11 xl:px-16">
 			<div class="max-w-lg text-white">
 				<img
@@ -109,13 +127,16 @@
 								Belum punya akun? Hubungi administrator layanan SIKOPLING.
 							</p>
 						</div>
+						<p class="mt-4 hidden text-center text-xs text-white/84 lg:block">
+							&copy; 2026 Dinas Lingkungan Hidup Kalimantan Selatan
+						</p>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<p class="pointer-events-none absolute inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-20 px-4 text-center text-xs text-white/84 sm:text-sm">
+	<p class="pointer-events-none absolute inset-x-0 bottom-[max(0.75rem,env(safe-area-inset-bottom))] z-20 px-4 text-center text-xs text-white/84 sm:text-sm lg:hidden">
 		&copy; 2026 Dinas Lingkungan Hidup Kalimantan Selatan
 	</p>
 </section>
@@ -125,10 +146,16 @@
 		height: 100vh;
 		min-height: 100vh;
 		background-color: #09120d;
-		background-image: url('/login/bg-illustration.svg');
-		background-repeat: no-repeat;
-		background-position: center center;
-		background-size: cover;
+	}
+
+	.login-media {
+		pointer-events: none;
+	}
+
+	.login-media-video {
+		height: 100%;
+		width: 100%;
+		object-fit: cover;
 	}
 
 	@supports (height: 100dvh) {
