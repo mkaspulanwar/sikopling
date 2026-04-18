@@ -148,8 +148,8 @@
 		>
 			<p>&copy; 2026 Dinas Lingkungan Hidup Kalimantan Selatan</p>
 			<div class="mt-2 flex items-center justify-start gap-4 text-[11px] sm:mt-0 sm:justify-end sm:text-xs">
-				<a href="/ketentuan-layanan" class="font-medium text-black hover:underline">Term</a>
-				<a href="/kebijakan-privasi" class="font-medium text-black hover:underline">Privacy</a>
+				<a href="/ketentuan-layanan" class="font-medium text-black hover:underline">Ketentuan Layanan</a>
+				<a href="/kebijakan-privasi" class="font-medium text-black hover:underline">Kebijakan Privasi</a>
 			</div>
 		</div>
 	</div>

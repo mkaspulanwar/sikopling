@@ -14,6 +14,10 @@
 		title: string;
 		href?: string;
 	};
+	type TentangItem = {
+		title: string;
+		href: string;
+	};
 	type SearchCategory = 'Halaman' | 'Bagian' | 'Layanan';
 	type SearchRoute = {
 		path: string;
@@ -51,6 +55,20 @@
 			href: '/layanan/pertek'
 		}
 	];
+	const tentangItems: TentangItem[] = [
+		{
+			title: 'Profil',
+			href: '/profil'
+		},
+		{
+			title: 'Kebijakan Privasi',
+			href: '/kebijakan-privasi'
+		},
+		{
+			title: 'Ketentuan Layanan',
+			href: '/ketentuan-layanan'
+		}
+	];
 
 	const showNavMenus = true;
 	const SEARCH_INDEX_CACHE_KEY = 'sikopling:universal-search-index';
@@ -70,7 +88,9 @@
 			category: 'Layanan',
 			priority: 97
 		},
-		{ path: '/tentang', title: 'Tentang', category: 'Halaman', priority: 66 },
+		{ path: '/profil', title: 'Profil', category: 'Halaman', priority: 66 },
+		{ path: '/kebijakan-privasi', title: 'Kebijakan Privasi', category: 'Halaman', priority: 62 },
+		{ path: '/ketentuan-layanan', title: 'Ketentuan Layanan', category: 'Halaman', priority: 61 },
 		{ path: '/kontak', title: 'Kontak', category: 'Halaman', priority: 64 },
 		{ path: '/login', title: 'Login', category: 'Halaman', priority: 60 }
 	];
@@ -104,13 +124,31 @@
 			priority: 97
 		}),
 		buildSearchDocument({
-			title: 'Tentang',
+			title: 'Profil',
 			description: 'Profil SIKOPLING, tujuan layanan, dan komitmen pelayanan lingkungan.',
-			href: '/tentang',
+			href: '/profil',
 			category: 'Halaman',
-			content: 'Tentang SIKOPLING, visi misi, dan informasi umum layanan.',
-			keywords: ['tentang', 'profil', 'informasi layanan', 'SIKOPLING'],
+			content: 'Profil SIKOPLING, visi misi, dan informasi umum layanan.',
+			keywords: ['profil', 'tentang', 'informasi layanan', 'SIKOPLING'],
 			priority: 66
+		}),
+		buildSearchDocument({
+			title: 'Kebijakan Privasi',
+			description: 'Informasi pengelolaan data pribadi pengguna layanan SIKOPLING.',
+			href: '/kebijakan-privasi',
+			category: 'Halaman',
+			content: 'Kebijakan privasi, perlindungan data, hak pengguna, dan ketentuan data pribadi.',
+			keywords: ['privasi', 'data pribadi', 'perlindungan data', 'kebijakan'],
+			priority: 62
+		}),
+		buildSearchDocument({
+			title: 'Ketentuan Layanan',
+			description: 'Syarat dan ketentuan penggunaan layanan digital SIKOPLING.',
+			href: '/ketentuan-layanan',
+			category: 'Halaman',
+			content: 'Ketentuan layanan, syarat penggunaan, hak dan kewajiban pengguna.',
+			keywords: ['ketentuan', 'syarat layanan', 'terms', 'kebijakan layanan'],
+			priority: 61
 		}),
 		buildSearchDocument({
 			title: 'Kontak',
@@ -133,10 +171,12 @@
 	];
 
 	let isLayananOpen = $state(false);
+	let isTentangOpen = $state(false);
 	let isMobileOpen = $state(false);
 	let isMobileMenuAnimating = $state(false);
 	let mobileMenuMotionState = $state<'idle' | 'opening' | 'closing'>('idle');
 	let isMobileLayananOpen = $state(false);
+	let isMobileTentangOpen = $state(false);
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
 	let searchInput = $state<HTMLInputElement | null>(null);
@@ -148,7 +188,9 @@
 	let lastScrollY = $state(typeof window !== 'undefined' ? window.scrollY : 0);
 	let currentHash = $state('');
 	let layananDropdown = $state<HTMLDivElement | null>(null);
+	let tentangDropdown = $state<HTMLDivElement | null>(null);
 	let layananCloseTimer: ReturnType<typeof setTimeout> | null = null;
+	let tentangCloseTimer: ReturnType<typeof setTimeout> | null = null;
 	const desktopNavBreakpoint = 1024;
 
 	function cleanText(value: string) {
@@ -456,9 +498,15 @@
 		clearTimeout(layananCloseTimer);
 		layananCloseTimer = null;
 	};
+	const clearTentangCloseTimer = () => {
+		if (!tentangCloseTimer) return;
+		clearTimeout(tentangCloseTimer);
+		tentangCloseTimer = null;
+	};
 
 	const openLayananMenu = () => {
 		clearLayananCloseTimer();
+		closeTentangMenu();
 		isLayananOpen = true;
 	};
 
@@ -474,9 +522,28 @@
 			layananCloseTimer = null;
 		}, 140);
 	};
+	const openTentangMenu = () => {
+		clearTentangCloseTimer();
+		closeLayananMenu();
+		isTentangOpen = true;
+	};
+	const closeTentangMenu = () => {
+		clearTentangCloseTimer();
+		isTentangOpen = false;
+	};
+	const scheduleCloseTentangMenu = () => {
+		clearTentangCloseTimer();
+		tentangCloseTimer = setTimeout(() => {
+			isTentangOpen = false;
+			tentangCloseTimer = null;
+		}, 140);
+	};
 
 	const closeMenus = () => {
 		closeLayananMenu();
+		closeTentangMenu();
+		isMobileLayananOpen = false;
+		isMobileTentangOpen = false;
 		isMobileOpen = false;
 	};
 
@@ -486,6 +553,7 @@
 		}
 		isMobileOpen = !isMobileOpen;
 		isLayananOpen = false;
+		isTentangOpen = false;
 	};
 
 	const handleMobileMenuIntroStart = () => {
@@ -508,6 +576,7 @@
 		mobileMenuMotionState = 'idle';
 		if (!isMobileOpen) {
 			isMobileLayananOpen = false;
+			isMobileTentangOpen = false;
 		}
 	};
 
@@ -515,6 +584,9 @@
 		const target = event.target as Node | null;
 		if (layananDropdown && target && !layananDropdown.contains(target)) {
 			closeLayananMenu();
+		}
+		if (tentangDropdown && target && !tentangDropdown.contains(target)) {
+			closeTentangMenu();
 		}
 	};
 
@@ -524,6 +596,13 @@
 			return;
 		}
 		closeLayananMenu();
+	};
+	const handleTentangFocusOut = (event: FocusEvent) => {
+		const nextFocusTarget = event.relatedTarget as Node | null;
+		if (tentangDropdown && nextFocusTarget && tentangDropdown.contains(nextFocusTarget)) {
+			return;
+		}
+		closeTentangMenu();
 	};
 
 	const handleWindowKeydown = (event: KeyboardEvent) => {
@@ -561,6 +640,7 @@
 			isMobileMenuAnimating = false;
 			mobileMenuMotionState = 'idle';
 			isMobileLayananOpen = false;
+			isMobileTentangOpen = false;
 		}
 	};
 
@@ -606,14 +686,17 @@
 			window.removeEventListener('resize', updateViewportState);
 			cancelAnimationFrame(frameId);
 			clearLayananCloseTimer();
+			clearTentangCloseTimer();
 		};
 	});
 
 	const isLandingPage = () => page.url.pathname === '/';
 	const isLayananRoute = () => page.url.pathname.startsWith('/layanan');
+	const isTentangRoute = () => tentangItems.some((item) => item.href === page.url.pathname);
 	const isPathActive = (path: string) => page.url.pathname === path;
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
+	const isTentangActive = () => isTentangRoute();
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const isMobileMenuActive = () => isMobileOpen || isMobileMenuAnimating;
 	const shouldUseLightNav = () => useLightNav() && !isMobileMenuActive();
@@ -648,7 +731,13 @@
 	};
 
 	const handleLayananItemClick = () => {
-		isLayananOpen = false;
+		closeLayananMenu();
+		if (isMobileOpen) {
+			closeMenus();
+		}
+	};
+	const handleTentangItemClick = () => {
+		closeTentangMenu();
 		if (isMobileOpen) {
 			closeMenus();
 		}
@@ -686,7 +775,9 @@
 		isMobileMenuActive() ||
 		isSearchOpen ||
 		isLayananOpen ||
-		isMobileLayananOpen;
+		isTentangOpen ||
+		isMobileLayananOpen ||
+		isMobileTentangOpen;
 
 	const navClass = () =>
 		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
@@ -839,13 +930,48 @@
 					</li>
 
 					<li>
-						<a
-							href="/tentang"
-							class={desktopLinkClass(isPathActive('/tentang'))}
-							aria-current={isPathActive('/tentang') ? 'page' : undefined}
+						<div
+							class="relative"
+							role="presentation"
+							bind:this={tentangDropdown}
+							onmouseenter={openTentangMenu}
+							onmouseleave={scheduleCloseTentangMenu}
+							onfocusin={openTentangMenu}
+							onfocusout={handleTentangFocusOut}
 						>
-							Tentang
-						</a>
+							<button
+								type="button"
+								class={`${desktopLinkClass(isTentangActive())} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								aria-expanded={isTentangOpen}
+								aria-haspopup="true"
+								onclick={() => (isTentangOpen ? closeTentangMenu() : openTentangMenu())}
+							>
+								<span>Tentang</span>
+								<ChevronDown
+									class={`h-4 w-4 transition-transform duration-200 ${isTentangOpen ? 'rotate-180' : ''}`}
+									strokeWidth={2.2}
+									aria-hidden="true"
+								/>
+							</button>
+
+							{#if isTentangOpen}
+								<div
+									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,18.5rem)] -translate-x-1/2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+								>
+									<div class="space-y-1">
+										{#each tentangItems as item}
+											<a
+												href={item.href}
+												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+												onclick={handleTentangItemClick}
+											>
+												{item.title}
+											</a>
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
 					</li>
 					<li>
 						<a
@@ -917,7 +1043,10 @@
 					type="button"
 					class={mobileLayananClass()}
 					aria-expanded={isMobileLayananOpen}
-					onclick={() => (isMobileLayananOpen = !isMobileLayananOpen)}
+					onclick={() => {
+						isMobileLayananOpen = !isMobileLayananOpen;
+						if (isMobileLayananOpen) isMobileTentangOpen = false;
+					}}
 				>
 					<span class="font-semibold">Layanan</span>
 					<ChevronDown
@@ -952,10 +1081,36 @@
 					</div>
 				{/if}
 
-				<a href="/tentang" class={mobileLinkClass()} onclick={closeMenus}>
-					<span>Tentang</span>
-					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
-				</a>
+				<button
+					type="button"
+					class={mobileLayananClass()}
+					aria-expanded={isMobileTentangOpen}
+					onclick={() => {
+						isMobileTentangOpen = !isMobileTentangOpen;
+						if (isMobileTentangOpen) isMobileLayananOpen = false;
+					}}
+				>
+					<span class="font-semibold">Tentang</span>
+					<ChevronDown
+						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobileTentangOpen ? 'rotate-180' : ''}`}
+						strokeWidth={2.2}
+						aria-hidden="true"
+					/>
+				</button>
+
+				{#if isMobileTentangOpen}
+					<div
+						class="ml-3 w-[calc(100%-0.75rem)] space-y-1 border-l border-[#dbe3ec] py-1 pl-3"
+						transition:slide={{ duration: 280, easing: cubicInOut }}
+					>
+						{#each tentangItems as item}
+							<a href={item.href} class={mobileLayananItemClass()} onclick={handleTentangItemClick}>
+								<span>{item.title}</span>
+								<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+							</a>
+						{/each}
+					</div>
+				{/if}
 				<a href="/kontak" class={mobileLinkClass()} onclick={closeMenus}>
 					<span>Kontak</span>
 					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />

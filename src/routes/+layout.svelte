@@ -29,8 +29,14 @@
 				return 'Antrian Dokumen Lingkungan';
 			case '/layanan/pertek':
 				return 'Antrian Persetujuan Teknis';
+			case '/profil':
+				return 'Profil Sikopling';
 			case '/tentang':
-				return 'Tentang Sikopling';
+				return 'Profil Sikopling';
+			case '/kebijakan-privasi':
+				return 'Kebijakan Privasi Sikopling';
+			case '/ketentuan-layanan':
+				return 'Ketentuan Layanan Sikopling';
 			case '/kontak':
 				return 'Kontak Sikopling';
 			case '/login':

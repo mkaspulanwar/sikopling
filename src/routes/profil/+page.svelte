@@ -140,11 +140,11 @@
 <svelte:head>
 	<meta
 		name="description"
-		content="Tentang SIKOPLING DLH Kalimantan Selatan: sejarah layanan, alur konsultasi, ruang lingkup dokumen, dan komitmen percepatan persetujuan lingkungan."
+		content="Profil SIKOPLING DLH Kalimantan Selatan: sejarah layanan, alur konsultasi, ruang lingkup dokumen, dan komitmen percepatan persetujuan lingkungan."
 	/>
 </svelte:head>
 
-<section class="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-20" id="tentang-hero">
+<section class="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-20" id="profil-hero">
 	<div
 		class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_14%_12%,rgba(103,191,70,0.2),transparent_42%),radial-gradient(circle_at_88%_20%,rgba(74,137,211,0.18),transparent_38%)]"
 	></div>
@@ -153,7 +153,7 @@
 	<div class="page-shell">
 		<div class="grid items-center gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-12">
 			<div>
-				<p class="text-xs font-semibold tracking-[0.13em] text-[#6f8d46] uppercase">Tentang SIKOPLING</p>
+				<p class="text-xs font-semibold tracking-[0.13em] text-[#6f8d46] uppercase">Profil SIKOPLING</p>
 				<h1 class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl lg:text-[3.15rem]">
 					Layanan yang Dibangun untuk Mempermudah Pemrakarsa
 				</h1>
@@ -377,7 +377,7 @@
 	</div>
 </section>
 
-<section id="tentang-cta" class="pb-16 sm:pb-20">
+<section id="profil-cta" class="pb-16 sm:pb-20">
 	<div class="page-shell">
 		<div
 			class="rounded-[1.8rem] border border-[#dce9d3] bg-[linear-gradient(130deg,#f3faec_0%,#ffffff_48%,#eef5ff_100%)] p-6 sm:p-8 lg:flex lg:items-center lg:justify-between lg:gap-8"
