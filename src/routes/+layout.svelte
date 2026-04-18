@@ -3,7 +3,7 @@
 	import { page } from '$app/state';
 	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import favicon from '$lib/assets/favicon.png';
 	import Navbar from '$lib/components/home/Navbar.svelte';
 	import SiteFooter from '$lib/components/home/SiteFooter.svelte';
 	import ChatbotWidget from '$lib/components/home/ChatbotWidget.svelte';
@@ -53,7 +53,7 @@
 </script>
 
 <svelte:head>
-	<link rel="icon" href={favicon} />
+	<link rel="icon" href={favicon} type="image/png" />
 	<title>{pageTitle}</title>
 	<meta
 		name="description"

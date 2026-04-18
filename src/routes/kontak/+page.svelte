@@ -1,4 +1,9 @@
-﻿<script lang="ts">
+<script module lang="ts">
+	let hasMapSessionLoaded = false;
+</script>
+
+<script lang="ts">
+	import { onMount } from 'svelte';
 	import Clock3 from 'lucide-svelte/icons/clock-3';
 	import ExternalLink from 'lucide-svelte/icons/external-link';
 	import MapPin from 'lucide-svelte/icons/map-pin';
@@ -118,10 +123,36 @@
 	];
 
 	let activeFaqId = $state<string | null>(faqItems[0]?.id ?? null);
+	let mapContainer: HTMLElement | null = $state(null);
+	let shouldLoadMap = $state(hasMapSessionLoaded);
+	let isMapFrameReady = $state(false);
+
+	const loadMap = () => {
+		if (shouldLoadMap) return;
+		shouldLoadMap = true;
+		hasMapSessionLoaded = true;
+	};
 
 	const toggleFaq = (id: string) => {
 		activeFaqId = activeFaqId === id ? null : id;
 	};
+
+	onMount(() => {
+		if (!mapContainer || shouldLoadMap) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (!entry?.isIntersecting) return;
+				loadMap();
+				observer.disconnect();
+			},
+			{ rootMargin: '280px 0px', threshold: 0.01 }
+		);
+
+		observer.observe(mapContainer);
+
+		return () => observer.disconnect();
+	});
 </script>
 
 <svelte:head>
@@ -129,6 +160,12 @@
 		name="description"
 		content="Kontak resmi SIKOPLING: chatbot, customer service, jam operasional, peta lokasi kantor DLH Provinsi Kalimantan Selatan, dan FAQ lengkap."
 	/>
+	<link rel="dns-prefetch" href="//maps.google.com" />
+	<link rel="dns-prefetch" href="//www.google.com" />
+	{#if shouldLoadMap}
+		<link rel="preconnect" href="https://maps.google.com" />
+		<link rel="preconnect" href="https://www.google.com" />
+	{/if}
 </svelte:head>
 
 <section id="kontak-hero" class="relative overflow-hidden pt-28 pb-14 sm:pt-32 sm:pb-20">
@@ -272,14 +309,54 @@
 		</div>
 
 		<div class="mt-7 overflow-hidden rounded-[1.7rem] border border-[#d8e6d0] bg-white p-2.5 sm:p-3.5">
-			<div class="map-frame relative overflow-hidden rounded-[1.2rem]">
-				<iframe
-					title="Peta lokasi DLH Provinsi Kalimantan Selatan"
-					src={mapsEmbedUrl}
-					loading="lazy"
-					referrerpolicy="no-referrer-when-downgrade"
-					class="h-[24rem] w-full sm:h-[30rem]"
-				></iframe>
+			<div class="map-frame relative overflow-hidden rounded-[1.2rem]" bind:this={mapContainer}>
+				{#if shouldLoadMap}
+					<iframe
+						title="Peta lokasi DLH Provinsi Kalimantan Selatan"
+						src={mapsEmbedUrl}
+						loading="lazy"
+						referrerpolicy="no-referrer-when-downgrade"
+						class={`h-[24rem] w-full transition-opacity duration-500 sm:h-[30rem] ${
+							isMapFrameReady ? 'opacity-100' : 'opacity-0'
+						}`}
+						onload={() => (isMapFrameReady = true)}
+					></iframe>
+					{#if !isMapFrameReady}
+						<div
+							class="absolute inset-0 grid place-items-center bg-[linear-gradient(165deg,#f8fbf6_0%,#eef6e8_55%,#edf5ff_100%)]"
+						>
+							<div class="px-4 text-center">
+								<p class="text-sm font-semibold tracking-[0.08em] text-[#5f7e3f] uppercase">
+									Memuat peta interaktif
+								</p>
+								<p class="mt-2 text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+									Sedang menyiapkan Google Maps untuk Anda.
+								</p>
+							</div>
+						</div>
+					{/if}
+				{:else}
+					<div
+						class="h-[24rem] bg-[linear-gradient(160deg,#f8fbf6_0%,#eef6e8_54%,#edf5ff_100%)] sm:h-[30rem]"
+					>
+						<div class="flex h-full flex-col items-center justify-center px-5 text-center">
+							<MapPin class="h-9 w-9 text-[#4b7f22]" />
+							<p class="mt-3 text-sm font-semibold tracking-[0.08em] text-[#5f7e3f] uppercase">
+								Peta interaktif belum dimuat
+							</p>
+							<p class="mt-2 max-w-xl text-sm leading-relaxed text-[var(--muted)] sm:text-base">
+								Untuk menghemat bandwidth, peta baru dimuat saat dibutuhkan.
+							</p>
+							<button
+								type="button"
+								class="mt-4 inline-flex items-center justify-center rounded-full bg-[#64AD31] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#4c8823]"
+								onclick={loadMap}
+							>
+								Muat Peta Sekarang
+							</button>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 

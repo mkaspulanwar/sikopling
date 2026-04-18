@@ -857,7 +857,7 @@
 		>
 			<a href="/" class="flex min-w-0 items-center" onclick={handleBerandaClick}>
 				<img
-					src="/layout/logo_sikopling.svg"
+					src="/layout/logo_sikopling.png"
 					alt="Logo SIKOPLING DLH Prov Kalsel"
 					class={logoClass()}
 				/>

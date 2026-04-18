@@ -7,6 +7,13 @@
 		name="description"
 		content="Masuk ke akun SIKOPLING untuk memantau progres dokumen dan mengelola layanan persetujuan lingkungan."
 	/>
+	<link
+		rel="preload"
+		href="/home/video-hero.webm?v=20260418"
+		as="video"
+		type="video/webm"
+		media="(min-width: 641px)"
+	/>
 </svelte:head>
 
 <section class="login-scene relative isolate overflow-hidden">
@@ -19,13 +26,9 @@
 			playsinline
 			preload="metadata"
 		>
-			<source
-				src="/home/video-hero.mp4"
-				type="video/mp4"
-				media="(min-width: 641px)"
-			/>
-			<source src="/home/video-hero.webm" type="video/webm" media="(min-width: 641px)" />
-			<source src="/home/video-hero.mp4" type="video/mp4" media="(min-width: 641px)" />
+			<source src="/home/video-hero.webm?v=20260418" type="video/webm" media="(min-width: 641px)" />
+			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" media="(min-width: 641px)" />
+			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" />
 		</video>
 	</div>
 	<div class="absolute inset-0 z-10 bg-slate-950/30" aria-hidden="true"></div>

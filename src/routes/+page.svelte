@@ -401,6 +401,13 @@
 		as="fetch"
 		type="application/octet-stream"
 	/>
+	<link
+		rel="preload"
+		href="/home/video-hero.webm?v=20260418"
+		as="video"
+		type="video/webm"
+		media="(min-width: 641px)"
+	/>
 </svelte:head>
 
 <section
@@ -417,12 +424,16 @@
 			preload="metadata"
 		>
 			<source
-				src="/home/video-hero.mp4"
+				src="/home/video-hero.webm?v=20260418"
+				type="video/webm"
+				media="(min-width: 641px)"
+			/>
+			<source
+				src="/home/video-hero.mp4?v=20260418"
 				type="video/mp4"
 				media="(min-width: 641px)"
 			/>
-			<source src="/home/video-hero.webm" type="video/webm" />
-			<source src="/home/video-hero.mp4" type="video/mp4" />
+			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" />
 		</video>
 		<div class="absolute inset-0 bg-black/15"></div>
 	</div>
