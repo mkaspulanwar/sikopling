@@ -24,13 +24,13 @@
 				type="video/mp4"
 				media="(min-width: 641px)"
 			/>
-			<source src="/home/video-hero.webm" type="video/webm" />
-			<source src="/home/video-hero.mp4" type="video/mp4" />
+			<source src="/home/video-hero.webm" type="video/webm" media="(min-width: 641px)" />
+			<source src="/home/video-hero.mp4" type="video/mp4" media="(min-width: 641px)" />
 		</video>
 	</div>
-	<div class="absolute inset-0 z-10 bg-slate-950/64" aria-hidden="true"></div>
+	<div class="absolute inset-0 z-10 bg-slate-950/30" aria-hidden="true"></div>
 	<div
-		class="absolute inset-0 z-10 bg-[radial-gradient(circle_at_14%_20%,rgba(109,206,116,0.2),transparent_42%),radial-gradient(circle_at_86%_68%,rgba(79,142,210,0.18),transparent_38%)]"
+		class="absolute inset-0 z-10 bg-[radial-gradient(circle_at_14%_20%,rgba(109,206,116,0.09),transparent_42%),radial-gradient(circle_at_86%_68%,rgba(79,142,210,0.08),transparent_38%)]"
 		aria-hidden="true"
 	></div>
 
@@ -156,6 +156,19 @@
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
+	}
+
+	@media (max-width: 640px) {
+		.login-media {
+			background-image: url('/login/hutan.jpg');
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+		}
+
+		.login-media-video {
+			display: none;
+		}
 	}
 
 	@supports (height: 100dvh) {
