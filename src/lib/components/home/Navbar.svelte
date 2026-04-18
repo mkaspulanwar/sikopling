@@ -135,6 +135,7 @@
 	let isLayananOpen = $state(false);
 	let isMobileOpen = $state(false);
 	let isMobileMenuAnimating = $state(false);
+	let mobileMenuMotionState = $state<'idle' | 'opening' | 'closing'>('idle');
 	let isMobileLayananOpen = $state(false);
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
@@ -489,18 +490,22 @@
 
 	const handleMobileMenuIntroStart = () => {
 		isMobileMenuAnimating = true;
+		mobileMenuMotionState = 'opening';
 	};
 
 	const handleMobileMenuIntroEnd = () => {
 		isMobileMenuAnimating = false;
+		mobileMenuMotionState = 'idle';
 	};
 
 	const handleMobileMenuOutroStart = () => {
 		isMobileMenuAnimating = true;
+		mobileMenuMotionState = 'closing';
 	};
 
 	const handleMobileMenuOutroEnd = () => {
 		isMobileMenuAnimating = false;
+		mobileMenuMotionState = 'idle';
 		if (!isMobileOpen) {
 			isMobileLayananOpen = false;
 		}
@@ -511,6 +516,14 @@
 		if (layananDropdown && target && !layananDropdown.contains(target)) {
 			closeLayananMenu();
 		}
+	};
+
+	const handleLayananFocusOut = (event: FocusEvent) => {
+		const nextFocusTarget = event.relatedTarget as Node | null;
+		if (layananDropdown && nextFocusTarget && layananDropdown.contains(nextFocusTarget)) {
+			return;
+		}
+		closeLayananMenu();
 	};
 
 	const handleWindowKeydown = (event: KeyboardEvent) => {
@@ -535,9 +548,19 @@
 
 	const updateViewportState = () => {
 		if (typeof window === 'undefined') return;
+		const wasMobileViewport = isMobileViewport;
 		isMobileViewport = window.innerWidth < desktopNavBreakpoint;
 		if (isMobileViewport) {
 			isNavVisible = true;
+			return;
+		}
+
+		// Sinkronkan state saat berpindah dari mobile ke desktop agar navbar tidak tertahan di mode mobile.
+		if (wasMobileViewport) {
+			isMobileOpen = false;
+			isMobileMenuAnimating = false;
+			mobileMenuMotionState = 'idle';
+			isMobileLayananOpen = false;
 		}
 	};
 
@@ -670,7 +693,7 @@
 			shouldShowNav() ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
 		} ${
 			isMobileMenuActive()
-				? 'bg-white text-[var(--ink)] shadow-[0_20px_38px_-30px_rgba(15,23,42,0.46)]'
+				? 'mobile-nav-solid bg-white text-[var(--ink)] shadow-none'
 				: shouldUseLightNav()
 					? 'bg-transparent text-white shadow-none'
 				: 'bg-[var(--surface)] text-[var(--ink)] shadow-none'
@@ -696,6 +719,15 @@
 
 	const mobileLayananItemClass = () =>
 		'menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155] transition-colors duration-200 hover:bg-[#f4f8fc] hover:text-[#2f8f2f]';
+
+	const mobileMenuPanelClass = () =>
+		`mobile-menu-panel relative -mt-px bg-white px-4 pt-3 pb-4 lg:hidden ${
+			mobileMenuMotionState === 'opening'
+				? 'is-opening'
+				: mobileMenuMotionState === 'closing'
+					? 'is-closing'
+					: ''
+		}`;
 
 	const mobileArrowIconClass = 'h-3.5 w-3.5 shrink-0 opacity-80';
 
@@ -760,6 +792,7 @@
 							onmouseenter={openLayananMenu}
 							onmouseleave={scheduleCloseLayananMenu}
 							onfocusin={openLayananMenu}
+							onfocusout={handleLayananFocusOut}
 						>
 							<button
 								type="button"
@@ -867,14 +900,14 @@
 
 	{#if showNavMenus && isMobileOpen}
 		<div
-			class="bg-white px-4 pt-3 pb-4 shadow-[0_26px_46px_-34px_rgba(15,23,42,0.56)] lg:hidden"
+			class={mobileMenuPanelClass()}
 			transition:slide={{ duration: 360, easing: cubicInOut }}
 			onintrostart={handleMobileMenuIntroStart}
 			onintroend={handleMobileMenuIntroEnd}
 			onoutrostart={handleMobileMenuOutroStart}
 			onoutroend={handleMobileMenuOutroEnd}
 		>
-			<div class="flex w-full flex-col items-start gap-2.5">
+			<div class="mobile-menu-panel__content flex w-full flex-col items-start gap-2.5">
 				<a href={navHref('beranda')} class={mobileLinkClass()} onclick={handleBerandaClick}>
 					<span>Beranda</span>
 					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
@@ -1075,6 +1108,120 @@
 		position: relative;
 	}
 
+	.mobile-nav-solid {
+		/* Hindari interpolasi warna navbar saat menu mobile aktif agar tidak muncul seam di hero */
+		transition-property: box-shadow, color, opacity, transform;
+	}
+
+	.mobile-nav-solid::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: -1px;
+		height: 2px;
+		background: #fff;
+		pointer-events: none;
+	}
+
+	.mobile-menu-panel {
+		position: relative;
+		box-shadow: 0 26px 46px -34px rgba(15, 23, 42, 0.56);
+	}
+
+	.mobile-menu-panel::before {
+		content: '';
+		position: absolute;
+		inset: 0 0 auto;
+		height: 1px;
+		background: #fff;
+		pointer-events: none;
+	}
+
+	.mobile-menu-panel::after {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 1rem;
+		right: 1rem;
+		height: 2px;
+		border-radius: 999px;
+		background: linear-gradient(
+			90deg,
+			rgba(62, 177, 74, 0),
+			rgba(62, 177, 74, 0.26),
+			rgba(62, 177, 74, 0)
+		);
+		opacity: 0;
+		transform: scaleX(0.64);
+		transform-origin: center;
+		pointer-events: none;
+	}
+
+	.mobile-menu-panel.is-opening::after {
+		animation: mobile-menu-seam-open 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	.mobile-menu-panel.is-closing::after {
+		animation: mobile-menu-seam-close 280ms cubic-bezier(0.4, 0, 1, 1) both;
+	}
+
+	.mobile-menu-panel.is-opening .mobile-menu-panel__content {
+		animation: mobile-menu-content-open 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+	}
+
+	.mobile-menu-panel.is-closing .mobile-menu-panel__content {
+		animation: mobile-menu-content-close 220ms cubic-bezier(0.4, 0, 1, 1) both;
+	}
+
+	@keyframes mobile-menu-seam-open {
+		0% {
+			opacity: 0;
+			transform: scaleX(0.64);
+		}
+		45% {
+			opacity: 0.42;
+			transform: scaleX(1);
+		}
+		100% {
+			opacity: 0.1;
+			transform: scaleX(1.06);
+		}
+	}
+
+	@keyframes mobile-menu-seam-close {
+		0% {
+			opacity: 0.3;
+			transform: scaleX(1);
+		}
+		100% {
+			opacity: 0;
+			transform: scaleX(0.56);
+		}
+	}
+
+	@keyframes mobile-menu-content-open {
+		0% {
+			opacity: 0.34;
+			transform: translateY(-8px) scale(0.992);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+	}
+
+	@keyframes mobile-menu-content-close {
+		0% {
+			opacity: 1;
+			transform: translateY(0) scale(1);
+		}
+		100% {
+			opacity: 0.44;
+			transform: translateY(-6px) scale(0.992);
+		}
+	}
+
 	.mobile-menu-toggle__line {
 		position: absolute;
 		left: 50%;
@@ -1125,5 +1272,13 @@
 
 	:global(.menu-item-static:visited) {
 		text-decoration: none;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.mobile-menu-panel::after,
+		.mobile-menu-panel__content {
+			animation: none !important;
+			transition: none !important;
+		}
 	}
 </style>
