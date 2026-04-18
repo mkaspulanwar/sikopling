@@ -275,6 +275,10 @@
 			isSearchIndexing = false;
 		}
 	};
+	const shouldAutoFocusSearch = () => {
+		if (typeof window === 'undefined') return false;
+		return window.matchMedia('(min-width: 1024px)').matches;
+	};
 	const openSearchModal = async () => {
 		isSearchOpen = true;
 		isMobileOpen = false;
@@ -283,6 +287,7 @@
 		if (!hasHydratedSearchIndex && !isSearchIndexing) {
 			void hydrateUniversalSearchIndex();
 		}
+		if (!shouldAutoFocusSearch()) return;
 		await tick();
 		searchInput?.focus();
 		searchInput?.select();
