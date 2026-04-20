@@ -744,23 +744,6 @@
 	};
 
 	$effect(() => {
-		if (typeof document === 'undefined') return;
-		const previousBodyOverflow = document.body.style.overflow;
-		const previousHtmlOverflow = document.documentElement.style.overflow;
-		if (isSearchOpen) {
-			document.body.style.overflow = 'hidden';
-			document.documentElement.style.overflow = 'hidden';
-		} else {
-			document.body.style.overflow = '';
-			document.documentElement.style.overflow = '';
-		}
-		return () => {
-			document.body.style.overflow = previousBodyOverflow;
-			document.documentElement.style.overflow = previousHtmlOverflow;
-		};
-	});
-
-	$effect(() => {
 		page.url.pathname;
 		if (typeof window === 'undefined') return;
 		lastScrollY = Math.max(window.scrollY, 0);
