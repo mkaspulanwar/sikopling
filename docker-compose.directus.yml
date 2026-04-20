@@ -1,0 +1,49 @@
+services:
+  directus-db:
+    image: postgres:16-alpine
+    container_name: sikopling-directus-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DIRECTUS_DB_NAME}
+      POSTGRES_USER: ${DIRECTUS_DB_USER}
+      POSTGRES_PASSWORD: ${DIRECTUS_DB_PASSWORD}
+    volumes:
+      - directus_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DIRECTUS_DB_USER} -d ${DIRECTUS_DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 8
+
+  directus:
+    image: directus/directus:latest
+    container_name: sikopling-directus
+    restart: unless-stopped
+    depends_on:
+      directus-db:
+        condition: service_healthy
+    ports:
+      - '${DIRECTUS_PORT}:8055'
+    environment:
+      KEY: ${DIRECTUS_KEY}
+      SECRET: ${DIRECTUS_SECRET}
+      ADMIN_EMAIL: ${DIRECTUS_ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${DIRECTUS_ADMIN_PASSWORD}
+      DB_CLIENT: pg
+      DB_HOST: directus-db
+      DB_PORT: 5432
+      DB_DATABASE: ${DIRECTUS_DB_NAME}
+      DB_USER: ${DIRECTUS_DB_USER}
+      DB_PASSWORD: ${DIRECTUS_DB_PASSWORD}
+      WEBSOCKETS_ENABLED: 'true'
+      CORS_ENABLED: 'true'
+      CORS_ORIGIN: ${DIRECTUS_CORS_ORIGIN}
+      PUBLIC_URL: ${DIRECTUS_PUBLIC_URL}
+    volumes:
+      - directus_uploads:/directus/uploads
+      - directus_extensions:/directus/extensions
+
+volumes:
+  directus_db_data:
+  directus_uploads:
+  directus_extensions:

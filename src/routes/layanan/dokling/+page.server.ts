@@ -1,0 +1,11 @@
+import { getCmsRows } from '$lib/server/cms'
+import type { PageServerLoad } from './$types'
+
+export const load: PageServerLoad = async () => {
+	const result = await getCmsRows('dokling')
+
+	return {
+		queueRows: result.rows,
+		cmsSource: result.source
+	}
+}

@@ -36,62 +36,9 @@
 		| 'Instansi Z-A';
 	type FilterChipKey = 'search' | 'sort' | 'status' | 'perlingType';
 
-	const agencySeeds = [
-		'PT Tirta Banua Lestari',
-		'Dinas PUPR Kota Banjarbaru',
-		'PT Borneo Kencana Industri',
-		'PT Energi Hijau Nusantara',
-		'Pemkab Tanah Laut',
-		'PT Sungai Bening Sejahtera',
-		'PT Karya Tata Lingkungan',
-		'DLH Kabupaten Banjar',
-		'PT Mitra Infrastruktur Kalimantan',
-		'PT Sarana Air Bersih Banua'
-	];
-	const activitySeeds = [
-		'Pembangunan instalasi pengolahan air limbah kawasan industri',
-		'Optimalisasi jaringan drainase kawasan permukiman',
-		'Pengembangan fasilitas daur ulang air proses produksi',
-		'Peningkatan kapasitas unit pengolahan air limbah domestik',
-		'Penataan sistem pengelolaan limpasan air hujan',
-		'Revitalisasi kolam retensi dan saluran pengendali banjir',
-		'Pemasangan jaringan perpipaan air limbah terpusat',
-		'Pembangunan sumur resapan dan infrastruktur konservasi air',
-		'Modernisasi pengolahan air limbah kegiatan industri',
-		'Penyesuaian teknis kualitas buangan air kegiatan operasional'
-	];
-	const statusSeeds: ProgressStatus[] = [
-		'Evaluasi Dokumen',
-		'Perbaikan Uji Administrasi',
-		'Penjadwalan Rapat',
-		'Dikembalikan',
-		'Submit'
-	];
-	const positionSeeds: QueuePosition[] = ['Penyusun', 'Sekretariat TU', 'Pemrakarsa'];
-
+	const { data }: { data: { queueRows: QueueRow[]; cmsSource: 'directus' | 'fallback' } } = $props();
+	const queueRows = $derived(data.queueRows);
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
-	const addDaysUtc = (isoDate: string, offsetDays: number) => {
-		const [year, month, day] = isoDate.split('-').map(Number);
-		const baseDate = new Date(Date.UTC(year, month - 1, day));
-		baseDate.setUTCDate(baseDate.getUTCDate() + offsetDays);
-		return formatIsoDate(baseDate);
-	};
-	const registrationSeed = Number.parseInt('782AA4B0912EF', 16);
-
-	const queueRows: QueueRow[] = Array.from({ length: 20 }, (_, index) => {
-		const receivedDate = addDaysUtc('2026-01-06', index * 2);
-		const progressUpdatedDate = addDaysUtc(receivedDate, (index % 5) + 1);
-		return {
-			registrationNo: (registrationSeed + index).toString(16).toUpperCase(),
-			receivedDate,
-			progressUpdatedDate,
-			agency: agencySeeds[index % agencySeeds.length],
-			activity: activitySeeds[index % activitySeeds.length],
-			documentType: 'Air',
-			position: positionSeeds[index % positionSeeds.length],
-			progressStatus: statusSeeds[index % statusSeeds.length]
-		};
-	});
 
 	const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 		day: '2-digit',

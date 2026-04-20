@@ -1,5 +1,16 @@
 ﻿<script lang="ts">
 	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
+
+	type LoginData = {
+		redirectTo: string
+	}
+
+	type LoginFormState = {
+		error?: string
+		redirectTo?: string
+	}
+
+	const { data, form }: { data: LoginData; form: LoginFormState | null } = $props();
 </script>
 
 <svelte:head>
@@ -76,7 +87,9 @@
 								Silakan login dengan akun terdaftar.
 							</p>
 
-							<form class="mt-5 space-y-3.5" action="#" method="post" novalidate>
+							<form class="mt-5 space-y-3.5" method="post" novalidate>
+								<input type="hidden" name="redirectTo" value={form?.redirectTo ?? data.redirectTo} />
+
 								<div class="space-y-1.5">
 									<label for="email" class="text-sm font-semibold text-[var(--ink)]">Email / Username</label>
 									<input
@@ -86,6 +99,7 @@
 										autocomplete="username"
 										placeholder="contoh: pemrakarsa@contoh.id"
 										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-[var(--ink)] placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
+										required
 									/>
 								</div>
 
@@ -98,8 +112,15 @@
 										autocomplete="current-password"
 										placeholder="Masukkan kata sandi"
 										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-[var(--ink)] placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
+										required
 									/>
 								</div>
+
+								{#if form?.error}
+									<p class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
+										{form.error}
+									</p>
+								{/if}
 
 								<div class="flex items-center justify-between gap-2 pt-0.5">
 									<label class="inline-flex items-center gap-2 text-sm text-[var(--muted)]">

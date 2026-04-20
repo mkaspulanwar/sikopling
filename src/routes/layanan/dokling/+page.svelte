@@ -39,93 +39,9 @@
 		| 'Instansi Z-A';
 	type FilterChipKey = 'search' | 'sort' | 'status' | 'position';
 
-	const queueTemplates: Array<
-		Omit<QueueRow, 'registrationNo' | 'receivedDate' | 'progressUpdatedDate' | 'position'>
-	> = [
-		{
-			agency: 'PT Mitra Agro Banua',
-			activity: 'Pengembangan Kawasan Industri Pengolahan Hasil Pertanian',
-			documentType: 'Andal',
-			progressStatus: 'Penilaian KA'
-		},
-		{
-			agency: 'Dinas PUPR Kab. Banjar',
-			activity: 'Normalisasi Sungai dan Penguatan Tanggul',
-			documentType: 'UKP-UPL',
-			progressStatus: 'Perbaikan Uji Administrasi'
-		},
-		{
-			agency: 'PT Karya Borneo Energi',
-			activity: 'Pembangunan Fasilitas Penyimpanan Limbah B3',
-			documentType: 'DPLH',
-			progressStatus: 'Penjadwalan Rapat'
-		},
-		{
-			agency: 'PT Sinar Khatulistiwa Mineral',
-			activity: 'Perluasan Area Stockpile Batubara',
-			documentType: 'Andal',
-			progressStatus: 'Pasca Sidang'
-		},
-		{
-			agency: 'PT Tirta Kalimantan Sejahtera',
-			activity: 'Instalasi Pengolahan Air Limbah Kawasan',
-			documentType: 'UKP-UPL',
-			progressStatus: 'SK terbit'
-		},
-		{
-			agency: 'Pemkab Tanah Laut',
-			activity: 'Revitalisasi TPA dan Sistem Pengelolaan Sampah Terpadu',
-			documentType: 'DELH',
-			progressStatus: 'Pasca Sidang'
-		},
-		{
-			agency: 'PT Samudra Pangan Nusantara',
-			activity: 'Pembangunan Pabrik Pengolahan Hasil Laut',
-			documentType: 'UKP-UPL',
-			progressStatus: 'Submit'
-		},
-		{
-			agency: 'PT Angkasa Banua Logistik',
-			activity: 'Pembangunan Gudang Logistik Terintegrasi',
-			documentType: 'DPLH',
-			progressStatus: 'Dikembalikan'
-		},
-		{
-			agency: 'PT Borneo Kencana Pulp',
-			activity: 'Penyesuaian Kapasitas Produksi dan Emisi Udara',
-			documentType: 'DELH',
-			progressStatus: 'Penilaian KA'
-		},
-		{
-			agency: 'PT Nusantara Konstruksi Raya',
-			activity: 'Addendum Dokumen Pengelolaan Lingkungan Kawasan Komersial',
-			documentType: 'Addendum',
-			progressStatus: 'Ditolak'
-		}
-	];
-
+	const { data }: { data: { queueRows: QueueRow[]; cmsSource: 'directus' | 'fallback' } } = $props();
+	const queueRows = $derived(data.queueRows);
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
-	const addDaysUtc = (isoDate: string, offsetDays: number) => {
-		const [year, month, day] = isoDate.split('-').map(Number);
-		const baseDate = new Date(Date.UTC(year, month - 1, day));
-		baseDate.setUTCDate(baseDate.getUTCDate() + offsetDays);
-		return formatIsoDate(baseDate);
-	};
-	const registrationSeed = Number.parseInt('681195DAEA4DD', 16);
-	const queuePositions: QueuePosition[] = ['Penyusun', 'Pemrakarsa', 'Sekretariat TU'];
-
-	const queueRows: QueueRow[] = Array.from({ length: 100 }, (_, index) => {
-		const template = queueTemplates[index % queueTemplates.length];
-		const receivedDate = addDaysUtc('2026-01-06', index * 2);
-		const progressUpdatedDate = addDaysUtc(receivedDate, (index % 6) + 1);
-		return {
-			registrationNo: (registrationSeed + index).toString(16).toUpperCase(),
-			receivedDate,
-			progressUpdatedDate,
-			position: queuePositions[index % queuePositions.length],
-			...template
-		};
-	});
 
 	const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 		day: '2-digit',

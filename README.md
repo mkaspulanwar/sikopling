@@ -124,6 +124,46 @@ npm run dev
 
 Development server default: `http://localhost:5173`.
 
+## Self-host Directus (Lokal)
+
+File yang dipakai:
+
+- `docker-compose.directus.yml`
+- `.env.directus` (copy awal dari `.env.directus.example`)
+
+Langkah cepat:
+
+```bash
+# 1) Siapkan konfigurasi Directus
+cp .env.directus.example .env.directus
+
+# 2) Jalankan Directus + PostgreSQL
+npm run directus:up
+
+# 3) Cek status container
+npm run directus:status
+```
+
+Setelah hidup:
+
+- Directus Studio: `http://localhost:8055/admin`
+- API base URL: `http://localhost:8055`
+
+Sinkronkan ke app frontend (`.env`):
+
+```bash
+DIRECTUS_URL=http://localhost:8055
+DIRECTUS_TOKEN=<static-token-directus-opsional>
+DIRECTUS_COLLECTION_DOKLING=dokling
+DIRECTUS_COLLECTION_PERTEK=pertek
+```
+
+Lalu restart server frontend:
+
+```bash
+npm run dev
+```
+
 ## NPM Scripts
 
 | Script                | Fungsi                                   |
@@ -131,6 +171,10 @@ Development server default: `http://localhost:5173`.
 | `npm run dev`         | Menjalankan development server           |
 | `npm run build`       | Build produksi                           |
 | `npm run preview`     | Menjalankan preview hasil build          |
+| `npm run directus:up` | Menjalankan Directus + PostgreSQL        |
+| `npm run directus:down` | Mematikan stack Directus               |
+| `npm run directus:logs` | Melihat log service Directus           |
+| `npm run directus:status` | Melihat status container Directus    |
 | `npm run check`       | Sinkronisasi SvelteKit + type check      |
 | `npm run check:watch` | Type check mode watch                    |
 | `npm run test:unit`   | Menjalankan unit/component test (Vitest) |
