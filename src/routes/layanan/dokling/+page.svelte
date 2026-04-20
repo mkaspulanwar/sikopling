@@ -155,6 +155,24 @@
 			].some((value) => normalize(value).includes(query));
 		});
 	});
+	const queueRowsSearchIndexText = $derived.by(() =>
+		queueRows
+			.map((row) =>
+				[
+					row.registrationNo,
+					row.agency,
+					row.activity,
+					row.documentType,
+					row.position,
+					row.progressStatus,
+					row.receivedDate,
+					row.progressUpdatedDate,
+					formatDate(row.receivedDate),
+					formatDate(row.progressUpdatedDate)
+				].join(' ')
+			)
+			.join(' ')
+	);
 
 	const agencyCollator = new Intl.Collator('id-ID', { sensitivity: 'base' });
 	const sortedRows = $derived.by(() =>
@@ -410,6 +428,7 @@
 
 <section class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-16 sm:pt-32 sm:pb-20">
 	<div class="nav-shell nav-shell-desktop-spacious relative">
+		<div hidden data-universal-search-index="queue-rows">{queueRowsSearchIndexText}</div>
 		<header class="mb-5 sm:mb-6">
 			<div class="max-w-3xl">
 				<h1

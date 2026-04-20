@@ -1,8 +1,13 @@
 ﻿<script lang="ts">
 	import { onMount, tick } from 'svelte';
+	import { goto } from '$app/navigation';
 	import { cubicInOut } from 'svelte/easing';
 	import { fade, fly, slide } from 'svelte/transition';
 	import { page } from '$app/state';
+	import {
+		UNIVERSAL_SEARCH_BLOCKED_PATH_PREFIXES,
+		UNIVERSAL_SEARCH_QUERY_PARAM
+	} from '$lib/constants/universal-search';
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
@@ -24,6 +29,9 @@
 		title: string;
 		category: SearchCategory;
 		priority: number;
+	};
+	type SearchRouteQueueItem = SearchRoute & {
+		depth: number;
 	};
 	type SearchDocument = {
 		id: string;
@@ -72,9 +80,11 @@
 
 	const showNavMenus = true;
 	const SEARCH_INDEX_CACHE_KEY = 'sikopling:universal-search-index';
-	const SEARCH_INDEX_CACHE_VERSION = 1;
+	const SEARCH_INDEX_CACHE_VERSION = 4;
 	const SEARCH_INDEX_CACHE_TTL_MS = 1000 * 60 * 60 * 24;
-	const searchableRoutes: SearchRoute[] = [
+	const SEARCH_INDEX_MAX_ROUTES = 48;
+	const SEARCH_INDEX_CRAWL_MAX_DEPTH = 3;
+	const searchableRouteSeeds: SearchRoute[] = [
 		{ path: '/', title: 'Beranda', category: 'Halaman', priority: 96 },
 		{
 			path: '/layanan/dokling',
@@ -94,6 +104,9 @@
 		{ path: '/kontak', title: 'Kontak', category: 'Halaman', priority: 64 },
 		{ path: '/login', title: 'Login', category: 'Halaman', priority: 60 }
 	];
+	const searchRouteTitleOverrides: Record<string, string> = Object.fromEntries(
+		searchableRouteSeeds.map((route) => [route.path, route.title])
+	);
 	const fallbackSearchDocuments: SearchDocument[] = [
 		buildSearchDocument({
 			title: 'Beranda',
@@ -218,6 +231,136 @@
 		if (!normalizedSectionId) return path;
 		return path === '/' ? `/#${normalizedSectionId}` : `${path}#${normalizedSectionId}`;
 	}
+	function normalizeSearchPathname(pathname: string) {
+		const trimmedPathname = pathname.trim();
+		if (!trimmedPathname) return '/';
+		const withLeadingSlash = trimmedPathname.startsWith('/') ? trimmedPathname : `/${trimmedPathname}`;
+		return withLeadingSlash.replace(/\/+$/, '') || '/';
+	}
+	function getPathnameFromSearchHref(href: string) {
+		const trimmedHref = cleanText(href);
+		if (!trimmedHref) return '/';
+		try {
+			const parsedUrl = new URL(trimmedHref, 'https://sikopling.local');
+			return normalizeSearchPathname(parsedUrl.pathname);
+		} catch {
+			const pathnameCandidate = trimmedHref.split('#')[0]?.split('?')[0] ?? '';
+			return normalizeSearchPathname(pathnameCandidate);
+		}
+	}
+	function isSearchHrefBlocked(href: string) {
+		const pathname = getPathnameFromSearchHref(href);
+		return UNIVERSAL_SEARCH_BLOCKED_PATH_PREFIXES.some(
+			(prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+		);
+	}
+	function isStaticAssetPath(pathname: string) {
+		return /\.[a-z0-9]{2,8}$/i.test(pathname);
+	}
+	function isSearchPathAllowed(pathname: string) {
+		const normalizedPathname = normalizeSearchPathname(pathname);
+		if (isSearchHrefBlocked(normalizedPathname)) return false;
+		if (normalizedPathname.startsWith('/_')) return false;
+		if (normalizedPathname === '/404' || normalizedPathname === '/500') return false;
+		if (isStaticAssetPath(normalizedPathname)) return false;
+		return true;
+	}
+	function resolveSearchPathFromHref(href: string, basePath = '/') {
+		const trimmedHref = cleanText(href);
+		if (!trimmedHref) return null;
+		if (
+			trimmedHref.startsWith('#') ||
+			trimmedHref.startsWith('mailto:') ||
+			trimmedHref.startsWith('tel:') ||
+			trimmedHref.startsWith('javascript:')
+		) {
+			return null;
+		}
+		try {
+			const normalizedBasePath = normalizeSearchPathname(basePath);
+			const parsedUrl = new URL(trimmedHref, `https://sikopling.local${normalizedBasePath}`);
+			if (parsedUrl.origin !== 'https://sikopling.local') return null;
+			const normalizedPathname = normalizeSearchPathname(parsedUrl.pathname);
+			if (!isSearchPathAllowed(normalizedPathname)) return null;
+			return normalizedPathname;
+		} catch {
+			return null;
+		}
+	}
+	function inferSearchRouteCategory(pathname: string): SearchCategory {
+		return pathname.startsWith('/layanan') ? 'Layanan' : 'Halaman';
+	}
+	function inferSearchRoutePriority(pathname: string) {
+		if (pathname === '/') return 96;
+		if (pathname.startsWith('/layanan')) return 88;
+		if (pathname === '/profil') return 66;
+		if (pathname === '/kontak') return 64;
+		if (pathname === '/kebijakan-privasi') return 62;
+		if (pathname === '/ketentuan-layanan') return 61;
+		if (pathname === '/login') return 60;
+		return 58;
+	}
+	function toTitleCase(value: string) {
+		return value
+			.split(' ')
+			.filter(Boolean)
+			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+			.join(' ');
+	}
+	function inferSearchRouteTitle(pathname: string) {
+		const override = searchRouteTitleOverrides[pathname];
+		if (override) return override;
+		if (pathname === '/') return 'Beranda';
+		const fromSegments = pathname
+			.split('/')
+			.filter(Boolean)
+			.map((segment) => segment.replace(/[-_]+/g, ' '));
+		if (fromSegments.length === 0) return 'Halaman';
+		return toTitleCase(fromSegments.join(' '));
+	}
+	function buildSearchRoute(pathname: string): SearchRoute {
+		const normalizedPathname = normalizeSearchPathname(pathname);
+		return {
+			path: normalizedPathname,
+			title: inferSearchRouteTitle(normalizedPathname),
+			category: inferSearchRouteCategory(normalizedPathname),
+			priority: inferSearchRoutePriority(normalizedPathname)
+		};
+	}
+	function collectSearchablePathsFromHtml(html: string, currentPath: string) {
+		const parser = new DOMParser();
+		const parsedDocument = parser.parseFromString(html, 'text/html');
+		const linkElements = Array.from(parsedDocument.querySelectorAll<HTMLAnchorElement>('a[href]'));
+		const nextPaths = new Set<string>();
+
+		for (const linkElement of linkElements) {
+			const href = linkElement.getAttribute('href') ?? '';
+			const path = resolveSearchPathFromHref(href, currentPath);
+			if (!path) continue;
+			nextPaths.add(path);
+		}
+		return [...nextPaths];
+	}
+	function buildSearchResultHref(href: string, query: string) {
+		const normalizedQuery = cleanText(query);
+		if (!normalizedQuery) return href;
+		try {
+			const parsedUrl = new URL(href, 'https://sikopling.local');
+			parsedUrl.searchParams.set(UNIVERSAL_SEARCH_QUERY_PARAM, normalizedQuery);
+			const pathname = normalizeSearchPathname(parsedUrl.pathname);
+			const search = parsedUrl.searchParams.toString();
+			return `${pathname}${search ? `?${search}` : ''}${parsedUrl.hash}`;
+		} catch {
+			const [pathWithQuery = '/', hashPart = ''] = href.split('#');
+			const [pathnamePart = '/', queryPart = ''] = pathWithQuery.split('?');
+			const params = new URLSearchParams(queryPart);
+			params.set(UNIVERSAL_SEARCH_QUERY_PARAM, normalizedQuery);
+			const pathname = normalizeSearchPathname(pathnamePart);
+			const search = params.toString();
+			const hash = hashPart ? `#${hashPart}` : '';
+			return `${pathname}${search ? `?${search}` : ''}${hash}`;
+		}
+	}
 	function buildSearchDocument(params: {
 		title: string;
 		description: string;
@@ -244,6 +387,7 @@
 	const dedupeSearchDocuments = (documents: SearchDocument[]) => {
 		const documentMap = new Map<string, SearchDocument>();
 		for (const document of documents) {
+			if (isSearchHrefBlocked(document.href)) continue;
 			const key = `${document.href}::${document.title}`;
 			const previous = documentMap.get(key);
 			if (!previous || document.priority > previous.priority) {
@@ -266,6 +410,7 @@
 				? candidate.priority
 				: 70;
 		if (!title || !description || !href || !isSearchCategory(category)) return null;
+		if (isSearchHrefBlocked(href)) return null;
 		const id =
 			typeof candidate.id === 'string' && candidate.id.trim()
 				? candidate.id
@@ -346,16 +491,23 @@
 		}
 	};
 	const extractSearchDocumentsFromHtml = (route: SearchRoute, html: string) => {
+		if (isSearchHrefBlocked(route.path)) return [];
 		const parser = new DOMParser();
 		const parsedDocument = parser.parseFromString(html, 'text/html');
 		const mainContent = parsedDocument.querySelector('main') ?? parsedDocument.body;
+		const indexingRoot = mainContent.cloneNode(true) as HTMLElement;
+		for (const element of indexingRoot.querySelectorAll<HTMLElement>(
+			'nav, footer, [data-universal-search-exclude="true"]'
+		)) {
+			element.remove();
+		}
 		const parsedPageTitle = cleanText(
 			parsedDocument.querySelector('title')?.textContent?.replace(/\|\s*SIKOPLING\s*$/i, '') ?? ''
 		);
 		const pageDescription = cleanText(
 			parsedDocument.querySelector('meta[name="description"]')?.getAttribute('content') ?? ''
 		);
-		const pageTextContent = cleanText(mainContent.textContent ?? '');
+		const pageTextContent = cleanText(indexingRoot.textContent ?? '');
 		const documents: SearchDocument[] = [];
 
 		if (pageTextContent.length > 35) {
@@ -372,9 +524,7 @@
 			);
 		}
 
-		const sectionElements = Array.from(
-			mainContent.querySelectorAll<HTMLElement>('section, article')
-		);
+		const sectionElements = Array.from(indexingRoot.querySelectorAll<HTMLElement>('section, article'));
 		for (const [sectionIndex, sectionElement] of sectionElements.entries()) {
 			const sectionTitle = cleanText(sectionElement.querySelector('h1,h2,h3')?.textContent ?? '');
 			const sectionText = cleanText(sectionElement.textContent ?? '');
@@ -396,6 +546,62 @@
 		}
 
 		return dedupeSearchDocuments(documents);
+	};
+	const crawlSearchableRoutes = async () => {
+		const routeMap = new Map<string, SearchRoute>();
+		const routeQueue: SearchRouteQueueItem[] = [];
+		const fetchedHtmlByPath = new Map<string, string>();
+
+		for (const seedRoute of searchableRouteSeeds) {
+			const normalizedPath = normalizeSearchPathname(seedRoute.path);
+			if (!isSearchPathAllowed(normalizedPath)) continue;
+			if (routeMap.has(normalizedPath)) continue;
+			const route = buildSearchRoute(normalizedPath);
+			routeMap.set(normalizedPath, {
+				...route,
+				title: seedRoute.title,
+				category: seedRoute.category,
+				priority: seedRoute.priority
+			});
+			routeQueue.push({
+				...routeMap.get(normalizedPath)!,
+				depth: 0
+			});
+		}
+
+		for (let queueIndex = 0; queueIndex < routeQueue.length; queueIndex += 1) {
+			if (routeMap.size >= SEARCH_INDEX_MAX_ROUTES) break;
+			const currentRoute = routeQueue[queueIndex];
+			if (currentRoute.depth > SEARCH_INDEX_CRAWL_MAX_DEPTH) continue;
+			if (fetchedHtmlByPath.has(currentRoute.path)) continue;
+
+			try {
+				const response = await fetch(currentRoute.path);
+				if (!response.ok) continue;
+				const html = await response.text();
+				fetchedHtmlByPath.set(currentRoute.path, html);
+				if (currentRoute.depth >= SEARCH_INDEX_CRAWL_MAX_DEPTH) continue;
+
+				const discoveredPaths = collectSearchablePathsFromHtml(html, currentRoute.path);
+				for (const discoveredPath of discoveredPaths) {
+					if (routeMap.size >= SEARCH_INDEX_MAX_ROUTES) break;
+					if (routeMap.has(discoveredPath)) continue;
+					const discoveredRoute = buildSearchRoute(discoveredPath);
+					routeMap.set(discoveredPath, discoveredRoute);
+					routeQueue.push({
+						...discoveredRoute,
+						depth: currentRoute.depth + 1
+					});
+				}
+			} catch {
+				// Abaikan route yang gagal di-fetch agar indeks tetap bisa dibangun dari route lainnya.
+			}
+		}
+
+		return {
+			routes: [...routeMap.values()],
+			fetchedHtmlByPath
+		};
 	};
 	const computeSearchScore = (document: SearchDocument, normalizedQuery: string) => {
 		if (!normalizedQuery) return 0;
@@ -423,18 +629,12 @@
 		isSearchIndexing = true;
 
 		try {
-			const routeFetches = searchableRoutes.map(async (route) => {
-				const response = await fetch(route.path);
-				if (!response.ok) return [];
-				const html = await response.text();
-				return extractSearchDocumentsFromHtml(route, html);
-			});
-			const results = await Promise.allSettled(routeFetches);
+			const { routes, fetchedHtmlByPath } = await crawlSearchableRoutes();
 			const dynamicDocuments: SearchDocument[] = [];
-			for (const result of results) {
-				if (result.status === 'fulfilled') {
-					dynamicDocuments.push(...result.value);
-				}
+			for (const route of routes) {
+				const html = fetchedHtmlByPath.get(route.path);
+				if (!html) continue;
+				dynamicDocuments.push(...extractSearchDocumentsFromHtml(route, html));
 			}
 
 			const nextDocuments = dedupeSearchDocuments([
@@ -462,14 +662,29 @@
 		searchInput?.focus();
 		searchInput?.select();
 	};
-	const closeSearchModal = () => {
+	const closeSearchModalWithOptions = (options?: { clearQuery?: boolean }) => {
 		isSearchOpen = false;
-		searchQuery = '';
+		if (options?.clearQuery ?? true) {
+			searchQuery = '';
+		}
 	};
-	const handleSearchResultClick = () => {
-		closeSearchModal();
+	const closeSearchModal = () => {
+		closeSearchModalWithOptions();
+	};
+	const handleSearchResultClick = (event: MouseEvent) => {
+		const target = event.currentTarget;
+		if (!(target instanceof HTMLAnchorElement)) {
+			closeSearchModal();
+			return;
+		}
+		event.preventDefault();
+		const targetHref = target.href;
+		closeSearchModalWithOptions({ clearQuery: false });
+		searchQuery = '';
+		void goto(targetHref);
 	};
 	const normalizedSearchQuery = $derived(normalizeSearchText(searchQuery));
+	const cleanedSearchQuery = $derived(cleanText(searchQuery));
 	const suggestedSearchResults = $derived.by(() =>
 		[...universalSearchDocuments].sort((left, right) => right.priority - left.priority).slice(0, 8)
 	);
@@ -1192,7 +1407,7 @@
 						{#each searchResults as result}
 							<li>
 								<a
-									href={result.href}
+									href={buildSearchResultHref(result.href, cleanedSearchQuery)}
 									class="group flex items-start justify-between gap-2.5 px-3 py-3.5 transition-colors hover:bg-[#f8fbf4] sm:gap-3 sm:px-4"
 									onclick={handleSearchResultClick}
 								>
