@@ -1,6 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
+	import ArrowDown from 'lucide-svelte/icons/arrow-down'
+	import ArrowUp from 'lucide-svelte/icons/arrow-up'
+	import ArrowUpDown from 'lucide-svelte/icons/arrow-up-down'
 	import PengajuanStatusBadge from '$lib/components/badges/PengajuanStatusBadge.svelte'
 	import { LAYANAN_VALUES, STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
 	import type { PageData } from './$types'
@@ -53,6 +56,7 @@
 	let flash = $state<FlashState>(null)
 	let pendingRowId = $state<string | null>(null)
 	let isCreating = $state(false)
+	let expandedRowsById = $state<Record<string, boolean>>({})
 	let draftStatusById = $state<Record<string, StatusPengajuan>>({})
 	let draftPosisiById = $state<Record<string, string>>({})
 	let draftNoteById = $state<Record<string, string>>({})
@@ -143,9 +147,14 @@
 		() => Math.min(data.result.page * data.result.pageSize, data.result.total)
 	)
 
-	const getSortIndicator = (column: SortableColumn) => {
-		if (data.filters.sortBy !== column) return '↕'
-		return data.filters.sortOrder === 'asc' ? '↑' : '↓'
+	const getSortDirection = (column: SortableColumn): 'none' | 'asc' | 'desc' => {
+		if (data.filters.sortBy !== column) return 'none'
+		return data.filters.sortOrder === 'asc' ? 'asc' : 'desc'
+	}
+
+	const isRowExpanded = (id: string) => Boolean(expandedRowsById[id])
+	const toggleRowExpanded = (id: string) => {
+		expandedRowsById[id] = !expandedRowsById[id]
 	}
 
 	const changePageSize = async (value: string) => {
@@ -437,10 +446,19 @@
 						<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Layanan</th>
 						{#each ['no_registrasi', 'tanggal_masuk', 'instansi', 'kegiatan', 'jenis_dokumen', 'posisi', 'status', 'tanggal_update'] as rawColumn}
 							{@const column = rawColumn as SortableColumn}
-							<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">
-								<a href={sortHref(column)} class="inline-flex items-center gap-1 hover:text-white/90">
-									<span>{sortLabels[column]}</span>
-									<span aria-hidden="true">{getSortIndicator(column)}</span>
+							<th class="border-b border-[#64AD31] px-4 py-4 text-left align-middle text-sm font-semibold tracking-[0.01em] text-white">
+								<a href={sortHref(column)} class="inline-flex items-center gap-1.5 align-middle hover:text-white/90">
+									<span class="leading-none">{sortLabels[column]}</span>
+									{#if getSortDirection(column) === 'asc'}
+										<ArrowUp class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+									{:else if getSortDirection(column) === 'desc'}
+										<ArrowDown class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+									{:else}
+										<ArrowUpDown class="h-3.5 w-3.5 shrink-0 opacity-80" aria-hidden="true" />
+									{/if}
+									<span class="sr-only">
+										Urutkan {sortLabels[column]} ({getSortDirection(column) === 'none' ? 'belum diurutkan' : getSortDirection(column)})
+									</span>
 								</a>
 							</th>
 						{/each}
@@ -477,38 +495,53 @@
 											if (STATUS_VALUES.includes(value as StatusPengajuan)) {
 												draftStatusById[row.id] = value as StatusPengajuan
 											}
-										}} class="rounded-lg border border-[#cfd7e3] px-2.5 py-2 text-xs font-medium">
+										}} class="h-10 rounded-lg border border-[#cfd7e3] px-2.5 text-xs font-medium">
 											{#each STATUS_VALUES as status}
 												<option value={status}>{status}</option>
 											{/each}
 										</select>
-										<input type="text" placeholder="Posisi terbaru" value={draftPosisiById[row.id] ?? row.posisi ?? ''} onchange={(event) => {
-											draftPosisiById[row.id] = (event.currentTarget as HTMLInputElement).value
-										}} class="rounded-lg border border-[#cfd7e3] px-2.5 py-2 text-xs" />
-										<input type="text" placeholder="Catatan perubahan (opsional)" value={draftNoteById[row.id] ?? ''} onchange={(event) => {
-											draftNoteById[row.id] = (event.currentTarget as HTMLInputElement).value
-										}} class="rounded-lg border border-[#cfd7e3] px-2.5 py-2 text-xs" />
-										<button type="button" onclick={() => submitStatusUpdate(row.id)} disabled={pendingRowId === row.id || data.unavailable} class="rounded-lg bg-[#64AD31] px-3 py-2 text-xs font-semibold text-white transition enabled:hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">{pendingRowId === row.id ? 'Menyimpan...' : 'Simpan Status'}</button>
-										<details class="rounded-lg border border-[#d7dee8] bg-[#f8fafc] p-2.5">
-											<summary class="cursor-pointer text-xs font-semibold text-[#334155]">History ({getRowHistory(row.id).length})</summary>
-											{#if getRowHistory(row.id).length === 0}
-												<p class="mt-2 text-xs text-[var(--muted)]">Belum ada histori perubahan.</p>
-											{:else}
-												<ul class="mt-2 space-y-2">
-													{#each getRowHistory(row.id) as history}
-														<li class="rounded-md border border-[#d7dee8] bg-white px-2 py-1.5 text-[11px] text-[#475467]">
-															<p class="font-semibold text-[#20232A]">{history.old_status ?? 'Belum ada'} -> {history.new_status}</p>
-															<p>Posisi: {history.old_posisi ?? '-'} -> {history.new_posisi ?? '-'}</p>
-															<p>Catatan: {history.note ?? '-'}</p>
-															<p class="text-[var(--muted)]">{formatDateTime(history.changed_at)}</p>
-														</li>
-													{/each}
-												</ul>
-											{/if}
-										</details>
+										<button type="button" onclick={() => toggleRowExpanded(row.id)} class="h-10 rounded-lg border border-[#cfd7e3] bg-white px-3 text-xs font-semibold text-[#334155] transition-colors hover:bg-[#f8fafc]">
+											{isRowExpanded(row.id) ? 'Tutup Detail' : 'Detail'}
+										</button>
 									</div>
 								</td>
 							</tr>
+							{#if isRowExpanded(row.id)}
+								<tr class="border-t border-[#e9edf3] bg-[#f8fafc]">
+									<td colspan="11" class="px-4 py-4">
+										<div class="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+											<div class="grid gap-3 md:grid-cols-2">
+												<input type="text" placeholder="Posisi terbaru" value={draftPosisiById[row.id] ?? row.posisi ?? ''} onchange={(event) => {
+													draftPosisiById[row.id] = (event.currentTarget as HTMLInputElement).value
+												}} class="h-10 rounded-lg border border-[#cfd7e3] bg-white px-3 text-xs text-[#20232A]" />
+												<input type="text" placeholder="Catatan perubahan (opsional)" value={draftNoteById[row.id] ?? ''} onchange={(event) => {
+													draftNoteById[row.id] = (event.currentTarget as HTMLInputElement).value
+												}} class="h-10 rounded-lg border border-[#cfd7e3] bg-white px-3 text-xs text-[#20232A]" />
+											</div>
+											<div class="flex flex-wrap items-start gap-2 xl:justify-end">
+												<button type="button" onclick={() => submitStatusUpdate(row.id)} disabled={pendingRowId === row.id || data.unavailable} class="h-10 rounded-lg bg-[#64AD31] px-3 text-xs font-semibold text-white transition enabled:hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">{pendingRowId === row.id ? 'Menyimpan...' : 'Simpan Status'}</button>
+												<details class="min-w-[12rem] rounded-lg border border-[#d7dee8] bg-white p-2.5">
+													<summary class="cursor-pointer text-xs font-semibold text-[#334155]">History ({getRowHistory(row.id).length})</summary>
+													{#if getRowHistory(row.id).length === 0}
+														<p class="mt-2 text-xs text-[var(--muted)]">Belum ada histori perubahan.</p>
+													{:else}
+														<ul class="mt-2 space-y-2">
+															{#each getRowHistory(row.id) as history}
+																<li class="rounded-md border border-[#d7dee8] bg-[#f8fafc] px-2 py-1.5 text-[11px] text-[#475467]">
+																	<p class="font-semibold text-[#20232A]">{history.old_status ?? 'Belum ada'} -> {history.new_status}</p>
+																	<p>Posisi: {history.old_posisi ?? '-'} -> {history.new_posisi ?? '-'}</p>
+																	<p>Catatan: {history.note ?? '-'}</p>
+																	<p class="text-[var(--muted)]">{formatDateTime(history.changed_at)}</p>
+																</li>
+															{/each}
+														</ul>
+													{/if}
+												</details>
+											</div>
+										</div>
+									</td>
+								</tr>
+							{/if}
 						{/each}
 					{/if}
 				</tbody>
