@@ -7,10 +7,6 @@
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",
-		"directus:up": "docker compose --env-file .env.directus -f docker-compose.directus.yml up -d",
-		"directus:down": "docker compose --env-file .env.directus -f docker-compose.directus.yml down",
-		"directus:logs": "docker compose --env-file .env.directus -f docker-compose.directus.yml logs -f directus",
-		"directus:status": "docker compose --env-file .env.directus -f docker-compose.directus.yml ps",
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
@@ -38,8 +34,9 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
-		"@directus/sdk": "^18.0.3",
 		"@lottiefiles/dotlottie-svelte": "^0.9.10",
+		"@supabase/ssr": "^0.10.2",
+		"@supabase/supabase-js": "^2.104.1",
 		"@vercel/analytics": "^2.0.1",
 		"gsap": "^3.14.2",
 		"lenis": "^1.3.21",

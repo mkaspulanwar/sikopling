@@ -205,14 +205,16 @@
 				return 'Kontak Sikopling';
 			case '/login':
 				return 'Login Sikopling';
+			case '/admin/pengajuan':
+				return 'Admin Pengajuan Sikopling';
 			default:
 				return 'Sikopling Kalsel';
 		}
 	});
 
-	const isLoginPage = $derived.by(() => {
+	const usePublicChrome = $derived.by(() => {
 		const pathname = page.url.pathname.replace(/\/+$/, '') || '/';
-		return pathname === '/login';
+		return pathname !== '/login' && !pathname.startsWith('/admin');
 	});
 
 	$effect(() => {
@@ -239,13 +241,13 @@
 </svelte:head>
 
 <div class="min-h-[100dvh] bg-[var(--canvas)] text-[var(--ink)]">
-	{#if !isLoginPage}
+	{#if usePublicChrome}
 		<Navbar />
 	{/if}
-	<main class={isLoginPage ? 'min-h-[100dvh]' : 'min-h-[40dvh]'}>
+	<main class={usePublicChrome ? 'min-h-[40dvh]' : 'min-h-[100dvh]'}>
 		{@render children()}
 	</main>
-	{#if !isLoginPage}
+	{#if usePublicChrome}
 		<SiteFooter />
 		<ChatbotWidget />
 	{/if}

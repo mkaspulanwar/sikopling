@@ -89,12 +89,12 @@
 								<input type="hidden" name="redirectTo" value={form?.redirectTo ?? data.redirectTo} />
 
 								<div class="space-y-1.5">
-									<label for="email" class="text-sm font-semibold text-[var(--ink)]">Email / Username</label>
+									<label for="email" class="text-sm font-semibold text-[var(--ink)]">Email</label>
 									<input
 										id="email"
 										name="email"
-										type="text"
-										autocomplete="username"
+										type="email"
+										autocomplete="email"
 										placeholder="contoh: pemrakarsa@contoh.id"
 										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-[var(--ink)] placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
 										required

@@ -124,45 +124,24 @@ npm run dev
 
 Development server default: `http://localhost:5173`.
 
-## Self-host Directus (Lokal)
+## Environment Variables
 
-File yang dipakai:
-
-- `docker-compose.directus.yml`
-- `.env.directus` (copy awal dari `.env.directus.example`)
-
-Langkah cepat:
+Copy template:
 
 ```bash
-# 1) Siapkan konfigurasi Directus
-cp .env.directus.example .env.directus
-
-# 2) Jalankan Directus + PostgreSQL
-npm run directus:up
-
-# 3) Cek status container
-npm run directus:status
+cp .env.example .env
 ```
 
-Setelah hidup:
+Required variables:
 
-- Directus Studio: `http://localhost:8055/admin`
-- API base URL: `http://localhost:8055`
+- `PUBLIC_SUPABASE_URL`
+- `PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
 
-Sinkronkan ke app frontend (`.env`):
+Production note:
 
-```bash
-DIRECTUS_URL=http://localhost:8055
-DIRECTUS_TOKEN=<static-token-directus-opsional>
-DIRECTUS_COLLECTION_DOKLING=dokling
-DIRECTUS_COLLECTION_PERTEK=pertek
-```
-
-Lalu restart server frontend:
-
-```bash
-npm run dev
-```
+- Untuk deployment production, simpan nilai env di dashboard platform (mis. Vercel Project Settings -> Environment Variables).
+- File `.env` lokal hanya untuk development dan tidak di-commit.
 
 ## NPM Scripts
 
@@ -171,10 +150,6 @@ npm run dev
 | `npm run dev`         | Menjalankan development server           |
 | `npm run build`       | Build produksi                           |
 | `npm run preview`     | Menjalankan preview hasil build          |
-| `npm run directus:up` | Menjalankan Directus + PostgreSQL        |
-| `npm run directus:down` | Mematikan stack Directus               |
-| `npm run directus:logs` | Melihat log service Directus           |
-| `npm run directus:status` | Melihat status container Directus    |
 | `npm run check`       | Sinkronisasi SvelteKit + type check      |
 | `npm run check:watch` | Type check mode watch                    |
 | `npm run test:unit`   | Menjalankan unit/component test (Vitest) |
@@ -188,7 +163,7 @@ npm run dev
 
 ## Catatan Implementasi
 
-- Data antrian pada halaman layanan masih berupa mock data yang di-generate di sisi frontend.
+- Data antrian pada halaman layanan menggunakan data fallback lokal di sisi server.
 - Tautan footer `/kebijakan-privasi` dan `/ketentuan-layanan` sudah dipasang, tetapi route halamannya belum tersedia.
 - Halaman `tentang`, `kontak`, dan `login` masih placeholder.
 

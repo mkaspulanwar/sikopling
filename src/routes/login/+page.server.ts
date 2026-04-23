@@ -1,17 +1,19 @@
-import { isAdminAuthenticated, setAdminSession, validateAdminCredentials } from '$lib/server/auth'
+import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 
 const resolveRedirectTarget = (value: string) => {
-	if (!value.startsWith('/')) return '/admin/cms'
-	if (!value.startsWith('/admin')) return '/admin/cms'
+	if (!value.startsWith('/')) return '/admin/pengajuan'
+	if (!value.startsWith('/admin')) return '/admin/pengajuan'
 	return value
 }
 
-export const load: PageServerLoad = async ({ cookies, url }) => {
-	const redirectTo = resolveRedirectTarget(url.searchParams.get('redirectTo') ?? '/admin/cms')
+export const load: PageServerLoad = async ({ url, locals }) => {
+	const redirectTo = resolveRedirectTarget(url.searchParams.get('redirectTo') ?? '/admin/pengajuan')
 
-	if (isAdminAuthenticated(cookies)) {
+	const { session, user } = await locals.safeGetSession()
+	const role = resolveUserRole(user)
+	if (session && isAdminRole(role)) {
 		throw redirect(303, redirectTo)
 	}
 
@@ -19,27 +21,42 @@ export const load: PageServerLoad = async ({ cookies, url }) => {
 }
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
+	default: async ({ request, locals }) => {
 		const formData = await request.formData()
-		const username = String(formData.get('email') ?? '').trim()
+		const email = String(formData.get('email') ?? '').trim()
 		const password = String(formData.get('password') ?? '')
-		const redirectTo = resolveRedirectTarget(String(formData.get('redirectTo') ?? '/admin/cms'))
+		const redirectTo = resolveRedirectTarget(String(formData.get('redirectTo') ?? '/admin/pengajuan'))
 
-		if (!username || !password) {
+		if (!email || !password) {
 			return fail(400, {
-				error: 'Email/Username dan kata sandi wajib diisi',
+				error: 'Email dan kata sandi wajib diisi',
 				redirectTo
 			})
 		}
 
-		if (!validateAdminCredentials(username, password)) {
+		if (!locals.supabase) {
+			return fail(503, {
+				error: 'Supabase belum dikonfigurasi. Hubungi administrator.',
+				redirectTo
+			})
+		}
+
+		const { data, error } = await locals.supabase.auth.signInWithPassword({ email, password })
+		if (error || !data.user) {
 			return fail(401, {
-				error: 'Kredensial tidak valid',
+				error: 'Email atau kata sandi tidak valid, atau akun belum terdaftar di Supabase Auth.',
 				redirectTo
 			})
 		}
 
-		setAdminSession(cookies)
+		const role = resolveUserRole(data.user)
+		if (!isAdminRole(role)) {
+			await locals.supabase.auth.signOut()
+			return fail(403, {
+				error: 'Akun berhasil login tetapi belum memiliki role admin (super_admin/admin/operator/reviewer).',
+				redirectTo
+			})
+		}
 		throw redirect(303, redirectTo)
 	}
 }

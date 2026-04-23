@@ -1,11 +1,8 @@
-import { getCmsRows } from '$lib/server/cms'
+import { getPublicQueueRows } from '$lib/server/public-queue'
 import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async () => {
-	const result = await getCmsRows('dokling')
-
 	return {
-		queueRows: result.rows,
-		cmsSource: result.source
+		queueRows: await getPublicQueueRows('dokling')
 	}
 }
