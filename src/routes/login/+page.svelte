@@ -23,7 +23,6 @@
 		href="/home/video-hero.webm?v=20260418"
 		as="video"
 		type="video/webm"
-		media="(min-width: 641px)"
 	/>
 </svelte:head>
 
@@ -37,8 +36,7 @@
 			playsinline
 			preload="metadata"
 		>
-			<source src="/home/video-hero.webm?v=20260418" type="video/webm" media="(min-width: 641px)" />
-			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" media="(min-width: 641px)" />
+			<source src="/home/video-hero.webm?v=20260418" type="video/webm" />
 			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" />
 		</video>
 	</div>
