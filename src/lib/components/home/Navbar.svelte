@@ -80,7 +80,7 @@
 
 	const showNavMenus = true;
 	const SEARCH_INDEX_CACHE_KEY = 'sikopling:universal-search-index';
-	const SEARCH_INDEX_CACHE_VERSION = 4;
+	const SEARCH_INDEX_CACHE_VERSION = 5;
 	const SEARCH_INDEX_CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 	const SEARCH_INDEX_MAX_ROUTES = 48;
 	const SEARCH_INDEX_CRAWL_MAX_DEPTH = 3;
@@ -384,15 +384,52 @@
 			normalizedContent: normalizeSearchText(params.content ?? '')
 		};
 	}
+	const getSearchDocumentSignalScore = (document: SearchDocument) => {
+		const categoryBonus = document.category === 'Bagian' ? 0 : 120;
+		return (
+			categoryBonus +
+			document.normalizedTitle.length * 2 +
+			document.normalizedDescription.length * 1.4 +
+			document.normalizedKeywords.length * 1.7 +
+			document.normalizedContent.length * 2.2
+		);
+	};
+	const mergeSearchDocuments = (preferred: SearchDocument, secondary: SearchDocument): SearchDocument => ({
+		...preferred,
+		description:
+			preferred.description.length >= secondary.description.length
+				? preferred.description
+				: secondary.description,
+		normalizedDescription:
+			preferred.normalizedDescription.length >= secondary.normalizedDescription.length
+				? preferred.normalizedDescription
+				: secondary.normalizedDescription,
+		normalizedKeywords:
+			preferred.normalizedKeywords.length >= secondary.normalizedKeywords.length
+				? preferred.normalizedKeywords
+				: secondary.normalizedKeywords,
+		normalizedContent:
+			preferred.normalizedContent.length >= secondary.normalizedContent.length
+				? preferred.normalizedContent
+				: secondary.normalizedContent
+	});
 	const dedupeSearchDocuments = (documents: SearchDocument[]) => {
 		const documentMap = new Map<string, SearchDocument>();
 		for (const document of documents) {
 			if (isSearchHrefBlocked(document.href)) continue;
 			const key = `${document.href}::${document.title}`;
 			const previous = documentMap.get(key);
-			if (!previous || document.priority > previous.priority) {
+			if (!previous) {
 				documentMap.set(key, document);
+				continue;
 			}
+			const shouldReplacePrevious =
+				document.priority > previous.priority ||
+				(document.priority === previous.priority &&
+					getSearchDocumentSignalScore(document) > getSearchDocumentSignalScore(previous));
+			const preferred = shouldReplacePrevious ? document : previous;
+			const secondary = shouldReplacePrevious ? previous : document;
+			documentMap.set(key, mergeSearchDocuments(preferred, secondary));
 		}
 		return [...documentMap.values()];
 	};
