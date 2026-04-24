@@ -1,6 +1,10 @@
 ﻿<script lang="ts">
 	import { browser } from "$app/environment";
+	import ArrowRight from "lucide-svelte/icons/arrow-right";
+	import Plus from "lucide-svelte/icons/plus";
 	import { onMount } from "svelte";
+	import { cubicOut } from "svelte/easing";
+	import { slide } from "svelte/transition";
 	import type { DotLottie } from "@lottiefiles/dotlottie-svelte";
 	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	import StackedCard from "$lib/components/home/StackedCard.svelte";
@@ -492,19 +496,13 @@
 			<p
 				class="text-xs font-semibold tracking-[0.12em] text-[#c8ffc6] uppercase"
 			>
-				Product Demo Loop
+				Antrian Dokumen & Persetujuan
 			</p>
 			<h2 id="overview-section"
 				class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.7rem]"
 			>
-				Overview Layanan SIKOPLING Dalam Satu Tampilan
+				LAYANAN SIKOPLING 
 			</h2>
-			<p
-				class="mt-3 text-base leading-relaxed text-white/86 sm:text-lg"
-			>
-				Cuplikan ringkas alur layanan, pemantauan progres dokumen, dan
-				navigasi utama yang tersedia di website SIKOPLING.
-			</p>
 		</div>
 
 		<div
@@ -577,7 +575,7 @@
 	<div class="page-shell" bind:this={statSection}>
 		<div class="mx-auto max-w-3xl text-center">
 			<p
-				class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase"
+				class="text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
 			>
 				Statistik Layanan
 			</p>
@@ -589,9 +587,7 @@
 			<p
 				class="mt-3 hidden sm:block text-base leading-relaxed text-[var(--muted)] sm:text-lg"
 			>
-				Berdasarkan data SIKOPLING, metrik berikut memperlihatkan
-				performa layanan konsultasi dan persetujuan lingkungan yang
-				semakin responsif.
+				Metrik performa layanan konsultasi dan persetujuan lingkungan.
 			</p>
 		</div>
 
@@ -719,14 +715,14 @@
 			<div class="pt-6 sm:pt-8">
 				<div class="mx-auto max-w-5xl text-center">
 					<p
-						class="mt-1 text-xs font-semibold tracking-[0.12em] text-[#c7ffc6] uppercase"
+							class="mt-1 text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
 					>
 						Layanan Dokumen Lingkungan
 					</p>
 					<h2
-						class="mt-2 text-[clamp(1rem,3vw,4rem)] font-semibold leading-tight tracking-tight text-white"
+						class="mt-6 text-[clamp(1rem,3vw,4rem)] font-semibold leading-tight tracking-tight text-white"
 					>
-						Jenis Dokumen yang Dapat Diproses
+						JENIS JENIS SIKOPLING
 					</h2>
 				</div>
 			</div>
@@ -741,7 +737,7 @@
 	<div class="page-shell">
 		<div class="mx-auto max-w-3xl text-center">
 			<p
-				class="text-xs font-semibold tracking-[0.12em] text-[#7f9662] uppercase"
+				class="text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
 			>
 				8 Langkah Percepatan
 			</p>
@@ -842,51 +838,71 @@
 <section id="faq" class="scroll-mt-28 bg-white py-16 sm:py-20">
 	<div class="nav-shell nav-shell-desktop-spacious">
 		<div
-			class="grid gap-8 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:gap-12"
+			class="grid gap-8 lg:grid-cols-[minmax(16rem,0.78fr)_minmax(0,1fr)] lg:gap-14 xl:gap-16"
 		>
-			<div class="lg:pt-2">
+			<div class="max-w-xl lg:pt-2 sm:text-center md:text-left">
+				<div
+					class="mb-4 flex flex-wrap items-center justify-center gap-3 text-sm font-semibold text-[var(--secondary)] md:justify-start"
+				>
+					<span
+						class="inline-flex h-8 items-center rounded-full bg-[var(--secondary-soft)] px-3"
+					>
+						FAQ SIKOPLING
+					</span>
+					<span class="hidden h-px w-10 bg-[var(--secondary)] sm:block" aria-hidden="true"></span>
+					<span>{homeFaqItems.length} pertanyaan populer</span>
+				</div>
 				<h2
-					class="max-w-md text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
+					class="max-w-md text-3xl leading-tight font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
 				>
 					Pertanyaan yang Sering Diajukan
 				</h2>
+				<p class="mt-4 max-w-sm text-base leading-relaxed text-[var(--muted)]">
+					FAQ untuk pertanyaan paling umum seputar layanan,
+					proses konsultasi, dan pemantauan dokumen.
+				</p>
 			</div>
 
-			<div>
-				<div class="space-y-3.5 sm:space-y-4">
+			<div class="w-full max-w-[58rem] justify-self-end">
+				<div class="space-y-3 sm:space-y-3.5">
 					{#each homeFaqItems as item}
 						<article
-							class="overflow-hidden rounded-[1.55rem] border border-[#e4e7ec] bg-white"
+							class={`overflow-hidden rounded-2xl border transition-all duration-300 ${
+								activeHomeFaqId === item.id
+									? "border-[var(--secondary)] bg-[var(--secondary-soft)] shadow-[0_16px_38px_rgba(62,177,74,0.12)]"
+									: "border-[#e0e5ed] bg-white shadow-[0_1px_0_rgba(16,24,40,0.02)] hover:border-[var(--secondary)] hover:bg-[var(--secondary-soft)] hover:shadow-[0_10px_26px_rgba(62,177,74,0.08)]"
+							}`}
 						>
 							<h3>
 								<button
 									type="button"
-									class="flex w-full items-center justify-between gap-4 px-5 py-4.5 text-left transition-colors hover:bg-[#f8faf6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6f864f] focus-visible:ring-inset sm:px-7 sm:py-5"
+									class="flex w-full items-center justify-between gap-4 px-5 py-4.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--secondary)] focus-visible:ring-inset sm:px-6 sm:py-5"
 									onclick={() => toggleHomeFaq(item.id)}
 									aria-expanded={activeHomeFaqId === item.id}
 									aria-controls={`${item.id}-answer`}
 								>
 									<span
-										class="text-[1.05rem] leading-snug font-semibold tracking-tight text-[var(--ink)] sm:text-[1.12rem]"
+										class="max-w-[44rem] text-[1rem] leading-snug font-semibold tracking-tight text-[var(--ink)] sm:text-[1.08rem]"
 									>
 										{item.question}
 									</span>
 									<span
-										class={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-2xl leading-none transition-transform duration-300 ${
+										class={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300 ${
 											activeHomeFaqId === item.id
-												? "rotate-45 border-[#c9d8b8] text-[#5d7b33]"
-												: "border-[#d8dde5] text-[#2f4f77]"
+												? "rotate-45 border-[var(--secondary)] bg-[var(--secondary)] text-white shadow-sm"
+												: "border-[#d8dde5] bg-white text-[var(--secondary)]"
 										}`}
 										aria-hidden="true"
 									>
-										+
+										<Plus class="h-5 w-5" strokeWidth={2.3} />
 									</span>
 								</button>
 							</h3>
 							{#if activeHomeFaqId === item.id}
 								<div
 									id={`${item.id}-answer`}
-									class="border-t border-[#edf0f4] px-5 pt-3.5 pb-5 text-sm leading-relaxed text-[var(--muted)] sm:px-7 sm:pt-4 sm:pb-6 sm:text-base"
+									class="border-t border-[var(--secondary)]/20 px-5 pt-3.5 pb-5 text-sm leading-relaxed text-[var(--muted)] sm:px-6 sm:pt-4 sm:pb-6 sm:text-base"
+									transition:slide={{ duration: 220, easing: cubicOut }}
 								>
 									{item.answer}
 								</div>
@@ -894,12 +910,17 @@
 						</article>
 					{/each}
 				</div>
-				<div class="mt-4 text-left sm:mt-5 sm:text-right">
+				<div class="mt-5 flex justify-start sm:justify-end">
 					<a
 						href="/kontak"
-						class="inline-flex items-center text-sm font-semibold text-[#5d7b33] transition-colors hover:text-[#476028]"
+						class="group inline-flex items-center gap-2 rounded-full border border-[var(--secondary)] px-4 py-2 text-sm font-semibold text-[var(--secondary)] transition-colors hover:bg-[var(--secondary-soft)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--secondary)]"
 					>
 						Lihat selengkapnya
+						<ArrowRight
+							class="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+							strokeWidth={2.2}
+							aria-hidden="true"
+						/>
 					</a>
 				</div>
 			</div>
@@ -1052,4 +1073,3 @@
 		}
 	}
 </style>
-

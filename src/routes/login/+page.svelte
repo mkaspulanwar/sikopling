@@ -78,10 +78,10 @@
 				<div class="flex min-h-full items-center justify-center py-5 sm:py-6">
 					<div class="w-full max-w-[28.5rem]">
 						<div class="rounded-[1.55rem] border border-white/28 bg-white/97 p-5 shadow-[0_26px_60px_-36px_rgba(15,23,42,0.78)] sm:p-6">
-							<h2 class="text-[1.75rem] leading-tight font-semibold tracking-tight text-[var(--ink)] sm:text-[1.95rem]">
+							<h2 class="text-[1.75rem] leading-tight font-semibold tracking-tight text-(--ink) sm:text-[1.95rem]">
 								Masuk Akun
 							</h2>
-							<p class="mt-1.5 text-sm text-[var(--muted)] sm:text-[0.96rem]">
+							<p class="mt-1.5 text-sm text-(--muted) sm:text-[0.96rem]">
 								Silakan login dengan akun terdaftar.
 							</p>
 
@@ -89,27 +89,27 @@
 								<input type="hidden" name="redirectTo" value={form?.redirectTo ?? data.redirectTo} />
 
 								<div class="space-y-1.5">
-									<label for="email" class="text-sm font-semibold text-[var(--ink)]">Email</label>
+									<label for="email" class="text-sm font-semibold text-(--ink)">Email</label>
 									<input
 										id="email"
 										name="email"
 										type="email"
 										autocomplete="email"
 										placeholder="contoh: pemrakarsa@contoh.id"
-										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-[var(--ink)] placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
+										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-(--ink) placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
 										required
 									/>
 								</div>
 
 								<div class="space-y-1.5">
-									<label for="password" class="text-sm font-semibold text-[var(--ink)]">Kata Sandi</label>
+									<label for="password" class="text-sm font-semibold text-(--ink)">Kata Sandi</label>
 									<input
 										id="password"
 										name="password"
 										type="password"
 										autocomplete="current-password"
 										placeholder="Masukkan kata sandi"
-										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-[var(--ink)] placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
+										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-(--ink) placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
 										required
 									/>
 								</div>
@@ -121,7 +121,7 @@
 								{/if}
 
 								<div class="flex items-center justify-between gap-2 pt-0.5">
-									<label class="inline-flex items-center gap-2 text-sm text-[var(--muted)]">
+									<label class="inline-flex items-center gap-2 text-sm text-(--muted)">
 										<input
 											type="checkbox"
 											name="remember"
@@ -145,7 +145,7 @@
 								</button>
 							</form>
 
-							<p class="mt-4 text-center text-xs leading-relaxed text-[var(--muted)] sm:text-sm">
+							<p class="mt-4 text-center text-xs leading-relaxed text-(--muted) sm:text-sm">
 								Belum punya akun? Hubungi administrator layanan SIKOPLING.
 							</p>
 						</div>

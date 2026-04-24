@@ -247,13 +247,13 @@
 	}
 </script>
 
-<section class="mx-auto flex w-full max-w-[1760px] flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
+<section class="mx-auto flex w-full max-w-440 flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
 	<header class="rounded-xl border border-[#d7dee8] bg-white px-5 py-5 sm:px-6">
 		<div class="flex flex-wrap items-start justify-between gap-3">
 			<div>
-				<p class="text-xs font-semibold uppercase tracking-[0.05em] text-[var(--muted)]">Dashboard Admin</p>
+				<p class="text-xs font-semibold uppercase tracking-[0.05em] text-(--muted)">Dashboard Admin</p>
 				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-[#20232A] sm:text-[2rem]">Antrian Pengajuan</h1>
-				<p class="mt-2 max-w-3xl text-sm text-[var(--muted)] sm:text-[0.96rem]">
+				<p class="mt-2 max-w-3xl text-sm text-(--muted) sm:text-[0.96rem]">
 					Kelola antrean dokling dan pertek dengan tabel operasional, pembaruan status, dan histori workflow.
 				</p>
 			</div>
@@ -310,11 +310,11 @@
 	<section class="rounded-xl border border-[#d7dee8] bg-white p-4 sm:p-5">
 		<div class="flex flex-wrap items-center justify-between gap-2">
 			<h2 class="text-base font-semibold text-[#20232A] sm:text-lg">Tambah Pengajuan Baru</h2>
-			<p class="text-xs text-[var(--muted)]">Isi kolom sesuai data pengajuan lalu simpan.</p>
+			<p class="text-xs text-(--muted)">Isi kolom sesuai data pengajuan lalu simpan.</p>
 		</div>
 		<div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Layanan *</span>
+				<span class="text-xs font-semibold text-(--muted)">Layanan *</span>
 				<select bind:value={createForm.layanan} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]">
 					{#each LAYANAN_VALUES as layanan}
 						<option value={layanan}>{layanan.toUpperCase()}</option>
@@ -322,15 +322,15 @@
 				</select>
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">No Registrasi *</span>
+				<span class="text-xs font-semibold text-(--muted)">No Registrasi *</span>
 				<input type="text" bind:value={createForm.no_registrasi} placeholder="Contoh: REG-2026-0001" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Tanggal Masuk</span>
+				<span class="text-xs font-semibold text-(--muted)">Tanggal Masuk</span>
 				<input type="date" bind:value={createForm.tanggal_masuk} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Status Awal</span>
+				<span class="text-xs font-semibold text-(--muted)">Status Awal</span>
 				<select bind:value={createForm.status} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]">
 					{#each STATUS_VALUES as status}
 						<option value={status}>{status}</option>
@@ -338,19 +338,19 @@
 				</select>
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Instansi</span>
+				<span class="text-xs font-semibold text-(--muted)">Instansi</span>
 				<input type="text" bind:value={createForm.instansi} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Kegiatan</span>
+				<span class="text-xs font-semibold text-(--muted)">Kegiatan</span>
 				<input type="text" bind:value={createForm.kegiatan} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Jenis Dokumen</span>
+				<span class="text-xs font-semibold text-(--muted)">Jenis Dokumen</span>
 				<input type="text" bind:value={createForm.jenis_dokumen} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Posisi</span>
+				<span class="text-xs font-semibold text-(--muted)">Posisi</span>
 				<input type="text" bind:value={createForm.posisi} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 		</div>
@@ -367,7 +367,7 @@
 			{#if hasActiveFilter}
 				<a
 					href={page.url.pathname}
-					class="inline-flex h-9 items-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[var(--muted)] transition-colors hover:bg-[#f3f5f8]"
+					class="inline-flex h-9 items-center rounded-lg border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-(--muted) transition-colors hover:bg-[#f3f5f8]"
 				>
 					Reset semua filter
 				</a>
@@ -375,11 +375,11 @@
 		</div>
 		<div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Kata Kunci</span>
+				<span class="text-xs font-semibold text-(--muted)">Kata Kunci</span>
 				<input type="search" name="keyword" value={data.filters.keyword ?? ''} placeholder="No registrasi / instansi / kegiatan" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Layanan</span>
+				<span class="text-xs font-semibold text-(--muted)">Layanan</span>
 				<select name="layanan" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]">
 					<option value="">Semua layanan</option>
 					{#each LAYANAN_VALUES as layanan}
@@ -388,7 +388,7 @@
 				</select>
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Status</span>
+				<span class="text-xs font-semibold text-(--muted)">Status</span>
 				<select name="status" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]">
 					<option value="">Semua status</option>
 					{#each STATUS_VALUES as status}
@@ -397,19 +397,19 @@
 				</select>
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Instansi</span>
+				<span class="text-xs font-semibold text-(--muted)">Instansi</span>
 				<input type="text" name="instansi" value={data.filters.instansi ?? ''} placeholder="Nama instansi" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Jenis Dokumen</span>
+				<span class="text-xs font-semibold text-(--muted)">Jenis Dokumen</span>
 				<input type="text" name="jenisDokumen" value={data.filters.jenisDokumen ?? ''} placeholder="AMDAL, UKL-UPL, dll" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Tanggal Mulai</span>
+				<span class="text-xs font-semibold text-(--muted)">Tanggal Mulai</span>
 				<input type="date" name="tanggalMulai" value={data.filters.tanggalMulai ?? ''} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-[var(--muted)]">Tanggal Selesai</span>
+				<span class="text-xs font-semibold text-(--muted)">Tanggal Selesai</span>
 				<input type="date" name="tanggalSelesai" value={data.filters.tanggalSelesai ?? ''} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 		</div>
@@ -423,12 +423,12 @@
 
 	<div class="space-y-4">
 		<div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-			<div class="hidden flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[var(--muted)] sm:text-sm md:flex">
-				<p>Rentang <span class="font-semibold text-[var(--ink)]">{formatNumber(visibleRangeStart)}-{formatNumber(visibleRangeEnd)}</span></p>
-				<p>Hasil Filter <span class="font-semibold text-[var(--ink)]">{formatNumber(data.result.data.length)}</span></p>
-				<p>Total Pengajuan <span class="font-semibold text-[var(--ink)]">{formatNumber(data.result.total)}</span></p>
+			<div class="hidden flex-wrap items-center gap-x-5 gap-y-1 text-xs text-(--muted) sm:text-sm md:flex">
+				<p>Rentang <span class="font-semibold text-(--ink)">{formatNumber(visibleRangeStart)}-{formatNumber(visibleRangeEnd)}</span></p>
+				<p>Hasil Filter <span class="font-semibold text-(--ink)">{formatNumber(data.result.data.length)}</span></p>
+				<p>Total Pengajuan <span class="font-semibold text-(--ink)">{formatNumber(data.result.total)}</span></p>
 			</div>
-			<label class="inline-flex items-center gap-2 text-xs text-[var(--muted)] sm:text-sm">
+			<label class="inline-flex items-center gap-2 text-xs text-(--muted) sm:text-sm">
 				<span class="font-medium">Tampilkan:</span>
 				<select value={data.result.pageSize} onchange={(event) => changePageSize((event.currentTarget as HTMLSelectElement).value)} class="h-9 w-[3.9rem] rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-2.5 text-xs font-semibold text-[#20232A] shadow-[0_1px_1px_rgba(15,23,42,0.03)]">
 					{#each [10, 20, 50, 100] as size}
@@ -469,8 +469,8 @@
 					{#if data.result.data.length === 0}
 						<tr>
 							<td colspan="11" class="px-6 py-12 text-center">
-								<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
-								<p class="mt-1 text-sm text-[var(--muted)]">Coba ubah kata kunci pencarian atau reset filter.</p>
+								<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
+								<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
 							</td>
 						</tr>
 					{:else}
@@ -480,12 +480,12 @@
 								<td class="px-4 py-4 text-sm text-[#20232A]">
 									<span class="inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold uppercase text-slate-700">{row.layanan}</span>
 								</td>
-								<td class="px-4 py-4 text-sm font-semibold text-[#20232A] break-words">{row.no_registrasi}</td>
+								<td class="px-4 py-4 text-sm font-semibold text-[#20232A] wrap-break-word">{row.no_registrasi}</td>
 								<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</td>
-								<td class="px-4 py-4 text-sm text-[#20232A] break-words">{row.instansi ?? '-'}</td>
-								<td class="px-4 py-4 text-sm text-[#20232A] break-words">{row.kegiatan ?? '-'}</td>
-								<td class="px-4 py-4 text-sm text-[#20232A] break-words">{row.jenis_dokumen ?? '-'}</td>
-								<td class="px-4 py-4 text-sm text-[#20232A] break-words">{row.posisi ?? '-'}</td>
+								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.instansi ?? '-'}</td>
+								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.kegiatan ?? '-'}</td>
+								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.jenis_dokumen ?? '-'}</td>
+								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.posisi ?? '-'}</td>
 								<td class="px-4 py-4 text-sm"><PengajuanStatusBadge status={row.status} /></td>
 								<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_update)}</td>
 								<td class="px-4 py-4">
@@ -520,10 +520,10 @@
 											</div>
 											<div class="flex flex-wrap items-start gap-2 xl:justify-end">
 												<button type="button" onclick={() => submitStatusUpdate(row.id)} disabled={pendingRowId === row.id || data.unavailable} class="h-10 rounded-lg bg-[#64AD31] px-3 text-xs font-semibold text-white transition enabled:hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">{pendingRowId === row.id ? 'Menyimpan...' : 'Simpan Status'}</button>
-												<details class="min-w-[12rem] rounded-lg border border-[#d7dee8] bg-white p-2.5">
+												<details class="min-w-48 rounded-lg border border-[#d7dee8] bg-white p-2.5">
 													<summary class="cursor-pointer text-xs font-semibold text-[#334155]">History ({getRowHistory(row.id).length})</summary>
 													{#if getRowHistory(row.id).length === 0}
-														<p class="mt-2 text-xs text-[var(--muted)]">Belum ada histori perubahan.</p>
+														<p class="mt-2 text-xs text-(--muted)">Belum ada histori perubahan.</p>
 													{:else}
 														<ul class="mt-2 space-y-2">
 															{#each getRowHistory(row.id) as history}
@@ -531,7 +531,7 @@
 																	<p class="font-semibold text-[#20232A]">{history.old_status ?? 'Belum ada'} -> {history.new_status}</p>
 																	<p>Posisi: {history.old_posisi ?? '-'} -> {history.new_posisi ?? '-'}</p>
 																	<p>Catatan: {history.note ?? '-'}</p>
-																	<p class="text-[var(--muted)]">{formatDateTime(history.changed_at)}</p>
+																	<p class="text-(--muted)">{formatDateTime(history.changed_at)}</p>
 																</li>
 															{/each}
 														</ul>
@@ -555,25 +555,25 @@
 			</div>
 			{#if data.result.data.length === 0}
 				<div class="px-6 py-12 text-center">
-					<p class="text-base font-semibold text-[var(--ink)]">Data tidak ditemukan</p>
-					<p class="mt-1 text-sm text-[var(--muted)]">Coba ubah kata kunci pencarian atau reset filter.</p>
+					<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
+					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
 				</div>
 			{:else}
 				<ul>
 					{#each data.result.data as row, index}
-						<li class="border-t border-[var(--line)] first:border-t-0 px-3 py-3">
+						<li class="border-t border-(--line) first:border-t-0 px-3 py-3">
 							<div class="grid grid-cols-[2.25rem_minmax(0,1fr)] gap-3">
 								<p class="pt-0.5 text-center text-sm font-semibold text-[#20232A]">{(data.result.page - 1) * data.result.pageSize + index + 1}</p>
 								<div>
 									<div class="flex items-start justify-between gap-2">
 										<div class="min-w-0">
 											<p class="truncate text-sm font-semibold text-[#20232A]">{row.instansi ?? '-'}</p>
-											<p class="mt-1 text-[0.75rem] break-all text-[var(--muted)]">{row.no_registrasi}</p>
+											<p class="mt-1 text-[0.75rem] break-all text-(--muted)">{row.no_registrasi}</p>
 										</div>
 										<PengajuanStatusBadge status={row.status} />
 									</div>
 									<p class="mt-2 text-xs text-[#20232A]">{row.kegiatan ?? '-'}</p>
-									<p class="mt-1 text-[0.75rem] text-[var(--muted)]">Update: {formatDate(row.tanggal_update)}</p>
+									<p class="mt-1 text-[0.75rem] text-(--muted)">Update: {formatDate(row.tanggal_update)}</p>
 								</div>
 							</div>
 						</li>
@@ -583,7 +583,7 @@
 		</div>
 
 		<footer class="flex flex-col items-start justify-between gap-3 border-t border-[#d7dee8] pt-3 md:flex-row md:items-center">
-			<p class="text-sm text-[var(--muted)]">Halaman <span class="font-semibold text-[var(--ink)]">{data.result.page}</span> dari <span class="font-semibold text-[var(--ink)]">{data.result.totalPages}</span></p>
+			<p class="text-sm text-(--muted)">Halaman <span class="font-semibold text-(--ink)">{data.result.page}</span> dari <span class="font-semibold text-(--ink)">{data.result.totalPages}</span></p>
 			<div class="flex flex-wrap gap-2">
 				<a href={buildQuery({ page: Math.max(data.result.page - 1, 1) })} class={`rounded-lg border px-3 py-1.5 text-sm font-semibold ${data.result.page === 1 ? 'pointer-events-none border-slate-200 text-slate-400' : 'border-slate-300 text-slate-700 hover:border-slate-500 hover:text-slate-900'}`}>Sebelumnya</a>
 				{#each pageNumbers as pageNumber}

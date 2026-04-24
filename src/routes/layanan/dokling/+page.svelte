@@ -482,14 +482,14 @@
 <svelte:window onclick={handleWindowClick} onkeydown={handleWindowKeydown} />
 
 <section
-	class="relative overflow-hidden bg-[var(--canvas)] pt-28 pb-16 sm:pt-32 sm:pb-20"
+	class="relative overflow-hidden bg-(--canvas) pt-28 pb-16 sm:pt-32 sm:pb-20"
 >
 	<div class="nav-shell nav-shell-desktop-spacious relative">
 		<div hidden data-universal-search-index="queue-rows">{queueRowsSearchIndexText}</div>
 		<header class="mb-5 sm:mb-6">
 			<div class="max-w-3xl">
 				<h1
-					class="text-[clamp(1.75rem,7.2vw,2.65rem)] leading-[1.12] font-semibold tracking-[-0.015em] text-[var(--ink)]"
+					class="text-[clamp(1.75rem,7.2vw,2.65rem)] leading-[1.12] font-semibold tracking-[-0.015em] text-(--ink)"
 				>
 					Antrian Dokumen Lingkungan
 				</h1>
@@ -503,10 +503,10 @@
 				>
 					<label
 						for="search-antrian"
-						class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:max-w-[30rem] md:px-4"
+						class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:max-w-120 md:px-4"
 					>
 						<Search
-							class="h-4.5 w-4.5 text-[var(--muted)]"
+							class="h-4.5 w-4.5 text-(--muted)"
 							strokeWidth={2}
 							aria-hidden="true"
 						/>
@@ -516,7 +516,7 @@
 							bind:value={searchQuery}
 							oninput={resetExpandedAndFirstPage}
 							placeholder="Cari registrasi atau instansi"
-							class="h-full w-full border-0 bg-transparent px-0 text-sm text-[var(--ink)] placeholder:text-[var(--muted)] focus:ring-0 focus:outline-none"
+							class="h-full w-full border-0 bg-transparent px-0 text-sm text-(--ink) placeholder:text-(--muted) focus:ring-0 focus:outline-none"
 						/>
 					</label>
 
@@ -535,13 +535,13 @@
 							<span>Filter</span>
 							{#if activeAdvancedFilterCount > 0}
 								<span
-									class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#64AD31] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
+									class="inline-flex min-w-5 items-center justify-center rounded-full bg-[#64AD31] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
 								>
 									{activeAdvancedFilterCount}
 								</span>
 							{/if}
 							<ChevronDown
-								class={`h-4 w-4 text-[var(--muted)] transition-transform ${isFilterPanelOpen ? "rotate-180" : ""}`}
+								class={`h-4 w-4 text-(--muted) transition-transform ${isFilterPanelOpen ? "rotate-180" : ""}`}
 								strokeWidth={2.1}
 							/>
 						</button>
@@ -569,7 +569,7 @@
 						<div>
 							<label
 								for="sort-option"
-								class="mb-1 block text-xs font-semibold text-[var(--muted)]"
+								class="mb-1 block text-xs font-semibold text-(--muted)"
 							>
 								Urutkan
 							</label>
@@ -583,11 +583,11 @@
 									onclick={toggleSortDropdown}
 									aria-haspopup="listbox"
 									aria-expanded={isSortDropdownOpen}
-									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-[var(--ink)] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
+									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-(--ink) shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
 								>
 									<span class="truncate">{sortOption}</span>
 									<ChevronDown
-										class={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isSortDropdownOpen ? "rotate-180" : ""}`}
+										class={`h-4 w-4 shrink-0 text-(--muted) transition-transform ${isSortDropdownOpen ? "rotate-180" : ""}`}
 										strokeWidth={2.2}
 									/>
 								</button>
@@ -626,7 +626,7 @@
 						<div>
 							<label
 								for="status-filter"
-								class="mb-1 block text-xs font-semibold text-[var(--muted)]"
+								class="mb-1 block text-xs font-semibold text-(--muted)"
 							>
 								Status Progress
 							</label>
@@ -640,11 +640,11 @@
 									onclick={toggleStatusDropdown}
 									aria-haspopup="listbox"
 									aria-expanded={isStatusDropdownOpen}
-									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-[var(--ink)] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
+									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-(--ink) shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
 								>
 									<span class="truncate">{statusFilter}</span>
 									<ChevronDown
-										class={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""}`}
+										class={`h-4 w-4 shrink-0 text-(--muted) transition-transform ${isStatusDropdownOpen ? "rotate-180" : ""}`}
 										strokeWidth={2.2}
 									/>
 								</button>
@@ -683,7 +683,7 @@
 						<div>
 							<label
 								for="position-filter"
-								class="mb-1 block text-xs font-semibold text-[var(--muted)]"
+								class="mb-1 block text-xs font-semibold text-(--muted)"
 							>
 								Jenis Dokumen
 							</label>
@@ -697,7 +697,7 @@
 									onclick={togglePositionDropdown}
 									aria-haspopup="listbox"
 									aria-expanded={isPositionDropdownOpen}
-									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-[var(--ink)] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
+									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-(--ink) shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
 								>
 									<span class="truncate"
 										>{positionFilter === "Semua Posisi"
@@ -705,7 +705,7 @@
 											: positionFilter}</span
 									>
 									<ChevronDown
-										class={`h-4 w-4 shrink-0 text-[var(--muted)] transition-transform ${isPositionDropdownOpen ? "rotate-180" : ""}`}
+										class={`h-4 w-4 shrink-0 text-(--muted) transition-transform ${isPositionDropdownOpen ? "rotate-180" : ""}`}
 										strokeWidth={2.2}
 									/>
 								</button>
@@ -746,9 +746,9 @@
 					<div
 						class="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-[#edf1f6] pt-3"
 					>
-						<p class="text-xs text-[var(--muted)]">
+						<p class="text-xs text-(--muted)">
 							Urutan aktif:
-							<span class="font-semibold text-[var(--ink)]"
+							<span class="font-semibold text-(--ink)"
 								>{sortOption}</span
 							>
 						</p>
@@ -757,7 +757,7 @@
 							{#if activeAdvancedFilterCount > 0}
 								<button
 									type="button"
-									class="inline-flex h-9 items-center justify-center rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-[var(--muted)] transition-colors hover:bg-[#f3f5f8] hover:text-[var(--ink)]"
+									class="inline-flex h-9 items-center justify-center rounded-md border border-[#d3dbe7] bg-[#ffffff] px-3 text-xs font-semibold text-(--muted) transition-colors hover:bg-[#f3f5f8] hover:text-(--ink)"
 									onclick={resetAdvancedFilters}
 								>
 									Reset Filter
@@ -797,31 +797,31 @@
 				class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
 			>
 				<div class="space-y-1">
-					<p class="text-xs text-[var(--muted)] md:hidden">
+					<p class="text-xs text-(--muted) md:hidden">
 						Menampilkan
-						<span class="font-semibold text-[var(--ink)]"
+						<span class="font-semibold text-(--ink)"
 							>{formatNumber(visibleRangeStart)}-{formatNumber(
 								visibleRangeEnd,
 							)}</span
 						>
 						dari
-						<span class="font-semibold text-[var(--ink)]"
+						<span class="font-semibold text-(--ink)"
 							>{formatNumber(totalFilteredRows)}</span
 						>
 						hasil
 					</p>
-					<p class="text-[0.72rem] text-[var(--muted)] md:hidden">
+					<p class="text-[0.72rem] text-(--muted) md:hidden">
 						Total pengajuan:
-						<span class="font-semibold text-[var(--ink)]"
+						<span class="font-semibold text-(--ink)"
 							>{formatNumber(queueRows.length)}</span
 						>
 					</p>
 					<div
-						class="hidden flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[var(--muted)] sm:text-sm md:flex"
+						class="hidden flex-wrap items-center gap-x-5 gap-y-1 text-xs text-(--muted) sm:text-sm md:flex"
 					>
 						<p>
 							Rentang
-							<span class="font-semibold text-[var(--ink)]"
+							<span class="font-semibold text-(--ink)"
 								>{formatNumber(
 									visibleRangeStart,
 								)}-{formatNumber(visibleRangeEnd)}</span
@@ -829,13 +829,13 @@
 						</p>
 						<p>
 							Hasil Filter
-							<span class="font-semibold text-[var(--ink)]"
+							<span class="font-semibold text-(--ink)"
 								>{formatNumber(totalFilteredRows)}</span
 							>
 						</p>
 						<p>
 							Total Pengajuan
-							<span class="font-semibold text-[var(--ink)]"
+							<span class="font-semibold text-(--ink)"
 								>{formatNumber(queueRows.length)}</span
 							>
 						</p>
@@ -844,7 +844,7 @@
 
 				<div class="flex flex-wrap items-center gap-2 md:justify-end">
 					<div
-						class="inline-flex items-center gap-2 text-xs text-[var(--muted)] sm:text-sm"
+						class="inline-flex items-center gap-2 text-xs text-(--muted) sm:text-sm"
 					>
 						<label for="rows-per-page" class="font-medium"
 							>Tampilkan:</label
@@ -860,7 +860,7 @@
 							>
 								<span>{rowsPerPage}</span>
 								<ChevronDown
-									class={`h-3 w-3 text-[var(--muted)] transition-transform sm:h-3.5 sm:w-3.5 ${isRowsDropdownOpen ? "rotate-180" : ""}`}
+									class={`h-3 w-3 text-(--muted) transition-transform sm:h-3.5 sm:w-3.5 ${isRowsDropdownOpen ? "rotate-180" : ""}`}
 									strokeWidth={2.2}
 								/>
 							</button>
@@ -957,11 +957,11 @@
 							<tr>
 								<td colspan="9" class="px-6 py-12 text-center">
 									<p
-										class="text-base font-semibold text-[var(--ink)]"
+										class="text-base font-semibold text-(--ink)"
 									>
 										Data tidak ditemukan
 									</p>
-									<p class="mt-1 text-sm text-[var(--muted)]">
+									<p class="mt-1 text-sm text-(--muted)">
 										Coba ubah kata kunci pencarian atau
 										reset filter.
 									</p>
@@ -1029,10 +1029,10 @@
 
 			{#if totalFilteredRows === 0}
 				<div class="px-6 py-12 text-center">
-					<p class="text-base font-semibold text-[var(--ink)]">
+					<p class="text-base font-semibold text-(--ink)">
 						Data tidak ditemukan
 					</p>
-					<p class="mt-1 text-sm text-[var(--muted)]">
+					<p class="mt-1 text-sm text-(--muted)">
 						Coba ubah kata kunci pencarian atau reset filter.
 					</p>
 				</div>
@@ -1068,7 +1068,7 @@
 												{row.agency}
 											</p>
 											<p
-												class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]"
+												class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
 											>
 												{row.registrationNo}
 											</p>
@@ -1076,7 +1076,7 @@
 												class="mt-2 flex flex-wrap items-center gap-1.5"
 											>
 												<span
-													class="text-[0.75rem] leading-tight text-[var(--muted)]"
+													class="text-[0.75rem] leading-tight text-(--muted)"
 												>
 													{row.documentType}
 												</span>
@@ -1088,7 +1088,7 @@
 											</div>
 										</div>
 										<span
-											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.registrationNo) ? "rotate-180" : ""}`}
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-(--muted) transition-transform ${isRowExpanded(row.registrationNo) ? "rotate-180" : ""}`}
 											aria-hidden="true"
 										>
 											<ChevronDown
