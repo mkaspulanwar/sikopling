@@ -214,12 +214,12 @@
 			bottom: -0.55rem;
 			z-index: 0;
 			color: rgba(255, 255, 255, 0.11);
-			font-size: clamp(4.25rem, 13vw, 10.5rem);
+			font-size: clamp(4.25rem, 12vw, 10.5rem);
 			font-weight: 800;
 			line-height: 0.78;
 			pointer-events: none;
 			white-space: nowrap;
-			transform: rotate(15deg);
+			transform: none;
 			transform-origin: right;
 		}
 
