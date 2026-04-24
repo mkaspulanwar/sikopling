@@ -570,10 +570,10 @@
 </section>
 <section
 	id="layanan-dashboard"
-	class="scroll-mt-28 bg-[var(--canvas)] py-7 sm:py-20"
+	class="scroll-mt-28 bg-[var(--canvas)] py-12 sm:py-30"
 >
 	<div class="page-shell" bind:this={statSection}>
-		<div class="mx-auto max-w-3xl text-center">
+		<div class="mx-auto max-w-4xl text-center">
 			<p
 				class="text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
 			>
@@ -715,12 +715,12 @@
 			<div class="pt-6 sm:pt-8">
 				<div class="mx-auto max-w-5xl text-center">
 					<p
-							class="mt-1 text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
+							class="mt-1 text-xs font-semibold tracking-[0.12em] text-[#c8ffc6] uppercase"
 					>
 						Layanan Dokumen Lingkungan
 					</p>
 					<h2
-						class="mt-6 text-[clamp(1rem,3vw,4rem)] font-semibold leading-tight tracking-tight text-white"
+						class="mt-2 sm:mt-6 text-[clamp(1rem,3vw,4rem)] font-semibold leading-tight tracking-tight text-white"
 					>
 						JENIS JENIS SIKOPLING
 					</h2>
