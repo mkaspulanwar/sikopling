@@ -1,5 +1,7 @@
 ﻿<script lang="ts">
 	import ArrowLeft from 'lucide-svelte/icons/arrow-left';
+	import Eye from 'lucide-svelte/icons/eye';
+	import EyeOff from 'lucide-svelte/icons/eye-off';
 
 	type LoginData = {
 		redirectTo: string
@@ -9,6 +11,8 @@
 		error?: string
 		redirectTo?: string
 	}
+
+	let showPassword = $state(false);
 
 	const { data, form }: { data: LoginData; form: LoginFormState | null } = $props();
 </script>
@@ -78,11 +82,11 @@
 				<div class="flex min-h-full items-center justify-center py-5 sm:py-6">
 					<div class="w-full max-w-[28.5rem]">
 						<div class="rounded-[1.55rem] border border-white/28 bg-white/97 p-5 shadow-[0_26px_60px_-36px_rgba(15,23,42,0.78)] sm:p-6">
-							<h2 class="text-[1.75rem] leading-tight font-semibold tracking-tight text-(--ink) sm:text-[1.95rem]">
-								Masuk Akun
+							<h2 class="text-center text-[1.75rem] leading-tight font-semibold tracking-tight text-(--ink) sm:text-[1.95rem]">
+								Masuk
 							</h2>
-							<p class="mt-1.5 text-sm text-(--muted) sm:text-[0.96rem]">
-								Silakan login dengan akun terdaftar.
+							<p class="mt-1.5 text-center text-sm text-(--muted) sm:text-[0.96rem]">
+								Silakan masuk dengan akun terdaftar.
 							</p>
 
 							<form class="mt-5 space-y-3.5" method="post" novalidate>
@@ -96,22 +100,38 @@
 										type="email"
 										autocomplete="email"
 										placeholder="contoh: pemrakarsa@contoh.id"
-										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-(--ink) placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
+										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-(--ink) placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:outline-none focus:ring-0 focus-visible:outline-none"
 										required
 									/>
 								</div>
 
 								<div class="space-y-1.5">
 									<label for="password" class="text-sm font-semibold text-(--ink)">Kata Sandi</label>
-									<input
-										id="password"
-										name="password"
-										type="password"
-										autocomplete="current-password"
-										placeholder="Masukkan kata sandi"
-										class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 text-[0.95rem] text-(--ink) placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:ring-0"
-										required
-									/>
+									<div class="relative">
+										<input
+											id="password"
+											name="password"
+											type={showPassword ? 'text' : 'password'}
+											autocomplete="current-password"
+											placeholder="Masukkan kata sandi"
+											class="h-11 w-full rounded-xl border border-[#d7dee8] bg-white px-3.5 pr-11 text-[0.95rem] text-(--ink) placeholder:text-[#7b8595] transition-colors focus:border-[#8dbd62] focus:outline-none focus:ring-0 focus-visible:outline-none"
+											required
+										/>
+										<button
+											type="button"
+											class="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center rounded-r-xl text-[#7b8595] transition-colors hover:text-[#4d5665] focus-visible:outline-none focus-visible:text-[#4d5665]"
+											aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Lihat kata sandi'}
+											aria-controls="password"
+											aria-pressed={showPassword}
+											onclick={() => (showPassword = !showPassword)}
+										>
+											{#if showPassword}
+												<EyeOff class="h-4 w-4" />
+											{:else}
+												<Eye class="h-4 w-4" />
+											{/if}
+										</button>
+									</div>
 								</div>
 
 								{#if form?.error}
@@ -125,7 +145,7 @@
 										<input
 											type="checkbox"
 											name="remember"
-											class="h-4 w-4 rounded border-[#cfd6e2] text-[#64ad31] focus:ring-[#64ad31]"
+											class="h-4 w-4 rounded border-[#c3cfdd] text-[#64AD31] focus:ring-[#64AD31]"
 										/>
 										Ingat saya
 									</label>
@@ -139,15 +159,12 @@
 
 								<button
 									type="submit"
-									class="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#64AD31] text-sm font-semibold text-white transition-colors hover:bg-[#4f8925]"
+									class="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#64AD31] text-sm font-semibold !text-white transition-colors hover:bg-[#4f8925]"
 								>
 									Masuk
 								</button>
 							</form>
 
-							<p class="mt-4 text-center text-xs leading-relaxed text-(--muted) sm:text-sm">
-								Belum punya akun? Hubungi administrator layanan SIKOPLING.
-							</p>
 						</div>
 						<p class="mt-4 hidden text-center text-xs text-white/84 lg:block">
 							&copy; 2026 Dinas Lingkungan Hidup Kalimantan Selatan
