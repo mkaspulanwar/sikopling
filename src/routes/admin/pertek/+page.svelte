@@ -2,10 +2,11 @@
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
 	import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
+	import StatusDropdown from '$lib/components/admin/StatusDropdown.svelte'
 	import { cubicOut } from 'svelte/easing'
 	import { fly } from 'svelte/transition'
 	import type { PageData } from './$types'
-	import CalendarDays from 'lucide-svelte/icons/calendar-days'
+	import Calendar from 'lucide-svelte/icons/calendar'
 	import ChevronDown from 'lucide-svelte/icons/chevron-down'
 	import ChevronLeft from 'lucide-svelte/icons/chevron-left'
 	import ChevronRight from 'lucide-svelte/icons/chevron-right'
@@ -849,7 +850,7 @@
 		<div class="relative w-full max-w-3xl rounded-2xl border border-[#d7dee8] bg-white shadow-[0_32px_68px_-42px_rgba(15,23,42,0.7)]">
 			<div class="flex items-center justify-between border-b border-[#e6ebf2] px-5 py-4">
 				<div>
-					<h2 class="text-lg font-semibold text-slate-900">Tambahkan Data</h2>
+					<h2 class="text-xl font-semibold text-slate-900">Tambahkan Data</h2>
 				</div>
 				<button type="button" onclick={closeCreateModal} class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d7dee8] text-slate-500 hover:bg-slate-50">
 					<X class="h-4 w-4" />
@@ -859,21 +860,15 @@
 				<div class="grid gap-3 sm:grid-cols-2">
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">No Registrasi *</span>
-						<input type="text" bind:value={createForm.no_registrasi} placeholder="68A929AEDE796" class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={createForm.no_registrasi} placeholder="Contoh: 68A929AEDE796" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Status</span>
-						<div class="group relative">
-							<select
-								bind:value={createForm.status}
-								class="h-11 w-full appearance-none rounded-xl border border-[#d5deea] bg-white bg-none px-3 pr-10 text-sm text-slate-700 transition focus:border-[#b6cadf] focus:outline-none focus:ring-2 focus:ring-[#dce8f5]"
-							>
-								{#each STATUS_VALUES as status}
-									<option value={status}>{status}</option>
-								{/each}
-							</select>
-							<ChevronDown class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-transform duration-200 ease-out group-focus-within:rotate-180" />
-						</div>
+						<StatusDropdown
+							bind:value={createForm.status}
+							options={STATUS_VALUES}
+							disabled={isSavingCreate || data.unavailable}
+						/>
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Tanggal Masuk</span>
@@ -881,10 +876,10 @@
 							<input
 								type="date"
 								bind:value={createForm.tanggal_masuk}
-								class="modern-date-input h-11 w-full rounded-xl border border-[#d5deea] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#9ec2e6] focus:outline-none focus:ring-2 focus:ring-[#dce8f5]"
+								class="modern-date-input h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"
 							/>
-							<span class="pointer-events-none absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#d8e2ef] bg-[#f3f7fc] text-slate-500 transition group-focus-within:border-[#9ec2e6] group-focus-within:bg-[#e6f0fb] group-focus-within:text-[#2b6aa8]">
-								<CalendarDays class="h-4 w-4" />
+							<span class="pointer-events-none absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#c7ddb7] bg-[#f2f9ea] text-[#4f6f3d] transition group-focus-within:border-[#89b866] group-focus-within:bg-[#e8f4db] group-focus-within:text-[#2f6b1f]">
+								<Calendar class="h-4 w-4" />
 							</span>
 						</div>
 					</label>
@@ -894,35 +889,35 @@
 							<input
 								type="date"
 								bind:value={createForm.tanggal_update}
-								class="modern-date-input h-11 w-full rounded-xl border border-[#d5deea] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#9ec2e6] focus:outline-none focus:ring-2 focus:ring-[#dce8f5]"
+								class="modern-date-input h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"
 							/>
-							<span class="pointer-events-none absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#d8e2ef] bg-[#f3f7fc] text-slate-500 transition group-focus-within:border-[#9ec2e6] group-focus-within:bg-[#e6f0fb] group-focus-within:text-[#2b6aa8]">
-								<CalendarDays class="h-4 w-4" />
+							<span class="pointer-events-none absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#c7ddb7] bg-[#f2f9ea] text-[#4f6f3d] transition group-focus-within:border-[#89b866] group-focus-within:bg-[#e8f4db] group-focus-within:text-[#2f6b1f]">
+								<Calendar class="h-4 w-4" />
 							</span>
 						</div>
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Instansi</span>
-						<input type="text" bind:value={createForm.instansi} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={createForm.instansi} placeholder="Contoh: Dinas Lingkungan Hidup Kalsel" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Kegiatan</span>
-						<input type="text" bind:value={createForm.kegiatan} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={createForm.kegiatan} placeholder="Contoh: Membangun gedung baru" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Jenis Dokumen</span>
-						<input type="text" bind:value={createForm.jenis_dokumen} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={createForm.jenis_dokumen} placeholder="Contoh: Andal" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
-						<input type="text" bind:value={createForm.posisi} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={createForm.posisi} placeholder="Contoh: Penyusun" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 				</div>
 			</div>
 			<div class="flex flex-wrap justify-end gap-2 border-t border-[#e6ebf2] px-5 py-4">
 				<button type="button" onclick={closeCreateModal} class="inline-flex h-10 items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
-				<button type="button" onclick={submitCreate} disabled={isSavingCreate || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
-					{isSavingCreate ? 'Menyimpan...' : 'Simpan Data'}
+				<button type="button" onclick={submitCreate} disabled={isSavingCreate || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
+					{isSavingCreate ? 'Menyimpan...' : 'Simpan'}
 				</button>
 			</div>
 		</div>
@@ -935,7 +930,7 @@
 		<div class="relative w-full max-w-3xl rounded-2xl border border-[#d7dee8] bg-white shadow-[0_32px_68px_-42px_rgba(15,23,42,0.7)]">
 			<div class="flex items-center justify-between border-b border-[#e6ebf2] px-5 py-4">
 				<div>
-					<h2 class="text-lg font-semibold text-slate-900">Edit Data</h2>
+					<h2 class="text-xl font-semibold text-slate-900">Edit Data</h2>
 				</div>
 				<button type="button" onclick={closeEditModal} class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#d7dee8] text-slate-500 hover:bg-slate-50">
 					<X class="h-4 w-4" />
@@ -945,21 +940,15 @@
 				<div class="grid gap-3 sm:grid-cols-2">
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">No Registrasi *</span>
-						<input type="text" bind:value={editForm.no_registrasi} placeholder="68A929AEDE796" class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={editForm.no_registrasi} placeholder="Contoh: 68A929AEDE796" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Status</span>
-						<div class="group relative">
-							<select
-								bind:value={editForm.status}
-								class="h-11 w-full appearance-none rounded-xl border border-[#d5deea] bg-white bg-none px-3 pr-10 text-sm text-slate-700 transition focus:border-[#b6cadf] focus:outline-none focus:ring-2 focus:ring-[#dce8f5]"
-							>
-								{#each STATUS_VALUES as status}
-									<option value={status}>{status}</option>
-								{/each}
-							</select>
-							<ChevronDown class="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 transition-transform duration-200 ease-out group-focus-within:rotate-180" />
-						</div>
+						<StatusDropdown
+							bind:value={editForm.status}
+							options={STATUS_VALUES}
+							disabled={isSavingEdit || data.unavailable}
+						/>
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Tanggal Masuk</span>
@@ -967,10 +956,10 @@
 							<input
 								type="date"
 								bind:value={editForm.tanggal_masuk}
-								class="modern-date-input h-11 w-full rounded-xl border border-[#d5deea] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#9ec2e6] focus:outline-none focus:ring-2 focus:ring-[#dce8f5]"
+								class="modern-date-input h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"
 							/>
-							<span class="pointer-events-none absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#d8e2ef] bg-[#f3f7fc] text-slate-500 transition group-focus-within:border-[#9ec2e6] group-focus-within:bg-[#e6f0fb] group-focus-within:text-[#2b6aa8]">
-								<CalendarDays class="h-4 w-4" />
+							<span class="pointer-events-none absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#c7ddb7] bg-[#f2f9ea] text-[#4f6f3d] transition group-focus-within:border-[#89b866] group-focus-within:bg-[#e8f4db] group-focus-within:text-[#2f6b1f]">
+								<Calendar class="h-4 w-4" />
 							</span>
 						</div>
 					</label>
@@ -980,35 +969,35 @@
 							<input
 								type="date"
 								bind:value={editForm.tanggal_update}
-								class="modern-date-input h-11 w-full rounded-xl border border-[#d5deea] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#9ec2e6] focus:outline-none focus:ring-2 focus:ring-[#dce8f5]"
+								class="modern-date-input h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"
 							/>
-							<span class="pointer-events-none absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#d8e2ef] bg-[#f3f7fc] text-slate-500 transition group-focus-within:border-[#9ec2e6] group-focus-within:bg-[#e6f0fb] group-focus-within:text-[#2b6aa8]">
-								<CalendarDays class="h-4 w-4" />
+							<span class="pointer-events-none absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#c7ddb7] bg-[#f2f9ea] text-[#4f6f3d] transition group-focus-within:border-[#89b866] group-focus-within:bg-[#e8f4db] group-focus-within:text-[#2f6b1f]">
+								<Calendar class="h-4 w-4" />
 							</span>
 						</div>
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Instansi</span>
-						<input type="text" bind:value={editForm.instansi} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={editForm.instansi} placeholder="Contoh: Dinas Lingkungan Hidup Kalsel" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Kegiatan</span>
-						<input type="text" bind:value={editForm.kegiatan} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={editForm.kegiatan} placeholder="Contoh: Membangun gedung baru" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Jenis Dokumen</span>
-						<input type="text" bind:value={editForm.jenis_dokumen} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={editForm.jenis_dokumen} placeholder="Contoh: Andal" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
-						<input type="text" bind:value={editForm.posisi} class="h-11 rounded-lg border border-[#cfd7e3] px-3 text-sm" />
+						<input type="text" bind:value={editForm.posisi} placeholder="Contoh: Penyusun" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 				</div>
 			</div>
 			<div class="flex flex-wrap justify-end gap-2 border-t border-[#e6ebf2] px-5 py-4">
 				<button type="button" onclick={closeEditModal} class="inline-flex h-10 items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
-				<button type="button" onclick={submitEdit} disabled={isSavingEdit || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
-					{isSavingEdit ? 'Menyimpan...' : 'Simpan Perubahan'}
+				<button type="button" onclick={submitEdit} disabled={isSavingEdit || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
+					{isSavingEdit ? 'Menyimpan...' : 'Simpan'}
 				</button>
 			</div>
 		</div>
@@ -1036,6 +1025,7 @@
 	.modern-date-input::-webkit-clear-button {
 		display: none;
 	}
+
 </style>
 
 
@@ -1067,6 +1057,7 @@
 		</div>
 	</div>
 {/if}
+
 
 
 
