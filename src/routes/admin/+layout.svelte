@@ -4,7 +4,7 @@
 	import { slide } from 'svelte/transition'
 	import type { Snippet } from 'svelte'
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right'
-	import FileCheck2 from 'lucide-svelte/icons/file-check-2'
+	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet'
 	import FileText from 'lucide-svelte/icons/file-text'
 	import LayoutDashboard from 'lucide-svelte/icons/layout-dashboard'
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
@@ -16,8 +16,8 @@
 
 	const navItems = [
 		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-		{ label: 'Dokling', href: '/admin/dokling', icon: FileText },
-		{ label: 'Pertek', href: '/admin/pertek', icon: FileCheck2 }
+		{ label: 'Dokling', href: '/admin/dokling', icon: FileSpreadsheet },
+		{ label: 'Pertek', href: '/admin/pertek', icon: FileText }
 	]
 
 	let isSidebarCollapsed = $state(false)
@@ -174,6 +174,13 @@
 					Logout
 				</span>
 			</a>
+			<p
+				class={`mt-3 px-1 text-center text-[10px] leading-relaxed text-[var(--muted)] transition-all duration-300 ${
+					isSidebarCollapsed ? 'max-h-0 overflow-hidden opacity-0' : 'max-h-20 opacity-100'
+				}`}
+			>
+				Powered by Sikopling
+			</p>
 		</div>
 	</aside>
 

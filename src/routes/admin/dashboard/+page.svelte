@@ -1,9 +1,6 @@
 <script lang="ts">
 	import type { PageData } from './$types'
 	import ArrowRight from 'lucide-svelte/icons/arrow-right'
-	import ClipboardList from 'lucide-svelte/icons/clipboard-list'
-	import ListTodo from 'lucide-svelte/icons/list-todo'
-	import ShieldUser from 'lucide-svelte/icons/shield-user'
 
 	const { data }: { data: PageData } = $props()
 
@@ -12,9 +9,21 @@
 		month: 'short',
 		year: 'numeric'
 	})
+	const dateTimeFormatter = new Intl.DateTimeFormat('id-ID', {
+		day: '2-digit',
+		month: 'short',
+		year: 'numeric',
+		hour: '2-digit',
+		minute: '2-digit'
+	})
 
 	const numberFormatter = new Intl.NumberFormat('id-ID')
 	const formatDate = (value: string | null) => (value ? dateFormatter.format(new Date(`${value}T00:00:00`)) : '-')
+	const formatDateTime = (value: string | null) => {
+		if (!value) return '-'
+		const parsed = new Date(value)
+		return Number.isNaN(parsed.getTime()) ? '-' : dateTimeFormatter.format(parsed)
+	}
 	const formatNumber = (value: number) => numberFormatter.format(value)
 </script>
 
@@ -123,38 +132,36 @@
 		</section>
 
 		<section class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)] sm:p-5">
-			<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Aksi Cepat</h2>
-			<div class="mt-3 grid gap-2">
-				<a
-					href="/admin/dokling"
-					class="group flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--accent-soft)] px-3 py-3 text-sm font-semibold text-[var(--muted)] transition hover:border-[#b9d9a3] hover:bg-[var(--secondary-soft)] hover:text-[#2f5f17]"
-				>
-					<span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--surface)] text-[#3f7f1f]">
-						<ClipboardList class="h-4.5 w-4.5" />
-					</span>
-					<span>Kelola Dokling</span>
-					<ArrowRight class="ml-auto h-4 w-4 transition group-hover:translate-x-0.5" />
-				</a>
-				<a
-					href="/admin/pertek"
-					class="group flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--accent-soft)] px-3 py-3 text-sm font-semibold text-[var(--muted)] transition hover:border-[#b9d9a3] hover:bg-[var(--secondary-soft)] hover:text-[#2f5f17]"
-				>
-					<span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--surface)] text-[#3f7f1f]">
-						<ShieldUser class="h-4.5 w-4.5" />
-					</span>
-					<span>Kelola Pertek</span>
-					<ArrowRight class="ml-auto h-4 w-4 transition group-hover:translate-x-0.5" />
-				</a>
+			<div class="flex items-center justify-between gap-2">
+				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Riwayat Login</h2>
 				<a
 					href="/admin/profil"
-					class="group flex items-center gap-3 rounded-xl border border-[var(--line)] bg-[var(--accent-soft)] px-3 py-3 text-sm font-semibold text-[var(--muted)] transition hover:border-[#b9d9a3] hover:bg-[var(--secondary-soft)] hover:text-[#2f5f17]"
+					class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--muted)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
 				>
-					<span class="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--surface)] text-[#3f7f1f]">
-						<ListTodo class="h-4.5 w-4.5" />
-					</span>
-					<span>Lihat Profil Admin</span>
-					<ArrowRight class="ml-auto h-4 w-4 transition group-hover:translate-x-0.5" />
+					Profil admin
+					<ArrowRight class="h-3.5 w-3.5" />
 				</a>
+			</div>
+
+			<div class="mt-3 space-y-2">
+				{#if data.loginHistory.length === 0}
+					<p class="rounded-xl border border-dashed border-[var(--line)] bg-[var(--accent-soft)] px-3 py-6 text-center text-sm text-[var(--muted)]">
+						Belum ada data riwayat login.
+					</p>
+				{:else}
+					{#each data.loginHistory as item}
+						<article class="rounded-xl border border-[var(--line)] bg-[var(--accent-soft)] p-3">
+							<div class="flex items-start gap-3">
+								<span class="mt-1.5 h-2.5 w-2.5 rounded-full bg-[#3f7f1f]" aria-hidden="true"></span>
+								<div class="min-w-0">
+									<p class="text-sm font-semibold text-[var(--ink)]">{item.label}</p>
+									<p class="mt-1 text-xs text-[var(--muted)]">{item.description}</p>
+									<p class="mt-2 text-xs font-medium text-[#2f5f17]">{formatDateTime(item.timestamp)}</p>
+								</div>
+							</div>
+						</article>
+					{/each}
+				{/if}
 			</div>
 		</section>
 	</div>

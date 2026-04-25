@@ -7,6 +7,33 @@ import {
 import { getAntrianPengajuanSummary, listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import type { PageServerLoad } from './$types'
 
+type LoginHistoryItem = {
+	id: string
+	label: string
+	description: string
+	timestamp: string
+}
+
+const buildLoginHistory = (user: { email?: string | null; last_sign_in_at?: string | null; created_at?: string | null }) => {
+	const emailLabel = user.email ?? 'akun admin'
+	const items = [
+		{
+			id: 'last-login',
+			label: 'Login Terakhir',
+			description: `Akses terbaru oleh ${emailLabel}.`,
+			timestamp: user.last_sign_in_at
+		},
+		{
+			id: 'account-created',
+			label: 'Akun Terdaftar',
+			description: `Akun ${emailLabel} tercatat di sistem.`,
+			timestamp: user.created_at
+		}
+	].filter((item): item is LoginHistoryItem => Boolean(item.timestamp))
+
+	return items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+}
+
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const filters = readAdminFilters(url.searchParams)
 	const auth = await requireAdminSupabase(locals)
@@ -18,7 +45,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			errorMessage: null,
 			filters,
 			summary: EMPTY_SUMMARY,
-			recentResult: createEmptyResult(filters.page, filters.pageSize)
+			recentResult: createEmptyResult(filters.page, filters.pageSize),
+			loginHistory: []
 		}
 	}
 
@@ -29,11 +57,13 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			errorMessage: null,
 			filters,
 			summary: EMPTY_SUMMARY,
-			recentResult: createEmptyResult(filters.page, filters.pageSize)
+			recentResult: createEmptyResult(filters.page, filters.pageSize),
+			loginHistory: []
 		}
 	}
 
 	try {
+		const { user } = await locals.safeGetSession()
 		const [summary, recentResult] = await Promise.all([
 			getAntrianPengajuanSummary(auth.supabase),
 			listAntrianPengajuan(auth.supabase, {
@@ -52,7 +82,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			errorMessage: null,
 			filters,
 			summary,
-			recentResult
+			recentResult,
+			loginHistory: user ? buildLoginHistory(user) : []
 		}
 	} catch (error) {
 		return {
@@ -61,7 +92,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			errorMessage: error instanceof Error ? error.message : 'Gagal memuat ringkasan dashboard',
 			filters,
 			summary: EMPTY_SUMMARY,
-			recentResult: createEmptyResult(filters.page, filters.pageSize)
+			recentResult: createEmptyResult(filters.page, filters.pageSize),
+			loginHistory: []
 		}
 	}
 }
