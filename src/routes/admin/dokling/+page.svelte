@@ -7,6 +7,8 @@
 	import type { PageData } from './$types'
 	import CalendarDays from 'lucide-svelte/icons/calendar-days'
 	import ChevronDown from 'lucide-svelte/icons/chevron-down'
+	import ChevronLeft from 'lucide-svelte/icons/chevron-left'
+	import ChevronRight from 'lucide-svelte/icons/chevron-right'
 	import Download from 'lucide-svelte/icons/download'
 	import CirclePlus from 'lucide-svelte/icons/circle-plus'
 	import SquarePen from 'lucide-svelte/icons/square-pen'
@@ -191,17 +193,6 @@
 		rowsPerPage = '20'
 		await applyFilters()
 	}
-
-	const pageNumbers = $derived.by(() => {
-		if (data.result.totalPages <= 7) {
-			return Array.from({ length: data.result.totalPages }, (_, index) => index + 1)
-		}
-
-		const start = Math.max(1, data.result.page - 2)
-		const end = Math.min(data.result.totalPages, start + 4)
-		const adjustedStart = Math.max(1, end - 4)
-		return Array.from({ length: end - adjustedStart + 1 }, (_, index) => adjustedStart + index)
-	})
 
 	const visibleRangeStart = $derived.by(
 		() => (data.result.total === 0 ? 0 : (data.result.page - 1) * data.result.pageSize + 1)
@@ -552,9 +543,9 @@
 				type="button"
 				onclick={openImportPicker}
 				disabled={isImporting || data.unavailable}
-				class="inline-flex h-10 items-center gap-2 rounded-xl border border-[#cde5ba] bg-[#edf8e7] px-4 text-sm font-semibold text-[#2f6f1b] transition hover:bg-[#e1f2d6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8dca1] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+				class="inline-flex h-10 items-center gap-2 rounded-xl border border-[#64AD31] bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:border-[#4f8925] hover:bg-[#4f8925] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8dca1] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
 			>
-				<Download class="h-4 w-4" />
+				<Download class="h-4 w-4 text-white" />
 				{isImporting ? 'Mengimpor...' : 'Import'}
 			</button>
 			<input bind:this={importInput} type="file" accept=".csv,text/csv" class="hidden" onchange={handleImport} />
@@ -589,11 +580,11 @@
 				<button
 					type="button"
 					onclick={clearSelection}
-					class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#d0d7e3] bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+					class="inline-flex h-6 w-6 items-center justify-center rounded-md border border-[#D64545] bg-[#D64545] text-white transition hover:border-[#b93a3a] hover:bg-[#b93a3a] hover:text-white"
 					aria-label="Hapus semua pilihan checkbox"
 					title="Hapus semua pilihan"
 				>
-					<X class="h-3.5 w-3.5" />
+					<X class="h-3.5 w-3.5 text-white" />
 				</button>
 			{/if}
 		</div>
@@ -602,9 +593,9 @@
 				type="button"
 				onclick={openCreateModal}
 				disabled={data.unavailable}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#d7dee8] bg-white px-4 text-sm font-semibold text-[#2f6f1b] transition hover:bg-white hover:text-[#2a6319] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8d488] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 disabled:text-slate-500"
+				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#64AD31] bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:border-[#4f8925] hover:bg-[#4f8925] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8d488] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 disabled:text-slate-500"
 			>
-				<CirclePlus class="h-4 w-4" />
+				<CirclePlus class="h-4 w-4 text-white" />
 				Tambah
 			</button>
 			<button
@@ -618,9 +609,9 @@
 			<button
 				type="button"
 				onclick={openSelectedRowForDelete}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#d7dee8] bg-white px-4 text-sm font-semibold text-[#b42318] transition hover:bg-white hover:text-[#991b1b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px"
+				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#D64545] bg-[#D64545] px-4 text-sm font-semibold !text-white transition hover:border-[#b93a3a] hover:bg-[#b93a3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px"
 			>
-				<Trash class="h-4 w-4" />
+				<Trash class="h-4 w-4 text-white" />
 				Hapus
 			</button>
 		</div>
@@ -797,45 +788,58 @@
 		</div>
 	</section>
 
-	<footer class="flex flex-wrap items-center justify-between gap-3">
-		<p class="text-sm text-slate-600">
-			Halaman <span class="font-semibold text-slate-900">{data.result.page}</span> dari
-			<span class="font-semibold text-slate-900">{data.result.totalPages}</span>
-		</p>
-		<div class="flex flex-wrap gap-2">
+	<footer class="mt-6 pt-2">
+		<nav aria-label="Navigasi halaman antrian dokling admin" class="mx-auto flex flex-wrap items-center justify-center gap-1.5">
+			<a
+				href={buildQuery({ page: 1 })}
+				aria-disabled={data.result.page === 1}
+				class={`inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold transition-colors ${
+					data.result.page === 1
+						? 'pointer-events-none text-[#475467] opacity-40'
+						: 'text-[#475467] hover:bg-[#f4f8f0] hover:text-[#20232A]'
+				}`}
+			>
+				Awal
+			</a>
 			<a
 				href={buildQuery({ page: Math.max(data.result.page - 1, 1) })}
-				class={`rounded-xl border px-3 py-1.5 text-sm font-semibold ${
+				aria-label="Halaman sebelumnya"
+				aria-disabled={data.result.page === 1}
+				class={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors ${
 					data.result.page === 1
-						? 'pointer-events-none border-slate-200 text-slate-400'
-						: 'border-slate-300 text-slate-700 hover:border-slate-500 hover:text-slate-900'
+						? 'pointer-events-none text-[#475467] opacity-40'
+						: 'text-[#475467] hover:bg-[#f4f8f0] hover:text-[#20232A]'
 				}`}
 			>
-				Sebelumnya
+				<ChevronLeft class="h-4 w-4" strokeWidth={2.3} />
 			</a>
-			{#each pageNumbers as pageNumber}
-				<a
-					href={buildQuery({ page: pageNumber })}
-					class={`rounded-xl border px-3 py-1.5 text-sm font-semibold ${
-						pageNumber === data.result.page
-							? 'border-[#64AD31] bg-[#64AD31] text-white'
-							: 'border-slate-300 text-slate-700 hover:border-slate-500 hover:text-slate-900'
-					}`}
-				>
-					{pageNumber}
-				</a>
-			{/each}
+			<div class="inline-flex h-9 min-w-[4.5rem] items-center justify-center px-1.5 text-xs font-semibold text-[#20232A] tabular-nums">
+				{data.result.page} / {data.result.totalPages}
+			</div>
 			<a
 				href={buildQuery({ page: Math.min(data.result.page + 1, data.result.totalPages) })}
-				class={`rounded-xl border px-3 py-1.5 text-sm font-semibold ${
+				aria-label="Halaman berikutnya"
+				aria-disabled={data.result.page === data.result.totalPages}
+				class={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors ${
 					data.result.page === data.result.totalPages
-						? 'pointer-events-none border-slate-200 text-slate-400'
-						: 'border-slate-300 text-slate-700 hover:border-slate-500 hover:text-slate-900'
+						? 'pointer-events-none text-[#475467] opacity-40'
+						: 'text-[#475467] hover:bg-[#f4f8f0] hover:text-[#20232A]'
 				}`}
 			>
-				Berikutnya
+				<ChevronRight class="h-4 w-4" strokeWidth={2.3} />
 			</a>
-		</div>
+			<a
+				href={buildQuery({ page: data.result.totalPages })}
+				aria-disabled={data.result.page === data.result.totalPages}
+				class={`inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold transition-colors ${
+					data.result.page === data.result.totalPages
+						? 'pointer-events-none text-[#475467] opacity-40'
+						: 'text-[#475467] hover:bg-[#f4f8f0] hover:text-[#20232A]'
+				}`}
+			>
+				Akhir
+			</a>
+		</nav>
 	</footer>
 </section>
 
