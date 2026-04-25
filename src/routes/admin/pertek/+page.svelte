@@ -699,7 +699,7 @@
 			</tbody>
 		</table>
 
-		<div class="mt-1 overflow-hidden rounded-xl border-y border-[#d7dee8] bg-transparent md:hidden">
+		<div class="overflow-hidden border-y border-[#d7dee8] bg-transparent md:hidden">
 			<div class="grid grid-cols-[1.5rem_2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white">
 				<span class="inline-flex justify-center">
 					<input
