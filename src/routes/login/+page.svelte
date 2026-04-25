@@ -24,9 +24,11 @@
 	/>
 	<link
 		rel="preload"
-		href="/home/video-hero.webm?v=20260418"
-		as="video"
-		type="video/webm"
+		href="/login/forest.jpg"
+		as="image"
+		type="image/jpeg"
+		media="(max-width: 640px)"
+		fetchpriority="high"
 	/>
 </svelte:head>
 
@@ -38,10 +40,14 @@
 			muted
 			loop
 			playsinline
-			preload="metadata"
+			preload="none"
 		>
-			<source src="/home/video-hero.webm?v=20260418" type="video/webm" />
-			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" />
+			<source
+				src="/home/video-hero.webm?v=20260418"
+				type="video/webm"
+				media="(min-width: 641px)"
+			/>
+			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" media="(min-width: 641px)" />
 		</video>
 	</div>
 	<div class="absolute inset-0 z-10 bg-slate-950/30" aria-hidden="true"></div>
@@ -199,7 +205,7 @@
 
 	@media (max-width: 640px) {
 		.login-media {
-			background-image: url('/login/hutan.jpg');
+			background-image: url('/login/forest.jpg');
 			background-position: center;
 			background-repeat: no-repeat;
 			background-size: cover;
