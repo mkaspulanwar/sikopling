@@ -28,7 +28,7 @@
 </script>
 
 <section class="mx-auto w-full max-w-[1320px] space-y-6">
-	<header class="overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 shadow-[0_22px_50px_-42px_rgba(15,23,42,0.42)] sm:p-7">
+	<header class="overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-7">
 		<div class="relative">
 			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[radial-gradient(circle,_rgba(100,173,49,0.28)_0%,_transparent_72%)]"></div>
 			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Dashboard Admin</p>
@@ -55,27 +55,27 @@
 		</p>
 	{/if}
 
-	<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-		<article class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)]">
-			<p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Total Pengajuan</p>
-			<p class="mt-2 text-3xl font-semibold tracking-tight text-[var(--ink)]">{formatNumber(data.summary.total)}</p>
+	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Pengajuan</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.total)}</p>
 		</article>
-		<article class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)]">
-			<p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Pending</p>
-			<p class="mt-2 text-3xl font-semibold tracking-tight text-amber-600">{formatNumber(data.summary.pending)}</p>
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Dokling</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.dokling)}</p>
 		</article>
-		<article class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)]">
-			<p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Dokling</p>
-			<p class="mt-2 text-3xl font-semibold tracking-tight text-[#3d7f1d]">{formatNumber(data.summary.dokling)}</p>
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Pertek</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.pertek)}</p>
 		</article>
-		<article class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)]">
-			<p class="text-xs font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">Pertek</p>
-			<p class="mt-2 text-3xl font-semibold tracking-tight text-[#2b8ec9]">{formatNumber(data.summary.pertek)}</p>
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Selesai</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.selesai)}</p>
 		</article>
 	</div>
 
 	<div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-		<section class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)] sm:p-5">
+		<section class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Pengajuan Terbaru</h2>
 				<a
@@ -131,7 +131,7 @@
 			</div>
 		</section>
 
-		<section class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 shadow-[0_16px_30px_-28px_rgba(15,23,42,0.4)] sm:p-5">
+		<section class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
 			<div class="flex items-center justify-between gap-2">
 				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Riwayat Login</h2>
 				<a
