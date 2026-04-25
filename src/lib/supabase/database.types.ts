@@ -1,5 +1,22 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
+type LayananValue = 'dokling' | 'pertek'
+
+type StatusValue =
+	| 'Submit / Masuk'
+	| 'Perbaikan Uji Administrasi'
+	| 'Penjadwalan Rapat'
+	| 'Drafting SK'
+	| 'SK Terbit'
+	| 'Belum Submit Perbaikan'
+	| 'Uji Administrasi'
+	| 'Ditolak'
+	| 'Pasca Sidang'
+	| 'Evaluasi Dokumen'
+	| 'Hold'
+	| 'Dikembalikan'
+	| 'Penilaian KA'
+
 export type Database = {
 	public: {
 		Tables: {
@@ -10,16 +27,10 @@ export type Database = {
 					instansi: string | null
 					jenis_dokumen: string | null
 					kegiatan: string | null
-					layanan: 'dokling' | 'pertek'
+					layanan: LayananValue
 					no_registrasi: string
 					posisi: string | null
-					status:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
+					status: StatusValue
 					tanggal_masuk: string | null
 					tanggal_update: string | null
 					updated_at: string
@@ -30,16 +41,10 @@ export type Database = {
 					instansi?: string | null
 					jenis_dokumen?: string | null
 					kegiatan?: string | null
-					layanan: 'dokling' | 'pertek'
+					layanan: LayananValue
 					no_registrasi: string
 					posisi?: string | null
-					status?:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
+					status?: StatusValue
 					tanggal_masuk?: string | null
 					tanggal_update?: string | null
 					updated_at?: string
@@ -50,16 +55,10 @@ export type Database = {
 					instansi?: string | null
 					jenis_dokumen?: string | null
 					kegiatan?: string | null
-					layanan?: 'dokling' | 'pertek'
+					layanan?: LayananValue
 					no_registrasi?: string
 					posisi?: string | null
-					status?:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
+					status?: StatusValue
 					tanggal_masuk?: string | null
 					tanggal_update?: string | null
 					updated_at?: string
@@ -72,23 +71,10 @@ export type Database = {
 					changed_by: string | null
 					id: string
 					new_posisi: string | null
-					new_status:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
+					new_status: StatusValue
 					note: string | null
 					old_posisi: string | null
-					old_status:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
-						| null
+					old_status: StatusValue | null
 					pengajuan_id: string
 				}
 				Insert: {
@@ -96,23 +82,10 @@ export type Database = {
 					changed_by?: string | null
 					id?: string
 					new_posisi?: string | null
-					new_status:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
+					new_status: StatusValue
 					note?: string | null
 					old_posisi?: string | null
-					old_status?:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
-						| null
+					old_status?: StatusValue | null
 					pengajuan_id: string
 				}
 				Update: {
@@ -120,23 +93,10 @@ export type Database = {
 					changed_by?: string | null
 					id?: string
 					new_posisi?: string | null
-					new_status?:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
+					new_status?: StatusValue
 					note?: string | null
 					old_posisi?: string | null
-					old_status?:
-						| 'Masuk'
-						| 'Verifikasi'
-						| 'Perbaikan'
-						| 'Penjadwalan'
-						| 'Pasca Sidang'
-						| 'Selesai'
-						| null
+					old_status?: StatusValue | null
 					pengajuan_id?: string
 				}
 				Relationships: []
@@ -148,3 +108,4 @@ export type Database = {
 		CompositeTypes: Record<string, never>
 	}
 }
+

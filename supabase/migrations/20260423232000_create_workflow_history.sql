@@ -3,7 +3,21 @@ create table if not exists public.workflow_history (
   pengajuan_id uuid not null references public.antrian_pengajuan(id) on delete cascade,
   old_status text,
   new_status text not null check (
-    new_status in ('Masuk', 'Verifikasi', 'Perbaikan', 'Penjadwalan', 'Pasca Sidang', 'Selesai')
+    new_status in (
+      'Submit / Masuk',
+      'Perbaikan Uji Administrasi',
+      'Penjadwalan Rapat',
+      'Drafting SK',
+      'SK Terbit',
+      'Belum Submit Perbaikan',
+      'Uji Administrasi',
+      'Ditolak',
+      'Pasca Sidang',
+      'Evaluasi Dokumen',
+      'Hold',
+      'Dikembalikan',
+      'Penilaian KA'
+    )
   ),
   old_posisi text,
   new_posisi text,
@@ -74,3 +88,4 @@ create trigger trg_antrian_pengajuan_workflow_history
 after update on public.antrian_pengajuan
 for each row
 execute procedure public.log_antrian_status_change();
+

@@ -34,17 +34,30 @@ const asQueuePosition = (value: string | null): PublicQueueRow['position'] => {
 
 const mapDoklingStatus = (status: string): string => {
 	switch (status) {
+		case 'Submit / Masuk':
 		case 'Masuk':
 			return 'Submit'
+		case 'Penilaian KA':
 		case 'Verifikasi':
 			return 'Penilaian KA'
+		case 'Perbaikan Uji Administrasi':
 		case 'Perbaikan':
 			return 'Perbaikan Uji Administrasi'
+		case 'Penjadwalan Rapat':
 		case 'Penjadwalan':
 			return 'Penjadwalan Rapat'
 		case 'Pasca Sidang':
 			return 'Pasca Sidang'
+		case 'Dikembalikan':
+			return 'Dikembalikan'
+		case 'Ditolak':
+			return 'Ditolak'
+		case 'Belum Submit Perbaikan':
+			return 'Perbaikan Uji Administrasi'
+		case 'Uji Administrasi':
+			return 'Penilaian KA'
 		case 'Selesai':
+		case 'SK Terbit':
 			return 'SK terbit'
 		default:
 			return 'Submit'
@@ -53,17 +66,36 @@ const mapDoklingStatus = (status: string): string => {
 
 const mapPertekStatus = (status: string): string => {
 	switch (status) {
+		case 'Submit / Masuk':
 		case 'Masuk':
 			return 'Submit'
+		case 'Evaluasi Dokumen':
 		case 'Verifikasi':
 			return 'Evaluasi Dokumen'
+		case 'Perbaikan Uji Administrasi':
 		case 'Perbaikan':
 			return 'Perbaikan Uji Administrasi'
+		case 'Penjadwalan Rapat':
 		case 'Penjadwalan':
 			return 'Penjadwalan Rapat'
+		case 'Dikembalikan':
+			return 'Dikembalikan'
+		case 'Ditolak':
+			return 'Dikembalikan'
+		case 'Belum Submit Perbaikan':
+			return 'Perbaikan Uji Administrasi'
+		case 'Uji Administrasi':
+			return 'Evaluasi Dokumen'
 		case 'Pasca Sidang':
 			return 'Penjadwalan Rapat'
+		case 'Hold':
+			return 'Evaluasi Dokumen'
+		case 'Drafting SK':
+			return 'Evaluasi Dokumen'
+		case 'Penilaian KA':
+			return 'Evaluasi Dokumen'
 		case 'Selesai':
+		case 'SK Terbit':
 			return 'Evaluasi Dokumen'
 		default:
 			return 'Submit'
@@ -97,3 +129,4 @@ export const getPublicQueueRows = async (layanan: LayananType): Promise<PublicQu
 		progressUpdatedDate: row.tanggal_update ?? row.tanggal_masuk ?? new Date().toISOString().slice(0, 10)
 	}))
 }
+

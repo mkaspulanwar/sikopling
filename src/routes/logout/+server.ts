@@ -4,7 +4,7 @@ const doLogout: RequestHandler = async ({ locals }) => {
 	if (locals.supabase) {
 		await locals.supabase.auth.signOut()
 	}
-	throw redirect(303, '/login')
+	throw redirect(303, '/')
 }
 
 export const GET: RequestHandler = doLogout

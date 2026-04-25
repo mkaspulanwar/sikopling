@@ -68,7 +68,7 @@
 		kegiatan: '',
 		jenis_dokumen: '',
 		posisi: '',
-		status: 'Masuk' as StatusPengajuan
+		status: 'Submit / Masuk' as StatusPengajuan
 	})
 
 	const formatDate = (value: string | null) => {
@@ -235,7 +235,7 @@
 			kegiatan: '',
 			jenis_dokumen: '',
 			posisi: '',
-			status: 'Masuk'
+			status: 'Submit / Masuk'
 		}
 		await goto(`${page.url.pathname}${page.url.search}`, {
 			invalidateAll: true,

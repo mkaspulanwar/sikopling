@@ -194,6 +194,7 @@ export const createAntrianPengajuan = async (
 		layanan: Layanan
 		noRegistrasi: string
 		tanggalMasuk?: string | null
+		tanggalUpdate?: string | null
 		instansi?: string | null
 		kegiatan?: string | null
 		jenisDokumen?: string | null
@@ -220,8 +221,8 @@ export const createAntrianPengajuan = async (
 			kegiatan: payload.kegiatan?.trim() || null,
 			jenis_dokumen: payload.jenisDokumen?.trim() || null,
 			posisi: payload.posisi?.trim() || null,
-			status: payload.status ?? 'Masuk',
-			tanggal_update: new Date().toISOString().slice(0, 10)
+			status: payload.status ?? 'Submit / Masuk',
+			tanggal_update: payload.tanggalUpdate ?? null
 		})
 		.select('*')
 		.single()
@@ -230,12 +231,111 @@ export const createAntrianPengajuan = async (
 	return data
 }
 
+export const updateAntrianPengajuan = async (
+	supabase: SupabaseClient<Database>,
+	payload: {
+		id: string
+		noRegistrasi?: string
+		tanggalMasuk?: string | null
+		tanggalUpdate?: string | null
+		instansi?: string | null
+		kegiatan?: string | null
+		jenisDokumen?: string | null
+		posisi?: string | null
+		status?: StatusPengajuan
+	}
+) => {
+	const updates: Database['public']['Tables']['antrian_pengajuan']['Update'] = {}
+
+	if (payload.noRegistrasi !== undefined) {
+		const normalizedNoRegistrasi = payload.noRegistrasi.trim()
+		if (!normalizedNoRegistrasi) {
+			throw new Error('No registrasi wajib diisi')
+		}
+		updates.no_registrasi = normalizedNoRegistrasi
+	}
+
+	if (payload.tanggalMasuk !== undefined) {
+		updates.tanggal_masuk = payload.tanggalMasuk || null
+	}
+
+	if (payload.tanggalUpdate !== undefined) {
+		updates.tanggal_update = payload.tanggalUpdate || null
+	}
+
+	if (payload.instansi !== undefined) {
+		updates.instansi = payload.instansi?.trim() || null
+	}
+
+	if (payload.kegiatan !== undefined) {
+		updates.kegiatan = payload.kegiatan?.trim() || null
+	}
+
+	if (payload.jenisDokumen !== undefined) {
+		updates.jenis_dokumen = payload.jenisDokumen?.trim() || null
+	}
+
+	if (payload.posisi !== undefined) {
+		updates.posisi = payload.posisi?.trim() || null
+	}
+
+	if (payload.status !== undefined) {
+		if (!STATUS_VALUES.includes(payload.status)) {
+			throw new Error('Status pengajuan tidak valid')
+		}
+		updates.status = payload.status
+	}
+
+	if (Object.keys(updates).length === 0) {
+		throw new Error('Tidak ada perubahan data yang dikirim')
+	}
+
+	const { data, error } = await supabase
+		.from('antrian_pengajuan')
+		.update(updates)
+		.eq('id', payload.id)
+		.select('*')
+		.single()
+
+	if (error) throw error
+	return data
+}
+
+export const deleteAntrianPengajuan = async (
+	supabase: SupabaseClient<Database>,
+	payload: { id: string }
+) => {
+	const { data: existingRow, error: existingError } = await supabase
+		.from('antrian_pengajuan')
+		.select('id')
+		.eq('id', payload.id)
+		.maybeSingle()
+
+	if (existingError) throw existingError
+
+	const { data: deletedRow, error } = await supabase
+		.from('antrian_pengajuan')
+		.delete()
+		.eq('id', payload.id)
+		.select('id')
+		.maybeSingle()
+
+	if (error) throw error
+
+	if (!deletedRow) {
+		if (!existingRow) {
+			throw new Error('PENGAJUAN_NOT_FOUND')
+		}
+		throw new Error('DELETE_BLOCKED_BY_POLICY')
+	}
+}
+
 export const getAntrianPengajuanSummary = async (
 	supabase: SupabaseClient<Database>
 ): Promise<AntrianPengajuanSummary> => {
 	const [totalResult, selesaiResult, doklingResult, pertekResult] = await Promise.all([
 		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }),
-		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('status', 'Selesai'),
+		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('status', 'SK Terbit'),
 		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('layanan', 'dokling'),
 		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('layanan', 'pertek')
 	])

@@ -11,8 +11,22 @@ create table if not exists public.antrian_pengajuan (
   kegiatan text,
   jenis_dokumen text,
   posisi text,
-  status text not null default 'Masuk' check (
-    status in ('Masuk', 'Verifikasi', 'Perbaikan', 'Penjadwalan', 'Pasca Sidang', 'Selesai')
+  status text not null default 'Submit / Masuk' check (
+    status in (
+      'Submit / Masuk',
+      'Perbaikan Uji Administrasi',
+      'Penjadwalan Rapat',
+      'Drafting SK',
+      'SK Terbit',
+      'Belum Submit Perbaikan',
+      'Uji Administrasi',
+      'Ditolak',
+      'Pasca Sidang',
+      'Evaluasi Dokumen',
+      'Hold',
+      'Dikembalikan',
+      'Penilaian KA'
+    )
   ),
   tanggal_update date,
   created_at timestamptz not null default timezone('utc', now()),
@@ -57,8 +71,10 @@ language sql
 stable
 as $$
   select coalesce(
-    nullif((auth.jwt() -> 'app_metadata' ->> 'role'), ''),
-    nullif((auth.jwt() -> 'user_metadata' ->> 'role'), ''),
+    nullif(lower(trim(auth.jwt() -> 'app_metadata' ->> 'role')), ''),
+    nullif(lower(trim(auth.jwt() -> 'app_metadata' ->> 'user_role')), ''),
+    nullif(lower(trim(auth.jwt() -> 'user_metadata' ->> 'role')), ''),
+    nullif(lower(trim(auth.jwt() -> 'user_metadata' ->> 'user_role')), ''),
     'anonymous'
   );
 $$;
@@ -79,11 +95,10 @@ create policy "admin can update antrian pengajuan"
 on public.antrian_pengajuan
 for update
 to authenticated
-using (public.current_app_role() in ('super_admin', 'admin', 'operator'))
+using (public.current_app_role() in ('super_admin', 'admin', 'operator', 'reviewer'))
 with check (
-  public.current_app_role() in ('super_admin', 'admin', 'operator')
+  public.current_app_role() in ('super_admin', 'admin', 'operator', 'reviewer')
   and layanan in ('dokling', 'pertek')
-  and status in ('Masuk', 'Verifikasi', 'Perbaikan', 'Penjadwalan', 'Pasca Sidang', 'Selesai')
 );
 
 create policy "super admin can delete antrian pengajuan"
@@ -95,3 +110,4 @@ using (public.current_app_role() = 'super_admin');
 revoke all on public.antrian_pengajuan from anon;
 revoke all on public.antrian_pengajuan from authenticated;
 grant select, insert, update, delete on public.antrian_pengajuan to authenticated;
+

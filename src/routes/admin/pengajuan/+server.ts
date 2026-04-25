@@ -77,6 +77,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const layanan = typeof body?.layanan === 'string' ? body.layanan : ''
 	const noRegistrasi = typeof body?.no_registrasi === 'string' ? body.no_registrasi : ''
 	const tanggalMasuk = typeof body?.tanggal_masuk === 'string' ? body.tanggal_masuk : undefined
+	const tanggalUpdate = typeof body?.tanggal_update === 'string' ? body.tanggal_update : undefined
 	const instansi = typeof body?.instansi === 'string' ? body.instansi : undefined
 	const kegiatan = typeof body?.kegiatan === 'string' ? body.kegiatan : undefined
 	const jenisDokumen = typeof body?.jenis_dokumen === 'string' ? body.jenis_dokumen : undefined
@@ -95,6 +96,10 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		return json({ message: 'Format tanggal masuk harus YYYY-MM-DD' }, { status: 400 })
 	}
 
+	if (!isIsoDate(tanggalUpdate)) {
+		return json({ message: 'Format tanggal update harus YYYY-MM-DD' }, { status: 400 })
+	}
+
 	if (status && !STATUS_VALUES.includes(status)) {
 		return json({ message: 'Status tidak valid' }, { status: 400 })
 	}
@@ -104,6 +109,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			layanan: layanan as 'dokling' | 'pertek',
 			noRegistrasi,
 			tanggalMasuk,
+			tanggalUpdate,
 			instansi,
 			kegiatan,
 			jenisDokumen,

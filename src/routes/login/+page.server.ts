@@ -1,15 +1,33 @@
 import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import { fail, redirect } from '@sveltejs/kit'
+import type { AuthError } from '@supabase/supabase-js'
 import type { Actions, PageServerLoad } from './$types'
 
 const resolveRedirectTarget = (value: string) => {
-	if (!value.startsWith('/')) return '/admin/pengajuan'
-	if (!value.startsWith('/admin')) return '/admin/pengajuan'
+	if (!value.startsWith('/')) return '/admin/dashboard'
+	if (!value.startsWith('/admin')) return '/admin/dashboard'
 	return value
 }
 
+const mapSignInErrorMessage = (error: AuthError | null) => {
+	if (!error) return 'Email atau kata sandi tidak valid, atau akun belum terdaftar di Supabase Auth.'
+
+	const normalized = error.message.toLowerCase()
+	if (normalized.includes('invalid login credentials')) {
+		return 'Email atau kata sandi tidak valid, atau akun belum terdaftar di Supabase Auth.'
+	}
+	if (normalized.includes('email not confirmed')) {
+		return 'Email belum dikonfirmasi. Cek inbox/verifikasi email di Supabase Auth.'
+	}
+	if (normalized.includes('email logins are disabled')) {
+		return 'Login email/password sedang dinonaktifkan di Supabase Auth (Auth > Providers).'
+	}
+
+	return 'Login ke Supabase gagal. Pastikan akun ada di Supabase Auth dan konfigurasi Auth sudah benar.'
+}
+
 export const load: PageServerLoad = async ({ url, locals }) => {
-	const redirectTo = resolveRedirectTarget(url.searchParams.get('redirectTo') ?? '/admin/pengajuan')
+	const redirectTo = resolveRedirectTarget(url.searchParams.get('redirectTo') ?? '/admin/dashboard')
 
 	const { session, user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
@@ -25,7 +43,7 @@ export const actions: Actions = {
 		const formData = await request.formData()
 		const email = String(formData.get('email') ?? '').trim()
 		const password = String(formData.get('password') ?? '')
-		const redirectTo = resolveRedirectTarget(String(formData.get('redirectTo') ?? '/admin/pengajuan'))
+		const redirectTo = resolveRedirectTarget(String(formData.get('redirectTo') ?? '/admin/dashboard'))
 
 		if (!email || !password) {
 			return fail(400, {
@@ -43,8 +61,16 @@ export const actions: Actions = {
 
 		const { data, error } = await locals.supabase.auth.signInWithPassword({ email, password })
 		if (error || !data.user) {
+			if (error) {
+				console.warn('Supabase signInWithPassword failed', {
+					code: error.code ?? null,
+					status: error.status ?? null,
+					message: error.message
+				})
+			}
+
 			return fail(401, {
-				error: 'Email atau kata sandi tidak valid, atau akun belum terdaftar di Supabase Auth.',
+				error: mapSignInErrorMessage(error),
 				redirectTo
 			})
 		}

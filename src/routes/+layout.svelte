@@ -207,6 +207,17 @@
 				return 'Login Sikopling';
 			case '/admin/pengajuan':
 				return 'Admin Pengajuan Sikopling';
+			case '/admin':
+			case '/admin/dashboard':
+				return 'Dashboard Admin Sikopling';
+			case '/admin/dokling':
+				return 'Admin Dokling Sikopling';
+			case '/admin/pertek':
+				return 'Admin Pertek Sikopling';
+			case '/admin/profil':
+				return 'Profil Admin Sikopling';
+			case '/admin/pengaturan':
+				return 'Pengaturan Admin Sikopling';
 			default:
 				return 'Sikopling Kalsel';
 		}
