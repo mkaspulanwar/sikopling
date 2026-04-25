@@ -562,19 +562,19 @@
 	</div>
 
 	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-		<article class="rounded-xl border border-white bg-white px-4 py-5 text-center">
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.total)}</p>
 		</article>
-		<article class="rounded-xl border border-white bg-white px-4 py-5 text-center">
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Selesai</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.selesai)}</p>
 		</article>
-		<article class="rounded-xl border border-white bg-white px-4 py-5 text-center">
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Diproses</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.diproses)}</p>
 		</article>
-		<article class="rounded-xl border border-white bg-white px-4 py-5 text-center">
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Ditolak</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.ditolak)}</p>
 		</article>
@@ -602,7 +602,7 @@
 				type="button"
 				onclick={openCreateModal}
 				disabled={data.unavailable}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-white bg-white px-4 text-sm font-semibold text-[#2f6f1b] transition hover:bg-white hover:text-[#2a6319] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8d488] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 disabled:text-slate-500"
+				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#d7dee8] bg-white px-4 text-sm font-semibold text-[#2f6f1b] transition hover:bg-white hover:text-[#2a6319] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8d488] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 disabled:text-slate-500"
 			>
 				<CirclePlus class="h-4 w-4" />
 				Tambah
@@ -610,7 +610,7 @@
 			<button
 				type="button"
 				onclick={openSelectedRowForEdit}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-white bg-white px-4 text-sm font-semibold text-[#2f4f6f] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2] focus-visible:ring-offset-2 active:translate-y-px"
+				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#d7dee8] bg-white px-4 text-sm font-semibold text-[#2f4f6f] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2] focus-visible:ring-offset-2 active:translate-y-px"
 			>
 				<SquarePen class="h-4 w-4" />
 				Edit
@@ -618,7 +618,7 @@
 			<button
 				type="button"
 				onclick={openSelectedRowForDelete}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-white bg-white px-4 text-sm font-semibold text-[#b42318] transition hover:bg-white hover:text-[#991b1b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px"
+				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#d7dee8] bg-white px-4 text-sm font-semibold text-[#b42318] transition hover:bg-white hover:text-[#991b1b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px"
 			>
 				<Trash class="h-4 w-4" />
 				Hapus
@@ -626,7 +626,7 @@
 		</div>
 	</div>
 
-	<section class="overflow-x-auto overflow-y-hidden rounded-2xl border border-[#d7dee8] bg-white">
+	<section class="overflow-x-auto overflow-y-hidden rounded-2xl border-y border-[#d7dee8] bg-white">
 		<table class="hidden w-full min-w-[1080px] border-collapse md:table">
 			<thead class="bg-[#64AD31]">
 				<tr>

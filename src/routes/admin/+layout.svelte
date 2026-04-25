@@ -77,7 +77,7 @@
 
 <svelte:window onkeydown={handleWindowKeydown} />
 
-<div class="relative flex min-h-[100dvh] bg-[var(--accent-soft)] text-[var(--ink)]">
+<div class="relative flex min-h-[100dvh] bg-white text-[var(--ink)]">
 	<aside
 		class={`hidden overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] px-3 pb-4 pt-5 shadow-[0_18px_42px_-30px_rgba(15,23,42,0.38)] [transition:width_280ms_cubic-bezier(0.22,1,0.36,1)] lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:flex lg:h-[100dvh] lg:flex-col ${
 			isSidebarCollapsed ? 'lg:w-[5.75rem]' : 'lg:w-[17.5rem]'
