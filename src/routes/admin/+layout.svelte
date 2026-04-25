@@ -16,8 +16,8 @@
 
 	const navItems = [
 		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-		{ label: 'Dokling', href: '/admin/dokling', icon: FileSpreadsheet },
-		{ label: 'Pertek', href: '/admin/pertek', icon: FileText }
+		{ label: 'Antrian Dokling', href: '/admin/dokling', icon: FileSpreadsheet },
+		{ label: 'Antrian Pertek', href: '/admin/pertek', icon: FileText }
 	]
 
 	let isSidebarCollapsed = $state(false)
@@ -79,15 +79,15 @@
 
 <div class="relative flex min-h-[100dvh] bg-white text-[var(--ink)]">
 	<aside
-		class={`hidden overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] px-3 pb-4 pt-5 shadow-[0_18px_42px_-30px_rgba(15,23,42,0.38)] [transition:width_280ms_cubic-bezier(0.22,1,0.36,1)] lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:flex lg:h-[100dvh] lg:flex-col ${
-			isSidebarCollapsed ? 'lg:w-[5.75rem]' : 'lg:w-[17.5rem]'
+		class={`hidden overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] px-[18px] pb-4 pt-5 shadow-[0_18px_42px_-30px_rgba(15,23,42,0.38)] [transition:width_280ms_cubic-bezier(0.22,1,0.36,1)] lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:flex lg:h-[100dvh] lg:flex-col ${
+			isSidebarCollapsed ? 'lg:w-[95px]' : 'lg:w-[285px]'
 		}`}
 	>
-		<div
-			class={`mb-3 flex h-14 items-center border-b border-[var(--line)] pb-3 ${
-				isSidebarCollapsed ? 'justify-center pr-0' : 'justify-between pr-0.5'
-			}`}
-		>
+			<div
+				class={`mb-3 flex h-14 items-center border-b border-[var(--line)] pb-5 ${
+					isSidebarCollapsed ? 'justify-center pr-0' : 'justify-between pr-0.5'
+				}`}
+			>
 			<a
 				href="/admin/dashboard"
 				aria-label="Sikopling Admin"
@@ -97,7 +97,7 @@
 						: 'max-w-[11rem] px-0 py-0 opacity-100'
 				}`}
 			>
-				<img src="/layout/logo_sikopling.png" alt="Logo Sikopling" class="h-[26px] w-auto max-w-[9.5rem] object-contain" />
+				<img src="/layout/logo_sikopling.png" alt="Logo Sikopling" class="h-[24px] w-auto max-w-[9.5rem] object-contain" />
 			</a>
 			<button
 				type="button"
@@ -136,9 +136,7 @@
 					<span
 						class={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${
 							active
-								? isSidebarCollapsed
-									? 'bg-transparent text-[var(--secondary)]'
-									: 'bg-[var(--secondary)]/15 text-[var(--secondary)]'
+								? 'bg-transparent text-[var(--secondary)]'
 								: 'bg-transparent text-[var(--muted)] group-hover:text-[var(--ink)]'
 						}`}
 					>
@@ -146,7 +144,7 @@
 					</span>
 					<span
 						class={`truncate whitespace-nowrap transition-all duration-300 ${
-							isSidebarCollapsed ? 'max-w-0 -translate-x-1 opacity-0' : 'max-w-[9rem] translate-x-0 opacity-100'
+							isSidebarCollapsed ? 'max-w-0 -translate-x-1 opacity-0' : 'max-w-[13.5rem] translate-x-0 opacity-100'
 						}`}
 					>
 						{item.label}
@@ -159,7 +157,7 @@
 			<a
 				href="/logout"
 				title={isSidebarCollapsed ? 'Logout' : undefined}
-				class={`flex h-11 items-center rounded-xl border border-[#fecaca] bg-[#fff1f1] text-sm font-semibold text-[#b42318] transition-colors duration-200 hover:bg-[#ffe9e9] hover:text-[#991b1b] ${
+				class={`flex h-11 items-center rounded-xl border border-[#d64545] bg-[#d64545] text-sm font-semibold text-white transition-colors duration-200 hover:border-[#c63d3d] hover:bg-[#c63d3d] hover:text-white ${
 					isSidebarCollapsed ? 'w-full justify-center px-0' : 'w-full justify-center gap-2 px-3'
 				}`}
 			>
@@ -184,7 +182,7 @@
 		</div>
 	</aside>
 
-	<div class={`min-w-0 flex-1 ${isSidebarCollapsed ? 'lg:pl-[5.75rem]' : 'lg:pl-[17.5rem]'}`}>
+	<div class={`min-w-0 flex-1 ${isSidebarCollapsed ? 'lg:pl-[95px]' : 'lg:pl-[285px]'}`}>
 		<header class={mobileHeaderClass()}>
 			<div class="nav-shell py-3">
 				<div class="flex items-center justify-between gap-3">
@@ -239,7 +237,7 @@
 						<a
 							href="/logout"
 							onclick={closeMobileMenu}
-							class="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#fecaca] bg-[#fff1f1] px-3 text-sm font-semibold text-[#b42318] transition-colors duration-200 hover:bg-[#ffe9e9] hover:text-[#991b1b]"
+							class="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#d64545] bg-[#d64545] px-3 text-sm font-semibold text-white transition-colors duration-200 hover:border-[#c63d3d] hover:bg-[#c63d3d] hover:text-white"
 						>
 							<SquareArrowRightExit class="h-4.5 w-4.5" />
 							<span>Logout</span>
