@@ -33,34 +33,42 @@ const supabaseHandle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createSupabaseServerClient(event)
 	event.locals.safeGetSession = async () => {
 		if (!event.locals.supabase) return { session: null, user: null }
+		const authClient = event.locals.supabase.auth
+
+		const getVerifiedUser = async () => {
+			const {
+				data: { user },
+				error
+			} = await authClient.getUser()
+			if (error || !user) return null
+			return user
+		}
 
 		// Read session first so SSR client can refresh expired access tokens using refresh token cookies.
 		const {
 			data: { session },
 			error: sessionError
-		} = await event.locals.supabase.auth.getSession()
-		if (sessionError || !session) return { session: null, user: null }
-
-		const {
-			data: { user },
-			error
-		} = await event.locals.supabase.auth.getUser()
-		if (!error && user) {
-			return { session: ({ user } as unknown as Session), user }
+		} = await authClient.getSession()
+		const verifiedUser = await getVerifiedUser()
+		if (session && verifiedUser) {
+			return {
+				session: ({ user: verifiedUser } as unknown as Session),
+				user: verifiedUser
+			}
 		}
 
-		// Fallback: when access token is stale but refresh token is still valid, refresh and retry once.
+		// Fallback: when access token/session is stale but refresh token is still valid, refresh and retry once.
+		const shouldTryRefresh = Boolean(sessionError) || !session || !verifiedUser
+		if (!shouldTryRefresh) return { session: null, user: null }
+
 		const {
 			data: refreshData,
 			error: refreshError
-		} = await event.locals.supabase.auth.refreshSession()
+		} = await authClient.refreshSession()
 		if (refreshError || !refreshData.session) return { session: null, user: null }
 
-		const {
-			data: { user: refreshedUser },
-			error: refreshedUserError
-		} = await event.locals.supabase.auth.getUser()
-		if (refreshedUserError || !refreshedUser) return { session: null, user: null }
+		const refreshedUser = await getVerifiedUser()
+		if (!refreshedUser) return { session: null, user: null }
 
 		// Build a minimal authenticated marker without trusting getSession() user payload.
 		return { session: ({ user: refreshedUser } as unknown as Session), user: refreshedUser }

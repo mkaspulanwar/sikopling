@@ -3,14 +3,16 @@
 	import Eye from 'lucide-svelte/icons/eye';
 	import EyeOff from 'lucide-svelte/icons/eye-off';
 
-	type LoginData = {
-		redirectTo: string
-	}
+type LoginData = {
+	redirectTo: string
+	remember: boolean
+}
 
-	type LoginFormState = {
-		error?: string
-		redirectTo?: string
-	}
+type LoginFormState = {
+	error?: string
+	redirectTo?: string
+	remember?: boolean
+}
 
 	let showPassword = $state(false);
 
@@ -151,6 +153,7 @@
 										<input
 											type="checkbox"
 											name="remember"
+											checked={form?.remember ?? data.remember}
 											class="h-4 w-4 rounded border-[#c3cfdd] text-[#64AD31] focus:ring-[#64AD31]"
 										/>
 										Ingat saya

@@ -1,4 +1,6 @@
 import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
+import { isRememberMeEnabled, setRememberMeCookie } from '$lib/server/admin-session'
+import { dev } from '$app/environment'
 import { fail, redirect } from '@sveltejs/kit'
 import type { AuthError } from '@supabase/supabase-js'
 import type { Actions, PageServerLoad } from './$types'
@@ -26,8 +28,9 @@ const mapSignInErrorMessage = (error: AuthError | null) => {
 	return 'Login ke Supabase gagal. Pastikan akun ada di Supabase Auth dan konfigurasi Auth sudah benar.'
 }
 
-export const load: PageServerLoad = async ({ url, locals }) => {
+export const load: PageServerLoad = async ({ url, locals, cookies }) => {
 	const redirectTo = resolveRedirectTarget(url.searchParams.get('redirectTo') ?? '/admin/dashboard')
+	const remember = isRememberMeEnabled(cookies)
 
 	const { session, user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
@@ -35,29 +38,36 @@ export const load: PageServerLoad = async ({ url, locals }) => {
 		throw redirect(303, redirectTo)
 	}
 
-	return { redirectTo }
+	return { redirectTo, remember }
 }
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request, locals, url, cookies }) => {
 		const formData = await request.formData()
 		const email = String(formData.get('email') ?? '').trim()
 		const password = String(formData.get('password') ?? '')
 		const redirectTo = resolveRedirectTarget(String(formData.get('redirectTo') ?? '/admin/dashboard'))
+		const remember = formData.get('remember') === 'on'
+		const secureCookie = !dev && url.protocol === 'https:'
 
 		if (!email || !password) {
 			return fail(400, {
 				error: 'Email dan kata sandi wajib diisi',
-				redirectTo
+				redirectTo,
+				remember
 			})
 		}
 
 		if (!locals.supabase) {
 			return fail(503, {
 				error: 'Supabase belum dikonfigurasi. Hubungi administrator.',
-				redirectTo
+				redirectTo,
+				remember
 			})
 		}
+
+		locals.rememberSessionOverride = remember
+		setRememberMeCookie(cookies, remember, secureCookie)
 
 		const { data, error } = await locals.supabase.auth.signInWithPassword({ email, password })
 		if (error || !data.user) {
@@ -71,7 +81,8 @@ export const actions: Actions = {
 
 			return fail(401, {
 				error: mapSignInErrorMessage(error),
-				redirectTo
+				redirectTo,
+				remember
 			})
 		}
 
@@ -80,7 +91,8 @@ export const actions: Actions = {
 			await locals.supabase.auth.signOut()
 			return fail(403, {
 				error: 'Akun berhasil login tetapi belum memiliki role admin (super_admin/admin/operator/reviewer).',
-				redirectTo
+				redirectTo,
+				remember
 			})
 		}
 		throw redirect(303, redirectTo)

@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { browser } from '$app/environment'
+	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
 	import { cubicInOut } from 'svelte/easing'
+	import { onDestroy, onMount } from 'svelte'
 	import { slide } from 'svelte/transition'
 	import type { Snippet } from 'svelte'
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right'
@@ -23,6 +26,15 @@
 	let isSidebarCollapsed = $state(false)
 	let isMobileMenuOpen = $state(false)
 	let mobileMenuMotionState = $state<'idle' | 'opening' | 'closing'>('idle')
+	const ADMIN_KEEP_ALIVE_INTERVAL_MS = 12 * 60 * 1000
+	const KEEP_ALIVE_LEADER_KEY = 'admin_keep_alive_leader'
+	const KEEP_ALIVE_LEADER_LEASE_MS = 90 * 1000
+	const KEEP_ALIVE_LEADER_HEARTBEAT_MS = 20 * 1000
+	let keepAliveInterval: ReturnType<typeof setInterval> | null = null
+	let leaderHeartbeatInterval: ReturnType<typeof setInterval> | null = null
+	let isPingingSession = false
+	let isKeepAliveLeader = false
+	let tabId = ''
 
 	const pathname = $derived.by(() => page.url.pathname.replace(/\/+$/, '') || '/admin/dashboard')
 
@@ -73,6 +85,139 @@
 	const handleMobileMenuOutroEnd = () => {
 		mobileMenuMotionState = 'idle'
 	}
+
+	type KeepAliveLeaderState = {
+		id: string
+		expiresAt: number
+	}
+
+	const readKeepAliveLeaderState = (): KeepAliveLeaderState | null => {
+		if (!browser) return null
+
+		try {
+			const rawValue = localStorage.getItem(KEEP_ALIVE_LEADER_KEY)
+			if (!rawValue) return null
+			const parsed = JSON.parse(rawValue) as Partial<KeepAliveLeaderState>
+			if (typeof parsed.id !== 'string' || typeof parsed.expiresAt !== 'number') return null
+			return { id: parsed.id, expiresAt: parsed.expiresAt }
+		} catch {
+			return null
+		}
+	}
+
+	const writeKeepAliveLeaderState = (state: KeepAliveLeaderState) => {
+		if (!browser) return
+		localStorage.setItem(KEEP_ALIVE_LEADER_KEY, JSON.stringify(state))
+	}
+
+	const syncKeepAliveLeaderState = () => {
+		const state = readKeepAliveLeaderState()
+		isKeepAliveLeader = Boolean(state && state.id === tabId && state.expiresAt > Date.now())
+	}
+
+	const claimKeepAliveLeadership = () => {
+		if (!browser || !tabId) return false
+
+		const now = Date.now()
+		const currentLeader = readKeepAliveLeaderState()
+
+		if (!currentLeader || currentLeader.expiresAt <= now || currentLeader.id === tabId) {
+			writeKeepAliveLeaderState({
+				id: tabId,
+				expiresAt: now + KEEP_ALIVE_LEADER_LEASE_MS
+			})
+			syncKeepAliveLeaderState()
+			return isKeepAliveLeader
+		}
+
+		syncKeepAliveLeaderState()
+		return false
+	}
+
+	const releaseKeepAliveLeadership = () => {
+		if (!browser || !tabId) return
+		const currentLeader = readKeepAliveLeaderState()
+		if (currentLeader?.id === tabId) {
+			localStorage.removeItem(KEEP_ALIVE_LEADER_KEY)
+		}
+		isKeepAliveLeader = false
+	}
+
+	const pingAdminSession = async () => {
+		if (!browser || isPingingSession || !isKeepAliveLeader) return
+
+		isPingingSession = true
+		try {
+			const response = await fetch('/admin/session', {
+				method: 'POST',
+				credentials: 'include'
+			})
+			if (response.status === 401) {
+				const redirectTarget = encodeURIComponent(`${page.url.pathname}${page.url.search}`)
+				await goto(`/login?redirectTo=${redirectTarget}`)
+			}
+		} catch (error) {
+			console.warn('Admin session keep-alive gagal', error)
+		} finally {
+			isPingingSession = false
+		}
+	}
+
+	onMount(() => {
+		tabId = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`
+		void claimKeepAliveLeadership()
+		void pingAdminSession()
+
+		keepAliveInterval = setInterval(() => {
+			claimKeepAliveLeadership()
+			void pingAdminSession()
+		}, ADMIN_KEEP_ALIVE_INTERVAL_MS)
+
+		leaderHeartbeatInterval = setInterval(() => {
+			claimKeepAliveLeadership()
+		}, KEEP_ALIVE_LEADER_HEARTBEAT_MS)
+
+		const handleVisibilityChange = () => {
+			if (document.visibilityState === 'visible') {
+				claimKeepAliveLeadership()
+				void pingAdminSession()
+			}
+		}
+
+		const handleStorageChange = (event: StorageEvent) => {
+			if (event.key !== KEEP_ALIVE_LEADER_KEY) return
+			syncKeepAliveLeaderState()
+		}
+
+		document.addEventListener('visibilitychange', handleVisibilityChange)
+		window.addEventListener('storage', handleStorageChange)
+
+		return () => {
+			document.removeEventListener('visibilitychange', handleVisibilityChange)
+			window.removeEventListener('storage', handleStorageChange)
+			if (keepAliveInterval) {
+				clearInterval(keepAliveInterval)
+				keepAliveInterval = null
+			}
+			if (leaderHeartbeatInterval) {
+				clearInterval(leaderHeartbeatInterval)
+				leaderHeartbeatInterval = null
+			}
+			releaseKeepAliveLeadership()
+		}
+	})
+
+	onDestroy(() => {
+		if (keepAliveInterval) {
+			clearInterval(keepAliveInterval)
+			keepAliveInterval = null
+		}
+		if (leaderHeartbeatInterval) {
+			clearInterval(leaderHeartbeatInterval)
+			leaderHeartbeatInterval = null
+		}
+		releaseKeepAliveLeadership()
+	})
 </script>
 
 <svelte:window onkeydown={handleWindowKeydown} />
