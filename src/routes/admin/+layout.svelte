@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { browser } from '$app/environment'
 	import { goto } from '$app/navigation'
-	import { page } from '$app/state'
+	import { navigating, page } from '$app/state'
+	import TopProgressBar from '$lib/components/TopProgressBar.svelte'
 	import { cubicInOut } from 'svelte/easing'
 	import { onDestroy, onMount } from 'svelte'
 	import { slide } from 'svelte/transition'
@@ -13,14 +14,16 @@
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
 	import PanelLeftOpen from 'lucide-svelte/icons/panel-left-open'
 	import SquareArrowRightExit from 'lucide-svelte/icons/square-arrow-right-exit'
+	import UserRound from 'lucide-svelte/icons/user-round'
 	import type { LayoutData } from './$types'
 
-	let { children }: { children: Snippet; data: LayoutData } = $props()
+	let { children, data }: { children: Snippet; data: LayoutData } = $props()
 
 	const navItems = [
 		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
 		{ label: 'Antrian Dokling', href: '/admin/dokling', icon: FileSpreadsheet },
-		{ label: 'Antrian Pertek', href: '/admin/pertek', icon: FileText }
+		{ label: 'Antrian Pertek', href: '/admin/pertek', icon: FileText },
+		{ label: 'Profil Admin', href: '/admin/profil', icon: UserRound }
 	]
 
 	let isSidebarCollapsed = $state(false)
@@ -37,6 +40,10 @@
 	let tabId = ''
 
 	const pathname = $derived.by(() => page.url.pathname.replace(/\/+$/, '') || '/admin/dashboard')
+	const isAdminNavigationPending = $derived.by(() => {
+		if (!browser || !navigating.to) return false
+		return navigating.to.url.pathname.startsWith('/admin')
+	})
 
 	const isNavActive = (href: string) =>
 		pathname === href || (href !== '/admin/dashboard' && pathname.startsWith(`${href}/`))
@@ -144,7 +151,7 @@
 	}
 
 	const pingAdminSession = async () => {
-		if (!browser || isPingingSession || !isKeepAliveLeader) return
+		if (!browser || !data.supabaseAvailable || !data.isAdmin || isPingingSession || !isKeepAliveLeader) return
 
 		isPingingSession = true
 		try {
@@ -223,6 +230,7 @@
 <svelte:window onkeydown={handleWindowKeydown} />
 
 <div class="relative flex min-h-[100dvh] bg-white text-[var(--ink)]">
+	<TopProgressBar active={isAdminNavigationPending} />
 	<aside
 		class={`hidden overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] px-[18px] pb-4 pt-5 shadow-[0_18px_42px_-30px_rgba(15,23,42,0.38)] [transition:width_280ms_cubic-bezier(0.22,1,0.36,1)] lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:flex lg:h-[100dvh] lg:flex-col ${
 			isSidebarCollapsed ? 'lg:w-[95px]' : 'lg:w-[285px]'

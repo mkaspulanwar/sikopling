@@ -1,10 +1,10 @@
 import {
 	EMPTY_SUMMARY,
 	createEmptyResult,
-	readAdminFilters,
-	requireAdminSupabase
+	logAdminLoad,
+	readAdminFilters
 } from '$lib/server/admin-route'
-import { getAntrianPengajuanSummary, listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import type { PageServerLoad } from './$types'
 
 type LoginHistoryItem = {
@@ -34,56 +34,62 @@ const buildLoginHistory = (user: { email?: string | null; last_sign_in_at?: stri
 	return items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
 }
 
-export const load: PageServerLoad = async ({ locals, url }) => {
-	const filters = readAdminFilters(url.searchParams)
-	const auth = await requireAdminSupabase(locals)
+export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
+	depends('admin:dashboard')
 
-	if (auth.state === 'unavailable') {
+	const filters = readAdminFilters(url.searchParams)
+	const adminData = await parent()
+
+	if (!adminData.supabaseAvailable || !locals.supabase) {
+		logAdminLoad('admin/dashboard/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
 			errorMessage: null,
 			filters,
-			summary: EMPTY_SUMMARY,
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			recentResult: createEmptyResult(filters.page, filters.pageSize),
 			loginHistory: []
 		}
 	}
 
-	if (auth.state === 'unauthorized') {
+	if (!adminData.isAdmin) {
+		logAdminLoad('admin/dashboard/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
 			errorMessage: null,
 			filters,
-			summary: EMPTY_SUMMARY,
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			recentResult: createEmptyResult(filters.page, filters.pageSize),
 			loginHistory: []
 		}
 	}
 
 	try {
-		const { user } = await locals.safeGetSession()
-		const [summary, recentResult] = await Promise.all([
-			getAntrianPengajuanSummary(auth.supabase),
-			listAntrianPengajuan(auth.supabase, {
-				page: filters.page,
-				pageSize: Math.min(filters.pageSize, 12),
-				keyword: filters.keyword,
-				status: filters.status,
-				sortBy: filters.sortBy,
-				sortOrder: filters.sortOrder
-			})
-		])
+		const recentResult = await listAntrianPengajuan(locals.supabase, {
+			page: filters.page,
+			pageSize: Math.min(filters.pageSize, 12),
+			keyword: filters.keyword,
+			status: filters.status,
+			sortBy: filters.sortBy,
+			sortOrder: filters.sortOrder
+		})
+
+		logAdminLoad('admin/dashboard/+page.server', {
+			state: 'ok',
+			page: filters.page,
+			pageSize: Math.min(filters.pageSize, 12)
+		})
 
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: false,
 			errorMessage: null,
 			filters,
-			summary,
+			summary: adminData.summary,
 			recentResult,
-			loginHistory: user ? buildLoginHistory(user) : []
+			loginHistory: adminData.user ? buildLoginHistory(adminData.user) : []
 		}
 	} catch (error) {
 		return {
@@ -91,7 +97,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			requiresSupabaseAuth: false,
 			errorMessage: error instanceof Error ? error.message : 'Gagal memuat ringkasan dashboard',
 			filters,
-			summary: EMPTY_SUMMARY,
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			recentResult: createEmptyResult(filters.page, filters.pageSize),
 			loginHistory: []
 		}

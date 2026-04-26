@@ -28,12 +28,12 @@
 </script>
 
 <section class="mx-auto w-full max-w-[1320px] space-y-6">
-	<header class="overflow-hidden rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-6 sm:p-7">
+	<header class="overflow-hidden rounded-3xl border border-[var(--line)] bg-[#64AD31] p-6 sm:p-7">
 		<div class="relative">
-			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full bg-[radial-gradient(circle,_rgba(100,173,49,0.28)_0%,_transparent_72%)]"></div>
-			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">Dashboard Admin</p>
-			<h1 class="mt-2 text-2xl font-semibold tracking-tight text-[var(--ink)] sm:text-[2rem]">Control Center Sikopling</h1>
-			<p class="mt-2 max-w-3xl text-sm text-[var(--muted)] sm:text-[0.96rem]">
+			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full"></div>
+			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--surface)]">Dashboard Admin</p>
+			<h1 class="mt-2 text-2xl font-semibold tracking-tight text-[var(--surface)] sm:text-[2rem]">Control Center Sikopling</h1>
+			<p class="mt-2 max-w-3xl text-sm text-[var(--surface)] sm:text-[0.96rem]">
 				Pantau volume dokumen lingkungan dan persetujuan teknis secara real-time, lalu lanjutkan ke halaman operasional untuk tindakan berikutnya.
 			</p>
 		</div>
@@ -75,7 +75,7 @@
 	</div>
 
 	<div class="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-		<section class="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
+		<section class="rounded-2xl border border-(--line) bg-[var(--surface)] p-4 sm:p-5">
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Pengajuan Terbaru</h2>
 				<a
@@ -87,14 +87,14 @@
 				</a>
 			</div>
 
-			<div class="mt-3 overflow-hidden rounded-xl border border-[var(--line)]">
+			<div class="mt-3 overflow-hidden rounded-xl border border-(--line)">
 				<table class="hidden w-full border-collapse md:table">
-					<thead class="bg-[var(--accent-soft)]">
+					<thead class="bg-[#64AD31]">
 						<tr>
-							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">No Registrasi</th>
-							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Layanan</th>
-							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Status</th>
-							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-[var(--muted)]">Update</th>
+							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-(--surface)">No Registrasi</th>
+							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-(--surface)">Layanan</th>
+							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-(--surface)">Status</th>
+							<th class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-[0.08em] text-(--surface)">Update</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -152,11 +152,11 @@
 					{#each data.loginHistory as item}
 						<article class="rounded-xl border border-[var(--line)] bg-[var(--accent-soft)] p-3">
 							<div class="flex items-start gap-3">
-								<span class="mt-1.5 h-2.5 w-2.5 rounded-full bg-[#3f7f1f]" aria-hidden="true"></span>
+								<span class="mt-1.5 h-2.5 w-2.5 rounded-full bg-[#64AD31]" aria-hidden="true"></span>
 								<div class="min-w-0">
 									<p class="text-sm font-semibold text-[var(--ink)]">{item.label}</p>
 									<p class="mt-1 text-xs text-[var(--muted)]">{item.description}</p>
-									<p class="mt-2 text-xs font-medium text-[#2f5f17]">{formatDateTime(item.timestamp)}</p>
+									<p class="mt-2 text-xs font-medium text-[#64AD31]">{formatDateTime(item.timestamp)}</p>
 								</div>
 							</div>
 						</article>

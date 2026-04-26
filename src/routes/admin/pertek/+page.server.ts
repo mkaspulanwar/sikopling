@@ -1,10 +1,10 @@
 import {
 	EMPTY_SUMMARY,
 	createEmptyResult,
-	readAdminFilters,
-	requireAdminSupabase
+	logAdminLoad,
+	readAdminFilters
 } from '$lib/server/admin-route'
-import { getAntrianPengajuanSummary, listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import type { PageServerLoad } from './$types'
 
 const EMPTY_PERTEK_STATUS_METRICS = {
@@ -14,29 +14,33 @@ const EMPTY_PERTEK_STATUS_METRICS = {
 	ditolak: 0
 }
 
-export const load: PageServerLoad = async ({ locals, url }) => {
-	const filters = readAdminFilters(url.searchParams)
-	const auth = await requireAdminSupabase(locals)
+export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
+	depends('admin:pertek')
 
-	if (auth.state === 'unavailable') {
+	const filters = readAdminFilters(url.searchParams)
+	const adminData = await parent()
+
+	if (!adminData.supabaseAvailable || !locals.supabase) {
+		logAdminLoad('admin/pertek/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
 			errorMessage: null,
 			filters,
-			summary: EMPTY_SUMMARY,
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: createEmptyResult(filters.page, filters.pageSize),
 			pertekStatusMetrics: EMPTY_PERTEK_STATUS_METRICS
 		}
 	}
 
-	if (auth.state === 'unauthorized') {
+	if (!adminData.isAdmin) {
+		logAdminLoad('admin/pertek/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
 			errorMessage: null,
 			filters,
-			summary: EMPTY_SUMMARY,
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: createEmptyResult(filters.page, filters.pageSize),
 			pertekStatusMetrics: EMPTY_PERTEK_STATUS_METRICS
 		}
@@ -60,29 +64,28 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			return nextQuery
 		}
 
-		const [result, summary, totalPertekResult, selesaiPertekResult, ditolakPertekResult] = await Promise.all([
-			listAntrianPengajuan(auth.supabase, {
+		const [result, totalPertekResult, selesaiPertekResult, ditolakPertekResult] = await Promise.all([
+			listAntrianPengajuan(locals.supabase, {
 				...filters,
 				layanan: 'pertek'
 			}),
-			getAntrianPengajuanSummary(auth.supabase),
 			applyPertekMetricFilters(
-				auth.supabase
+				locals.supabase
 					.from('antrian_pengajuan')
-					.select('*', { count: 'exact', head: true })
+					.select('id', { count: 'exact', head: true })
 					.eq('layanan', 'pertek')
 			),
 			applyPertekMetricFilters(
-				auth.supabase
+				locals.supabase
 					.from('antrian_pengajuan')
-					.select('*', { count: 'exact', head: true })
+					.select('id', { count: 'exact', head: true })
 					.eq('layanan', 'pertek')
 					.eq('status', 'SK Terbit')
 			),
 			applyPertekMetricFilters(
-				auth.supabase
+				locals.supabase
 					.from('antrian_pengajuan')
-					.select('*', { count: 'exact', head: true })
+					.select('id', { count: 'exact', head: true })
 					.eq('layanan', 'pertek')
 					.eq('status', 'Ditolak')
 			)
@@ -97,12 +100,19 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		const ditolak = ditolakPertekResult.count ?? 0
 		const diproses = Math.max(total - selesai - ditolak, 0)
 
+		logAdminLoad('admin/pertek/+page.server', {
+			state: 'ok',
+			page: filters.page,
+			pageSize: filters.pageSize,
+			total: result.total
+		})
+
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: false,
 			errorMessage: null,
 			filters,
-			summary,
+			summary: adminData.summary,
 			result,
 			pertekStatusMetrics: {
 				total,
@@ -117,7 +127,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			requiresSupabaseAuth: false,
 			errorMessage: error instanceof Error ? error.message : 'Gagal memuat data pertek',
 			filters,
-			summary: EMPTY_SUMMARY,
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: createEmptyResult(filters.page, filters.pageSize),
 			pertekStatusMetrics: EMPTY_PERTEK_STATUS_METRICS
 		}

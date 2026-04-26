@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
+	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/state'
 	import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
 	import PositionDropdown from '$lib/components/admin/PositionDropdown.svelte'
@@ -137,14 +137,8 @@
 	const formatDate = (value: string | null) => (value ? dateFormatter.format(new Date(`${value}T00:00:00`)) : '-')
 	const formatNumber = (value: number) => numberFormatter.format(value)
 	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status]
-
 	const refreshPage = async () => {
-		await goto(`${page.url.pathname}${page.url.search}`, {
-			invalidateAll: true,
-			replaceState: true,
-			noScroll: true,
-			keepFocus: true
-		})
+		await Promise.all([invalidate('admin:summary'), invalidate('admin:dokling')])
 	}
 
 	const buildListUrl = (params: URLSearchParams) => {
@@ -188,7 +182,6 @@
 		params.set('page', '1')
 
 		await goto(buildListUrl(params), {
-			invalidateAll: true,
 			replaceState: true,
 			noScroll: true,
 			keepFocus: true
@@ -641,7 +634,7 @@
 								const target = event.currentTarget as HTMLInputElement
 								setAllVisibleSelection(target.checked)
 							}}
-							class="h-4 w-4 rounded border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white"
+							class="h-5 w-5 rounded-xl border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white"
 							aria-label="Pilih semua data di halaman ini"
 						/>
 					</th>
@@ -1064,7 +1057,6 @@
 		</div>
 	</div>
 {/if}
-
 
 
 

@@ -26,6 +26,12 @@ type SortOrder = 'asc' | 'desc'
 type AntrianRow = Database['public']['Tables']['antrian_pengajuan']['Row']
 type WorkflowHistoryRow = Database['public']['Tables']['workflow_history']['Row']
 
+const ANTRIAN_PENGAJUAN_LIST_COLUMNS =
+	'id, layanan, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
+
+const WORKFLOW_HISTORY_COLUMNS =
+	'id, pengajuan_id, old_status, new_status, old_posisi, new_posisi, note, changed_by, changed_at'
+
 export type ListAntrianPengajuanParams = {
 	page?: number
 	pageSize?: number
@@ -93,7 +99,7 @@ export const listAntrianPengajuan = async (
 
 	let query = supabase
 		.from('antrian_pengajuan')
-		.select('*', { count: 'exact' })
+		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS, { count: 'exact' })
 		.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
 		.range(from, to)
 
@@ -162,7 +168,7 @@ export const updateStatusAntrianPengajuan = async (
 			tanggal_update: new Date().toISOString().slice(0, 10)
 		})
 		.eq('id', payload.id)
-		.select('*')
+		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS)
 		.single()
 
 	if (error) throw error
@@ -225,7 +231,7 @@ export const createAntrianPengajuan = async (
 			status: payload.status ?? 'Submit / Masuk',
 			tanggal_update: payload.tanggalUpdate ?? null
 		})
-		.select('*')
+		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS)
 		.single()
 
 	if (error) throw error
@@ -291,7 +297,7 @@ export const updateAntrianPengajuan = async (
 		.from('antrian_pengajuan')
 		.update(updates)
 		.eq('id', payload.id)
-		.select('*')
+		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS)
 		.single()
 
 	if (error) throw error
@@ -331,10 +337,10 @@ export const getAntrianPengajuanSummary = async (
 	supabase: SupabaseClient<Database>
 ): Promise<AntrianPengajuanSummary> => {
 	const [totalResult, selesaiResult, doklingResult, pertekResult] = await Promise.all([
-		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }),
-		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('status', 'SK Terbit'),
-		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('layanan', 'dokling'),
-		supabase.from('antrian_pengajuan').select('*', { count: 'exact', head: true }).eq('layanan', 'pertek')
+		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }),
+		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('status', 'SK Terbit'),
+		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'dokling'),
+		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'pertek')
 	])
 
 	if (totalResult.error) throw totalResult.error
@@ -359,7 +365,7 @@ export const getWorkflowHistoryByPengajuanIds = async (
 
 	const { data, error } = await supabase
 		.from('workflow_history')
-		.select('*')
+		.select(WORKFLOW_HISTORY_COLUMNS)
 		.in('pengajuan_id', pengajuanIds)
 		.order('changed_at', { ascending: false })
 
