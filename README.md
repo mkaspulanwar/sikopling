@@ -1,6 +1,8 @@
-# SIKOPLING
+<p align="center">
+  <img src="./static/home/heading.svg" alt="SIKOPLING" width="420" />
+</p>
 
-Portal antarmuka layanan informasi persetujuan lingkungan (internal project).
+Portal layanan informasi dan pengelolaan antrian persetujuan lingkungan DLH Provinsi Kalimantan Selatan.
 
 ![Svelte](https://img.shields.io/badge/Svelte-5-ff3e00?logo=svelte&logoColor=white)
 ![SvelteKit](https://img.shields.io/badge/SvelteKit-2-ff3e00?logo=svelte&logoColor=white)
@@ -12,50 +14,238 @@ Portal antarmuka layanan informasi persetujuan lingkungan (internal project).
 
 ## Status
 
-`Internal / Confidential` - repo ini ditujukan untuk penggunaan internal tim.
+`Internal / Confidential` - repository ini untuk penggunaan internal tim.
 
-README ini disinkronkan dengan kondisi kode pada **4 April 2026**.
+README ini disinkronkan dengan kondisi kode pada **26 April 2026**.
 
-## Ringkasan
+## Ringkasan Sistem
 
-SIKOPLING adalah aplikasi frontend berbasis SvelteKit untuk portal informasi layanan dan pelacakan antrian.
+SIKOPLING saat ini terdiri dari dua area utama:
 
-Fokus implementasi saat ini:
-
-- landing page informatif,
-- halaman antrian layanan (dokling dan pertek),
-- navigasi responsif desktop/mobile,
-- universal search lintas halaman,
-- chatbot bantuan berbasis WhatsApp,
-- fondasi testing untuk pengembangan lanjutan.
-
-## Route Aktif
-
-| Route              | Status      | Keterangan                                                         |
-| ------------------ | ----------- | ------------------------------------------------------------------ |
-| `/`                | Aktif       | Landing page dengan statistik, daftar layanan, dan alur percepatan |
-| `/layanan/dokling` | Aktif       | Tabel antrian dokumen lingkungan (mock data)                       |
-| `/layanan/pertek`  | Aktif       | Tabel antrian persetujuan teknis (mock data)                       |
-| `/tentang`         | Placeholder | Halaman dummy                                                      |
-| `/kontak`          | Placeholder | Halaman dummy                                                      |
-| `/login`           | Placeholder | Halaman dummy                                                      |
+1. **Area publik**
+   - landing page interaktif,
+   - halaman profil, kontak, kebijakan privasi, ketentuan layanan,
+   - antrian publik dokling dan pertek dari data Supabase (service role).
+2. **Area admin**
+   - login Supabase Auth (role-based),
+   - dashboard ringkasan,
+   - manajemen data antrian dokling/pertek (filter, CRUD, import CSV, export CSV),
+   - endpoint API admin untuk operasi data.
 
 ## Fitur Utama
 
-- Navbar fixed dengan mode desktop/mobile, dropdown layanan, dan state aktif route.
-- Universal search modal (`Ctrl/Cmd + K`) dengan indeks dinamis dari halaman aplikasi.
-- Landing page dengan hero video, statistik animasi (IntersectionObserver), jenis dokumen, dan alur layanan.
-- Halaman antrian dokumen lingkungan:
+- **Universal Search** lintas halaman publik (`Ctrl/Cmd + K`) dengan highlight otomatis hasil pencarian pada konten.
+- **Landing page** modern dengan hero video, statistik animasi, showcase layanan, FAQ, dan CTA.
+- **Antrian publik** (`/layanan/dokling`, `/layanan/pertek`) dengan:
   - pencarian,
-  - filter lanjutan,
+  - filter,
   - sorting,
   - pagination,
-  - expandable row (mobile),
-  - export CSV.
-- Halaman antrian persetujuan teknis dengan fitur tabel serupa.
-- Floating chatbot widget untuk memilih kanal WhatsApp (Chatbot / Customer Service).
-- Footer dengan informasi kontak dan tautan sosial.
-- Integrasi `@vercel/analytics` di root layout.
+  - responsive expandable row (mobile),
+  - export CSV di sisi klien.
+- **Panel admin** dengan proteksi role:
+  - role valid: `super_admin`, `admin`, `operator`, `reviewer`,
+  - sidebar desktop + mobile drawer,
+  - session keep-alive otomatis (`/admin/session`).
+- **Manajemen data admin (dokling/pertek)**:
+  - tambah data (modal),
+  - edit data (modal),
+  - hapus data tunggal/massal (dengan pembatasan role),
+  - import CSV (`/admin/api/[layanan]/import`),
+  - export CSV (`/admin/api/[layanan]/export`),
+  - metrik ringkasan per layanan (total/selesai/diproses/ditolak).
+- **Antrian admin umum** (`/admin/pengajuan`) untuk lintas layanan:
+  - filter komprehensif,
+  - sorting server-side,
+  - update status + posisi + catatan,
+  - tampilan histori workflow per pengajuan.
+- **Integrasi Supabase SSR** + manajemen cookie auth (termasuk opsi "ingat saya").
+- **Vercel Analytics** di root layout.
+
+## Struktur Project (Terkini)
+
+```text
+.
+├── src/                                           # Source code utama aplikasi
+│   ├── app.d.ts
+│   ├── app.html
+│   ├── hooks.server.ts                            # SSR hooks + Supabase session + cache header
+│   ├── lib/
+│   │   ├── assets/
+│   │   │   └── favicon.png
+│   │   ├── components/
+│   │   │   ├── admin/
+│   │   │   │   ├── PositionDropdown.svelte
+│   │   │   │   └── StatusDropdown.svelte
+│   │   │   ├── badges/
+│   │   │   │   └── PengajuanStatusBadge.svelte
+│   │   │   └── home/
+│   │   │       ├── Navbar.svelte
+│   │   │       ├── ChatbotWidget.svelte
+│   │   │       ├── SiteFooter.svelte
+│   │   │       ├── HorizontalScroll.svelte
+│   │   │       └── StackedCard.svelte
+│   │   ├── constants/
+│   │   │   ├── universal-search.ts
+│   │   │   └── universal-search.test.ts
+│   │   ├── server/
+│   │   │   ├── admin-route.ts
+│   │   │   ├── admin-session.ts
+│   │   │   ├── antrian-pengajuan.ts
+│   │   │   ├── public-queue.ts
+│   │   │   └── supabase-auth.ts
+│   │   └── supabase/
+│   │       ├── client.ts
+│   │       ├── server.ts
+│   │       ├── env.ts
+│   │       ├── constants.ts
+│   │       └── database.types.ts
+│   └── routes/
+│       ├── +layout.svelte
+│       ├── +page.svelte
+│       ├── layout.css
+│       ├── layanan/
+│       │   ├── dokling/
+│       │   │   ├── +page.server.ts
+│       │   │   └── +page.svelte
+│       │   └── pertek/
+│       │       ├── +page.server.ts
+│       │       └── +page.svelte
+│       ├── login/
+│       │   ├── +page.server.ts
+│       │   └── +page.svelte
+│       ├── logout/
+│       │   └── +server.ts
+│       ├── profil/
+│       │   └── +page.svelte
+│       ├── tentang/
+│       │   └── +page.ts                         # Redirect ke /profil
+│       ├── kontak/
+│       │   └── +page.svelte
+│       ├── kebijakan-privasi/
+│       │   └── +page.svelte
+│       ├── ketentuan-layanan/
+│       │   └── +page.svelte
+│       └── admin/
+│           ├── +layout.server.ts
+│           ├── +layout.svelte
+│           ├── +page.server.ts
+│           ├── dashboard/
+│           │   ├── +page.server.ts
+│           │   └── +page.svelte
+│           ├── dokling/
+│           │   ├── +page.server.ts
+│           │   └── +page.svelte
+│           ├── pertek/
+│           │   ├── +page.server.ts
+│           │   └── +page.svelte
+│           ├── pengajuan/
+│           │   ├── +page.server.ts
+│           │   ├── +page.svelte
+│           │   ├── +server.ts
+│           │   └── [id]/
+│           │       └── +server.ts
+│           ├── api/
+│           │   └── [layanan]/
+│           │       ├── import/
+│           │       │   └── +server.ts
+│           │       └── export/
+│           │           └── +server.ts
+│           ├── profil/
+│           │   └── +page.svelte
+│           ├── pengaturan/
+│           │   └── +page.svelte
+│           └── session/
+│               └── +server.ts
+├── static/                                        # Asset statis (gambar, video, lottie)
+│   ├── home/
+│   ├── layout/
+│   ├── login/
+│   ├── tentang/
+│   ├── kontak/
+│   └── robots.txt
+├── supabase/
+│   ├── migrations/                                # SQL migrasi schema & policy
+│   │   ├── 20260423144841_remote_schema.sql
+│   │   ├── 20260423223000_create_antrian_pengajuan.sql
+│   │   ├── 20260423232000_create_workflow_history.sql
+│   │   ├── 20260423235500_allow_update_workflow_history_note.sql
+│   │   ├── 20260424143000_allow_admin_operator_delete_antrian_pengajuan.sql
+│   │   ├── 20260424150000_restrict_delete_to_super_admin.sql
+│   │   └── 20260426103000_allow_nullable_duplicate_no_registrasi.sql
+│   └── .temp/                                     # Metadata lokal Supabase CLI
+├── tests/
+│   └── home.e2e.ts                                # E2E Playwright
+├── .env.example
+├── package.json
+├── playwright.config.ts
+├── svelte.config.js
+├── vite.config.ts
+├── tsconfig.json
+├── contributing.md
+└── LICENSE
+```
+
+## Route Aktif
+
+### Publik
+
+| Route | Keterangan |
+| --- | --- |
+| `/` | Landing page utama |
+| `/layanan/dokling` | Antrian dokumen lingkungan (publik) |
+| `/layanan/pertek` | Antrian persetujuan teknis (publik) |
+| `/profil` | Halaman profil layanan SIKOPLING |
+| `/tentang` | Redirect 308 ke `/profil` |
+| `/kontak` | Halaman kontak + peta + FAQ |
+| `/kebijakan-privasi` | Halaman kebijakan privasi |
+| `/ketentuan-layanan` | Halaman ketentuan layanan |
+| `/login` | Halaman login admin |
+| `/logout` | Logout sesi auth |
+
+### Admin
+
+| Route | Keterangan |
+| --- | --- |
+| `/admin` | Redirect 307 ke `/admin/dashboard` |
+| `/admin/dashboard` | Ringkasan metrik dan aktivitas login |
+| `/admin/dokling` | Operasional data antrian dokling |
+| `/admin/pertek` | Operasional data antrian pertek |
+| `/admin/pengajuan` | Operasional lintas layanan + workflow |
+| `/admin/profil` | Informasi akun admin aktif |
+| `/admin/pengaturan` | Halaman preferensi UI admin (placeholder fungsional) |
+
+### API Admin
+
+| Endpoint | Method | Fungsi |
+| --- | --- | --- |
+| `/admin/session` | `GET`, `POST` | Keep-alive sesi admin |
+| `/admin/pengajuan` | `GET` | List data pengajuan (server-side filter/sort/page) |
+| `/admin/pengajuan` | `POST` | Create pengajuan |
+| `/admin/pengajuan` | `PATCH` | Update status + posisi + note |
+| `/admin/pengajuan/[id]` | `PATCH` | Update detail data per id |
+| `/admin/pengajuan/[id]` | `DELETE` | Hapus data (dibatasi role) |
+| `/admin/api/[layanan]/import` | `POST` | Import CSV (`dokling`/`pertek`) |
+| `/admin/api/[layanan]/export` | `GET` | Export CSV (`dokling`/`pertek`) |
+
+## Arsitektur Data (Supabase)
+
+Tabel utama:
+
+- `antrian_pengajuan`
+  - menyimpan data antrian dokling/pertek,
+  - memiliki trigger update `updated_at` dan `tanggal_update`,
+  - status dibatasi oleh daftar status pada konstanta aplikasi.
+- `workflow_history`
+  - menyimpan histori perubahan status/posisi,
+  - tercatat otomatis melalui trigger `log_antrian_status_change`,
+  - mendukung update `note` untuk catatan workflow.
+
+Catatan policy:
+
+- operasi baca admin: `super_admin`, `admin`, `operator`, `reviewer`,
+- operasi tulis tertentu: dibatasi per policy,
+- operasi hapus data saat ini diproteksi untuk `super_admin`.
 
 ## Tech Stack
 
@@ -63,123 +253,78 @@ Fokus implementasi saat ini:
 - `svelte` (Svelte 5 + runes)
 - `typescript`
 - `tailwindcss` + `@tailwindcss/forms` + `@tailwindcss/vite`
+- `@supabase/ssr` + `@supabase/supabase-js`
 - `lucide-svelte`
 - `simple-icons`
+- `@lottiefiles/dotlottie-svelte`
+- `gsap`
+- `lenis`
 - `@vercel/analytics`
-- `vitest` + `vitest-browser-svelte`
-- `@playwright/test`
-
-## Struktur Proyek
-
-```text
-src/
-  app.d.ts
-  app.html
-  lib/
-    assets/
-      favicon.svg
-    components/
-      home/
-        Navbar.svelte
-        ChatbotWidget.svelte
-        SiteFooter.svelte
-  routes/
-    +layout.svelte
-    +page.svelte
-    layout.css
-    kontak/
-      +page.svelte
-    layanan/
-      dokling/
-        +page.svelte
-      pertek/
-        +page.svelte
-    login/
-      +page.svelte
-    tentang/
-      +page.svelte
-
-static/
-  home/
-    heading.svg
-    hero-video.webm
-  layout/
-    chatbot.svg
-    logo_sikopling.svg
-    maskot.svg
-  robots.txt
-```
+- `vitest` + `@vitest/browser-playwright`
+- `playwright`
 
 ## Prasyarat
 
 - Node.js `20+`
 - npm `10+`
 
-## Menjalankan Proyek
+## Menjalankan Project
 
 ```bash
 npm install
 npm run dev
 ```
 
-Development server default: `http://localhost:5173`.
+Default dev server: `http://localhost:5173`.
+
+Build production:
+
+```bash
+npm run build
+npm run preview
+```
 
 ## Environment Variables
 
-Copy template:
+Salin template:
 
 ```bash
 cp .env.example .env
 ```
 
-Required variables:
+Variable:
 
-- `PUBLIC_SUPABASE_URL`
-- `PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
+- `PUBLIC_SUPABASE_URL` (wajib)
+- `PUBLIC_SUPABASE_ANON_KEY` (wajib)
+- `SUPABASE_SERVICE_ROLE_KEY` (wajib untuk operasi server privileged, termasuk sumber data antrian publik)
+- `SUPABASE_DB_PASSWORD` (opsional, helper lokal Supabase CLI)
 
-Production note:
-
-- Untuk deployment production, simpan nilai env di dashboard platform (mis. Vercel Project Settings -> Environment Variables).
-- File `.env` lokal hanya untuk development dan tidak di-commit.
+Jika `PUBLIC_SUPABASE_URL` / `PUBLIC_SUPABASE_ANON_KEY` tidak diisi, halaman admin akan menampilkan status `unavailable`.
 
 ## NPM Scripts
 
-| Script                | Fungsi                                   |
-| --------------------- | ---------------------------------------- |
-| `npm run dev`         | Menjalankan development server           |
-| `npm run build`       | Build produksi                           |
-| `npm run preview`     | Menjalankan preview hasil build          |
-| `npm run check`       | Sinkronisasi SvelteKit + type check      |
-| `npm run check:watch` | Type check mode watch                    |
-| `npm run test:unit`   | Menjalankan unit/component test (Vitest) |
-| `npm run test:e2e`    | Menjalankan e2e test (Playwright)        |
-| `npm run test`        | Menjalankan unit test lalu e2e test      |
+| Script | Fungsi |
+| --- | --- |
+| `npm run dev` | Menjalankan development server |
+| `npm run build` | Build produksi |
+| `npm run preview` | Menjalankan preview hasil build |
+| `npm run check` | Sync SvelteKit + type check |
+| `npm run check:watch` | Type check mode watch |
+| `npm run test:unit` | Menjalankan test Vitest (client + server project) |
+| `npm run test:e2e` | Menjalankan E2E Playwright |
+| `npm run test` | Menjalankan unit test lalu E2E test |
 
 ## Testing Saat Ini
 
-- Konfigurasi Vitest dan Playwright sudah tersedia.
-- Saat ini belum ada file test aplikasi (`src/**/*.test.*`, `src/**/*.spec.*`, `*.e2e.*`).
+Test yang tersedia saat ini:
 
-## Catatan Implementasi
-
-- Data antrian pada halaman layanan menggunakan data fallback lokal di sisi server.
-- Tautan footer `/kebijakan-privasi` dan `/ketentuan-layanan` sudah dipasang, tetapi route halamannya belum tersedia.
-- Halaman `tentang`, `kontak`, dan `login` masih placeholder.
-
-## Observability (Vercel)
-
-Analytics diaktifkan melalui `injectAnalytics()` pada layout aplikasi.
-
-Agar data analytics masuk:
-
-1. Aktifkan **Web Analytics** pada project Vercel.
-2. Deploy ke Vercel (tracking tidak aktif pada mode development lokal).
+- `src/lib/constants/universal-search.test.ts` (unit test konstanta universal search)
+- `tests/home.e2e.ts` (E2E render konten inti homepage)
 
 ## Kontribusi
 
-Ikuti panduan kontribusi di [contributing.md](./contributing.md).
+Ikuti panduan di [contributing.md](./contributing.md).
 
 ## Lisensi
 
-Project ini mengikuti lisensi pada file [LICENSE](./LICENSE).
+Lisensi mengikuti file [LICENSE](./LICENSE).
