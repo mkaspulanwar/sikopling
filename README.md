@@ -16,8 +16,8 @@
 
 ## Link
 
-[![Asset SIKOPLING](https://img.shields.io/badge/Asset-SIKOPLING-0F9D58?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6)
-[![Figma Workflow](https://img.shields.io/badge/Figma-Workflow%20SIKOPLING-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/vf54g0g6E2cwoMbY12GXpQ/Workflow-Sikopling?node-id=0-1&p=f&t=942eIymLDssYNfAi-0)
+[![Asset SIKOPLING](https://img.shields.io/badge/Drive-Sikopling-0F9D58?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6)
+[![Figma Workflow](https://img.shields.io/badge/Figma-Sikopling-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/vf54g0g6E2cwoMbY12GXpQ/Workflow-Sikopling?node-id=0-1&p=f&t=942eIymLDssYNfAi-0)
 
 ## Status
 
