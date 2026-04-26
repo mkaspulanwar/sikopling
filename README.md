@@ -2,7 +2,9 @@
   <img src="./static/home/heading.svg" alt="SIKOPLING" width="420" />
 </p>
 
-Portal layanan informasi dan pengelolaan antrian persetujuan lingkungan DLH Provinsi Kalimantan Selatan.
+<p align="center">
+  Portal layanan informasi dan pengelolaan antrian persetujuan lingkungan.
+</p>
 
 ![Svelte](https://img.shields.io/badge/Svelte-5-ff3e00?logo=svelte&logoColor=white)
 ![SvelteKit](https://img.shields.io/badge/SvelteKit-2-ff3e00?logo=svelte&logoColor=white)
@@ -14,15 +16,8 @@ Portal layanan informasi dan pengelolaan antrian persetujuan lingkungan DLH Prov
 
 ## Link
 
-<p align="center">
-  <a href="https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6">
-    <img alt="Drive Assets Sikopling" src="https://img.shields.io/badge/Drive%20Assets-Sikopling-64AD31?style=for-the-badge&logo=googledrive&logoColor=white" />
-  </a>
-  &nbsp;
-  <a href="https://www.figma.com/design/vf54g0g6E2cwoMbY12GXpQ/Workflow-Sikopling?node-id=0-1&p=f&t=942eIymLDssYNfAi-0">
-    <img alt="Figma Design Sikopling" src="https://img.shields.io/badge/Figma%20Design-Sikopling-1F2937?style=for-the-badge&logo=figma&logoColor=F24E1E" />
-  </a>
-</p>
+[![Asset SIKOPLING](https://img.shields.io/badge/Asset-SIKOPLING-0F9D58?logo=googledrive&logoColor=white)](https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6)
+[![Figma Workflow](https://img.shields.io/badge/Figma-Workflow%20SIKOPLING-F24E1E?logo=figma&logoColor=white)](https://www.figma.com/design/vf54g0g6E2cwoMbY12GXpQ/Workflow-Sikopling?node-id=0-1&p=f&t=942eIymLDssYNfAi-0)
 
 ## Status
 
