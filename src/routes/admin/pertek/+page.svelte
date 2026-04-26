@@ -1054,25 +1054,11 @@
 	<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
 		<button type="button" class="absolute inset-0 bg-slate-900/55 backdrop-blur-[2px]" onclick={closeDeleteModal} aria-label="Tutup modal hapus data"></button>
 		<div class="relative w-full max-w-md rounded-2xl border border-[#f3c5c5] bg-white p-5 shadow-[0_28px_50px_-36px_rgba(15,23,42,0.7)]">
-			<h2 class="text-lg font-semibold text-slate-900">
-				Hapus {deleteTarget.ids.length > 1 ? `${deleteTarget.ids.length} data pertek` : 'data pertek'}?
-			</h2>
-			<p class="mt-2 text-sm text-slate-600">
-				{#if deleteTarget.ids.length === 1}
-					Data <span class="font-semibold text-slate-900">{deleteTarget.labels[0]}</span> akan dihapus permanen.
-				{:else}
-					Data yang dipilih akan dihapus permanen.
-				{/if}
-			</p>
-			{#if deleteTarget.ids.length > 1}
-				<p class="mt-1 text-xs text-slate-500">
-					{deleteTarget.labels.slice(0, 3).join(', ')}{deleteTarget.labels.length > 3 ? ' dan lainnya' : ''}
-				</p>
-			{/if}
+			<h2 class="text-lg font-semibold text-slate-900">Data akan dihapus permanen</h2>
 			<div class="mt-5 flex flex-wrap justify-end gap-2">
 				<button type="button" onclick={closeDeleteModal} class="inline-flex h-10 items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
-				<button type="button" onclick={confirmDelete} disabled={isDeleting || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-rose-600 px-4 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300">
-					{isDeleting ? 'Menghapus...' : 'Ya, Hapus'}
+				<button type="button" onclick={confirmDelete} disabled={isDeleting || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-rose-600 px-4 text-sm font-semibold !text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:!text-white">
+					{isDeleting ? 'Menghapus...' : 'Hapus'}
 				</button>
 			</div>
 		</div>
