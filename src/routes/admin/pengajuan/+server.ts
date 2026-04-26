@@ -15,6 +15,24 @@ const parseNumber = (value: string | null, fallback: number) => {
 }
 
 const isIsoDate = (value: string | undefined) => !value || /^\d{4}-\d{2}-\d{2}$/.test(value)
+const extractErrorMessage = (error: unknown, fallback: string) => {
+	if (error instanceof Error) return error.message
+	if (typeof error === 'object' && error) {
+		const maybeError = error as {
+			message?: unknown
+			details?: unknown
+			hint?: unknown
+			code?: unknown
+		}
+		const message = typeof maybeError.message === 'string' ? maybeError.message : ''
+		const details = typeof maybeError.details === 'string' ? maybeError.details : ''
+		const hint = typeof maybeError.hint === 'string' ? maybeError.hint : ''
+		const code = typeof maybeError.code === 'string' ? maybeError.code : ''
+		const chunks = [message, details, hint, code ? `code=${code}` : ''].filter(Boolean)
+		if (chunks.length > 0) return chunks.join(' | ')
+	}
+	return fallback
+}
 
 const ensureAdminSession = async (locals: App.Locals) => {
 	const auth = await requireAdminSupabase(locals)
@@ -117,7 +135,16 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		})
 		return json({ data: created }, { status: 201 })
 	} catch (error) {
-		const message = error instanceof Error ? error.message : 'Gagal menambahkan data pengajuan'
+		const message = extractErrorMessage(error, 'Gagal menambahkan data pengajuan')
+		const normalized = message.toLowerCase()
+		if (
+			normalized.includes('jwt') ||
+			normalized.includes('not authenticated') ||
+			normalized.includes('auth session missing') ||
+			normalized.includes('permission denied')
+		) {
+			return json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 })
+		}
 		if (message.toLowerCase().includes('duplicate key')) {
 			return json({ message: 'No registrasi sudah digunakan' }, { status: 409 })
 		}

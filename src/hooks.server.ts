@@ -34,14 +34,36 @@ const supabaseHandle: Handle = async ({ event, resolve }) => {
 	event.locals.safeGetSession = async () => {
 		if (!event.locals.supabase) return { session: null, user: null }
 
+		// Read session first so SSR client can refresh expired access tokens using refresh token cookies.
+		const {
+			data: { session },
+			error: sessionError
+		} = await event.locals.supabase.auth.getSession()
+		if (sessionError || !session) return { session: null, user: null }
+
 		const {
 			data: { user },
 			error
 		} = await event.locals.supabase.auth.getUser()
-		if (error || !user) return { session: null, user: null }
+		if (!error && user) {
+			return { session: ({ user } as unknown as Session), user }
+		}
+
+		// Fallback: when access token is stale but refresh token is still valid, refresh and retry once.
+		const {
+			data: refreshData,
+			error: refreshError
+		} = await event.locals.supabase.auth.refreshSession()
+		if (refreshError || !refreshData.session) return { session: null, user: null }
+
+		const {
+			data: { user: refreshedUser },
+			error: refreshedUserError
+		} = await event.locals.supabase.auth.getUser()
+		if (refreshedUserError || !refreshedUser) return { session: null, user: null }
 
 		// Build a minimal authenticated marker without trusting getSession() user payload.
-		return { session: ({ user } as unknown as Session), user }
+		return { session: ({ user: refreshedUser } as unknown as Session), user: refreshedUser }
 	}
 
 	return resolve(event, {

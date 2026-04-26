@@ -1,4 +1,5 @@
 import { LAYANAN_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
+import { requireAdminSupabase } from '$lib/server/admin-route'
 import {
 	getAntrianPengajuanSummary,
 	getWorkflowHistoryByPengajuanIds,
@@ -46,8 +47,6 @@ const readSortBy = (value: string | null) => {
 }
 
 const readSortOrder = (value: string | null): 'asc' | 'desc' => (value === 'asc' ? 'asc' : 'desc')
-const ADMIN_ROLES = new Set(['super_admin', 'admin', 'operator', 'reviewer'])
-
 export const load: PageServerLoad = async ({ locals, url }) => {
 	const query = url.searchParams
 
@@ -69,7 +68,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		sortOrder: readSortOrder(query.get('sortOrder'))
 	}
 
-	if (!locals.supabase) {
+	const auth = await requireAdminSupabase(locals)
+	if (auth.state === 'unavailable') {
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
@@ -93,13 +93,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 	}
 
-	const { session, user } = await locals.safeGetSession()
-	const role =
-		(typeof user?.app_metadata?.role === 'string' && user.app_metadata.role) ||
-		(typeof user?.user_metadata?.role === 'string' && user.user_metadata.role) ||
-		null
-
-	if (!session || !role || !ADMIN_ROLES.has(role)) {
+	if (auth.state === 'unauthorized') {
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
@@ -125,11 +119,11 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
 	try {
 		const [result, summary] = await Promise.all([
-			listAntrianPengajuan(locals.supabase, filters),
-			getAntrianPengajuanSummary(locals.supabase)
+			listAntrianPengajuan(auth.supabase, filters),
+			getAntrianPengajuanSummary(auth.supabase)
 		])
 		const historyByPengajuan = await getWorkflowHistoryByPengajuanIds(
-			locals.supabase,
+			auth.supabase,
 			result.data.map((row) => row.id)
 		)
 
