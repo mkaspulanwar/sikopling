@@ -1399,7 +1399,7 @@
 						inputmode="search"
 						autocomplete="off"
 						placeholder="Cari halaman, layanan, atau dokumen"
-						class="h-full w-full border-0 bg-transparent text-base text-[var(--ink)] placeholder:text-[var(--muted)] shadow-none outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 sm:text-[0.98rem]"
+						class="universal-search-input h-full w-full border-0 bg-transparent text-base text-[var(--ink)] placeholder:text-[var(--muted)] shadow-none outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 sm:text-[0.98rem]"
 						aria-label="Cari konten website"
 					/>
 				</div>
@@ -1662,6 +1662,20 @@
 
 	:global(.menu-item-static:visited) {
 		text-decoration: none;
+	}
+
+	:global(.universal-search-input[type='search']::-webkit-search-cancel-button),
+	:global(.universal-search-input[type='search']::-webkit-search-decoration) {
+		-webkit-appearance: none;
+		appearance: none;
+		display: none;
+	}
+
+	:global(.universal-search-input[type='search']::-ms-clear),
+	:global(.universal-search-input[type='search']::-ms-reveal) {
+		display: none;
+		width: 0;
+		height: 0;
 	}
 
 	@media (prefers-reduced-motion: reduce) {
