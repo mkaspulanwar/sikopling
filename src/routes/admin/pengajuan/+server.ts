@@ -92,7 +92,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	const body = await request.json()
 	const layanan = typeof body?.layanan === 'string' ? body.layanan : ''
-	const noRegistrasi = typeof body?.no_registrasi === 'string' ? body.no_registrasi : ''
+	const noRegistrasi = typeof body?.no_registrasi === 'string' ? body.no_registrasi : null
 	const tanggalMasuk = typeof body?.tanggal_masuk === 'string' ? body.tanggal_masuk : undefined
 	const tanggalUpdate = typeof body?.tanggal_update === 'string' ? body.tanggal_update : undefined
 	const instansi = typeof body?.instansi === 'string' ? body.instansi : undefined
@@ -103,10 +103,6 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	if (!LAYANAN_VALUES.includes(layanan as 'dokling' | 'pertek')) {
 		return json({ message: 'Layanan wajib dipilih' }, { status: 400 })
-	}
-
-	if (!noRegistrasi.trim()) {
-		return json({ message: 'No registrasi wajib diisi' }, { status: 400 })
 	}
 
 	if (!isIsoDate(tanggalMasuk)) {

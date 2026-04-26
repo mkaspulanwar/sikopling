@@ -74,6 +74,10 @@ const normalizeSortBy = (value?: string): SortColumn => {
 }
 
 const normalizeSortOrder = (value?: string): SortOrder => (value === 'asc' ? 'asc' : 'desc')
+const normalizeNoRegistrasi = (value?: string | null) => {
+	const normalized = value?.trim()
+	return normalized ? normalized : null
+}
 
 export const listAntrianPengajuan = async (
 	supabase: SupabaseClient<Database>,
@@ -192,7 +196,7 @@ export const createAntrianPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: {
 		layanan: Layanan
-		noRegistrasi: string
+		noRegistrasi?: string | null
 		tanggalMasuk?: string | null
 		tanggalUpdate?: string | null
 		instansi?: string | null
@@ -206,10 +210,7 @@ export const createAntrianPengajuan = async (
 		throw new Error('Layanan tidak valid')
 	}
 
-	const normalizedNoRegistrasi = payload.noRegistrasi.trim()
-	if (!normalizedNoRegistrasi) {
-		throw new Error('No registrasi wajib diisi')
-	}
+	const normalizedNoRegistrasi = normalizeNoRegistrasi(payload.noRegistrasi)
 
 	const { data, error } = await supabase
 		.from('antrian_pengajuan')
@@ -235,7 +236,7 @@ export const updateAntrianPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: {
 		id: string
-		noRegistrasi?: string
+		noRegistrasi?: string | null
 		tanggalMasuk?: string | null
 		tanggalUpdate?: string | null
 		instansi?: string | null
@@ -248,11 +249,7 @@ export const updateAntrianPengajuan = async (
 	const updates: Database['public']['Tables']['antrian_pengajuan']['Update'] = {}
 
 	if (payload.noRegistrasi !== undefined) {
-		const normalizedNoRegistrasi = payload.noRegistrasi.trim()
-		if (!normalizedNoRegistrasi) {
-			throw new Error('No registrasi wajib diisi')
-		}
-		updates.no_registrasi = normalizedNoRegistrasi
+		updates.no_registrasi = normalizeNoRegistrasi(payload.noRegistrasi)
 	}
 
 	if (payload.tanggalMasuk !== undefined) {

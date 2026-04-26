@@ -11,7 +11,7 @@ const escapeCsvValue = (value: string) => {
 
 const toCsv = (
 	rows: Array<{
-		no_registrasi: string
+		no_registrasi: string | null
 		tanggal_masuk: string | null
 		instansi: string | null
 		kegiatan: string | null

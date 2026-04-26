@@ -28,7 +28,7 @@ export type Database = {
 					jenis_dokumen: string | null
 					kegiatan: string | null
 					layanan: LayananValue
-					no_registrasi: string
+					no_registrasi: string | null
 					posisi: string | null
 					status: StatusValue
 					tanggal_masuk: string | null
@@ -42,7 +42,7 @@ export type Database = {
 					jenis_dokumen?: string | null
 					kegiatan?: string | null
 					layanan: LayananValue
-					no_registrasi: string
+					no_registrasi?: string | null
 					posisi?: string | null
 					status?: StatusValue
 					tanggal_masuk?: string | null
@@ -56,7 +56,7 @@ export type Database = {
 					jenis_dokumen?: string | null
 					kegiatan?: string | null
 					layanan?: LayananValue
-					no_registrasi?: string
+					no_registrasi?: string | null
 					posisi?: string | null
 					status?: StatusValue
 					tanggal_masuk?: string | null

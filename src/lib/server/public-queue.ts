@@ -123,7 +123,7 @@ export const getPublicQueueRows = async (layanan: LayananType): Promise<PublicQu
 	}
 
 	return (data ?? []).map((row) => ({
-		registrationNo: row.no_registrasi,
+		registrationNo: row.no_registrasi ?? '-',
 		receivedDate: row.tanggal_masuk ?? row.tanggal_update ?? new Date().toISOString().slice(0, 10),
 		agency: row.instansi ?? '-',
 		activity: row.kegiatan ?? '-',

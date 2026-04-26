@@ -77,7 +77,7 @@
 	})
 
 	const formFromRow = (row: QueueRow): QueueForm => ({
-		no_registrasi: row.no_registrasi,
+		no_registrasi: row.no_registrasi ?? '',
 		tanggal_masuk: row.tanggal_masuk ?? '',
 		tanggal_update: row.tanggal_update ?? '',
 		instansi: row.instansi ?? '',
@@ -310,7 +310,7 @@
 	const openDeleteModal = (rows: QueueRow[]) => {
 		deleteTarget = {
 			ids: rows.map((row) => row.id),
-			labels: rows.map((row) => row.no_registrasi)
+			labels: rows.map((row) => row.no_registrasi ?? '-')
 		}
 	}
 
@@ -366,10 +366,6 @@
 	}
 
 	const submitCreate = async () => {
-		if (!createForm.no_registrasi.trim()) {
-			flash = { type: 'error', message: 'No registrasi wajib diisi' }
-			return
-		}
 		if (!createForm.tanggal_update.trim()) {
 			flash = { type: 'error', message: 'Tanggal update wajib diisi' }
 			return
@@ -408,10 +404,6 @@
 
 	const submitEdit = async () => {
 		if (!editRowId) return
-		if (!editForm.no_registrasi.trim()) {
-			flash = { type: 'error', message: 'No registrasi wajib diisi' }
-			return
-		}
 		if (!editForm.tanggal_update.trim()) {
 			flash = { type: 'error', message: 'Tanggal update wajib diisi' }
 			return
@@ -692,7 +684,7 @@
 								/>
 							</td>
 							<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">{(data.result.page - 1) * data.result.pageSize + index + 1}</td>
-							<td class="px-4 py-4 text-sm font-semibold text-[#20232A]">{row.no_registrasi}</td>
+							<td class="px-4 py-4 text-sm font-semibold text-[#20232A]">{row.no_registrasi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.instansi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</td>
@@ -762,7 +754,7 @@
 												{row.instansi ?? '-'}
 											</p>
 											<p class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]">
-												{row.no_registrasi}
+												{row.no_registrasi ?? '-'}
 											</p>
 											<div class="mt-2 flex flex-wrap items-center gap-1.5">
 												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
