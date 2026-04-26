@@ -4,9 +4,9 @@ import {
 	listAntrianPengajuan,
 	updateStatusAntrianPengajuan
 } from '$lib/server/antrian-pengajuan'
+import { requireAdminSupabase } from '$lib/server/admin-route'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
-const ADMIN_ROLES = new Set(['super_admin', 'admin', 'operator', 'reviewer'])
 
 const parseNumber = (value: string | null, fallback: number) => {
 	if (!value) return fallback
@@ -17,22 +17,21 @@ const parseNumber = (value: string | null, fallback: number) => {
 const isIsoDate = (value: string | undefined) => !value || /^\d{4}-\d{2}-\d{2}$/.test(value)
 
 const ensureAdminSession = async (locals: App.Locals) => {
-	if (!locals.supabase) {
+	const auth = await requireAdminSupabase(locals)
+
+	if (auth.state === 'unavailable') {
 		return {
 			error: json({ message: 'Supabase belum dikonfigurasi di environment deployment' }, { status: 503 })
 		}
 	}
-	const { session, user } = await locals.safeGetSession()
-	const role =
-		(typeof user?.app_metadata?.role === 'string' && user.app_metadata.role) ||
-		(typeof user?.user_metadata?.role === 'string' && user.user_metadata.role) ||
-		null
-	if (!session || !role || !ADMIN_ROLES.has(role)) {
+
+	if (auth.state === 'unauthorized') {
 		return {
 			error: json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 })
 		}
 	}
-	return { supabase: locals.supabase }
+
+	return { supabase: auth.supabase }
 }
 
 export const GET: RequestHandler = async ({ locals, url }) => {

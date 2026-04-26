@@ -2,6 +2,7 @@
 	import { goto } from '$app/navigation'
 	import { page } from '$app/state'
 	import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
+	import PositionDropdown from '$lib/components/admin/PositionDropdown.svelte'
 	import StatusDropdown from '$lib/components/admin/StatusDropdown.svelte'
 	import { cubicOut } from 'svelte/easing'
 	import { fly } from 'svelte/transition'
@@ -33,6 +34,12 @@
 
 	const { data }: { data: PageData } = $props()
 	const layanan = 'dokling' as const
+	const POSITION_OPTIONS = [
+		'Penyusun',
+		'Pemrakarsa',
+		'Sekretariat TU',
+		'Lainnya'
+	] as const
 
 	const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 		day: '2-digit',
@@ -65,7 +72,7 @@
 		instansi: '',
 		kegiatan: '',
 		jenis_dokumen: '',
-		posisi: '',
+		posisi: 'Penyusun',
 		status: 'Submit / Masuk'
 	})
 
@@ -332,6 +339,7 @@
 
 		const response = await fetch(`/admin/api/${layanan}/import`, {
 			method: 'POST',
+			credentials: 'include',
 			body: formData
 		})
 
@@ -366,12 +374,17 @@
 			flash = { type: 'error', message: 'Tanggal update wajib diisi' }
 			return
 		}
+		if (!createForm.posisi.trim()) {
+			flash = { type: 'error', message: 'Posisi wajib diisi' }
+			return
+		}
 
 		isSavingCreate = true
 		flash = null
 
 		const response = await fetch('/admin/pengajuan', {
 			method: 'POST',
+			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify({
 				layanan,
@@ -403,12 +416,17 @@
 			flash = { type: 'error', message: 'Tanggal update wajib diisi' }
 			return
 		}
+		if (!editForm.posisi.trim()) {
+			flash = { type: 'error', message: 'Posisi wajib diisi' }
+			return
+		}
 
 		isSavingEdit = true
 		flash = null
 
 		const response = await fetch(`/admin/pengajuan/${editRowId}`, {
 			method: 'PATCH',
+			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify(normalizePayload(editForm))
 		})
@@ -437,7 +455,8 @@
 		const deleteResults = await Promise.all(
 			targetIds.map(async (id) => {
 				const response = await fetch(`/admin/pengajuan/${id}`, {
-					method: 'DELETE'
+					method: 'DELETE',
+					credentials: 'include'
 				})
 				const payload = await response
 					.json()
@@ -910,7 +929,12 @@
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
-						<input type="text" bind:value={createForm.posisi} placeholder="Contoh: Penyusun" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+						<PositionDropdown
+							bind:value={createForm.posisi}
+							options={POSITION_OPTIONS}
+							disabled={isSavingCreate || data.unavailable}
+							placeholder="Contoh: Koordinator Tim"
+						/>
 					</label>
 				</div>
 			</div>
@@ -990,7 +1014,12 @@
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
-						<input type="text" bind:value={editForm.posisi} placeholder="Contoh: Penyusun" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+						<PositionDropdown
+							bind:value={editForm.posisi}
+							options={POSITION_OPTIONS}
+							disabled={isSavingEdit || data.unavailable}
+							placeholder="Contoh: Koordinator Tim"
+						/>
 					</label>
 				</div>
 			</div>

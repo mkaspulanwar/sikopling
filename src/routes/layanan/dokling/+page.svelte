@@ -16,7 +16,7 @@
 		| "Dikembalikan"
 		| "Ditolak"
 		| "Submit";
-	type QueuePosition = "Penyusun" | "Pemrakarsa" | "Sekretariat TU";
+	type QueuePosition = string;
 
 	type QueueRow = {
 		registrationNo: string;

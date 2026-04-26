@@ -11,7 +11,7 @@ type PublicQueueRow = {
 	agency: string
 	activity: string
 	documentType: string
-	position: 'Penyusun' | 'Pemrakarsa' | 'Sekretariat TU'
+	position: string
 	progressStatus: string
 	progressUpdatedDate: string
 }
@@ -28,8 +28,12 @@ const resolveServiceClient = () => {
 }
 
 const asQueuePosition = (value: string | null): PublicQueueRow['position'] => {
-	if (value === 'Pemrakarsa' || value === 'Sekretariat TU') return value
-	return 'Penyusun'
+	const normalized = value?.trim()
+	if (!normalized) return 'Penyusun'
+	if (normalized === 'Pemrakarsa' || normalized === 'Sekretariat TU' || normalized === 'Penyusun') {
+		return normalized
+	}
+	return normalized
 }
 
 const mapDoklingStatus = (status: string): string => {
