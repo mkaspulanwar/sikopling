@@ -16,10 +16,11 @@ Portal layanan informasi dan pengelolaan antrian persetujuan lingkungan DLH Prov
 
 <p align="center">
   <a href="https://drive.google.com/drive/folders/100V7CrI6LjbkllF8kWAbIO6P5ze_u6x6">
-    <img alt="Drive Assets Sikopling" src="https://img.shields.io/badge/Drive%20Assets%20Sikopling-0F9D58?logo=googledrive&logoColor=white" />
+    <img alt="Drive Assets Sikopling" src="https://img.shields.io/badge/Drive%20Assets-Sikopling-64AD31?style=for-the-badge&logo=googledrive&logoColor=white" />
   </a>
+  &nbsp;
   <a href="https://www.figma.com/design/vf54g0g6E2cwoMbY12GXpQ/Workflow-Sikopling?node-id=0-1&p=f&t=942eIymLDssYNfAi-0">
-    <img alt="Figma Design Sikopling" src="https://img.shields.io/badge/Figma%20Design%20Sikopling-F24E1E?logo=figma&logoColor=white" />
+    <img alt="Figma Design Sikopling" src="https://img.shields.io/badge/Figma%20Design-Sikopling-1F2937?style=for-the-badge&logo=figma&logoColor=F24E1E" />
   </a>
 </p>
 
