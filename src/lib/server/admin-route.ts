@@ -1,3 +1,4 @@
+import { dev } from '$app/environment'
 import { STATUS_VALUES, type Layanan, type StatusPengajuan } from '$lib/supabase/constants'
 import type { Database } from '$lib/supabase/database.types'
 import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
@@ -78,6 +79,11 @@ export const readAdminFilters = (query: URLSearchParams): AdminListFilters => ({
 })
 
 export const isLayanan = (value: string): value is Layanan => value === 'dokling' || value === 'pertek'
+
+export const logAdminLoad = (source: string, detail?: Record<string, unknown>) => {
+	if (!dev) return
+	console.info(`[admin-load] ${source}`, detail ?? {})
+}
 
 export const requireAdminSupabase = async (
 	locals: App.Locals

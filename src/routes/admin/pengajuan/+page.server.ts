@@ -1,7 +1,6 @@
 import { LAYANAN_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
-import { requireAdminSupabase } from '$lib/server/admin-route'
+import { EMPTY_SUMMARY, logAdminLoad } from '$lib/server/admin-route'
 import {
-	getAntrianPengajuanSummary,
 	getWorkflowHistoryByPengajuanIds,
 	listAntrianPengajuan
 } from '$lib/server/antrian-pengajuan'
@@ -47,8 +46,12 @@ const readSortBy = (value: string | null) => {
 }
 
 const readSortOrder = (value: string | null): 'asc' | 'desc' => (value === 'asc' ? 'asc' : 'desc')
-export const load: PageServerLoad = async ({ locals, url }) => {
+
+export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
+	depends('admin:pengajuan')
+
 	const query = url.searchParams
+	const adminData = await parent()
 
 	const filters = {
 		page: Math.max(1, Math.floor(readNumber(query.get('page'), 1))),
@@ -68,20 +71,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		sortOrder: readSortOrder(query.get('sortOrder'))
 	}
 
-	const auth = await requireAdminSupabase(locals)
-	if (auth.state === 'unavailable') {
+	if (!adminData.supabaseAvailable || !locals.supabase) {
+		logAdminLoad('admin/pengajuan/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
 			errorMessage: null,
 			filters,
-			summary: {
-				total: 0,
-				pending: 0,
-				selesai: 0,
-				dokling: 0,
-				pertek: 0
-			},
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: {
 				data: [],
 				total: 0,
@@ -93,19 +90,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 		}
 	}
 
-	if (auth.state === 'unauthorized') {
+	if (!adminData.isAdmin) {
+		logAdminLoad('admin/pengajuan/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
 			errorMessage: null,
 			filters,
-			summary: {
-				total: 0,
-				pending: 0,
-				selesai: 0,
-				dokling: 0,
-				pertek: 0
-			},
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: {
 				data: [],
 				total: 0,
@@ -118,21 +110,25 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 	}
 
 	try {
-		const [result, summary] = await Promise.all([
-			listAntrianPengajuan(auth.supabase, filters),
-			getAntrianPengajuanSummary(auth.supabase)
-		])
+		const result = await listAntrianPengajuan(locals.supabase, filters)
 		const historyByPengajuan = await getWorkflowHistoryByPengajuanIds(
-			auth.supabase,
+			locals.supabase,
 			result.data.map((row) => row.id)
 		)
+
+		logAdminLoad('admin/pengajuan/+page.server', {
+			state: 'ok',
+			page: filters.page,
+			pageSize: filters.pageSize,
+			total: result.total
+		})
 
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: false,
 			errorMessage: null,
 			filters,
-			summary,
+			summary: adminData.summary,
 			result,
 			historyByPengajuan
 		}
@@ -143,13 +139,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 			requiresSupabaseAuth: false,
 			errorMessage: message,
 			filters,
-			summary: {
-				total: 0,
-				pending: 0,
-				selesai: 0,
-				dokling: 0,
-				pertek: 0
-			},
+			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: {
 				data: [],
 				total: 0,

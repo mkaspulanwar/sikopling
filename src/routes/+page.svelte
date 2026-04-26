@@ -8,6 +8,7 @@
 	import type { DotLottie } from "@lottiefiles/dotlottie-svelte";
 	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	import StackedCard from "$lib/components/home/StackedCard.svelte";
+	import EyeCursorZone from "$lib/components/EyeCursorZone.svelte";
 
 	type HomeFaqItem = {
 		id: string;
@@ -730,29 +731,31 @@
 	</HorizontalScroll>
 </section>
 
-<section
-	id="alur-percepatan"
-	class="scroll-mt-28 bg-[var(--canvas)] py-6 sm:py-14"
->
-	<div class="page-shell">
-		<div class="mx-auto max-w-3xl text-center">
-			<p
-				class="text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
+	<section
+		id="alur-percepatan"
+		class="scroll-mt-28 bg-(--canvas) py-6 sm:py-14">
+		<EyeCursorZone>
+		<div class="page-shell">
+			<div
+				class="mx-auto max-w-3xl rounded-2xl border border-[var(--line)] bg-white/65 p-5 text-center backdrop-blur-[1px] sm:p-6"
 			>
-				8 Langkah Percepatan
-			</p>
-			<h2
-				class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
-			>
-				Alur Persetujuan Lingkungan
-			</h2>
-			<p
-				class="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-lg"
-			>
-				Alur ini dirancang agar proses layanan lebih transparan,
-				terukur, dan efisien bagi pemrakarsa.
-			</p>
-		</div>
+				<p
+					class="text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
+				>
+					8 Langkah Percepatan
+				</p>
+				<h2
+					class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
+				>
+					Alur Persetujuan Lingkungan
+				</h2>
+				<p
+					class="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-lg"
+				>
+					Alur ini dirancang agar proses layanan lebih transparan,
+					terukur, dan efisien bagi pemrakarsa.
+				</p>
+			</div>
 
 		<ol class="mt-8 space-y-3.5 lg:hidden">
 			{#each serviceSteps as step, index}
@@ -834,6 +837,7 @@
 			</div>
 		</div>
 	</div>
+	</EyeCursorZone>
 </section>
 <section id="faq" class="scroll-mt-28 bg-white py-16 sm:py-20">
 	<div class="nav-shell nav-shell-desktop-spacious">

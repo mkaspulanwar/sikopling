@@ -1063,7 +1063,7 @@
 		}`;
 
 	const actionButtonClass = () =>
-		`inline-flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
+		`cursor-pointer inline-flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
 			shouldUseLightNav()
 				? 'border-white/25 bg-white/10 text-white'
 				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
@@ -1122,7 +1122,7 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isLayananActive())} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								class={`${desktopLinkClass(isLayananActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
 								aria-expanded={isLayananOpen}
 								aria-haspopup="true"
 								onclick={() => (isLayananOpen ? closeLayananMenu() : openLayananMenu())}
@@ -1176,7 +1176,7 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isTentangActive())} appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								class={`${desktopLinkClass(isTentangActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
 								aria-expanded={isTentangOpen}
 								aria-haspopup="true"
 								onclick={() => (isTentangOpen ? closeTentangMenu() : openTentangMenu())}

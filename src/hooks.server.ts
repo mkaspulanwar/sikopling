@@ -31,47 +31,62 @@ const withHeader = (response: Response, key: string, value: string) => {
 
 const supabaseHandle: Handle = async ({ event, resolve }) => {
 	event.locals.supabase = createSupabaseServerClient(event)
+	let safeGetSessionPromise: Promise<{ session: Session | null; user: Session['user'] | null }> | null =
+		null
+
 	event.locals.safeGetSession = async () => {
+		if (safeGetSessionPromise) {
+			return safeGetSessionPromise
+		}
+
 		if (!event.locals.supabase) return { session: null, user: null }
-		const authClient = event.locals.supabase.auth
 
-		const getVerifiedUser = async () => {
-			const {
-				data: { user },
-				error
-			} = await authClient.getUser()
-			if (error || !user) return null
-			return user
-		}
+		safeGetSessionPromise = (async () => {
+			const supabase = event.locals.supabase
+			if (!supabase) return { session: null, user: null }
 
-		// Read session first so SSR client can refresh expired access tokens using refresh token cookies.
-		const {
-			data: { session },
-			error: sessionError
-		} = await authClient.getSession()
-		const verifiedUser = await getVerifiedUser()
-		if (session && verifiedUser) {
-			return {
-				session: ({ user: verifiedUser } as unknown as Session),
-				user: verifiedUser
+			const authClient = supabase.auth
+
+			const getVerifiedUser = async () => {
+				const {
+					data: { user },
+					error
+				} = await authClient.getUser()
+				if (error || !user) return null
+				return user
 			}
-		}
 
-		// Fallback: when access token/session is stale but refresh token is still valid, refresh and retry once.
-		const shouldTryRefresh = Boolean(sessionError) || !session || !verifiedUser
-		if (!shouldTryRefresh) return { session: null, user: null }
+			// Read session first so SSR client can refresh expired access tokens using refresh token cookies.
+			const {
+				data: { session },
+				error: sessionError
+			} = await authClient.getSession()
+			const verifiedUser = await getVerifiedUser()
+			if (session && verifiedUser) {
+				return {
+					session: ({ user: verifiedUser } as unknown as Session),
+					user: verifiedUser
+				}
+			}
 
-		const {
-			data: refreshData,
-			error: refreshError
-		} = await authClient.refreshSession()
-		if (refreshError || !refreshData.session) return { session: null, user: null }
+			// Fallback: when access token/session is stale but refresh token is still valid, refresh and retry once.
+			const shouldTryRefresh = Boolean(sessionError) || !session || !verifiedUser
+			if (!shouldTryRefresh) return { session: null, user: null }
 
-		const refreshedUser = await getVerifiedUser()
-		if (!refreshedUser) return { session: null, user: null }
+			const {
+				data: refreshData,
+				error: refreshError
+			} = await authClient.refreshSession()
+			if (refreshError || !refreshData.session) return { session: null, user: null }
 
-		// Build a minimal authenticated marker without trusting getSession() user payload.
-		return { session: ({ user: refreshedUser } as unknown as Session), user: refreshedUser }
+			const refreshedUser = await getVerifiedUser()
+			if (!refreshedUser) return { session: null, user: null }
+
+			// Build a minimal authenticated marker without trusting getSession() user payload.
+			return { session: ({ user: refreshedUser } as unknown as Session), user: refreshedUser }
+		})()
+
+		return safeGetSessionPromise
 	}
 
 	return resolve(event, {

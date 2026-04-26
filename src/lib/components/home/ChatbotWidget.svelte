@@ -246,14 +246,14 @@ function toggleFaq(id: string) {
 			>
 				{#if isOpen}
 					<span class="hidden h-full w-full sm:block">
-						<X class="h-full w-full text-white" color="#fff" strokeWidth={2.45} aria-hidden="true" />
+						<X class="cursor-pointer h-full w-full text-white" color="#fff" strokeWidth={2.45} aria-hidden="true" />
 					</span>
 				{:else}
 					<span class="block h-full w-full">
 						<img
 							src="/layout/chatbot.png"
 							alt=""
-							class="h-full w-full origin-center scale-[1.42] object-contain sm:scale-[1.3]"
+							class="cursor-pointer h-full w-full origin-center scale-[1.42] object-contain sm:scale-[1.3]"
 							aria-hidden="true"
 						/>
 					</span>
@@ -265,7 +265,7 @@ function toggleFaq(id: string) {
 
 <style>
 	.chatbot-trigger--bounce {
-		animation: chatbot-trigger-bounce 0.26s cubic-bezier(0.32, 1.55, 0.58, 1);
+		animation: chatbot-trigger-bounce 0.26s cubic-bezier(0.32, 1.55, 0.58, 0.5);
 	}
 
 	@keyframes chatbot-trigger-bounce {

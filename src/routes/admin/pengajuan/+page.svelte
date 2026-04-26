@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
+	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/state'
 	import ArrowDown from 'lucide-svelte/icons/arrow-down'
 	import ArrowUp from 'lucide-svelte/icons/arrow-up'
@@ -78,6 +78,9 @@
 
 	const formatDateTime = (value: string) => dateTimeFormatter.format(new Date(value))
 	const formatNumber = (value: number) => numberFormatter.format(value)
+	const refreshAdminPengajuanData = async () => {
+		await Promise.all([invalidate('admin:summary'), invalidate('admin:pengajuan')])
+	}
 
 	const getRowHistory = (pengajuanId: string) => {
 		const historyMap = data.historyByPengajuan as Record<
@@ -160,7 +163,7 @@
 	const changePageSize = async (value: string) => {
 		const parsed = Number(value)
 		if (!Number.isFinite(parsed)) return
-		await goto(buildQuery({ pageSize: parsed, page: 1 }), { invalidateAll: true, keepFocus: true })
+		await goto(buildQuery({ pageSize: parsed, page: 1 }), { keepFocus: true })
 	}
 
 	const submitStatusUpdate = async (id: string) => {
@@ -195,12 +198,7 @@
 		}
 
 		flash = { type: 'success', message: `Status untuk ${id.slice(0, 8)} berhasil diperbarui` }
-		await goto(`${page.url.pathname}${page.url.search}`, {
-			invalidateAll: true,
-			replaceState: true,
-			noScroll: true,
-			keepFocus: true
-		})
+		await refreshAdminPengajuanData()
 		pendingRowId = null
 	}
 
@@ -237,12 +235,7 @@
 			posisi: '',
 			status: 'Submit / Masuk'
 		}
-		await goto(`${page.url.pathname}${page.url.search}`, {
-			invalidateAll: true,
-			replaceState: true,
-			noScroll: true,
-			keepFocus: true
-		})
+		await refreshAdminPengajuanData()
 		isCreating = false
 	}
 </script>
