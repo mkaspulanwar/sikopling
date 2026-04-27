@@ -13,11 +13,26 @@ const EMPTY_PERTEK_STATUS_METRICS = {
 	diproses: 0,
 	ditolak: 0
 }
+const PAGE_SIZE_OPTIONS = [5, 10, 20] as const
+const DEFAULT_PAGE_SIZE = 10
+
+const normalizePertekPageSize = (value: string | null) => {
+	const parsed = Number(value)
+	if (!Number.isFinite(parsed)) return DEFAULT_PAGE_SIZE
+	const sanitized = Math.floor(parsed)
+	return PAGE_SIZE_OPTIONS.includes(sanitized as (typeof PAGE_SIZE_OPTIONS)[number])
+		? sanitized
+		: DEFAULT_PAGE_SIZE
+}
 
 export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
 	depends('admin:pertek')
 
-	const filters = readAdminFilters(url.searchParams)
+	const baseFilters = readAdminFilters(url.searchParams)
+	const filters = {
+		...baseFilters,
+		pageSize: normalizePertekPageSize(url.searchParams.get('pageSize'))
+	}
 	const adminData = await parent()
 
 	if (!adminData.supabaseAvailable || !locals.supabase) {

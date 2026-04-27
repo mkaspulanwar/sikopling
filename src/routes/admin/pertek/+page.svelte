@@ -75,6 +75,8 @@
 		posisi: 'Penyusun',
 		status: 'Submit / Masuk'
 	})
+	const ROWS_PER_PAGE_OPTIONS = [5, 10, 20] as const
+	type RowsPerPageOption = (typeof ROWS_PER_PAGE_OPTIONS)[number]
 
 	const formFromRow = (row: QueueRow): QueueForm => ({
 		no_registrasi: row.no_registrasi ?? '',
@@ -110,11 +112,17 @@
 	let selectedRowIds = $state<string[]>([])
 	let filterKeyword = $state('')
 	let filterStatus = $state<StatusPengajuan | ''>('')
-	let rowsPerPage = $state('20')
+	let rowsPerPage = $state<RowsPerPageOption>(10)
+	let isRowsDropdownOpen = $state(false)
+	let rowsDropdownElement = $state<HTMLDivElement | null>(null)
 	let deleteTarget = $state<DeleteTarget>(null)
 	let expandedRowsById = $state<Record<string, boolean>>({})
 	let createForm = $state<QueueForm>(createInitialForm())
 	let editForm = $state<QueueForm>(createInitialForm())
+	const normalizeRowsPerPage = (value: number): RowsPerPageOption =>
+		ROWS_PER_PAGE_OPTIONS.includes(value as RowsPerPageOption)
+			? (value as RowsPerPageOption)
+			: 10
 
 	$effect(() => {
 		if (!flash) return
@@ -129,7 +137,8 @@
 	$effect(() => {
 		filterKeyword = data.filters.keyword ?? ''
 		filterStatus = data.filters.status ?? ''
-		rowsPerPage = String(data.result.pageSize)
+		rowsPerPage = normalizeRowsPerPage(data.result.pageSize)
+		isRowsDropdownOpen = false
 		selectedRowIds = []
 		expandedRowsById = {}
 	})
@@ -161,10 +170,7 @@
 	const applyFilters = async () => {
 		const params = new URLSearchParams(page.url.searchParams)
 		const keyword = filterKeyword.trim()
-		const size = Number(rowsPerPage)
-		const sanitizedPageSize = Number.isFinite(size)
-			? Math.min(100, Math.max(10, Math.floor(size)))
-			: data.result.pageSize
+		const sanitizedPageSize = normalizeRowsPerPage(rowsPerPage)
 
 		if (keyword) {
 			params.set('keyword', keyword)
@@ -191,8 +197,26 @@
 	const resetFilters = async () => {
 		filterKeyword = ''
 		filterStatus = ''
-		rowsPerPage = '20'
+		rowsPerPage = 10
 		await applyFilters()
+	}
+	const changeRowsPerPage = async (value: string) => {
+		const parsed = Number(value)
+		if (!Number.isFinite(parsed)) return
+		const normalizedValue = normalizeRowsPerPage(Math.floor(parsed))
+		rowsPerPage = normalizedValue
+		await goto(buildQuery({ pageSize: normalizedValue, page: 1 }), {
+			noScroll: true,
+			keepFocus: true
+		})
+	}
+	const toggleRowsDropdown = () => {
+		isRowsDropdownOpen = !isRowsDropdownOpen
+	}
+	const selectRowsPerPage = async (value: RowsPerPageOption) => {
+		isRowsDropdownOpen = false
+		if (rowsPerPage === value) return
+		await changeRowsPerPage(String(value))
 	}
 
 	const visibleRangeStart = $derived.by(
@@ -307,9 +331,17 @@
 
 	const handleModalEscape = (event: KeyboardEvent) => {
 		if (event.key !== 'Escape') return
+		if (isRowsDropdownOpen) isRowsDropdownOpen = false
 		if (isCreateModalOpen) closeCreateModal()
 		if (isEditModalOpen) closeEditModal()
 		if (deleteTarget) closeDeleteModal()
+	}
+	const handleWindowClick = (event: MouseEvent) => {
+		const target = event.target
+		if (!(target instanceof Node)) return
+		if (isRowsDropdownOpen && !rowsDropdownElement?.contains(target)) {
+			isRowsDropdownOpen = false
+		}
 	}
 
 	const handleImport = async (event: Event) => {
@@ -471,7 +503,7 @@
 	}
 </script>
 
-<svelte:window onkeydown={handleModalEscape} />
+<svelte:window onkeydown={handleModalEscape} onclick={handleWindowClick} />
 
 <section class="w-full space-y-5">
 	{#if data.unavailable}
@@ -570,7 +602,56 @@
 	</div>
 
 	<div class="flex flex-wrap items-center justify-between gap-2">
-		<div class="flex items-center gap-2">
+		<div class="flex flex-wrap items-center gap-2 sm:gap-3">
+			<div class="relative inline-flex items-center text-xs text-slate-600 sm:text-sm" bind:this={rowsDropdownElement}>
+				<button
+					id="rows-per-page"
+					type="button"
+					onclick={toggleRowsDropdown}
+					aria-haspopup="listbox"
+					aria-expanded={isRowsDropdownOpen}
+					aria-label="Pilih jumlah baris"
+					class={`flex h-8 w-[3.9rem] items-center justify-between rounded-lg border bg-[#ffffff] pl-2.5 pr-2 text-xs font-semibold text-[#20232A] shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-all duration-200 sm:h-9 ${
+						isRowsDropdownOpen
+							? 'border-[#9fc47f] ring-2 ring-[#e6f2dc]'
+							: 'border-[#cfd7e3] hover:border-[#b7c2d0]'
+					}`}
+				>
+					<span>{rowsPerPage}</span>
+					<ChevronDown
+						class={`h-3.5 w-3.5 text-slate-500 transition-transform duration-200 ease-out ${
+							isRowsDropdownOpen ? 'rotate-180 text-[#2f6f1b]' : ''
+						}`}
+						strokeWidth={2.2}
+					/>
+				</button>
+				{#if isRowsDropdownOpen}
+					<ul
+						role="listbox"
+						aria-labelledby="rows-per-page"
+						transition:fly={{ y: -4, duration: 180 }}
+						class="absolute left-0 top-full z-30 mt-1.5 w-[3.9rem] overflow-hidden rounded-lg border border-[#cfdbcb] bg-white p-1 shadow-[0_14px_28px_-18px_rgba(15,23,42,0.5)]"
+					>
+						{#each ROWS_PER_PAGE_OPTIONS as size}
+							<li>
+								<button
+									type="button"
+									role="option"
+									aria-selected={rowsPerPage === size}
+									onclick={() => selectRowsPerPage(size)}
+									class={`flex w-full items-center justify-center rounded-md px-2 py-1.5 text-xs transition-colors ${
+										rowsPerPage === size
+											? 'bg-[#edf7e7] font-semibold text-[#1f5d2e]'
+											: 'text-[#20232A] hover:bg-[#f5f8fb]'
+									}`}
+								>
+									{size}
+								</button>
+							</li>
+						{/each}
+					</ul>
+				{/if}
+			</div>
 			<p class="text-sm font-medium text-slate-700">
 				<span class="font-semibold text-slate-900">{selectionSummaryText}</span>
 			</p>

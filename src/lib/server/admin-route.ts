@@ -73,7 +73,7 @@ const readSortOrder = (value: string | null): SortOrder => (value === 'asc' ? 'a
 
 export const readAdminFilters = (query: URLSearchParams): AdminListFilters => ({
 	page: Math.max(1, readNumber(query.get('page'), 1)),
-	pageSize: Math.min(100, Math.max(10, readNumber(query.get('pageSize'), 20))),
+	pageSize: Math.min(100, Math.max(5, readNumber(query.get('pageSize'), 20))),
 	keyword: readString(query.get('keyword')),
 	status: STATUS_VALUES.includes(query.get('status') as StatusPengajuan)
 		? (query.get('status') as StatusPengajuan)
