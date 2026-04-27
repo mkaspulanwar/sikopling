@@ -5,6 +5,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 const DEFAULT_PAGE = 1
 const DEFAULT_PAGE_SIZE = 20
 const MAX_PAGE_SIZE = 100
+const MAX_IDS_PAGE_SIZE = 1000
 
 const SORTABLE_COLUMNS = [
 	'no_registrasi',
@@ -62,6 +63,14 @@ export type ListAntrianPengajuanResult = {
 	totalPages: number
 }
 
+export type ListAntrianPengajuanIdsResult = {
+	data: Array<{ id: string }>
+	total: number
+	page: number
+	pageSize: number
+	totalPages: number
+}
+
 export type AntrianPengajuanSummary = {
 	total: number
 	pending: number
@@ -84,6 +93,11 @@ const normalizePage = (value?: number) => {
 const normalizePageSize = (value?: number) => {
 	if (!value || Number.isNaN(value) || value < 1) return DEFAULT_PAGE_SIZE
 	return Math.min(Math.floor(value), MAX_PAGE_SIZE)
+}
+
+const normalizeIdsPageSize = (value?: number) => {
+	if (!value || Number.isNaN(value) || value < 1) return MAX_IDS_PAGE_SIZE
+	return Math.min(Math.floor(value), MAX_IDS_PAGE_SIZE)
 }
 
 const normalizeSortBy = (value?: string): SortColumn => {
@@ -158,6 +172,68 @@ export const listAntrianPengajuan = async (
 
 	return {
 		data: data ?? [],
+		total,
+		page,
+		pageSize,
+		totalPages
+	}
+}
+
+export const listAntrianPengajuanIds = async (
+	supabase: SupabaseClient<Database>,
+	params: ListAntrianPengajuanParams = {}
+): Promise<ListAntrianPengajuanIdsResult> => {
+	const page = normalizePage(params.page)
+	const pageSize = normalizeIdsPageSize(params.pageSize)
+	const from = (page - 1) * pageSize
+	const to = from + pageSize - 1
+
+	const sortBy = normalizeSortBy(params.sortBy)
+	const sortOrder = normalizeSortOrder(params.sortOrder)
+
+	let query = supabase
+		.from('antrian_pengajuan')
+		.select('id', { count: 'exact' })
+		.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
+		.range(from, to)
+
+	if (params.layanan && LAYANAN_VALUES.includes(params.layanan)) {
+		query = query.eq('layanan', params.layanan)
+	}
+
+	if (params.status && STATUS_VALUES.includes(params.status)) {
+		query = query.eq('status', params.status)
+	}
+
+	if (params.instansi) {
+		query = query.ilike('instansi', `%${params.instansi.trim()}%`)
+	}
+
+	if (params.jenisDokumen) {
+		query = query.ilike('jenis_dokumen', `%${params.jenisDokumen.trim()}%`)
+	}
+
+	if (params.tanggalMulai) {
+		query = query.gte('tanggal_masuk', params.tanggalMulai)
+	}
+
+	if (params.tanggalSelesai) {
+		query = query.lte('tanggal_masuk', params.tanggalSelesai)
+	}
+
+	if (params.keyword?.trim()) {
+		const keyword = `%${params.keyword.trim()}%`
+		query = query.or(`no_registrasi.ilike.${keyword},instansi.ilike.${keyword},kegiatan.ilike.${keyword}`)
+	}
+
+	const { data, count, error } = await query
+	if (error) throw error
+
+	const total = count ?? 0
+	const totalPages = Math.max(1, Math.ceil(total / pageSize))
+
+	return {
+		data: (data ?? []).map((row) => ({ id: row.id })),
 		total,
 		page,
 		pageSize,

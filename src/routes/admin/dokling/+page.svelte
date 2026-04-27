@@ -20,6 +20,7 @@
 
 	type FlashState = { type: 'success' | 'error'; message: string } | null
 	type QueueRow = PageData['result']['data'][number]
+	type SelectedRowsById = Record<string, QueueRow>
 	type QueueForm = {
 		no_registrasi: string
 		tanggal_masuk: string
@@ -30,7 +31,10 @@
 		posisi: string
 		status: StatusPengajuan
 	}
-	type DeleteTarget = { ids: string[]; labels: string[] } | null
+	type DeleteTarget =
+		| { mode: 'ids'; ids: string[] }
+		| { mode: 'allFiltered'; excludedIds: string[] }
+		| null
 
 	const { data }: { data: PageData } = $props()
 	const layanan = 'dokling' as const
@@ -77,6 +81,10 @@
 	})
 	const ROWS_PER_PAGE_OPTIONS = [5, 10, 20] as const
 	type RowsPerPageOption = (typeof ROWS_PER_PAGE_OPTIONS)[number]
+	const getInitialRowsPerPage = (): RowsPerPageOption =>
+		ROWS_PER_PAGE_OPTIONS.includes(data.result.pageSize as RowsPerPageOption)
+			? (data.result.pageSize as RowsPerPageOption)
+			: 10
 
 	const formFromRow = (row: QueueRow): QueueForm => ({
 		no_registrasi: row.no_registrasi ?? '',
@@ -110,11 +118,15 @@
 	let isDeleting = $state(false)
 	let editRowId = $state<string | null>(null)
 	let selectedRowIds = $state<string[]>([])
+	let selectedRowsById = $state<SelectedRowsById>({})
+	let isAllFilteredSelected = $state(false)
+	let excludedRowIds = $state<string[]>([])
 	let filterKeyword = $state('')
 	let filterStatus = $state<StatusPengajuan | ''>('')
-	let rowsPerPage = $state<RowsPerPageOption>(10)
+	let rowsPerPage = $state<RowsPerPageOption>(getInitialRowsPerPage())
 	let isRowsDropdownOpen = $state(false)
 	let rowsDropdownElement = $state<HTMLDivElement | null>(null)
+	let selectionScopeKey = $state('')
 	let deleteTarget = $state<DeleteTarget>(null)
 	let expandedRowsById = $state<Record<string, boolean>>({})
 	let createForm = $state<QueueForm>(createInitialForm())
@@ -137,10 +149,31 @@
 	$effect(() => {
 		filterKeyword = data.filters.keyword ?? ''
 		filterStatus = data.filters.status ?? ''
-		rowsPerPage = normalizeRowsPerPage(data.result.pageSize)
+		const nextRowsPerPage = normalizeRowsPerPage(data.result.pageSize)
+		if (rowsPerPage !== nextRowsPerPage) {
+			rowsPerPage = nextRowsPerPage
+		}
 		isRowsDropdownOpen = false
-		selectedRowIds = []
 		expandedRowsById = {}
+	})
+	$effect(() => {
+		const nextScopeKey = [
+			layanan,
+			data.filters.keyword ?? '',
+			data.filters.status ?? '',
+			data.filters.sortBy,
+			data.filters.sortOrder
+		].join('|')
+
+		if (!selectionScopeKey) {
+			selectionScopeKey = nextScopeKey
+			return
+		}
+
+		if (selectionScopeKey !== nextScopeKey) {
+			clearSelection()
+			selectionScopeKey = nextScopeKey
+		}
 	})
 
 	const formatDate = (value: string | null) => (value ? dateFormatter.format(new Date(`${value}T00:00:00`)) : '-')
@@ -210,6 +243,14 @@
 			keepFocus: true
 		})
 	}
+	const goToPage = async (nextPage: number) => {
+		const boundedPage = Math.min(Math.max(1, nextPage), data.result.totalPages)
+		if (boundedPage === data.result.page) return
+		await goto(buildQuery({ page: boundedPage }), {
+			noScroll: true,
+			keepFocus: true
+		})
+	}
 	const toggleRowsDropdown = () => {
 		isRowsDropdownOpen = !isRowsDropdownOpen
 	}
@@ -225,13 +266,18 @@
 	const visibleRangeEnd = $derived.by(() =>
 		Math.min(data.result.page * data.result.pageSize, data.result.total)
 	)
-	const selectedRows = $derived.by(() =>
-		data.result.data.filter((row) => selectedRowIds.includes(row.id))
-	)
+	const selectedRowIdSet = $derived.by(() => new Set(selectedRowIds))
+	const excludedRowIdSet = $derived.by(() => new Set(excludedRowIds))
 	const isAllRowsSelected = $derived.by(
-		() => data.result.data.length > 0 && data.result.data.every((row) => selectedRowIds.includes(row.id))
+		() =>
+			data.result.data.length > 0 &&
+			data.result.data.every((row) =>
+				isAllFilteredSelected ? !excludedRowIdSet.has(row.id) : selectedRowIdSet.has(row.id)
+			)
 	)
-	const selectedCount = $derived.by(() => selectedRowIds.length)
+	const selectedCount = $derived.by(() =>
+		isAllFilteredSelected ? Math.max(data.result.total - excludedRowIds.length, 0) : selectedRowIds.length
+	)
 	const selectionSummaryText = $derived.by(
 		() => `${formatNumber(selectedCount)}/${formatNumber(data.result.total)} terpilih`
 	)
@@ -252,24 +298,50 @@
 		isCreateModalOpen = false
 	}
 
-	const isRowSelected = (rowId: string) => selectedRowIds.includes(rowId)
+	const isRowSelected = (rowId: string) =>
+		isAllFilteredSelected ? !excludedRowIdSet.has(rowId) : selectedRowIdSet.has(rowId)
 
-	const setRowSelection = (rowId: string, checked: boolean) => {
-		if (checked) {
-			if (!selectedRowIds.includes(rowId)) {
-				selectedRowIds = [...selectedRowIds, rowId]
+	const setRowSelection = (row: QueueRow, checked: boolean) => {
+		if (isAllFilteredSelected) {
+			if (checked) {
+				excludedRowIds = excludedRowIds.filter((id) => id !== row.id)
+				return
+			}
+			if (!excludedRowIdSet.has(row.id)) {
+				excludedRowIds = [...excludedRowIds, row.id]
 			}
 			return
 		}
-		selectedRowIds = selectedRowIds.filter((id) => id !== rowId)
+
+		if (checked) {
+			if (!selectedRowIds.includes(row.id)) {
+				selectedRowIds = [...selectedRowIds, row.id]
+			}
+			selectedRowsById = { ...selectedRowsById, [row.id]: row }
+			return
+		}
+		selectedRowIds = selectedRowIds.filter((id) => id !== row.id)
+		const nextSelectedRowsById = { ...selectedRowsById }
+		delete nextSelectedRowsById[row.id]
+		selectedRowsById = nextSelectedRowsById
 	}
 
 	const setAllRowsSelection = (checked: boolean) => {
-		selectedRowIds = checked ? data.result.data.map((row) => row.id) : []
+		if (checked) {
+			isAllFilteredSelected = true
+			excludedRowIds = []
+			selectedRowIds = []
+			selectedRowsById = {}
+			return
+		}
+		clearSelection()
 	}
 
 	const clearSelection = () => {
 		selectedRowIds = []
+		selectedRowsById = {}
+		isAllFilteredSelected = false
+		excludedRowIds = []
 	}
 
 	const isRowExpanded = (rowId: string) => Boolean(expandedRowsById[rowId])
@@ -286,23 +358,51 @@
 	}
 
 	const openSelectedRowForEdit = () => {
-		if (selectedRows.length === 0) {
+		if (isAllFilteredSelected) {
+			flash = {
+				type: 'error',
+				message: 'Mode pilih semua aktif. Batalkan dulu, lalu pilih satu baris untuk edit.'
+			}
+			return
+		}
+		if (selectedRowIds.length === 0) {
 			flash = { type: 'error', message: 'Pilih data terlebih dahulu untuk diedit.' }
 			return
 		}
-		if (selectedRows.length > 1) {
+		if (selectedRowIds.length > 1) {
 			flash = { type: 'error', message: 'Edit hanya bisa untuk satu data. Pilih satu baris saja.' }
 			return
 		}
-		openEditModal(selectedRows[0])
+		const selectedRow = selectedRowsById[selectedRowIds[0]]
+		if (!selectedRow) {
+			flash = { type: 'error', message: 'Data terpilih tidak ditemukan. Silakan pilih ulang.' }
+			return
+		}
+		openEditModal(selectedRow)
 	}
 
 	const openSelectedRowForDelete = () => {
-		if (selectedRows.length === 0) {
+		if (!isAllFilteredSelected && selectedRowIds.length === 0) {
 			flash = { type: 'error', message: 'Pilih minimal satu data untuk dihapus.' }
 			return
 		}
-		openDeleteModal(selectedRows)
+		if (selectedCount === 0) {
+			flash = { type: 'error', message: 'Tidak ada data terpilih untuk dihapus.' }
+			return
+		}
+
+		if (isAllFilteredSelected) {
+			deleteTarget = {
+				mode: 'allFiltered',
+				excludedIds: [...excludedRowIds]
+			}
+			return
+		}
+
+		deleteTarget = {
+			mode: 'ids',
+			ids: [...selectedRowIds]
+		}
 	}
 
 	const openEditModal = (row: QueueRow) => {
@@ -315,13 +415,6 @@
 		if (isSavingEdit) return
 		isEditModalOpen = false
 		editRowId = null
-	}
-
-	const openDeleteModal = (rows: QueueRow[]) => {
-		deleteTarget = {
-			ids: rows.map((row) => row.id),
-			labels: rows.map((row) => row.no_registrasi ?? '-')
-		}
 	}
 
 	const closeDeleteModal = () => {
@@ -460,45 +553,62 @@
 
 		isDeleting = true
 		flash = null
-		const targetIds = [...deleteTarget.ids]
+		const requestBody =
+			deleteTarget.mode === 'allFiltered'
+				? {
+						mode: 'allFiltered',
+						layanan,
+						keyword: data.filters.keyword ?? undefined,
+						status: data.filters.status ?? undefined,
+						sortBy: data.filters.sortBy,
+						sortOrder: data.filters.sortOrder,
+						excludedIds: deleteTarget.excludedIds
+					}
+				: { mode: 'ids', ids: deleteTarget.ids }
 
-		const deleteResults = await Promise.all(
-			targetIds.map(async (id) => {
-				const response = await fetch(`/admin/pengajuan/${id}`, {
-					method: 'DELETE',
-					credentials: 'include'
-				})
-				const payload = await response
-					.json()
-					.catch(() => ({ message: 'Gagal memproses respons server' }))
-				return { ok: response.ok, message: payload?.message as string | undefined }
-			})
-		)
+		const response = await fetch('/admin/pengajuan', {
+			method: 'DELETE',
+			credentials: 'include',
+			headers: { 'content-type': 'application/json' },
+			body: JSON.stringify(requestBody)
+		})
+		const payload = await response
+			.json()
+			.catch(() => ({ message: 'Gagal memproses respons server saat menghapus data' }))
 
-		const failedDeletes = deleteResults.filter((result) => !result.ok)
-		if (failedDeletes.length > 0) {
-			const successCount = deleteResults.length - failedDeletes.length
+		if (!response.ok) {
+			flash = { type: 'error', message: payload?.message ?? 'Gagal menghapus data' }
+			isDeleting = false
+			return
+		}
+
+		const successCount = typeof payload?.successCount === 'number' ? payload.successCount : 0
+		const failedCount = typeof payload?.failedCount === 'number' ? payload.failedCount : 0
+		const firstErrorMessage =
+			typeof payload?.firstErrorMessage === 'string' ? payload.firstErrorMessage : null
+
+		if (successCount > 0) {
+			clearSelection()
+			deleteTarget = null
+			await refreshPage()
+		}
+
+		if (failedCount > 0) {
 			flash = {
 				type: 'error',
 				message:
 					successCount > 0
-						? `Sebagian data gagal dihapus. Berhasil ${successCount}, gagal ${failedDeletes.length}.`
-						: (failedDeletes[0]?.message ?? 'Gagal menghapus data')
+						? `Sebagian data gagal dihapus. Berhasil ${successCount}, gagal ${failedCount}.`
+						: (firstErrorMessage ?? 'Gagal menghapus data')
 			}
 			isDeleting = false
 			return
 		}
 
-		selectedRowIds = selectedRowIds.filter((id) => !targetIds.includes(id))
-		deleteTarget = null
 		flash = {
 			type: 'success',
-			message:
-				deleteResults.length > 1
-					? `${deleteResults.length} data dokling berhasil dihapus.`
-					: 'Data dokling berhasil dihapus.'
+			message: successCount > 1 ? `${successCount} data dokling berhasil dihapus.` : 'Data dokling berhasil dihapus.'
 		}
-		await refreshPage()
 		isDeleting = false
 	}
 </script>
@@ -688,7 +798,8 @@
 			<button
 				type="button"
 				onclick={openSelectedRowForDelete}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#D64545] bg-[#D64545] px-4 text-sm font-semibold !text-white transition hover:border-[#b93a3a] hover:bg-[#b93a3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px"
+				disabled={data.unavailable}
+				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#D64545] bg-[#D64545] px-4 text-sm font-semibold !text-white transition hover:border-[#b93a3a] hover:bg-[#b93a3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300"
 			>
 				<Trash class="h-4 w-4 text-white" />
 				Hapus
@@ -704,12 +815,13 @@
 						<input
 							type="checkbox"
 							checked={isAllRowsSelected}
+							disabled={data.unavailable}
 							onchange={(event) => {
 								const target = event.currentTarget as HTMLInputElement
 								setAllRowsSelection(target.checked)
 							}}
-							class="h-4 w-4 rounded border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white"
-							aria-label="Pilih semua data di halaman ini"
+							class="h-4 w-4 cursor-pointer rounded border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white disabled:cursor-not-allowed"
+							aria-label="Pilih semua data terfilter di semua halaman"
 						/>
 					</th>
 					<th class="w-14 border-b border-[#64AD31] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white">No</th>
@@ -744,9 +856,9 @@
 									checked={isRowSelected(row.id)}
 									onchange={(event) => {
 										const target = event.currentTarget as HTMLInputElement
-										setRowSelection(row.id, target.checked)
+										setRowSelection(row, target.checked)
 									}}
-									class="h-4 w-4 rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31]"
+									class="h-4 w-4 cursor-pointer rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31] disabled:cursor-not-allowed"
 									style="accent-color: #64AD31;"
 									aria-label={`Pilih data ${row.no_registrasi}`}
 								/>
@@ -790,9 +902,9 @@
 										checked={isRowSelected(row.id)}
 										onchange={(event) => {
 											const target = event.currentTarget as HTMLInputElement
-											setRowSelection(row.id, target.checked)
+											setRowSelection(row, target.checked)
 										}}
-										class="h-4 w-4 rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31]"
+										class="h-4 w-4 cursor-pointer rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31] disabled:cursor-not-allowed"
 										style="accent-color: #64AD31;"
 										aria-label={`Pilih data ${row.no_registrasi}`}
 									/>
@@ -862,6 +974,10 @@
 		<nav aria-label="Navigasi halaman antrian dokling admin" class="mx-auto flex flex-wrap items-center justify-center gap-1.5">
 			<a
 				href={buildQuery({ page: 1 })}
+				onclick={(event) => {
+					event.preventDefault()
+					void goToPage(1)
+				}}
 				aria-disabled={data.result.page === 1}
 				class={`inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold transition-colors ${
 					data.result.page === 1
@@ -873,6 +989,10 @@
 			</a>
 			<a
 				href={buildQuery({ page: Math.max(data.result.page - 1, 1) })}
+				onclick={(event) => {
+					event.preventDefault()
+					void goToPage(data.result.page - 1)
+				}}
 				aria-label="Halaman sebelumnya"
 				aria-disabled={data.result.page === 1}
 				class={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors ${
@@ -888,6 +1008,10 @@
 			</div>
 			<a
 				href={buildQuery({ page: Math.min(data.result.page + 1, data.result.totalPages) })}
+				onclick={(event) => {
+					event.preventDefault()
+					void goToPage(data.result.page + 1)
+				}}
 				aria-label="Halaman berikutnya"
 				aria-disabled={data.result.page === data.result.totalPages}
 				class={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors ${
@@ -900,6 +1024,10 @@
 			</a>
 			<a
 				href={buildQuery({ page: data.result.totalPages })}
+				onclick={(event) => {
+					event.preventDefault()
+					void goToPage(data.result.totalPages)
+				}}
 				aria-disabled={data.result.page === data.result.totalPages}
 				class={`inline-flex h-9 items-center justify-center rounded-md px-2.5 text-xs font-semibold transition-colors ${
 					data.result.page === data.result.totalPages
