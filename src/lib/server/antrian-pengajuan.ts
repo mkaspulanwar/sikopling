@@ -26,6 +26,14 @@ type SortOrder = 'asc' | 'desc'
 type AntrianRow = Database['public']['Tables']['antrian_pengajuan']['Row']
 type WorkflowHistoryRow = Database['public']['Tables']['workflow_history']['Row']
 
+const STATUS_SELESAI: StatusPengajuan = 'SK Terbit'
+const STATUS_DITOLAK: StatusPengajuan = 'Ditolak'
+const STATUS_PERLU_PERBAIKAN: StatusPengajuan[] = [
+	'Perbaikan Uji Administrasi',
+	'Belum Submit Perbaikan',
+	'Dikembalikan'
+]
+
 const ANTRIAN_PENGAJUAN_LIST_COLUMNS =
 	'id, layanan, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
 
@@ -60,6 +68,10 @@ export type AntrianPengajuanSummary = {
 	selesai: number
 	dokling: number
 	pertek: number
+	diproses: number
+	ditolak: number
+	admin: number
+	perluPerbaikan: number
 }
 
 export type WorkflowHistoryByPengajuan = Record<string, WorkflowHistoryRow[]>
@@ -83,6 +95,12 @@ const normalizeSortOrder = (value?: string): SortOrder => (value === 'asc' ? 'as
 const normalizeNoRegistrasi = (value?: string | null) => {
 	const normalized = value?.trim()
 	return normalized ? normalized : null
+}
+
+const normalizeCount = (value: unknown) => {
+	if (typeof value === 'number' && Number.isFinite(value)) return value
+	const parsed = Number(value)
+	return Number.isFinite(parsed) ? parsed : 0
 }
 
 export const listAntrianPengajuan = async (
@@ -336,25 +354,50 @@ export const deleteAntrianPengajuan = async (
 export const getAntrianPengajuanSummary = async (
 	supabase: SupabaseClient<Database>
 ): Promise<AntrianPengajuanSummary> => {
-	const [totalResult, selesaiResult, doklingResult, pertekResult] = await Promise.all([
-		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }),
-		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('status', 'SK Terbit'),
-		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'dokling'),
-		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'pertek')
-	])
+	const [totalResult, selesaiResult, ditolakResult, doklingResult, pertekResult, perluPerbaikanResult, adminResult] =
+		await Promise.all([
+			supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }),
+			supabase
+				.from('antrian_pengajuan')
+				.select('id', { count: 'exact', head: true })
+				.eq('status', STATUS_SELESAI),
+			supabase
+				.from('antrian_pengajuan')
+				.select('id', { count: 'exact', head: true })
+				.eq('status', STATUS_DITOLAK),
+			supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'dokling'),
+			supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'pertek'),
+			supabase
+				.from('antrian_pengajuan')
+				.select('id', { count: 'exact', head: true })
+				.in('status', STATUS_PERLU_PERBAIKAN),
+			supabase.rpc('count_registered_admins')
+		])
 
 	if (totalResult.error) throw totalResult.error
 	if (selesaiResult.error) throw selesaiResult.error
+	if (ditolakResult.error) throw ditolakResult.error
 	if (doklingResult.error) throw doklingResult.error
 	if (pertekResult.error) throw pertekResult.error
+	if (perluPerbaikanResult.error) throw perluPerbaikanResult.error
+	if (adminResult.error) {
+		const missingFunction =
+			adminResult.error.code === 'PGRST202' ||
+			adminResult.error.message.toLowerCase().includes('count_registered_admins')
+		if (!missingFunction) throw adminResult.error
+	}
 
 	const total = totalResult.count ?? 0
 	const selesai = selesaiResult.count ?? 0
+	const ditolak = ditolakResult.count ?? 0
 	const dokling = doklingResult.count ?? 0
 	const pertek = pertekResult.count ?? 0
+	const perluPerbaikan = perluPerbaikanResult.count ?? 0
+	const admin = adminResult.error ? 0 : Math.max(normalizeCount(adminResult.data), 0)
+	const diproses = Math.max(total - selesai - ditolak, 0)
 	const pending = Math.max(total - selesai, 0)
 
-	return { total, pending, selesai, dokling, pertek }
+	return { total, pending, selesai, dokling, pertek, diproses, ditolak, admin, perluPerbaikan }
 }
 
 export const getWorkflowHistoryByPengajuanIds = async (

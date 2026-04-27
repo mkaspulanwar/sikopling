@@ -103,7 +103,12 @@ export type Database = {
 			}
 		}
 		Views: Record<string, never>
-		Functions: Record<string, never>
+		Functions: {
+			count_registered_admins: {
+				Args: Record<PropertyKey, never>
+				Returns: number
+			}
+		}
 		Enums: Record<string, never>
 		CompositeTypes: Record<string, never>
 	}

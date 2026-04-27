@@ -34,7 +34,11 @@ export const EMPTY_SUMMARY = {
 	pending: 0,
 	selesai: 0,
 	dokling: 0,
-	pertek: 0
+	pertek: 0,
+	diproses: 0,
+	ditolak: 0,
+	admin: 0,
+	perluPerbaikan: 0
 }
 
 export const createEmptyResult = (page: number, pageSize: number) => ({

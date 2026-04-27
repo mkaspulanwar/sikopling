@@ -204,12 +204,10 @@
 	const selectedRows = $derived.by(() =>
 		data.result.data.filter((row) => selectedRowIds.includes(row.id))
 	)
-	const selectedCount = $derived.by(() => selectedRowIds.length)
-	const allVisibleSelected = $derived.by(
-		() =>
-			data.result.data.length > 0 &&
-			data.result.data.every((row) => selectedRowIds.includes(row.id))
+	const isAllRowsSelected = $derived.by(
+		() => data.result.data.length > 0 && data.result.data.every((row) => selectedRowIds.includes(row.id))
 	)
+	const selectedCount = $derived.by(() => selectedRowIds.length)
 	const selectionSummaryText = $derived.by(
 		() => `${formatNumber(selectedCount)}/${formatNumber(data.result.total)} terpilih`
 	)
@@ -242,13 +240,8 @@
 		selectedRowIds = selectedRowIds.filter((id) => id !== rowId)
 	}
 
-	const setAllVisibleSelection = (checked: boolean) => {
-		const visibleIds = data.result.data.map((row) => row.id)
-		if (checked) {
-			selectedRowIds = Array.from(new Set([...selectedRowIds, ...visibleIds]))
-			return
-		}
-		selectedRowIds = selectedRowIds.filter((id) => !visibleIds.includes(id))
+	const setAllRowsSelection = (checked: boolean) => {
+		selectedRowIds = checked ? data.result.data.map((row) => row.id) : []
 	}
 
 	const clearSelection = () => {
@@ -629,12 +622,12 @@
 					<th class="w-11 border-b border-[#64AD31] px-2 py-4 text-center text-sm font-semibold text-white">
 						<input
 							type="checkbox"
-							checked={allVisibleSelected}
+							checked={isAllRowsSelected}
 							onchange={(event) => {
 								const target = event.currentTarget as HTMLInputElement
-								setAllVisibleSelection(target.checked)
+								setAllRowsSelection(target.checked)
 							}}
-							class="h-5 w-5 rounded-xl border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white"
+							class="h-4 w-4 rounded border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white"
 							aria-label="Pilih semua data di halaman ini"
 						/>
 					</th>
@@ -672,7 +665,8 @@
 										const target = event.currentTarget as HTMLInputElement
 										setRowSelection(row.id, target.checked)
 									}}
-									class="h-4 w-4 rounded border-[#c3cfdd] text-[#64AD31] focus:ring-[#64AD31]"
+									class="h-4 w-4 rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31]"
+									style="accent-color: #64AD31;"
 									aria-label={`Pilih data ${row.no_registrasi}`}
 								/>
 							</td>
@@ -697,18 +691,7 @@
 
 		<div class="overflow-hidden border-y border-[#d7dee8] bg-transparent md:hidden">
 			<div class="grid grid-cols-[1.5rem_2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white">
-				<span class="inline-flex justify-center">
-					<input
-						type="checkbox"
-						checked={allVisibleSelected}
-						onchange={(event) => {
-							const target = event.currentTarget as HTMLInputElement
-							setAllVisibleSelection(target.checked)
-						}}
-						class="h-4 w-4 rounded border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white"
-						aria-label="Pilih semua data di halaman ini"
-					/>
-				</span>
+				<span aria-hidden="true"></span>
 				<span class="text-center">No</span>
 				<span class="text-sm">Detail Dokumen</span>
 			</div>
@@ -728,7 +711,8 @@
 											const target = event.currentTarget as HTMLInputElement
 											setRowSelection(row.id, target.checked)
 										}}
-										class="h-4 w-4 rounded border-[#c3cfdd] text-[#64AD31] focus:ring-[#64AD31]"
+										class="h-4 w-4 rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31]"
+										style="accent-color: #64AD31;"
 										aria-label={`Pilih data ${row.no_registrasi}`}
 									/>
 								</span>

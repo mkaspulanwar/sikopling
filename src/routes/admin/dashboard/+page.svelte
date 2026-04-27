@@ -55,7 +55,7 @@
 		</p>
 	{/if}
 
-	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+	<div class="grid grid-cols-2 gap-3 lg:grid-cols-3">
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Pengajuan</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.total)}</p>
@@ -71,6 +71,14 @@
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Selesai</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.selesai)}</p>
+		</article>
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Diproses</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.diproses)}</p>
+		</article>
+		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Ditolak</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.ditolak)}</p>
 		</article>
 	</div>
 
