@@ -164,11 +164,26 @@ h6 {
 	text-shadow: 0 4px 14px rgba(0, 0, 0, 0.44);
 	pointer-events: auto;
 	cursor: pointer;
+	transition:
+		opacity 0.24s ease,
+		transform 0.24s ease;
 }
 
 @media (max-width: 640px) {
 	.hero-scroll-indicator {
 		bottom: max(2.25rem, calc(env(safe-area-inset-bottom) + 0.5rem));
+	}
+}
+
+.hero-scroll-indicator-hidden {
+	opacity: 0;
+	pointer-events: none;
+	transform: translate(-50%, 10px);
+}
+
+@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+	.hero-parallax .hero-scroll-indicator {
+		position: fixed;
 	}
 }
 

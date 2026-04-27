@@ -166,7 +166,9 @@
 		{ left: "76%", top: "82%", ...serviceSteps[6] },
 	];
 	let activeHomeFaqId = $state<string | null>(null);
+	let heroSection: HTMLElement | null = $state(null);
 	let statSection: HTMLElement | null = $state(null);
+	let isHeroScrollIndicatorVisible = $state(true);
 	let isCounterStarted = $state(false);
 	let statValues = $state<Record<string, number>>(
 		Object.fromEntries(statItems.map((item) => [item.key, 0])),
@@ -331,6 +333,8 @@
 	};
 	onMount(() => {
 		let isUnmounted = false;
+		let heroObserver: IntersectionObserver | null = null;
+		let statObserver: IntersectionObserver | null = null;
 
 		if (browser) {
 			void import("@lottiefiles/dotlottie-svelte").then((module) => {
@@ -340,29 +344,36 @@
 			});
 		}
 
-		if (!statSection) {
-			return () => {
-				isUnmounted = true;
-				removeLottieListeners?.();
-			};
+		if (heroSection) {
+			heroObserver = new IntersectionObserver(
+				([entry]) => {
+					isHeroScrollIndicatorVisible = entry.isIntersecting;
+				},
+				{ threshold: 0, rootMargin: "0px 0px -60% 0px" },
+			);
+
+			heroObserver.observe(heroSection);
 		}
 
-		const observer = new IntersectionObserver(
-			([entry]) => {
-				isStatSectionVisible = entry.isIntersecting;
-				if (entry.isIntersecting) {
-					startCounterAnimation();
-				}
-				syncLottiePlayback();
-			},
-			{ threshold: 0.4, rootMargin: "100px 0px -80px 0px" },
-		);
+		if (statSection) {
+			statObserver = new IntersectionObserver(
+				([entry]) => {
+					isStatSectionVisible = entry.isIntersecting;
+					if (entry.isIntersecting) {
+						startCounterAnimation();
+					}
+					syncLottiePlayback();
+				},
+				{ threshold: 0.4, rootMargin: "100px 0px -80px 0px" },
+			);
 
-		observer.observe(statSection);
+			statObserver.observe(statSection);
+		}
 
 		return () => {
 			isUnmounted = true;
-			observer.disconnect();
+			heroObserver?.disconnect();
+			statObserver?.disconnect();
 			cancelAnimationFrame(animationFrameId);
 			removeLottieListeners?.();
 		};
@@ -417,6 +428,7 @@
 <section
 	id="beranda"
 	class="hero-parallax relative isolate min-h-[100svh] overflow-hidden bg-black lg:min-h-[100dvh]"
+	bind:this={heroSection}
 >
 	<div class="hero-media absolute inset-0" aria-hidden="true">
 		<video
@@ -461,6 +473,7 @@
 	<button
 		type="button"
 		class="hero-scroll-indicator"
+		class:hero-scroll-indicator-hidden={!isHeroScrollIndicatorVisible}
 		aria-label="Scroll ke bagian Statistik Layanan"
 		onclick={scrollToDashboard}
 	>
