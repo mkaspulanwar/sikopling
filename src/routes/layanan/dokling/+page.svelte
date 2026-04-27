@@ -1057,24 +1057,24 @@
 									{pageStartIndex + index + 1}
 								</p>
 
-								<div class="min-w-0">
-									<div
-										class="flex items-start justify-between gap-2"
-									>
-										<div class="min-w-0">
-											<p
-												class="truncate pr-1 text-sm leading-snug font-semibold text-[#20232A]"
-											>
-												{row.agency}
-											</p>
-											<p
-												class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
-											>
-												{row.registrationNo}
-											</p>
-											<div
-												class="mt-2 flex flex-wrap items-center gap-1.5"
-											>
+									<div class="min-w-0">
+										<div
+											class="flex items-start justify-between gap-2"
+										>
+											<div class="min-w-0">
+												<p
+													class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]"
+												>
+													{row.agency}
+												</p>
+												<p
+													class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
+												>
+													{row.registrationNo}
+												</p>
+												<div
+													class="mt-2 flex flex-wrap items-center gap-1.5"
+												>
 												<span
 													class="text-[0.75rem] leading-tight text-(--muted)"
 												>
