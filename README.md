@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./static/home/heading.svg" alt="SIKOPLING" width="420" />
+  <img src="./static/home/heading-full.png" alt="SIKOPLING" width="420" />
 </p>
 
 <p align="center">
