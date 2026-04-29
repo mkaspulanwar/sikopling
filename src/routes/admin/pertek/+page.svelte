@@ -891,7 +891,19 @@
 
 		<div class="overflow-hidden border-y border-[#d7dee8] bg-transparent md:hidden">
 			<div class="grid grid-cols-[1.5rem_2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white">
-				<span aria-hidden="true"></span>
+				<span class="inline-flex justify-center">
+					<input
+						type="checkbox"
+						checked={isAllRowsSelected}
+						disabled={data.unavailable}
+						onchange={(event) => {
+							const target = event.currentTarget as HTMLInputElement
+							setAllRowsSelection(target.checked)
+						}}
+						class="h-4 w-4 cursor-pointer rounded border-white/70 bg-white/10 text-[#2f6f1b] focus:ring-white disabled:cursor-not-allowed"
+						aria-label="Pilih semua data terfilter di semua halaman"
+					/>
+				</span>
 				<span class="text-center">No</span>
 				<span class="text-sm">Detail Dokumen</span>
 			</div>
