@@ -6,6 +6,7 @@
 	import { cubicOut } from "svelte/easing";
 	import { slide } from "svelte/transition";
 	import type { DotLottie } from "@lottiefiles/dotlottie-svelte";
+	import type { PageData } from "./$types";
 	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	import StackedCard from "$lib/components/home/StackedCard.svelte";
 	import EyeCursorZone from "$lib/components/EyeCursorZone.svelte";
@@ -34,22 +35,24 @@
 		top: string;
 	};
 
+	let { data }: { data: PageData } = $props();
+
 	const statItems: StatItem[] = [
 		{
-			key: "konsultasi",
-			label: "Konsultasi Selesai",
-			target: 1248,
+			key: "total",
+			label: "Total Pengajuan",
+			target: data.summary.total,
 			suffix: "+",
 			description:
-				"Pemrakarsa yang telah dibantu melalui kanal konsultasi interaktif SIKOPLING.",
+				"Total pengajuan dokumen yang tercatat pada dashboard admin SIKOPLING.",
 		},
 		{
-			key: "dokumen",
-			label: "Dokumen Disetujui",
-			target: 836,
+			key: "selesai",
+			label: "Pengajuan Selesai",
+			target: data.summary.selesai,
 			suffix: "+",
 			description:
-				"Persetujuan lingkungan terbit dari berbagai jenis dokumen layanan.",
+				"Jumlah dokumen pengajuan yang sudah selesai berdasarkan dashboard admin SIKOPLING.",
 		},
 		{
 			key: "waktu",
@@ -62,7 +65,7 @@
 		},
 		{
 			key: "kepuasan",
-			label: "Indeks Kepuasan Masyarakat",
+			label: "Index Kepuasan",
 			target: 98,
 			suffix: "%",
 			description:
@@ -92,14 +95,14 @@
 		},
 	];
 	const statLeafLayout = {
-		left: ["dokumen", "kepuasan"],
-		right: ["konsultasi", "waktu"],
+		left: ["total", "kepuasan"],
+		right: ["selesai", "waktu"],
 	} as const;
 
 	const statLeafSubtitles: Record<string, string> = {
-		dokumen: "Persetujuan",
+		total: "Total Dokumen",
 		kepuasan: "Tingkat Kepuasan",
-		konsultasi: "Per Pemrakarsa",
+		selesai: "Surat Keputusan Terbit",
 		waktu: "Waktu Layanan",
 	};
 

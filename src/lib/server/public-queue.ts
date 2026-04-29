@@ -16,6 +16,11 @@ type PublicQueueRow = {
 	progressUpdatedDate: string
 }
 
+type PublicSummaryMetrics = {
+	total: number
+	selesai: number
+}
+
 const resolveServiceClient = () => {
 	if (!publicEnv.PUBLIC_SUPABASE_URL || !privateEnv.SUPABASE_SERVICE_ROLE_KEY) return null
 	const normalizedUrl = publicEnv.PUBLIC_SUPABASE_URL.trim()
@@ -132,5 +137,27 @@ export const getPublicQueueRows = async (layanan: LayananType): Promise<PublicQu
 		progressStatus: layanan === 'dokling' ? mapDoklingStatus(row.status) : mapPertekStatus(row.status),
 		progressUpdatedDate: row.tanggal_update ?? row.tanggal_masuk ?? new Date().toISOString().slice(0, 10)
 	}))
+}
+
+export const getPublicSummaryMetrics = async (): Promise<PublicSummaryMetrics> => {
+	const supabase = resolveServiceClient()
+	if (!supabase) {
+		return { total: 0, selesai: 0 }
+	}
+
+	const [totalResult, selesaiResult] = await Promise.all([
+		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }),
+		supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('status', 'SK Terbit')
+	])
+
+	if (totalResult.error || selesaiResult.error) {
+		console.error('Failed loading public summary metrics:', totalResult.error?.message ?? selesaiResult.error?.message)
+		return { total: 0, selesai: 0 }
+	}
+
+	return {
+		total: totalResult.count ?? 0,
+		selesai: selesaiResult.count ?? 0
+	}
 }
 
