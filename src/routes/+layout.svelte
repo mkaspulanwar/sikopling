@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { browser } from '$app/environment';
 	import { onMount, tick } from 'svelte';
-	import { page } from '$app/state';
+	import { navigating, page } from '$app/state';
 	import { injectAnalytics } from '@vercel/analytics/sveltekit';
 	import {
 		UNIVERSAL_SEARCH_BLOCKED_PATH_PREFIXES,
@@ -10,6 +11,7 @@
 	} from '$lib/constants/universal-search';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.png';
+	import TopProgressBar from '$lib/components/TopProgressBar.svelte';
 	import Navbar from '$lib/components/home/Navbar.svelte';
 	import SiteFooter from '$lib/components/home/SiteFooter.svelte';
 	import ChatbotWidget from '$lib/components/home/ChatbotWidget.svelte';
@@ -228,6 +230,12 @@
 		return pathname !== '/login' && !pathname.startsWith('/admin');
 	});
 
+	const isPublicNavigationPending = $derived.by(() => {
+		if (!browser || !navigating.to) return false;
+		const destinationPath = normalizePathname(navigating.to.url.pathname);
+		return destinationPath !== '/login' && !destinationPath.startsWith('/admin');
+	});
+
 	$effect(() => {
 		page.url.pathname;
 		page.url.search;
@@ -252,6 +260,7 @@
 </svelte:head>
 
 <div class="min-h-[100dvh] bg-[var(--canvas)] text-[var(--ink)]">
+	<TopProgressBar active={isPublicNavigationPending} />
 	{#if usePublicChrome}
 		<Navbar />
 	{/if}

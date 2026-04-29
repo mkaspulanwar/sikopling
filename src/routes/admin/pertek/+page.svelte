@@ -623,7 +623,7 @@
 	{/if}
 	{#if data.requiresSupabaseAuth}
 		<p class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-			Akses halaman pertek membutuhkan akun admin pada Supabase Auth.
+			Akses halaman persetujuan teknis membutuhkan akun admin pada Supabase Auth.
 		</p>
 	{/if}
 	{#if data.errorMessage}
@@ -662,18 +662,25 @@
 		</div>
 	{/if}
 
-	<div class="flex flex-wrap items-start justify-between gap-3 border-b border-[#e8edf5] pb-3">
-		<h1 class="text-xl font-semibold tracking-tight text-slate-900 sm:text-2xl">
-			Data Antrian Persetujuan Lingkungan
-		</h1>
-		<div class="flex flex-wrap gap-2">
+	<header class="overflow-hidden rounded-3xl border border-[var(--line)] bg-[#64AD31] p-6 sm:p-7">
+		<div class="relative">
+			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full"></div>
+			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--surface)]">Dashboard Admin</p>
+			<h1 class="mt-2 text-2xl font-semibold tracking-tight text-[var(--surface)] sm:text-[2rem]">
+				Antrian Persetujuan Teknis
+			</h1>
+			<p class="mt-2 max-w-3xl text-sm text-[var(--surface)] sm:text-[0.96rem]">
+				Kelola status, pembaruan, dan tindak lanjut persetujuan teknis dalam satu alur kerja admin yang konsisten.
+			</p>
+		</div>
+		<div class="mt-4 flex flex-wrap gap-2 sm:mt-5">
 			<a
 				href={exportHref}
 				aria-disabled={data.unavailable}
-				class={`inline-flex h-10 items-center gap-2 rounded-xl border border-[#d5dce8] bg-white px-4 text-sm font-semibold text-slate-700 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2] focus-visible:ring-offset-2 ${
+				class={`inline-flex h-10 items-center gap-2 rounded-xl border border-white/45 bg-white/10 px-4 text-sm font-semibold text-white transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-[#64AD31] ${
 					data.unavailable
 						? 'pointer-events-none opacity-50'
-						: 'hover:border-[#c2cfdf] hover:bg-[#f8fafc] hover:text-slate-900'
+						: 'hover:border-white/60 hover:bg-white/20'
 				}`}
 			>
 				<Upload class="h-4 w-4" />
@@ -683,14 +690,14 @@
 				type="button"
 				onclick={openImportPicker}
 				disabled={isImporting || data.unavailable}
-				class="inline-flex h-10 items-center gap-2 rounded-xl border border-[#64AD31] bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:border-[#4f8925] hover:bg-[#4f8925] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8dca1] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
+				class="inline-flex h-10 items-center gap-2 rounded-xl border border-white bg-white px-4 text-sm font-semibold text-[#3f7220] transition hover:border-[#eef7e8] hover:bg-[#eef7e8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/65 focus-visible:ring-offset-2 focus-visible:ring-offset-[#64AD31] disabled:cursor-not-allowed disabled:opacity-60"
 			>
-				<Download class="h-4 w-4 text-white" />
+				<Download class="h-4 w-4 text-[#3f7220]" />
 				{isImporting ? 'Mengimpor...' : 'Import'}
 			</button>
 			<input bind:this={importInput} type="file" accept=".csv,text/csv" class="hidden" onchange={handleImport} />
 		</div>
-	</div>
+	</header>
 
 	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
@@ -839,7 +846,7 @@
 				{#if data.result.data.length === 0}
 					<tr>
 						<td colspan="10" class="px-6 py-12 text-center">
-							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data pertek.</p>
+							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data persetujuan teknis.</p>
 							<p class="mt-1 text-sm text-[var(--muted)]">Silakan tambah baris baru.</p>
 						</td>
 					</tr>
@@ -890,7 +897,7 @@
 			</div>
 
 			{#if data.result.data.length === 0}
-				<p class="px-2 py-8 text-center text-sm text-slate-500">Belum ada data pertek.</p>
+				<p class="px-2 py-8 text-center text-sm text-slate-500">Belum ada data persetujuan teknis.</p>
 			{:else}
 				<ul>
 					{#each data.result.data as row, index}
@@ -971,7 +978,7 @@
 	</section>
 
 	<footer class="mt-6 pt-2">
-		<nav aria-label="Navigasi halaman antrian pertek admin" class="mx-auto flex flex-wrap items-center justify-center gap-1.5">
+		<nav aria-label="Navigasi halaman antrian persetujuan teknis admin" class="mx-auto flex flex-wrap items-center justify-center gap-1.5">
 			<a
 				href={buildQuery({ page: 1 })}
 				onclick={(event) => {
