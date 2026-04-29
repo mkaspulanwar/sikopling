@@ -718,7 +718,7 @@
 		</article>
 	</div>
 
-	<div class="flex flex-wrap items-center justify-between gap-2">
+	<div class="flex flex-wrap items-center gap-2">
 		<div class="flex flex-wrap items-center gap-2 sm:gap-3">
 			<div class="relative inline-flex items-center text-xs text-slate-600 sm:text-sm" bind:this={rowsDropdownElement}>
 				<button
@@ -784,32 +784,38 @@
 				</button>
 			{/if}
 		</div>
-		<div class="flex flex-wrap gap-2">
+		<div class="ml-auto flex items-center gap-2">
 			<button
 				type="button"
 				onclick={openCreateModal}
 				disabled={data.unavailable}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#64AD31] bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:border-[#4f8925] hover:bg-[#4f8925] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8d488] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 disabled:text-slate-500"
+				class="inline-flex h-10 w-10 cursor-pointer items-center justify-center gap-0 rounded-xl border border-[#64AD31] bg-[#64AD31] px-0 text-sm font-semibold !text-white transition hover:border-[#4f8925] hover:bg-[#4f8925] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#a8d488] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 disabled:text-slate-500 md:w-auto md:justify-start md:gap-2 md:px-4"
+				aria-label="Tambah data"
+				title="Tambah"
 			>
 				<CirclePlus class="h-4 w-4 text-white" />
-				Tambah
+				<span class="hidden md:inline">Tambah</span>
 			</button>
 			<button
 				type="button"
 				onclick={openSelectedRowForEdit}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#d7dee8] bg-white px-4 text-sm font-semibold text-[#2f4f6f] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2] focus-visible:ring-offset-2 active:translate-y-px"
+				class="inline-flex h-10 w-10 cursor-pointer items-center justify-center gap-0 rounded-xl border border-[#d7dee8] bg-white px-0 text-sm font-semibold text-[#2f4f6f] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2] focus-visible:ring-offset-2 active:translate-y-px md:w-auto md:justify-start md:gap-2 md:px-4"
+				aria-label="Edit data terpilih"
+				title="Edit"
 			>
 				<SquarePen class="h-4 w-4" />
-				Edit
+				<span class="hidden md:inline">Edit</span>
 			</button>
 			<button
 				type="button"
 				onclick={openSelectedRowForDelete}
 				disabled={data.unavailable}
-				class="inline-flex h-10 cursor-pointer items-center gap-2 rounded-xl border border-[#D64545] bg-[#D64545] px-4 text-sm font-semibold !text-white transition hover:border-[#b93a3a] hover:bg-[#b93a3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300"
+				class="inline-flex h-10 w-10 cursor-pointer items-center justify-center gap-0 rounded-xl border border-[#D64545] bg-[#D64545] px-0 text-sm font-semibold !text-white transition hover:border-[#b93a3a] hover:bg-[#b93a3a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f2d2d2] focus-visible:ring-offset-2 active:translate-y-px disabled:cursor-not-allowed disabled:border-slate-200 disabled:bg-slate-300 md:w-auto md:justify-start md:gap-2 md:px-4"
+				aria-label="Hapus data terpilih"
+				title="Hapus"
 			>
 				<Trash class="h-4 w-4 text-white" />
-				Hapus
+				<span class="hidden md:inline">Hapus</span>
 			</button>
 		</div>
 	</div>
