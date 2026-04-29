@@ -52,6 +52,10 @@
 		isMobileMenuOpen = !isMobileMenuOpen
 	}
 
+	const toggleSidebar = () => {
+		isSidebarCollapsed = !isSidebarCollapsed
+	}
+
 	const closeMobileMenu = () => {
 		isMobileMenuOpen = false
 	}
@@ -232,7 +236,7 @@
 <div class="relative flex min-h-[100dvh] bg-white text-[var(--ink)]">
 	<TopProgressBar active={isAdminNavigationPending} />
 	<aside
-		class={`hidden overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] px-[18px] pb-4 pt-5 shadow-[0_18px_42px_-30px_rgba(15,23,42,0.38)] [transition:width_280ms_cubic-bezier(0.22,1,0.36,1)] lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:flex lg:h-[100dvh] lg:flex-col ${
+		class={`admin-sidebar-desktop hidden overflow-hidden border-r border-[var(--line)] bg-[var(--surface)] px-[18px] pb-4 pt-5 shadow-[0_18px_42px_-30px_rgba(15,23,42,0.38)] lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:flex lg:h-[100dvh] lg:flex-col ${
 			isSidebarCollapsed ? 'lg:w-[95px]' : 'lg:w-[285px]'
 		}`}
 	>
@@ -244,17 +248,17 @@
 			<a
 				href="/admin/dashboard"
 				aria-label="Sikopling Admin"
-				class={`inline-flex items-center overflow-hidden transition-all duration-300 ${
+				class={`admin-sidebar-brand inline-flex items-center overflow-hidden ${
 					isSidebarCollapsed
-						? 'pointer-events-none max-w-0 px-0 py-0 opacity-0'
-						: 'max-w-[11rem] px-0 py-0 opacity-100'
+						? 'is-collapsed pointer-events-none max-w-0 -translate-x-1 px-0 py-0 opacity-0'
+						: 'is-expanded max-w-[11rem] translate-x-0 px-0 py-0 opacity-100'
 				}`}
 			>
 				<img src="/layout/logo_sikopling.png" alt="Logo Sikopling" class="h-[24px] w-auto max-w-[9.5rem] object-contain" />
 			</a>
 			<button
 				type="button"
-				onclick={() => (isSidebarCollapsed = !isSidebarCollapsed)}
+				onclick={toggleSidebar}
 				class={`inline-flex items-center justify-center text-[var(--muted)] transition-colors duration-200 hover:bg-[var(--accent-soft)] hover:text-[var(--ink)] ${
 					isSidebarCollapsed ? 'h-11 w-full shrink-0 rounded-xl bg-transparent' : 'h-11 w-11 rounded-xl bg-transparent'
 				}`}
@@ -276,8 +280,8 @@
 				<a
 					href={item.href}
 					title={isSidebarCollapsed ? item.label : undefined}
-					class={`group flex h-11 items-center overflow-hidden rounded-xl border text-sm font-semibold transition-colors duration-200 ${
-						isSidebarCollapsed ? 'justify-center px-0' : 'gap-3 px-2.5'
+					class={`admin-sidebar-link group flex h-11 items-center overflow-hidden rounded-xl border text-sm font-semibold ${
+						isSidebarCollapsed ? 'justify-start gap-0 px-[13.5px]' : 'justify-start gap-3 px-2.5'
 					} ${
 						active
 							? isSidebarCollapsed
@@ -296,8 +300,10 @@
 						<item.icon class="h-[1.02rem] w-[1.02rem] shrink-0" />
 					</span>
 					<span
-						class={`truncate whitespace-nowrap transition-all duration-300 ${
-							isSidebarCollapsed ? 'max-w-0 -translate-x-1 opacity-0' : 'max-w-[13.5rem] translate-x-0 opacity-100'
+						class={`admin-sidebar-label min-w-0 truncate whitespace-nowrap ${
+							isSidebarCollapsed
+								? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
+								: 'is-expanded max-w-[13.5rem] translate-x-0 opacity-100'
 						}`}
 					>
 						{item.label}
@@ -318,8 +324,10 @@
 					<SquareArrowRightExit class="h-[1.02rem] w-[1.02rem] shrink-0" />
 				</span>
 				<span
-					class={`whitespace-nowrap transition-all duration-300 ${
-						isSidebarCollapsed ? 'max-w-0 -translate-x-1 opacity-0' : 'max-w-[6rem] translate-x-0 opacity-100'
+					class={`admin-sidebar-label whitespace-nowrap ${
+						isSidebarCollapsed
+							? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
+							: 'is-expanded max-w-[6rem] translate-x-0 opacity-100'
 					}`}
 				>
 					Logout
@@ -335,7 +343,7 @@
 		</div>
 	</aside>
 
-	<div class={`min-w-0 flex-1 ${isSidebarCollapsed ? 'lg:pl-[95px]' : 'lg:pl-[285px]'}`}>
+	<div class={`admin-main-shell min-w-0 flex-1 ${isSidebarCollapsed ? 'lg:pl-[95px]' : 'lg:pl-[285px]'}`}>
 		<header class={mobileHeaderClass()}>
 			<div class="nav-shell py-3">
 				<div class="flex items-center justify-between gap-3">
@@ -407,6 +415,56 @@
 </div>
 
 <style>
+	.admin-sidebar-desktop {
+		transition: width 340ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.admin-main-shell {
+		transition: padding-left 340ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.admin-sidebar-brand {
+		transform-origin: left center;
+		transition:
+			max-width 240ms cubic-bezier(0.16, 1, 0.3, 1),
+			opacity 180ms ease,
+			transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.admin-sidebar-brand.is-expanded {
+		transition-delay: 120ms;
+	}
+
+	.admin-sidebar-brand.is-collapsed {
+		transition-delay: 0ms;
+	}
+
+	.admin-sidebar-link {
+		transition:
+			padding 340ms cubic-bezier(0.22, 1, 0.36, 1),
+			gap 340ms cubic-bezier(0.22, 1, 0.36, 1),
+			background-color 200ms ease,
+			color 200ms ease,
+			border-color 200ms ease;
+	}
+
+	.admin-sidebar-label {
+		display: block;
+		transform-origin: left center;
+		transition:
+			max-width 220ms cubic-bezier(0.16, 1, 0.3, 1),
+			opacity 160ms ease,
+			transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+	}
+
+	.admin-sidebar-label.is-expanded {
+		transition-delay: 120ms;
+	}
+
+	.admin-sidebar-label.is-collapsed {
+		transition-delay: 0ms;
+	}
+
 	.mobile-menu-toggle {
 		position: relative;
 	}
@@ -505,6 +563,11 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
+		.admin-sidebar-desktop,
+		.admin-main-shell,
+		.admin-sidebar-brand,
+		.admin-sidebar-link,
+		.admin-sidebar-label,
 		.mobile-menu-panel::after,
 		.mobile-menu-toggle__line {
 			animation: none !important;
