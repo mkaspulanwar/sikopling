@@ -927,7 +927,7 @@
 								>
 									<div class="flex items-start justify-between gap-2">
 										<div class="min-w-0">
-											<p class="truncate pr-1 text-sm leading-snug font-semibold text-[#20232A]">
+											<p class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]">
 												{row.instansi ?? '-'}
 											</p>
 											<p class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]">
