@@ -148,7 +148,7 @@
   #horizontal-scroll {
     position: relative;
     overflow: hidden;
-    background-image: url("/home/gradient-texture.png");
+    background-image: url("/home/gradient-texture.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
