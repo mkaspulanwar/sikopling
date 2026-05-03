@@ -9,7 +9,6 @@
 	import type { PageData } from "./$types";
 	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	import StackedCard from "$lib/components/home/StackedCard.svelte";
-	import EyeCursorZone from "$lib/components/EyeCursorZone.svelte";
 
 	type HomeFaqItem = {
 		id: string;
@@ -750,7 +749,6 @@
 	<section
 		id="alur-percepatan"
 		class="scroll-mt-28 bg-(--canvas) py-6 sm:py-14">
-		<EyeCursorZone>
 		<div class="page-shell">
 			<div
 				class="mx-auto max-w-3xl rounded-2xl border border-[var(--line)] bg-white/65 p-5 text-center backdrop-blur-[1px] sm:p-6"
@@ -853,7 +851,6 @@
 			</div>
 		</div>
 	</div>
-	</EyeCursorZone>
 </section>
 <section id="faq" class="scroll-mt-28 bg-white py-16 sm:py-20">
 	<div class="nav-shell nav-shell-desktop-spacious">
