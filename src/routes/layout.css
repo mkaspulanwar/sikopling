@@ -118,7 +118,7 @@ h6 {
 	font-family: var(--font-body);
 }
 
-.hero-media-video {
+.hero-media-image {
 	position: absolute;
 	inset: 0;
 	width: 100%;

@@ -421,9 +421,9 @@
 	/>
 	<link
 		rel="preload"
-		href="/home/video-hero.webm?v=20260418"
-		as="video"
-		type="video/webm"
+		href="/home/background-hero.jpg"
+		as="image"
+		type="image/jpeg"
 	/>
 </svelte:head>
 
@@ -433,23 +433,14 @@
 	bind:this={heroSection}
 >
 	<div class="hero-media absolute inset-0" aria-hidden="true">
-		<video
-			class="hero-media-video"
-			autoplay
-			muted
-			loop
-			playsinline
-			preload="metadata"
-		>
-			<source
-				src="/home/video-hero.webm?v=20260418"
-				type="video/webm"
-			/>
-			<source
-				src="/home/video-hero.mp4?v=20260418"
-				type="video/mp4"
-			/>
-		</video>
+		<img
+			class="hero-media-image"
+			src="/home/background-hero.jpg"
+			alt=""
+			loading="eager"
+			decoding="async"
+			fetchpriority="high"
+		/>
 		<div class="absolute inset-0 bg-black/15"></div>
 	</div>
 	<div
@@ -954,7 +945,7 @@
 		pointer-events: none;
 	}
 
-	.hero-media-video {
+	.hero-media-image {
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
