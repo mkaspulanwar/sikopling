@@ -667,7 +667,7 @@
 			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full"></div>
 			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--surface)]">Dashboard Admin</p>
 			<h1 class="mt-2 text-2xl font-semibold tracking-tight text-[var(--surface)] sm:text-[2rem]">
-				Antrian Dokumen Lingkungan
+				Monitoring Persetujuan Lingkungan
 			</h1>
 			<p class="mt-2 max-w-3xl text-sm text-[var(--surface)] sm:text-[0.96rem]">
 				Kelola status, pembaruan, dan tindak lanjut dokumen lingkungan dalam satu alur kerja admin yang konsisten.

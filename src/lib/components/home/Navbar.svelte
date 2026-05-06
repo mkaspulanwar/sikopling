@@ -67,7 +67,7 @@
 		},
 		{
 			title: 'Monitoring Integrasi',
-			href: '/#layanan-dashboard'
+			href: '/layanan/integrasi'
 		}
 	];
 	const pengumumanItems: PengumumanItem[] = [
@@ -114,6 +114,12 @@
 			category: 'Layanan',
 			priority: 97
 		},
+		{
+			path: '/layanan/integrasi',
+			title: 'Monitoring Integrasi',
+			category: 'Layanan',
+			priority: 95
+		},
 		{ path: '/profil', title: 'Profil', category: 'Halaman', priority: 66 },
 		{ path: '/kebijakan-privasi', title: 'Kebijakan Privasi', category: 'Halaman', priority: 62 },
 		{ path: '/ketentuan-layanan', title: 'Ketentuan Layanan', category: 'Halaman', priority: 61 },
@@ -151,6 +157,15 @@
 			content: 'Persetujuan teknis, air limbah, progres evaluasi dokumen dan penjadwalan rapat.',
 			keywords: ['pertek', 'persetujuan teknis', 'air', 'limbah', 'lingkungan'],
 			priority: 97
+		}),
+		buildSearchDocument({
+			title: 'Monitoring Integrasi',
+			description: 'Layanan pencarian antrian monitoring integrasi SIKOPLING.',
+			href: '/layanan/integrasi',
+			category: 'Layanan',
+			content: 'Monitoring integrasi, sinkronisasi layanan, status integrasi, posisi, dan keterangan.',
+			keywords: ['integrasi', 'monitoring integrasi', 'sinkronisasi', 'layanan'],
+			priority: 95
 		}),
 		buildSearchDocument({
 			title: 'Profil',

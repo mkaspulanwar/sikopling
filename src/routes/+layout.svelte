@@ -195,6 +195,8 @@
 				return 'Monitoring Persetujuan Lingkungan';
 			case '/layanan/pertek':
 				return 'Monitoring Persetujuan Teknis';
+			case '/layanan/integrasi':
+				return 'Monitoring Integrasi';
 			case '/profil':
 				return 'Profil Sikopling';
 			case '/tentang':
@@ -216,6 +218,8 @@
 				return 'Admin Dokling Sikopling';
 			case '/admin/pertek':
 				return 'Admin Pertek Sikopling';
+			case '/admin/integrasi':
+				return 'Admin Integrasi Sikopling';
 			case '/admin/profil':
 				return 'Profil Admin Sikopling';
 			case '/admin/pengaturan':

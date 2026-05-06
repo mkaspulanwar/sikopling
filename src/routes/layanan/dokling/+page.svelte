@@ -491,7 +491,7 @@
 				<h1
 					class="text-[clamp(1.75rem,7.2vw,2.65rem)] leading-[1.12] font-semibold tracking-[-0.015em] text-(--ink)"
 				>
-					Antrian Dokumen Lingkungan
+					Monitoring Persetujuan Lingkungan
 				</h1>
 			</div>
 		</header>

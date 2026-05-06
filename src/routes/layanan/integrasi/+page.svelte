@@ -6,37 +6,22 @@
 	import ListFilterPlus from "lucide-svelte/icons/list-filter-plus";
 	import Search from "lucide-svelte/icons/search";
 	import X from "lucide-svelte/icons/x";
+	import type { PageData } from "./$types";
 
-	type ProgressStatus =
-		| "Evaluasi Dokumen"
-		| "Perbaikan Uji Administrasi"
-		| "Penjadwalan Rapat"
-		| "Dikembalikan"
-		| "Submit";
-	type QueuePosition = string;
-
-	type QueueRow = {
-		registrationNo: string;
-		receivedDate: string;
-		agency: string;
-		activity: string;
-		documentType: string;
-		position: QueuePosition;
-		progressStatus: ProgressStatus;
-		progressUpdatedDate: string;
-	};
-
-	type PositionFilter = "Semua Jenis" | "Air";
+	type QueueRow = PageData["queueRows"][number];
+	type ProgressStatus = QueueRow["status"];
+	type PositionFilter =
+		| "Semua Posisi"
+		| "PKPLH"
+		| "SKKL";
 	type SortOption =
-		| "Terbaru"
-		| "Terlama"
 		| "Update terbaru"
 		| "Update terlama"
 		| "Instansi A-Z"
 		| "Instansi Z-A";
-	type FilterChipKey = "search" | "sort" | "status" | "perlingType";
+	type FilterChipKey = "search" | "sort" | "status" | "position";
 
-	const { data }: { data: { queueRows: QueueRow[] } } = $props();
+	const { data }: { data: PageData } = $props();
 	const queueRows = $derived(data.queueRows);
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 
@@ -48,9 +33,9 @@
 	const numberFormatter = new Intl.NumberFormat("id-ID");
 
 	let searchQuery = $state("");
-	let sortOption = $state<SortOption>("Terbaru");
+	let sortOption = $state<SortOption>("Update terbaru");
 	let statusFilter = $state<"Semua Status" | ProgressStatus>("Semua Status");
-	let positionFilter = $state<PositionFilter>("Semua Jenis");
+	let positionFilter = $state<PositionFilter>("Semua Posisi");
 	let isFilterPanelOpen = $state(false);
 	let filterToggleButton = $state<HTMLButtonElement | null>(null);
 	let filterPanelElement = $state<HTMLDivElement | null>(null);
@@ -67,9 +52,8 @@
 	type RowsPerPage = (typeof rowsPerPageOptions)[number];
 	let rowsPerPage = $state<RowsPerPage>(10);
 	let currentPage = $state(1);
+
 	const sortOptions: SortOption[] = [
-		"Terbaru",
-		"Terlama",
 		"Update terbaru",
 		"Update terlama",
 		"Instansi A-Z",
@@ -77,172 +61,151 @@
 	];
 	const statusOptions: Array<"Semua Status" | ProgressStatus> = [
 		"Semua Status",
-		"Evaluasi Dokumen",
-		"Perbaikan Uji Administrasi",
-		"Penjadwalan Rapat",
-		"Dikembalikan",
+		"Uji admin",
 		"Submit",
+		"Ditolak",
+		"SK/Rekomendasi",
 	];
 	const positionFilterOptions: Array<{
 		label: string;
 		value: PositionFilter;
 	}> = [
-		{ label: "Semua Jenis", value: "Semua Jenis" },
-		{ label: "Air", value: "Air" },
+		{ label: "Semua Jenis", value: "Semua Posisi" },
+		{ label: "PKPLH", value: "PKPLH" },
+		{ label: "SKKL", value: "SKKL" },
 	];
 
+	const normalize = (value: string) => value.trim().toLowerCase();
 	const toTimestamp = (value: string) =>
 		new Date(`${value}T00:00:00`).getTime();
 	const formatDate = (value: string) =>
 		dateFormatter.format(new Date(`${value}T00:00:00`));
 	const formatNumber = (value: number) => numberFormatter.format(value);
-	const normalize = (value: string) => value.trim().toLowerCase();
 	const escapeCsvValue = (value: string) =>
 		`"${value.replaceAll('"', '""')}"`;
+	const formatKeterangan = (value: string) => (value.trim() ? value : "-");
+
 	const statusBadgeClassMap: Record<ProgressStatus, string> = {
-		"Evaluasi Dokumen": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
-		"Perbaikan Uji Administrasi":
-			"border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]",
-		"Penjadwalan Rapat": "border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]",
-		Dikembalikan: "border-[#d9a98a] bg-[#fff1e8] text-[#8a4522]",
+		"Uji admin": "border-[#8f67b0] bg-[#ede3f7] text-[#5f3888]",
 		Submit: "border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]",
+		Ditolak: "border-[#e1a5a5] bg-[#fff0f0] text-[#8c2f2f]",
+		"SK/Rekomendasi": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
 	};
 	const getStatusBadgeClass = (status: ProgressStatus) =>
 		statusBadgeClassMap[status];
-	const resolvePositionCategory = (documentType: string): PositionFilter => {
-		const value = normalize(documentType);
-		return value.includes("air") ? "Air" : "Semua Jenis";
+
+	const resolvePositionCategory = (
+		jenisIntegrasi: string,
+	): Exclude<PositionFilter, "Semua Posisi"> | "Lainnya" => {
+		const value = normalize(jenisIntegrasi);
+		if (value.includes("pkplh")) return "PKPLH";
+		if (value.includes("skkl")) return "SKKL";
+		return "Lainnya";
 	};
 
 	const filteredRows = $derived.by(() => {
 		const query = normalize(searchQuery);
 		return queueRows.filter((row) => {
 			const statusMatched =
-				statusFilter === "Semua Status" ||
-				row.progressStatus === statusFilter;
+				statusFilter === "Semua Status" || row.status === statusFilter;
 			const positionMatched =
-				positionFilter === "Semua Jenis" ||
-				resolvePositionCategory(row.documentType) === positionFilter;
-			if (!statusMatched) return false;
-			if (!positionMatched) return false;
+				positionFilter === "Semua Posisi" ||
+				resolvePositionCategory(row.jenis) === positionFilter;
+			if (!statusMatched || !positionMatched) return false;
 			if (!query) return true;
 
 			return [
-				row.registrationNo,
-				row.agency,
-				row.activity,
-				row.documentType,
-				row.position,
-				row.progressStatus,
-				formatDate(row.receivedDate),
-				formatDate(row.progressUpdatedDate),
+				row.no,
+				row.instansi,
+				row.kegiatan,
+				row.jenis,
+				row.status,
+				row.posisi,
+				formatDate(row.tanggalUpdate),
+				formatKeterangan(row.keterangan),
 			].some((value) => normalize(value).includes(query));
 		});
 	});
+
 	const queueRowsSearchIndexText = $derived.by(() =>
 		queueRows
 			.map((row) =>
 				[
-					row.registrationNo,
-					row.agency,
-					row.activity,
-					row.documentType,
-					row.position,
-					row.progressStatus,
-					row.receivedDate,
-					row.progressUpdatedDate,
-					formatDate(row.receivedDate),
-					formatDate(row.progressUpdatedDate)
-				].join(' ')
+					row.no,
+					row.instansi,
+					row.kegiatan,
+					row.jenis,
+					row.status,
+					row.posisi,
+					row.tanggalUpdate,
+					formatDate(row.tanggalUpdate),
+					formatKeterangan(row.keterangan),
+				].join(" "),
 			)
-			.join(' ')
+			.join(" "),
 	);
 
 	const agencyCollator = new Intl.Collator("id-ID", { sensitivity: "base" });
 	const sortedRows = $derived.by(() =>
 		[...filteredRows].sort((left, right) => {
 			switch (sortOption) {
-				case "Terbaru":
-					return (
-						toTimestamp(right.receivedDate) -
-						toTimestamp(left.receivedDate)
-					);
-				case "Terlama":
-					return (
-						toTimestamp(left.receivedDate) -
-						toTimestamp(right.receivedDate)
-					);
 				case "Update terlama":
-					return (
-						toTimestamp(left.progressUpdatedDate) -
-						toTimestamp(right.progressUpdatedDate)
-					);
+					return toTimestamp(left.tanggalUpdate) - toTimestamp(right.tanggalUpdate);
 				case "Instansi A-Z":
-					return agencyCollator.compare(left.agency, right.agency);
+					return agencyCollator.compare(left.instansi, right.instansi);
 				case "Instansi Z-A":
-					return agencyCollator.compare(right.agency, left.agency);
+					return agencyCollator.compare(right.instansi, left.instansi);
 				case "Update terbaru":
 				default:
-					return (
-						toTimestamp(right.progressUpdatedDate) -
-						toTimestamp(left.progressUpdatedDate)
-					);
+					return toTimestamp(right.tanggalUpdate) - toTimestamp(left.tanggalUpdate);
 			}
 		}),
 	);
+
 	const totalFilteredRows = $derived(sortedRows.length);
 	const totalPages = $derived(
 		Math.max(1, Math.ceil(totalFilteredRows / rowsPerPage)),
 	);
 	const pageStartIndex = $derived((currentPage - 1) * rowsPerPage);
 	const pageEndIndex = $derived(pageStartIndex + rowsPerPage);
-	const paginatedRows = $derived(
-		sortedRows.slice(pageStartIndex, pageEndIndex),
-	);
-	const visibleRangeStart = $derived(
-		totalFilteredRows === 0 ? 0 : pageStartIndex + 1,
-	);
+	const paginatedRows = $derived(sortedRows.slice(pageStartIndex, pageEndIndex));
+	const visibleRangeStart = $derived(totalFilteredRows === 0 ? 0 : pageStartIndex + 1);
 	const visibleRangeEnd = $derived(Math.min(pageEndIndex, totalFilteredRows));
 	const activeAdvancedFilterCount = $derived(
-		(sortOption !== "Terbaru" ? 1 : 0) +
+		(sortOption !== "Update terbaru" ? 1 : 0) +
 			(statusFilter !== "Semua Status" ? 1 : 0) +
-			(positionFilter !== "Semua Jenis" ? 1 : 0),
+			(positionFilter !== "Semua Posisi" ? 1 : 0),
 	);
+
 	const activeFilterChips = $derived.by(() => {
 		const chips: Array<{
 			key: FilterChipKey;
 			label: string;
 			value: string;
 		}> = [];
+
 		if (searchQuery.trim()) {
-			chips.push({
-				key: "search",
-				label: "Pencarian",
-				value: searchQuery.trim(),
-			});
+			chips.push({ key: "search", label: "Pencarian", value: searchQuery.trim() });
 		}
-		if (sortOption !== "Terbaru") {
+		if (sortOption !== "Update terbaru") {
 			chips.push({ key: "sort", label: "Urutkan", value: sortOption });
 		}
 		if (statusFilter !== "Semua Status") {
 			chips.push({ key: "status", label: "Status", value: statusFilter });
 		}
-		if (positionFilter !== "Semua Jenis") {
-			chips.push({
-				key: "perlingType",
-				label: "Jenis Perling",
-				value: positionFilter,
-			});
+		if (positionFilter !== "Semua Posisi") {
+			chips.push({ key: "position", label: "Jenis", value: positionFilter });
 		}
+
 		return chips;
 	});
 
-	const isRowExpanded = (registrationNo: string) =>
-		expandedRows.includes(registrationNo);
+	const isRowExpanded = (queueNo: string) => expandedRows.includes(queueNo);
 	const resetExpandedAndFirstPage = () => {
 		expandedRows = [];
 		currentPage = 1;
 	};
+
 	const closeAllDropdownMenus = () => {
 		isSortDropdownOpen = false;
 		isStatusDropdownOpen = false;
@@ -267,6 +230,7 @@
 	const toggleRowsDropdown = () => {
 		isRowsDropdownOpen = !isRowsDropdownOpen;
 	};
+
 	const selectSortOption = (value: SortOption) => {
 		sortOption = value;
 		resetExpandedAndFirstPage();
@@ -287,38 +251,39 @@
 		resetExpandedAndFirstPage();
 		isRowsDropdownOpen = false;
 	};
-	const toggleRowExpanded = (registrationNo: string) => {
-		expandedRows = isRowExpanded(registrationNo)
-			? expandedRows.filter((item) => item !== registrationNo)
-			: [...expandedRows, registrationNo];
+
+	const toggleRowExpanded = (queueNo: string) => {
+		expandedRows = isRowExpanded(queueNo)
+			? expandedRows.filter((item) => item !== queueNo)
+			: [...expandedRows, queueNo];
 	};
 	const toggleFilterPanel = () => {
 		isFilterPanelOpen = !isFilterPanelOpen;
-		if (!isFilterPanelOpen) {
-			closeAllDropdownMenus();
-		}
+		if (!isFilterPanelOpen) closeAllDropdownMenus();
 	};
 	const closeFilterPanel = () => {
 		isFilterPanelOpen = false;
 		closeAllDropdownMenus();
 	};
+
 	const clearFilterChip = (key: FilterChipKey) => {
 		switch (key) {
 			case "search":
 				searchQuery = "";
 				break;
 			case "sort":
-				sortOption = "Terbaru";
+				sortOption = "Update terbaru";
 				break;
 			case "status":
 				statusFilter = "Semua Status";
 				break;
-			case "perlingType":
-				positionFilter = "Semua Jenis";
+			case "position":
+				positionFilter = "Semua Posisi";
 				break;
 		}
 		resetExpandedAndFirstPage();
 	};
+
 	const handleWindowClick = (event: MouseEvent) => {
 		const target = event.target as Node | null;
 		if (!target) return;
@@ -328,10 +293,7 @@
 		if (isStatusDropdownOpen && !statusDropdownElement?.contains(target)) {
 			isStatusDropdownOpen = false;
 		}
-		if (
-			isPositionDropdownOpen &&
-			!positionDropdownElement?.contains(target)
-		) {
+		if (isPositionDropdownOpen && !positionDropdownElement?.contains(target)) {
 			isPositionDropdownOpen = false;
 		}
 		if (isRowsDropdownOpen && !rowsDropdownElement?.contains(target)) {
@@ -342,11 +304,13 @@
 		if (filterToggleButton?.contains(target)) return;
 		closeFilterPanel();
 	};
+
 	const handleWindowKeydown = (event: KeyboardEvent) => {
 		if (event.key !== "Escape") return;
 		closeFilterPanel();
 		closeAllDropdownMenus();
 	};
+
 	const goToPreviousPage = () => {
 		if (currentPage === 1) return;
 		currentPage -= 1;
@@ -379,26 +343,26 @@
 		if (sortedRows.length === 0) return;
 
 		const header = [
-			"No Registrasi",
-			"Tanggal Masuk",
+			"No Integrasi",
 			"Instansi",
 			"Kegiatan",
-			"Jenis Perling",
-			"Posisi",
+			"Jenis Integrasi",
 			"Status",
+			"Posisi",
 			"Tanggal Update",
+			"Keterangan",
 		];
 
 		const lines = sortedRows.map((row) =>
 			[
-				row.registrationNo,
-				formatDate(row.receivedDate),
-				row.agency,
-				row.activity,
-				row.documentType,
-				row.position,
-				row.progressStatus,
-				formatDate(row.progressUpdatedDate),
+				row.no,
+				row.instansi,
+				row.kegiatan,
+				row.jenis,
+				row.status,
+				row.posisi,
+				formatDate(row.tanggalUpdate),
+				formatKeterangan(row.keterangan),
 			]
 				.map(escapeCsvValue)
 				.join(","),
@@ -414,7 +378,7 @@
 		const objectUrl = URL.createObjectURL(blob);
 		const anchor = document.createElement("a");
 		anchor.href = objectUrl;
-		anchor.download = `antrian-persetujuan-teknis-${formatIsoDate(new Date())}.csv`;
+		anchor.download = `antrian-monitoring-integrasi-${formatIsoDate(new Date())}.csv`;
 		document.body.append(anchor);
 		anchor.click();
 		anchor.remove();
@@ -423,27 +387,28 @@
 
 	const resetFilter = () => {
 		searchQuery = "";
-		sortOption = "Terbaru";
+		sortOption = "Update terbaru";
 		statusFilter = "Semua Status";
-		positionFilter = "Semua Jenis";
+		positionFilter = "Semua Posisi";
 		isFilterPanelOpen = false;
 		closeAllDropdownMenus();
 		expandedRows = [];
 		currentPage = 1;
 	};
 	const resetAdvancedFilters = () => {
-		sortOption = "Terbaru";
+		sortOption = "Update terbaru";
 		statusFilter = "Semua Status";
-		positionFilter = "Semua Jenis";
+		positionFilter = "Semua Posisi";
 		closeAllDropdownMenus();
 		resetExpandedAndFirstPage();
 	};
 </script>
 
 <svelte:head>
+	<title>Monitoring Integrasi - SIKOPLING</title>
 	<meta
 		name="description"
-		content="Halaman pelacakan antrian persetujuan teknis untuk memantau status progress pengajuan."
+		content="Halaman monitoring integrasi SIKOPLING untuk memantau status integrasi dokumen dan layanan."
 	/>
 </svelte:head>
 
@@ -459,7 +424,7 @@
 				<h1
 					class="text-[clamp(1.75rem,7.2vw,2.65rem)] leading-[1.12] font-semibold tracking-[-0.015em] text-(--ink)"
 				>
-					Monitoring Persetujuan Teknis
+					Monitoring Integrasi
 				</h1>
 			</div>
 		</header>
@@ -470,8 +435,8 @@
 					class="flex flex-col gap-2.5 md:flex-row md:items-center md:justify-between"
 				>
 					<label
-						for="search-antrian"
-						class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:max-w-[30rem] md:px-4"
+						for="search-integrasi"
+						class="flex h-11 w-full items-center gap-3 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3.5 md:max-w-120 md:px-4"
 					>
 						<Search
 							class="h-4.5 w-4.5 text-(--muted)"
@@ -479,11 +444,11 @@
 							aria-hidden="true"
 						/>
 						<input
-							id="search-antrian"
+							id="search-integrasi"
 							type="text"
 							bind:value={searchQuery}
 							oninput={resetExpandedAndFirstPage}
-							placeholder="Cari instansi atau kegiatan"
+							placeholder="Cari no integrasi atau instansi"
 							class="h-full w-full border-0 bg-transparent px-0 text-sm text-(--ink) placeholder:text-(--muted) focus:ring-0 focus:outline-none"
 						/>
 					</label>
@@ -496,14 +461,14 @@
 							bind:this={filterToggleButton}
 							onclick={toggleFilterPanel}
 							aria-expanded={isFilterPanelOpen}
-							aria-controls="pertek-filter-panel"
+							aria-controls="integrasi-filter-panel"
 							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none sm:w-auto sm:px-4"
 						>
 							<ListFilterPlus class="h-4 w-4" strokeWidth={2.1} />
 							<span>Filter</span>
 							{#if activeAdvancedFilterCount > 0}
 								<span
-									class="inline-flex min-w-[1.25rem] items-center justify-center rounded-full bg-[#64AD31] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
+									class="inline-flex min-w-5 items-center justify-center rounded-full bg-[#64AD31] px-1.5 py-0.5 text-[0.66rem] leading-none text-white"
 								>
 									{activeAdvancedFilterCount}
 								</span>
@@ -529,7 +494,7 @@
 
 			{#if isFilterPanelOpen}
 				<div
-					id="pertek-filter-panel"
+					id="integrasi-filter-panel"
 					bind:this={filterPanelElement}
 					class="rounded-lg border border-[#d7dee8] bg-[#ffffff] p-3 sm:p-4"
 				>
@@ -650,17 +615,17 @@
 
 						<div>
 							<label
-								for="position-filter"
+								for="posisi-filter"
 								class="mb-1 block text-xs font-semibold text-(--muted)"
 							>
-								Jenis Perling
+								Jenis Integrasi
 							</label>
 							<div
 								class="relative"
 								bind:this={positionDropdownElement}
 							>
 								<button
-									id="position-filter"
+									id="posisi-filter"
 									type="button"
 									onclick={togglePositionDropdown}
 									aria-haspopup="listbox"
@@ -668,7 +633,9 @@
 									class="flex h-11 w-full items-center justify-between rounded-lg border border-[#cfd7e3] bg-[#ffffff] pr-3 pl-3 text-left text-sm font-medium text-(--ink) shadow-[0_1px_1px_rgba(15,23,42,0.03)] transition-colors hover:border-[#bac6d8] focus:border-[#aeb8c7] focus:ring-2 focus:ring-[#e9edf3] focus:outline-none"
 								>
 									<span class="truncate"
-										>{positionFilter}</span
+										>{positionFilter === "Semua Posisi"
+											? "Semua Jenis"
+											: positionFilter}</span
 									>
 									<ChevronDown
 										class={`h-4 w-4 shrink-0 text-(--muted) transition-transform ${isPositionDropdownOpen ? "rotate-180" : ""}`}
@@ -678,7 +645,7 @@
 								{#if isPositionDropdownOpen}
 									<ul
 										role="listbox"
-										aria-labelledby="position-filter"
+										aria-labelledby="posisi-filter"
 										class="absolute z-30 mt-1.5 max-h-56 w-full overflow-auto rounded-lg border border-[#d1d9e5] bg-white p-1 shadow-[0_16px_30px_-20px_rgba(15,23,42,0.45)]"
 									>
 										{#each positionFilterOptions as option}
@@ -777,7 +744,7 @@
 						hasil
 					</p>
 					<p class="text-[0.72rem] text-(--muted) md:hidden">
-						Total pengajuan:
+						Total data:
 						<span class="font-semibold text-(--ink)"
 							>{formatNumber(queueRows.length)}</span
 						>
@@ -800,7 +767,7 @@
 							>
 						</p>
 						<p>
-							Total Pengajuan
+							Total Data
 							<span class="font-semibold text-(--ink)"
 								>{formatNumber(queueRows.length)}</span
 							>
@@ -878,16 +845,6 @@
 							<th
 								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
-								No Registrasi
-							</th>
-							<th
-								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
-							>
-								Tanggal Masuk
-							</th>
-							<th
-								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
-							>
 								Instansi
 							</th>
 							<th
@@ -898,7 +855,7 @@
 							<th
 								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
-								Jenis Perling
+								Jenis Integrasi
 							</th>
 							<th
 								class="w-28 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
@@ -915,13 +872,18 @@
 							>
 								Tanggal Update
 							</th>
+							<th
+								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
+							>
+								Keterangan
+							</th>
 						</tr>
 					</thead>
 
 					<tbody>
 						{#if totalFilteredRows === 0}
 							<tr>
-								<td colspan="9" class="px-6 py-12 text-center">
+								<td colspan="8" class="px-6 py-12 text-center">
 									<p
 										class="text-base font-semibold text-(--ink)"
 									>
@@ -942,38 +904,37 @@
 										{pageStartIndex + index + 1}
 									</td>
 									<td class="px-6 py-4 text-sm text-[#20232A]"
-										>{row.registrationNo}</td
-									>
-									<td class="px-6 py-4 text-sm text-[#20232A]"
-										>{formatDate(row.receivedDate)}</td
-									>
-									<td class="px-6 py-4 text-sm text-[#20232A]"
-										>{row.agency}</td
+										>{row.instansi}</td
 									>
 									<td
 										class="px-6 py-4 text-sm leading-relaxed text-[#20232A]"
-										>{row.activity}</td
+										>{row.kegiatan}</td
 									>
 									<td class="px-6 py-4 text-sm text-[#20232A]"
-										>{row.documentType}</td
+										>{row.jenis}</td
 									>
 									<td
 										class="w-28 px-4 py-4 text-sm text-[#20232A]"
-										>{row.position}</td
+										>{row.posisi}</td
 									>
 									<td
 										class="w-32 px-4 py-4 text-sm leading-snug text-[#20232A]"
 									>
 										<span
-											class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.progressStatus)}`}
+											class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.status)}`}
 										>
-											{row.progressStatus}
+											{row.status}
 										</span>
 									</td>
 									<td
 										class="px-6 py-4 text-sm text-[#20232A]"
 									>
-										{formatDate(row.progressUpdatedDate)}
+										{formatDate(row.tanggalUpdate)}
+									</td>
+									<td
+										class="px-6 py-4 text-sm leading-relaxed text-[#20232A]"
+									>
+										{formatKeterangan(row.keterangan)}
 									</td>
 								</tr>
 							{/each}
@@ -990,7 +951,7 @@
 				class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white"
 			>
 				<span class="text-center">No</span>
-				<span class="text-sm">Detail Dokumen</span>
+				<span class="text-sm">Detail Integrasi</span>
 			</div>
 
 			{#if totalFilteredRows === 0}
@@ -1006,15 +967,15 @@
 				<ul>
 					{#each paginatedRows as row, index}
 						<li
-							class="border-t border-(--line) first:border-t-0"
+							class="border-t border-[var(--line)] first:border-t-0"
 						>
 							<button
 								type="button"
 								class="grid w-full grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-3 px-3 py-3.5 text-left"
 								onclick={() =>
-									toggleRowExpanded(row.registrationNo)}
+									toggleRowExpanded(row.no)}
 								aria-expanded={isRowExpanded(
-									row.registrationNo,
+									row.no,
 								)}
 							>
 								<p
@@ -1031,12 +992,12 @@
 												<p
 													class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]"
 												>
-													{row.agency}
+													{row.instansi}
 												</p>
 												<p
 													class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
 												>
-													{row.registrationNo}
+													{row.no}
 												</p>
 												<div
 													class="mt-2 flex flex-wrap items-center gap-1.5"
@@ -1044,17 +1005,17 @@
 												<span
 													class="text-[0.75rem] leading-tight text-(--muted)"
 												>
-													{row.documentType}
+													{row.jenis}
 												</span>
 												<span
-													class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.progressStatus)}`}
+													class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.status)}`}
 												>
-													{row.progressStatus}
+													{row.status}
 												</span>
 											</div>
 										</div>
 										<span
-											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-(--line) bg-transparent text-(--muted) transition-transform ${isRowExpanded(row.registrationNo) ? "rotate-180" : ""}`}
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-(--muted) transition-transform ${isRowExpanded(row.no) ? "rotate-180" : ""}`}
 											aria-hidden="true"
 										>
 											<ChevronDown
@@ -1066,23 +1027,11 @@
 								</div>
 							</button>
 
-							{#if isRowExpanded(row.registrationNo)}
+							{#if isRowExpanded(row.no)}
 								<div
-									class="border-t border-(--line) bg-transparent px-4 py-4"
+									class="border-t border-[var(--line)] bg-transparent px-4 py-4"
 								>
 									<dl class="space-y-4">
-										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
-												Tanggal Masuk
-											</dt>
-											<dd
-												class="mt-1 text-sm text-[#20232A]"
-											>
-												{formatDate(row.receivedDate)}
-											</dd>
-										</div>
 										<div>
 											<dt
 												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
@@ -1092,7 +1041,7 @@
 											<dd
 												class="mt-1 text-sm leading-relaxed text-[#20232A]"
 											>
-												{row.activity}
+												{row.kegiatan}
 											</dd>
 										</div>
 										<div>
@@ -1104,7 +1053,7 @@
 											<dd
 												class="mt-1 text-sm text-[#20232A]"
 											>
-												{row.position}
+												{row.posisi}
 											</dd>
 										</div>
 										<div>
@@ -1117,8 +1066,20 @@
 												class="mt-1 text-sm text-[#20232A]"
 											>
 												{formatDate(
-													row.progressUpdatedDate,
+													row.tanggalUpdate,
 												)}
+											</dd>
+										</div>
+										<div>
+											<dt
+												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
+											>
+												Keterangan
+											</dt>
+											<dd
+												class="mt-1 text-sm leading-relaxed text-[#20232A]"
+											>
+												{formatKeterangan(row.keterangan)}
 											</dd>
 										</div>
 									</dl>
@@ -1133,7 +1094,7 @@
 		{#if totalFilteredRows > 0}
 			<div class="mt-6 pt-2">
 				<nav
-					aria-label="Navigasi halaman antrian persetujuan teknis"
+					aria-label="Navigasi halaman monitoring integrasi"
 					class="mx-auto flex flex-wrap items-center justify-center gap-1.5"
 				>
 					<button
@@ -1184,3 +1145,4 @@
 		{/if}
 	</div>
 </section>
+
