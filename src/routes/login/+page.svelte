@@ -26,31 +26,25 @@ type LoginFormState = {
 	/>
 	<link
 		rel="preload"
-		href="/login/forest.jpg"
+		href="/home/background-photo.jpg"
 		as="image"
 		type="image/jpeg"
-		media="(max-width: 640px)"
 		fetchpriority="high"
 	/>
 </svelte:head>
 
 <section class="login-scene relative isolate overflow-hidden">
 	<div class="login-media absolute inset-0 z-0" aria-hidden="true">
-		<video
-			class="login-media-video"
-			autoplay
-			muted
-			loop
-			playsinline
-			preload="none"
-		>
-			<source
-				src="/home/video-hero.webm?v=20260418"
-				type="video/webm"
-				media="(min-width: 641px)"
-			/>
-			<source src="/home/video-hero.mp4?v=20260418" type="video/mp4" media="(min-width: 641px)" />
-		</video>
+		<img
+			class="login-media-image"
+			src="/home/background-photo.jpg"
+			alt=""
+			width="2560"
+			height="1707"
+			loading="eager"
+			decoding="async"
+			fetchpriority="high"
+		/>
 	</div>
 	<div class="absolute inset-0 z-10 bg-slate-950/30" aria-hidden="true"></div>
 	<div
@@ -200,23 +194,10 @@ type LoginFormState = {
 		pointer-events: none;
 	}
 
-	.login-media-video {
+	.login-media-image {
 		height: 100%;
 		width: 100%;
 		object-fit: cover;
-	}
-
-	@media (max-width: 640px) {
-		.login-media {
-			background-image: url('/login/forest.jpg');
-			background-position: center;
-			background-repeat: no-repeat;
-			background-size: cover;
-		}
-
-		.login-media-video {
-			display: none;
-		}
 	}
 
 	@supports (height: 100dvh) {
