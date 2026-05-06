@@ -12,6 +12,7 @@ export const createSupabaseServerClient = (event: RequestEvent) =>
 	if (!config) return null
 
 	return createServerClient<Database>(config.url, config.key, {
+		global: { fetch: event.fetch },
 		cookies: {
 			getAll: () => event.cookies.getAll(),
 			setAll: (cookiesToSet) => {

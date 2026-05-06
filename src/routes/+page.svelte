@@ -36,7 +36,7 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const statItems: StatItem[] = [
+	const statItems = $derived.by<StatItem[]>(() => [
 		{
 			key: "total",
 			label: "Total Pengajuan",
@@ -70,7 +70,7 @@
 			description:
 				"Persentase tingkat kepuasan pemrakarsa berdasarkan survei layanan SIKOPLING.",
 		},
-	];
+	]);
 	const homeFaqItems: HomeFaqItem[] = [
 		{
 			id: "faq-layanan",
@@ -107,12 +107,12 @@
 
 	const pickStatItem = (key: string) =>
 		statItems.find((item) => item.key === key);
-	const leftLeafStats = statLeafLayout.left
+	const leftLeafStats = $derived(statLeafLayout.left
 		.map((key) => pickStatItem(key))
-		.filter((item): item is StatItem => Boolean(item));
-	const rightLeafStats = statLeafLayout.right
+		.filter((item): item is StatItem => Boolean(item)));
+	const rightLeafStats = $derived(statLeafLayout.right
 		.map((key) => pickStatItem(key))
-		.filter((item): item is StatItem => Boolean(item));
+		.filter((item): item is StatItem => Boolean(item)));
 
 	const serviceSteps: StepItem[] = [
 		{
@@ -172,9 +172,12 @@
 	let statSection: HTMLElement | null = $state(null);
 	let isHeroScrollIndicatorVisible = $state(true);
 	let isCounterStarted = $state(false);
-	let statValues = $state<Record<string, number>>(
-		Object.fromEntries(statItems.map((item) => [item.key, 0])),
-	);
+	let statValues = $state<Record<string, number>>({
+		total: 0,
+		selesai: 0,
+		waktu: 0,
+		kepuasan: 0,
+	});
 
 	let animationFrameId = 0;
 

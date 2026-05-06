@@ -584,62 +584,6 @@
 
 		return dedupeSearchDocuments(documents);
 	};
-	const crawlSearchableRoutes = async () => {
-		const routeMap = new Map<string, SearchRoute>();
-		const routeQueue: SearchRouteQueueItem[] = [];
-		const fetchedHtmlByPath = new Map<string, string>();
-
-		for (const seedRoute of searchableRouteSeeds) {
-			const normalizedPath = normalizeSearchPathname(seedRoute.path);
-			if (!isSearchPathAllowed(normalizedPath)) continue;
-			if (routeMap.has(normalizedPath)) continue;
-			const route = buildSearchRoute(normalizedPath);
-			routeMap.set(normalizedPath, {
-				...route,
-				title: seedRoute.title,
-				category: seedRoute.category,
-				priority: seedRoute.priority
-			});
-			routeQueue.push({
-				...routeMap.get(normalizedPath)!,
-				depth: 0
-			});
-		}
-
-		for (let queueIndex = 0; queueIndex < routeQueue.length; queueIndex += 1) {
-			if (routeMap.size >= SEARCH_INDEX_MAX_ROUTES) break;
-			const currentRoute = routeQueue[queueIndex];
-			if (currentRoute.depth > SEARCH_INDEX_CRAWL_MAX_DEPTH) continue;
-			if (fetchedHtmlByPath.has(currentRoute.path)) continue;
-
-			try {
-				const response = await fetch(currentRoute.path);
-				if (!response.ok) continue;
-				const html = await response.text();
-				fetchedHtmlByPath.set(currentRoute.path, html);
-				if (currentRoute.depth >= SEARCH_INDEX_CRAWL_MAX_DEPTH) continue;
-
-				const discoveredPaths = collectSearchablePathsFromHtml(html, currentRoute.path);
-				for (const discoveredPath of discoveredPaths) {
-					if (routeMap.size >= SEARCH_INDEX_MAX_ROUTES) break;
-					if (routeMap.has(discoveredPath)) continue;
-					const discoveredRoute = buildSearchRoute(discoveredPath);
-					routeMap.set(discoveredPath, discoveredRoute);
-					routeQueue.push({
-						...discoveredRoute,
-						depth: currentRoute.depth + 1
-					});
-				}
-			} catch {
-				// Abaikan route yang gagal di-fetch agar indeks tetap bisa dibangun dari route lainnya.
-			}
-		}
-
-		return {
-			routes: [...routeMap.values()],
-			fetchedHtmlByPath
-		};
-	};
 	const computeSearchScore = (document: SearchDocument, normalizedQuery: string) => {
 		if (!normalizedQuery) return 0;
 		let score = 0;
@@ -666,13 +610,12 @@
 		isSearchIndexing = true;
 
 		try {
-			const { routes, fetchedHtmlByPath } = await crawlSearchableRoutes();
-			const dynamicDocuments: SearchDocument[] = [];
-			for (const route of routes) {
-				const html = fetchedHtmlByPath.get(route.path);
-				if (!html) continue;
-				dynamicDocuments.push(...extractSearchDocumentsFromHtml(route, html));
-			}
+			const currentPath = normalizeSearchPathname(window.location.pathname);
+			const currentRoute = buildSearchRoute(currentPath);
+			const dynamicDocuments = extractSearchDocumentsFromHtml(
+				currentRoute,
+				document.documentElement.outerHTML
+			);
 
 			const nextDocuments = dedupeSearchDocuments([
 				...fallbackSearchDocuments,

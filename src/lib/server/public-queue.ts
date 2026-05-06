@@ -21,14 +21,17 @@ type PublicSummaryMetrics = {
 	selesai: number
 }
 
-const resolveServiceClient = () => {
+type ServerFetch = typeof fetch
+
+const resolveServiceClient = (serverFetch: ServerFetch) => {
 	if (!publicEnv.PUBLIC_SUPABASE_URL || !privateEnv.SUPABASE_SERVICE_ROLE_KEY) return null
 	const normalizedUrl = publicEnv.PUBLIC_SUPABASE_URL.trim()
 		.replace(/\/+$/, '')
 		.replace(/\/rest\/v1$/i, '')
 
 	return createClient<Database>(normalizedUrl, privateEnv.SUPABASE_SERVICE_ROLE_KEY, {
-		auth: { persistSession: false }
+		auth: { persistSession: false },
+		global: { fetch: serverFetch }
 	})
 }
 
@@ -111,8 +114,8 @@ const mapPertekStatus = (status: string): string => {
 	}
 }
 
-export const getPublicQueueRows = async (layanan: LayananType): Promise<PublicQueueRow[]> => {
-	const supabase = resolveServiceClient()
+export const getPublicQueueRows = async (layanan: LayananType, serverFetch: ServerFetch): Promise<PublicQueueRow[]> => {
+	const supabase = resolveServiceClient(serverFetch)
 	if (!supabase) return []
 
 	const { data, error } = await supabase
@@ -139,8 +142,8 @@ export const getPublicQueueRows = async (layanan: LayananType): Promise<PublicQu
 	}))
 }
 
-export const getPublicSummaryMetrics = async (): Promise<PublicSummaryMetrics> => {
-	const supabase = resolveServiceClient()
+export const getPublicSummaryMetrics = async (serverFetch: ServerFetch): Promise<PublicSummaryMetrics> => {
+	const supabase = resolveServiceClient(serverFetch)
 	if (!supabase) {
 		return { total: 0, selesai: 0 }
 	}
