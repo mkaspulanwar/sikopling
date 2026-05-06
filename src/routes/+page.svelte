@@ -394,39 +394,10 @@
 	/>
 	<link
 		rel="preload"
-		href="/layout/daun-kiri.svg"
-		as="image"
-		type="image/svg+xml"
-	/>
-	<link
-		rel="preload"
-		href="/layout/daun-kanan.svg"
-		as="image"
-		type="image/svg+xml"
-	/>
-	<link
-		rel="preload"
-		href="/layout/line-number.svg"
-		as="image"
-		type="image/svg+xml"
-	/>
-	<link
-		rel="preload"
-		href="/layout/daun-line.svg"
-		as="image"
-		type="image/svg+xml"
-	/>
-	<link
-		rel="preload"
-		href="/layout/tree.lottie"
-		as="fetch"
-		type="application/octet-stream"
-	/>
-	<link
-		rel="preload"
-		href="/home/background-hero.jpg"
+		href="/home/background-photo.jpg"
 		as="image"
 		type="image/jpeg"
+		fetchpriority="high"
 	/>
 </svelte:head>
 
@@ -438,8 +409,10 @@
 	<div class="hero-media absolute inset-0" aria-hidden="true">
 		<img
 			class="hero-media-image"
-			src="/home/background-hero.jpg"
+			src="/home/background-photo.jpg"
 			alt=""
+			width="2560"
+			height="1707"
 			loading="eager"
 			decoding="async"
 			fetchpriority="high"
@@ -1057,23 +1030,6 @@
 
 		.demo-loop-video {
 			transform: translateZ(0) scale(1.065);
-		}
-	}
-
-	@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-		.hero-parallax {
-			clip-path: inset(0);
-		}
-
-		.hero-parallax .hero-media {
-			position: fixed;
-			inset: 0;
-		}
-
-		.hero-parallax .hero-parallax-copy {
-			position: fixed;
-			inset: 0;
-			pointer-events: none;
 		}
 	}
 
