@@ -55,12 +55,16 @@
 
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Antrian Dokumen Lingkungan',
+			title: 'Monitoring Persetujuan Lingkungan',
 			href: '/layanan/dokling'
 		},
 		{
-			title: 'Antrian Persetujuan Teknis',
+			title: 'Monitoring Persetujuan Teknis',
 			href: '/layanan/pertek'
+		},
+		{
+			title: 'Monitoring Integrasi',
+			href: '/#layanan-dashboard'
 		}
 	];
 	const tentangItems: TentangItem[] = [
@@ -88,13 +92,13 @@
 		{ path: '/', title: 'Beranda', category: 'Halaman', priority: 96 },
 		{
 			path: '/layanan/dokling',
-			title: 'Antrian Dokumen Lingkungan',
+			title: 'Monitoring Persetujuan Lingkungan',
 			category: 'Layanan',
 			priority: 99
 		},
 		{
 			path: '/layanan/pertek',
-			title: 'Antrian Persetujuan Teknis',
+			title: 'Monitoring Persetujuan Teknis',
 			category: 'Layanan',
 			priority: 97
 		},
@@ -118,7 +122,7 @@
 			priority: 96
 		}),
 		buildSearchDocument({
-			title: 'Antrian Dokumen Lingkungan',
+			title: 'Monitoring Persetujuan Lingkungan',
 			description: 'Layanan pemantauan progres pengajuan dokumen lingkungan.',
 			href: '/layanan/dokling',
 			category: 'Layanan',
@@ -128,7 +132,7 @@
 			priority: 99
 		}),
 		buildSearchDocument({
-			title: 'Antrian Persetujuan Teknis',
+			title: 'Monitoring Persetujuan Teknis',
 			description: 'Layanan pencarian antrian persetujuan teknis lingkungan.',
 			href: '/layanan/pertek',
 			category: 'Layanan',

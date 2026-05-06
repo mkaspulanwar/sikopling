@@ -192,9 +192,9 @@
 			case '/':
 				return 'Sikopling Kalsel';
 			case '/layanan/dokling':
-				return 'Antrian Dokumen Lingkungan';
+				return 'Monitoring Persetujuan Lingkungan';
 			case '/layanan/pertek':
-				return 'Antrian Persetujuan Teknis';
+				return 'Monitoring Persetujuan Teknis';
 			case '/profil':
 				return 'Profil Sikopling';
 			case '/tentang':
