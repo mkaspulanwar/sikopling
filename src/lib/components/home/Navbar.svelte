@@ -19,6 +19,9 @@
 		title: string;
 		href?: string;
 	};
+	type PengumumanItem = {
+		title: string;
+	};
 	type TentangItem = {
 		title: string;
 		href: string;
@@ -66,6 +69,11 @@
 			title: 'Monitoring Integrasi',
 			href: '/#layanan-dashboard'
 		}
+	];
+	const pengumumanItems: PengumumanItem[] = [
+		{ title: 'Penerbitan Persetujuan Lingkungan' },
+		{ title: 'Penerbitan Persetujuan Teknis' },
+		{ title: 'Penerbitan Integrasi' }
 	];
 	const tentangItems: TentangItem[] = [
 		{
@@ -188,11 +196,13 @@
 	];
 
 	let isLayananOpen = $state(false);
+	let isPengumumanOpen = $state(false);
 	let isTentangOpen = $state(false);
 	let isMobileOpen = $state(false);
 	let isMobileMenuAnimating = $state(false);
 	let mobileMenuMotionState = $state<'idle' | 'opening' | 'closing'>('idle');
 	let isMobileLayananOpen = $state(false);
+	let isMobilePengumumanOpen = $state(false);
 	let isMobileTentangOpen = $state(false);
 	let isSearchOpen = $state(false);
 	let searchQuery = $state('');
@@ -205,8 +215,10 @@
 	let lastScrollY = $state(typeof window !== 'undefined' ? window.scrollY : 0);
 	let currentHash = $state('');
 	let layananDropdown = $state<HTMLDivElement | null>(null);
+	let pengumumanDropdown = $state<HTMLDivElement | null>(null);
 	let tentangDropdown = $state<HTMLDivElement | null>(null);
 	let layananCloseTimer: ReturnType<typeof setTimeout> | null = null;
+	let pengumumanCloseTimer: ReturnType<typeof setTimeout> | null = null;
 	let tentangCloseTimer: ReturnType<typeof setTimeout> | null = null;
 	const desktopNavBreakpoint = 1024;
 
@@ -641,6 +653,8 @@
 		isSearchOpen = true;
 		isMobileOpen = false;
 		isLayananOpen = false;
+		isPengumumanOpen = false;
+		isTentangOpen = false;
 		if (!shouldAutoFocusSearch()) return;
 		await tick();
 		searchInput?.focus();
@@ -697,6 +711,11 @@
 		clearTimeout(layananCloseTimer);
 		layananCloseTimer = null;
 	};
+	const clearPengumumanCloseTimer = () => {
+		if (!pengumumanCloseTimer) return;
+		clearTimeout(pengumumanCloseTimer);
+		pengumumanCloseTimer = null;
+	};
 	const clearTentangCloseTimer = () => {
 		if (!tentangCloseTimer) return;
 		clearTimeout(tentangCloseTimer);
@@ -705,6 +724,7 @@
 
 	const openLayananMenu = () => {
 		clearLayananCloseTimer();
+		closePengumumanMenu();
 		closeTentangMenu();
 		isLayananOpen = true;
 	};
@@ -721,9 +741,27 @@
 			layananCloseTimer = null;
 		}, 140);
 	};
+	const openPengumumanMenu = () => {
+		clearPengumumanCloseTimer();
+		closeLayananMenu();
+		closeTentangMenu();
+		isPengumumanOpen = true;
+	};
+	const closePengumumanMenu = () => {
+		clearPengumumanCloseTimer();
+		isPengumumanOpen = false;
+	};
+	const scheduleClosePengumumanMenu = () => {
+		clearPengumumanCloseTimer();
+		pengumumanCloseTimer = setTimeout(() => {
+			isPengumumanOpen = false;
+			pengumumanCloseTimer = null;
+		}, 140);
+	};
 	const openTentangMenu = () => {
 		clearTentangCloseTimer();
 		closeLayananMenu();
+		closePengumumanMenu();
 		isTentangOpen = true;
 	};
 	const closeTentangMenu = () => {
@@ -740,8 +778,10 @@
 
 	const closeMenus = () => {
 		closeLayananMenu();
+		closePengumumanMenu();
 		closeTentangMenu();
 		isMobileLayananOpen = false;
+		isMobilePengumumanOpen = false;
 		isMobileTentangOpen = false;
 		isMobileOpen = false;
 	};
@@ -752,6 +792,7 @@
 		}
 		isMobileOpen = !isMobileOpen;
 		isLayananOpen = false;
+		isPengumumanOpen = false;
 		isTentangOpen = false;
 	};
 
@@ -775,6 +816,7 @@
 		mobileMenuMotionState = 'idle';
 		if (!isMobileOpen) {
 			isMobileLayananOpen = false;
+			isMobilePengumumanOpen = false;
 			isMobileTentangOpen = false;
 		}
 	};
@@ -783,6 +825,9 @@
 		const target = event.target as Node | null;
 		if (layananDropdown && target && !layananDropdown.contains(target)) {
 			closeLayananMenu();
+		}
+		if (pengumumanDropdown && target && !pengumumanDropdown.contains(target)) {
+			closePengumumanMenu();
 		}
 		if (tentangDropdown && target && !tentangDropdown.contains(target)) {
 			closeTentangMenu();
@@ -795,6 +840,13 @@
 			return;
 		}
 		closeLayananMenu();
+	};
+	const handlePengumumanFocusOut = (event: FocusEvent) => {
+		const nextFocusTarget = event.relatedTarget as Node | null;
+		if (pengumumanDropdown && nextFocusTarget && pengumumanDropdown.contains(nextFocusTarget)) {
+			return;
+		}
+		closePengumumanMenu();
 	};
 	const handleTentangFocusOut = (event: FocusEvent) => {
 		const nextFocusTarget = event.relatedTarget as Node | null;
@@ -839,6 +891,7 @@
 			isMobileMenuAnimating = false;
 			mobileMenuMotionState = 'idle';
 			isMobileLayananOpen = false;
+			isMobilePengumumanOpen = false;
 			isMobileTentangOpen = false;
 		}
 	};
@@ -885,6 +938,7 @@
 			window.removeEventListener('resize', updateViewportState);
 			cancelAnimationFrame(frameId);
 			clearLayananCloseTimer();
+			clearPengumumanCloseTimer();
 			clearTentangCloseTimer();
 		};
 	});
@@ -935,6 +989,12 @@
 			closeMenus();
 		}
 	};
+	const handlePengumumanItemClick = () => {
+		closePengumumanMenu();
+		if (isMobileOpen) {
+			closeMenus();
+		}
+	};
 	const handleTentangItemClick = () => {
 		closeTentangMenu();
 		if (isMobileOpen) {
@@ -957,8 +1017,10 @@
 		isMobileMenuActive() ||
 		isSearchOpen ||
 		isLayananOpen ||
+		isPengumumanOpen ||
 		isTentangOpen ||
 		isMobileLayananOpen ||
+		isMobilePengumumanOpen ||
 		isMobileTentangOpen;
 
 	const navClass = () =>
@@ -1046,7 +1108,7 @@
 			</a>
 
 			{#if showNavMenus}
-				<ul class="hidden items-center gap-9 lg:flex lg:justify-self-center">
+				<ul class="hidden items-center gap-7 lg:flex lg:justify-self-center xl:gap-9">
 					<li>
 						<a
 							href={navHref('beranda')}
@@ -1104,6 +1166,52 @@
 													{item.title}
 												</button>
 											{/if}
+										{/each}
+									</div>
+								</div>
+							{/if}
+						</div>
+					</li>
+
+					<li>
+						<div
+							class="relative"
+							role="presentation"
+							bind:this={pengumumanDropdown}
+							onmouseenter={openPengumumanMenu}
+							onmouseleave={scheduleClosePengumumanMenu}
+							onfocusin={openPengumumanMenu}
+							onfocusout={handlePengumumanFocusOut}
+						>
+							<button
+								type="button"
+								class={`${desktopLinkClass(false)} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								aria-expanded={isPengumumanOpen}
+								aria-haspopup="true"
+								onclick={() =>
+									isPengumumanOpen ? closePengumumanMenu() : openPengumumanMenu()}
+							>
+								<span>Pengumuman</span>
+								<ChevronDown
+									class={`h-4 w-4 transition-transform duration-200 ${isPengumumanOpen ? 'rotate-180' : ''}`}
+									strokeWidth={2.2}
+									aria-hidden="true"
+								/>
+							</button>
+
+							{#if isPengumumanOpen}
+								<div
+									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,20.5rem)] -translate-x-1/2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+								>
+									<div class="space-y-1">
+										{#each pengumumanItems as item}
+											<div
+												role="menuitem"
+												aria-disabled="true"
+												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)]"
+											>
+												{item.title}
+											</div>
 										{/each}
 									</div>
 								</div>
@@ -1227,7 +1335,10 @@
 					aria-expanded={isMobileLayananOpen}
 					onclick={() => {
 						isMobileLayananOpen = !isMobileLayananOpen;
-						if (isMobileLayananOpen) isMobileTentangOpen = false;
+						if (isMobileLayananOpen) {
+							isMobilePengumumanOpen = false;
+							isMobileTentangOpen = false;
+						}
 					}}
 				>
 					<span class="font-semibold">Layanan</span>
@@ -1266,10 +1377,57 @@
 				<button
 					type="button"
 					class={mobileLayananClass()}
+					aria-expanded={isMobilePengumumanOpen}
+					onclick={() => {
+						isMobilePengumumanOpen = !isMobilePengumumanOpen;
+						if (isMobilePengumumanOpen) {
+							isMobileLayananOpen = false;
+							isMobileTentangOpen = false;
+						}
+					}}
+				>
+					<span class="font-semibold">Pengumuman</span>
+					<ChevronDown
+						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobilePengumumanOpen ? 'rotate-180' : ''}`}
+						strokeWidth={2.2}
+						aria-hidden="true"
+					/>
+				</button>
+
+				{#if isMobilePengumumanOpen}
+					<div
+						class="ml-3 w-[calc(100%-0.75rem)] space-y-1 border-l border-[#dbe3ec] py-1 pl-3"
+						transition:slide={{ duration: 280, easing: cubicInOut }}
+					>
+						{#each pengumumanItems as item}
+							<div
+								class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155]"
+								onclick={handlePengumumanItemClick}
+								onkeydown={(event) => {
+									if (event.key === 'Enter' || event.key === ' ') {
+										event.preventDefault();
+										handlePengumumanItemClick();
+									}
+								}}
+								role="button"
+								tabindex="0"
+							>
+								<span>{item.title}</span>
+							</div>
+						{/each}
+					</div>
+				{/if}
+
+				<button
+					type="button"
+					class={mobileLayananClass()}
 					aria-expanded={isMobileTentangOpen}
 					onclick={() => {
 						isMobileTentangOpen = !isMobileTentangOpen;
-						if (isMobileTentangOpen) isMobileLayananOpen = false;
+						if (isMobileTentangOpen) {
+							isMobileLayananOpen = false;
+							isMobilePengumumanOpen = false;
+						}
 					}}
 				>
 					<span class="font-semibold">Tentang</span>
