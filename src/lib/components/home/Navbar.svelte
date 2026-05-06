@@ -87,6 +87,10 @@
 		{
 			title: 'Ketentuan Layanan',
 			href: '/ketentuan-layanan'
+		},
+		{
+			title: 'Kontak',
+			href: '/kontak'
 		}
 	];
 
@@ -1263,15 +1267,6 @@
 							{/if}
 						</div>
 					</li>
-					<li>
-						<a
-							href="/kontak"
-							class={desktopLinkClass(isPathActive('/kontak'))}
-							aria-current={isPathActive('/kontak') ? 'page' : undefined}
-						>
-							Kontak
-						</a>
-					</li>
 				</ul>
 			{/if}
 
@@ -1451,11 +1446,6 @@
 						{/each}
 					</div>
 				{/if}
-				<a href="/kontak" class={mobileLinkClass()} onclick={closeMenus}>
-					<span>Kontak</span>
-					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
-				</a>
-
 				<a
 					href="/login"
 					class="nav-menu-font mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#64AD31] px-5 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
