@@ -877,7 +877,7 @@
 							<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">{(data.result.page - 1) * data.result.pageSize + index + 1}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.instansi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</td>
-							<td class="px-4 py-4 text-sm font-semibold text-[#20232A]">{row.jenis_integrasi ?? '-'}</td>
+							<td class="px-4 py-4 text-sm text-[#20232A]">{row.jenis_integrasi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.posisi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm">
 								<span class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.status)}`}>
