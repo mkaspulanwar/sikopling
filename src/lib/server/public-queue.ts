@@ -1,6 +1,7 @@
 import { env as privateEnv } from '$env/dynamic/private'
 import { env as publicEnv } from '$env/dynamic/public'
 import { createClient } from '@supabase/supabase-js'
+import { INTEGRASI_STATUS_VALUES, type IntegrasiStatus } from '$lib/supabase/constants'
 import type { Database } from '$lib/supabase/database.types'
 
 type LayananType = 'perling' | 'pertek'
@@ -22,7 +23,7 @@ export type PublicIntegrationRow = {
 	instansi: string
 	kegiatan: string
 	jenis: string
-	status: 'Uji admin' | 'Submit' | 'Ditolak' | 'SK/Rekomendasi'
+	status: IntegrasiStatus
 	posisi: string
 	tanggalUpdate: string
 	keterangan: string
@@ -165,7 +166,7 @@ export const getPublicIntegrationRows = async (serverFetch: ServerFetch): Promis
 
 	const { data, error } = await supabase
 		.from('monitoring_integrasi')
-		.select('no_registrasi, instansi, kegiatan, jenis_dokumen, status, posisi, tanggal_update, keterangan')
+		.select('instansi, kegiatan, jenis_integrasi, status, posisi, tanggal_update, keterangan')
 		.order('tanggal_update', { ascending: false, nullsFirst: false })
 		.limit(300)
 
@@ -174,20 +175,13 @@ export const getPublicIntegrationRows = async (serverFetch: ServerFetch): Promis
 		return []
 	}
 
-	const allowedStatuses: PublicIntegrationRow['status'][] = [
-		'Uji admin',
-		'Submit',
-		'Ditolak',
-		'SK/Rekomendasi'
-	]
-
 	return (data ?? []).map((row, index) => ({
-		no: row.no_registrasi ?? String(index + 1),
+		no: String(index + 1),
 		instansi: row.instansi ?? '-',
 		kegiatan: row.kegiatan ?? '-',
-		jenis: row.jenis_dokumen ?? '-',
-		status: allowedStatuses.includes(row.status as PublicIntegrationRow['status'])
-			? (row.status as PublicIntegrationRow['status'])
+		jenis: row.jenis_integrasi ?? '-',
+		status: INTEGRASI_STATUS_VALUES.includes(row.status as IntegrasiStatus)
+			? (row.status as IntegrasiStatus)
 			: 'Submit',
 		posisi: row.posisi ?? '-',
 		tanggalUpdate: row.tanggal_update ?? new Date().toISOString().slice(0, 10),

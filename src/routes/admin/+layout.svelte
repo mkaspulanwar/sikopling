@@ -10,6 +10,7 @@
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right'
 	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet'
 	import FileText from 'lucide-svelte/icons/file-text'
+	import GitBranch from 'lucide-svelte/icons/git-branch'
 	import LayoutDashboard from 'lucide-svelte/icons/layout-dashboard'
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
 	import PanelLeftOpen from 'lucide-svelte/icons/panel-left-open'
@@ -23,6 +24,7 @@
 		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
 		{ label: 'Monitoring Perling', href: '/admin/perling', icon: FileSpreadsheet },
 		{ label: 'Monitoring Pertek', href: '/admin/pertek', icon: FileText },
+		{ label: 'Monitoring Integrasi', href: '/admin/integrasi', icon: GitBranch },
 		{ label: 'Profil Admin', href: '/admin/profil', icon: UserRound }
 	]
 

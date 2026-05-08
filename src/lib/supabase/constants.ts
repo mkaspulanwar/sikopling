@@ -16,6 +16,17 @@ export const STATUS_VALUES = [
 	'Penilaian KA'
 ] as const
 
+export const INTEGRASI_STATUS_VALUES = [
+	'Submit',
+	'Uji Admin',
+	'Uji Substansi',
+	'Drafting SK/Rekom',
+	'SK/Rekom Terbit',
+	'Ditolak',
+	'Lainnya'
+] as const
+
 export type Layanan = (typeof LAYANAN_VALUES)[number]
 export type StatusPengajuan = (typeof STATUS_VALUES)[number]
+export type IntegrasiStatus = (typeof INTEGRASI_STATUS_VALUES)[number]
 

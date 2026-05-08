@@ -1,19 +1,8 @@
-import { STATUS_VALUES } from '$lib/supabase/constants'
+import { INTEGRASI_STATUS_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
 import { isLayanan, requireAdminSupabase } from '$lib/server/admin-route'
 import { createAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
-
-const INTEGRATION_STATUSES = [
-	'Submit',
-	'Uji admin',
-	'Ditolak',
-	'SK/Rekomendasi',
-	'Evaluasi Dokumen',
-	'Verifikasi Integrasi',
-	'Dikembalikan',
-	'Selesai'
-] as const
 
 const normalizeHeader = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 const isIsoDate = (value: string | undefined) => Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value))
@@ -92,7 +81,11 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		}
 	}
 
-	if (!columnMap.has('noregistrasi')) {
+	if (params.layanan === 'integrasi' && !columnMap.has('jenisintegrasi')) {
+		return json({ message: 'Kolom jenis_integrasi wajib ada pada CSV integrasi' }, { status: 400 })
+	}
+
+	if (params.layanan !== 'integrasi' && !columnMap.has('noregistrasi')) {
 		return json({ message: 'Kolom no_registrasi wajib ada pada CSV' }, { status: 400 })
 	}
 
@@ -104,30 +97,22 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		for (const [lineIndex, line] of lines.slice(1).entries()) {
 			const row = parseCsvLine(line, delimiter)
 
-			const noRegistrasi = readCell(row, columnMap, 'noregistrasi')
-			const tanggalMasukRaw = readCell(row, columnMap, 'tanggalmasuk')
 			const instansi = readCell(row, columnMap, 'instansi')
 			const kegiatan = readCell(row, columnMap, 'kegiatan')
-			const jenisDokumen = readCell(row, columnMap, 'jenisdokumen')
+			const jenisIntegrasi = readCell(row, columnMap, 'jenisintegrasi')
 			const posisi = readCell(row, columnMap, 'posisi')
 			const statusRaw = readCell(row, columnMap, 'status')
-			const status = INTEGRATION_STATUSES.includes(
-				statusRaw as (typeof INTEGRATION_STATUSES)[number]
+			const status = INTEGRASI_STATUS_VALUES.includes(
+				statusRaw as (typeof INTEGRASI_STATUS_VALUES)[number]
 			)
-				? (statusRaw as (typeof INTEGRATION_STATUSES)[number])
+				? (statusRaw as (typeof INTEGRASI_STATUS_VALUES)[number])
 				: 'Submit'
 			const tanggalUpdateRaw = readCell(row, columnMap, 'tanggalupdate')
 			const keterangan = readCell(row, columnMap, 'keterangan')
 
-			if (!noRegistrasi) {
+			if (!jenisIntegrasi) {
 				failed += 1
-				errors.push(`Baris ${lineIndex + 2}: no_registrasi kosong`)
-				continue
-			}
-
-			if (tanggalMasukRaw && !isIsoDate(tanggalMasukRaw)) {
-				failed += 1
-				errors.push(`Baris ${lineIndex + 2}: tanggal_masuk harus format YYYY-MM-DD`)
+				errors.push(`Baris ${lineIndex + 2}: jenis_integrasi kosong`)
 				continue
 			}
 
@@ -139,11 +124,9 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 
 			try {
 				const { error } = await auth.supabase.from('monitoring_integrasi').insert({
-					no_registrasi: noRegistrasi,
-					tanggal_masuk: tanggalMasukRaw || null,
 					instansi: instansi || null,
 					kegiatan: kegiatan || null,
-					jenis_dokumen: jenisDokumen || null,
+					jenis_integrasi: jenisIntegrasi || null,
 					posisi: posisi || null,
 					status,
 					tanggal_update: tanggalUpdateRaw || null,

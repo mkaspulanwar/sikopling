@@ -61,10 +61,13 @@
 	];
 	const statusOptions: Array<"Semua Status" | ProgressStatus> = [
 		"Semua Status",
-		"Uji admin",
 		"Submit",
+		"Uji Admin",
+		"Uji Substansi",
+		"Drafting SK/Rekom",
+		"SK/Rekom Terbit",
 		"Ditolak",
-		"SK/Rekomendasi",
+		"Lainnya",
 	];
 	const positionFilterOptions: Array<{
 		label: string;
@@ -86,10 +89,13 @@
 	const formatKeterangan = (value: string) => (value.trim() ? value : "-");
 
 	const statusBadgeClassMap: Record<ProgressStatus, string> = {
-		"Uji admin": "border-[#8f67b0] bg-[#ede3f7] text-[#5f3888]",
 		Submit: "border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]",
+		"Uji Admin": "border-[#8f67b0] bg-[#ede3f7] text-[#5f3888]",
+		"Uji Substansi": "border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]",
+		"Drafting SK/Rekom": "border-[#a8b8d6] bg-[#edf2ff] text-[#274472]",
+		"SK/Rekom Terbit": "border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]",
 		Ditolak: "border-[#e1a5a5] bg-[#fff0f0] text-[#8c2f2f]",
-		"SK/Rekomendasi": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
+		Lainnya: "border-[#d5d8de] bg-[#f4f5f7] text-[#4b5563]",
 	};
 	const getStatusBadgeClass = (status: ProgressStatus) =>
 		statusBadgeClassMap[status];

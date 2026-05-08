@@ -1142,8 +1142,8 @@
 				</div>
 			</div>
 			<div class="flex flex-wrap justify-end gap-2 border-t border-[#e6ebf2] px-5 py-4">
-				<button type="button" onclick={closeCreateModal} class="inline-flex h-10 items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
-				<button type="button" onclick={submitCreate} disabled={isSavingCreate || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
+				<button type="button" onclick={closeCreateModal} class="inline-flex h-10 cursor-pointer items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
+				<button type="button" onclick={submitCreate} disabled={isSavingCreate || data.unavailable} class="inline-flex h-10 cursor-pointer items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
 					{isSavingCreate ? 'Menyimpan...' : 'Simpan'}
 				</button>
 			</div>
@@ -1227,8 +1227,8 @@
 				</div>
 			</div>
 			<div class="flex flex-wrap justify-end gap-2 border-t border-[#e6ebf2] px-5 py-4">
-				<button type="button" onclick={closeEditModal} class="inline-flex h-10 items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
-				<button type="button" onclick={submitEdit} disabled={isSavingEdit || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
+				<button type="button" onclick={closeEditModal} class="inline-flex h-10 cursor-pointer items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
+				<button type="button" onclick={submitEdit} disabled={isSavingEdit || data.unavailable} class="inline-flex h-10 cursor-pointer items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold !text-white transition hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
 					{isSavingEdit ? 'Menyimpan...' : 'Simpan'}
 				</button>
 			</div>
@@ -1267,8 +1267,8 @@
 		<div class="relative w-full max-w-md rounded-2xl border border-[#f3c5c5] bg-white p-5 shadow-[0_28px_50px_-36px_rgba(15,23,42,0.7)]">
 			<h2 class="text-lg font-semibold text-slate-900">Data akan dihapus permanen</h2>
 			<div class="mt-5 flex flex-wrap justify-end gap-2">
-				<button type="button" onclick={closeDeleteModal} class="inline-flex h-10 items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
-				<button type="button" onclick={confirmDelete} disabled={isDeleting || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-rose-600 px-4 text-sm font-semibold !text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:!text-white">
+				<button type="button" onclick={closeDeleteModal} class="inline-flex h-10 cursor-pointer items-center rounded-lg border border-[#cfd7e3] bg-white px-4 text-sm font-semibold text-slate-700">Batal</button>
+				<button type="button" onclick={confirmDelete} disabled={isDeleting || data.unavailable} class="inline-flex h-10 cursor-pointer items-center rounded-lg bg-rose-600 px-4 text-sm font-semibold !text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:!text-white">
 					{isDeleting ? 'Menghapus...' : 'Hapus'}
 				</button>
 			</div>

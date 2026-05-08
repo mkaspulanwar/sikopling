@@ -21,13 +21,12 @@ type StatusValue =
 
 type IntegrasiStatusValue =
 	| 'Submit'
-	| 'Uji admin'
+	| 'Uji Admin'
+	| 'Uji Substansi'
+	| 'Drafting SK/Rekom'
+	| 'SK/Rekom Terbit'
 	| 'Ditolak'
-	| 'SK/Rekomendasi'
-	| 'Evaluasi Dokumen'
-	| 'Verifikasi Integrasi'
-	| 'Dikembalikan'
-	| 'Selesai'
+	| 'Lainnya'
 
 type WorkflowStatusValue = StatusValue | IntegrasiStatusValue
 
@@ -168,13 +167,11 @@ export type Database = {
 					created_at: string
 					id: string
 					instansi: string | null
-					jenis_dokumen: string | null
+					jenis_integrasi: string | null
 					kegiatan: string | null
 					keterangan: string | null
-					no_registrasi: string | null
 					posisi: string | null
 					status: IntegrasiStatusValue
-					tanggal_masuk: string | null
 					tanggal_update: string | null
 					updated_at: string
 				}
@@ -182,13 +179,11 @@ export type Database = {
 					created_at?: string
 					id?: string
 					instansi?: string | null
-					jenis_dokumen?: string | null
+					jenis_integrasi?: string | null
 					kegiatan?: string | null
 					keterangan?: string | null
-					no_registrasi?: string | null
 					posisi?: string | null
 					status?: IntegrasiStatusValue
-					tanggal_masuk?: string | null
 					tanggal_update?: string | null
 					updated_at?: string
 				}
@@ -196,13 +191,11 @@ export type Database = {
 					created_at?: string
 					id?: string
 					instansi?: string | null
-					jenis_dokumen?: string | null
+					jenis_integrasi?: string | null
 					kegiatan?: string | null
 					keterangan?: string | null
-					no_registrasi?: string | null
 					posisi?: string | null
 					status?: IntegrasiStatusValue
-					tanggal_masuk?: string | null
 					tanggal_update?: string | null
 					updated_at?: string
 				}

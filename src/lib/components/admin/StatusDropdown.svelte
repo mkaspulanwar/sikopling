@@ -3,16 +3,15 @@
 	import { fly } from 'svelte/transition'
 	import Check from 'lucide-svelte/icons/check'
 	import ChevronDown from 'lucide-svelte/icons/chevron-down'
-	import type { StatusPengajuan } from '$lib/supabase/constants'
 
 	type Props = {
-		value: StatusPengajuan
-		options: readonly StatusPengajuan[]
+		value: string
+		options: readonly string[]
 		disabled?: boolean
 		id?: string
 	}
 
-	let { value = $bindable<StatusPengajuan>(), options, disabled = false, id }: Props = $props()
+	let { value = $bindable<string>(), options, disabled = false, id }: Props = $props()
 
 	let isOpen = $state(false)
 	let rootElement = $state<HTMLDivElement | null>(null)
@@ -22,7 +21,7 @@
 		isOpen = !isOpen
 	}
 
-	const selectOption = (option: StatusPengajuan) => {
+	const selectOption = (option: string) => {
 		value = option
 		isOpen = false
 	}
@@ -57,7 +56,7 @@
 	<button
 		type="button"
 		{id}
-		class="h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 py-2 text-left text-sm text-slate-700 transition focus-visible:border-[#8fbd6d] focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-none disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+		class="h-11 w-full cursor-pointer rounded-xl border border-[#c9dcb8] bg-white px-3 py-2 text-left text-sm text-slate-700 transition focus-visible:border-[#8fbd6d] focus-visible:outline-none focus-visible:ring-0 focus-visible:shadow-none disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
 		aria-haspopup="listbox"
 		aria-expanded={isOpen}
 		onclick={toggleDropdown}
@@ -66,7 +65,7 @@
 		<span class="flex items-center justify-between gap-2">
 			<span class="min-w-0 truncate">{value}</span>
 			<span
-				class={`inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border text-[#4f6f3d] transition ${
+				class={`inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-lg border text-[#4f6f3d] transition ${
 					isOpen
 						? 'border-[#89b866] bg-[#e8f4db] text-[#2f6b1f]'
 						: 'border-[#c7ddb7] bg-[#f2f9ea]'
@@ -89,7 +88,7 @@
 					type="button"
 					role="option"
 					aria-selected={value === option}
-					class={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition ${
+					class={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-sm transition ${
 						value === option
 							? 'bg-[#edf7e6] text-[#2f6b1f]'
 							: 'text-slate-700 hover:bg-[#f3f9ee] hover:text-slate-900'
