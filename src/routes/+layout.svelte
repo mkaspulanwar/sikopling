@@ -191,7 +191,7 @@
 		switch (pathname) {
 			case '/':
 				return 'Sikopling Kalsel';
-			case '/layanan/dokling':
+			case '/layanan/perling':
 				return 'Monitoring Persetujuan Lingkungan';
 			case '/layanan/pertek':
 				return 'Monitoring Persetujuan Teknis';
@@ -214,8 +214,8 @@
 			case '/admin':
 			case '/admin/dashboard':
 				return 'Dashboard Admin Sikopling';
-			case '/admin/dokling':
-				return 'Admin Dokling Sikopling';
+			case '/admin/perling':
+				return 'Admin Perling Sikopling';
 			case '/admin/pertek':
 				return 'Admin Pertek Sikopling';
 			case '/admin/integrasi':

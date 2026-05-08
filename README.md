@@ -43,7 +43,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
 
 - **Universal Search** lintas halaman publik (`Ctrl/Cmd + K`) dengan highlight otomatis hasil pencarian pada konten.
 - **Landing page** modern dengan hero video, statistik animasi, showcase layanan, FAQ, dan CTA.
-- **Antrian publik** (`/layanan/dokling`, `/layanan/pertek`) dengan:
+- **Antrian publik** (`/layanan/perling`, `/layanan/pertek`) dengan:
   - pencarian,
   - filter,
   - sorting,
@@ -200,7 +200,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
 | Route | Keterangan |
 | --- | --- |
 | `/` | Landing page utama |
-| `/layanan/dokling` | Antrian dokumen lingkungan (publik) |
+| `/layanan/perling` | Antrian dokumen lingkungan (publik) |
 | `/layanan/pertek` | Antrian persetujuan teknis (publik) |
 | `/profil` | Halaman profil layanan SIKOPLING |
 | `/tentang` | Redirect 308 ke `/profil` |
@@ -216,7 +216,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
 | --- | --- |
 | `/admin` | Redirect 307 ke `/admin/dashboard` |
 | `/admin/dashboard` | Ringkasan metrik dan aktivitas login |
-| `/admin/dokling` | Operasional data antrian dokling |
+| `/admin/perling` | Operasional data antrian perling |
 | `/admin/pertek` | Operasional data antrian pertek |
 | `/admin/pengajuan` | Operasional lintas layanan + workflow |
 | `/admin/profil` | Informasi akun admin aktif |

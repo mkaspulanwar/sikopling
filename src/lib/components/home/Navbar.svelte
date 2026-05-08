@@ -1,4 +1,4 @@
-﻿<script lang="ts">
+<script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { cubicInOut } from 'svelte/easing';
@@ -59,7 +59,7 @@
 	const layananItems: LayananItem[] = [
 		{
 			title: 'Monitoring Persetujuan Lingkungan',
-			href: '/layanan/dokling'
+			href: '/layanan/perling'
 		},
 		{
 			title: 'Monitoring Persetujuan Teknis',
@@ -103,7 +103,7 @@
 	const searchableRouteSeeds: SearchRoute[] = [
 		{ path: '/', title: 'Beranda', category: 'Halaman', priority: 96 },
 		{
-			path: '/layanan/dokling',
+			path: '/layanan/perling',
 			title: 'Monitoring Persetujuan Lingkungan',
 			category: 'Layanan',
 			priority: 99
@@ -142,7 +142,7 @@
 		buildSearchDocument({
 			title: 'Monitoring Persetujuan Lingkungan',
 			description: 'Layanan pemantauan progres pengajuan dokumen lingkungan.',
-			href: '/layanan/dokling',
+			href: '/layanan/perling',
 			category: 'Layanan',
 			content:
 				'Dokumen lingkungan, status antrian, pemrakarsa, progres layanan, persetujuan lingkungan.',

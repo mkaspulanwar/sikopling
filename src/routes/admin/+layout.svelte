@@ -22,7 +22,7 @@
 
 	const navItems = [
 		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-		{ label: 'Antrian Dokling', href: '/admin/dokling', icon: FileSpreadsheet },
+		{ label: 'Antrian Perling', href: '/admin/perling', icon: FileSpreadsheet },
 		{ label: 'Antrian Pertek', href: '/admin/pertek', icon: FileText },
 		{ label: 'Monitoring Integrasi', href: '/admin/integrasi', icon: Combine },
 		{ label: 'Profil Admin', href: '/admin/profil', icon: UserRound }

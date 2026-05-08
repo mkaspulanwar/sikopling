@@ -61,7 +61,7 @@
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.total)}</p>
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
-			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Dokling</p>
+			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Perling</p>
 			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.dokling)}</p>
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
@@ -87,7 +87,7 @@
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Pengajuan Terbaru</h2>
 				<a
-					href="/admin/dokling"
+					href="/admin/perling"
 					class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--muted)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
 				>
 					Lihat antrian

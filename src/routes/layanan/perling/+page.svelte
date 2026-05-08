@@ -528,7 +528,7 @@
 							bind:this={filterToggleButton}
 							onclick={toggleFilterPanel}
 							aria-expanded={isFilterPanelOpen}
-							aria-controls="dokling-filter-panel"
+							aria-controls="perling-filter-panel"
 							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none sm:w-auto sm:px-4"
 						>
 							<ListFilterPlus class="h-4 w-4" strokeWidth={2.1} />
@@ -561,7 +561,7 @@
 
 			{#if isFilterPanelOpen}
 				<div
-					id="dokling-filter-panel"
+					id="perling-filter-panel"
 					bind:this={filterPanelElement}
 					class="rounded-lg border border-[#d7dee8] bg-[#ffffff] p-3 sm:p-4"
 				>

@@ -180,7 +180,7 @@
 	const formatNumber = (value: number) => numberFormatter.format(value)
 	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status]
 	const refreshPage = async () => {
-		await Promise.all([invalidate('admin:summary'), invalidate('admin:dokling')])
+		await Promise.all([invalidate('admin:summary'), invalidate('admin:perling')])
 	}
 
 	const buildListUrl = (params: URLSearchParams) => {
@@ -508,7 +508,7 @@
 
 		isCreateModalOpen = false
 		createForm = createInitialForm()
-		flash = { type: 'success', message: 'Data dokling berhasil ditambahkan.' }
+		flash = { type: 'success', message: 'Data perling berhasil ditambahkan.' }
 		await refreshPage()
 		isSavingCreate = false
 	}
@@ -543,7 +543,7 @@
 
 		isEditModalOpen = false
 		editRowId = null
-		flash = { type: 'success', message: 'Data dokling berhasil diperbarui.' }
+		flash = { type: 'success', message: 'Data perling berhasil diperbarui.' }
 		await refreshPage()
 		isSavingEdit = false
 	}
@@ -607,7 +607,7 @@
 
 		flash = {
 			type: 'success',
-			message: successCount > 1 ? `${successCount} data dokling berhasil dihapus.` : 'Data dokling berhasil dihapus.'
+			message: successCount > 1 ? `${successCount} data perling berhasil dihapus.` : 'Data perling berhasil dihapus.'
 		}
 		isDeleting = false
 	}

@@ -26,7 +26,7 @@ const normalizeDoklingPageSize = (value: string | null) => {
 }
 
 export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
-	depends('admin:dokling')
+	depends('admin:perling')
 
 	const baseFilters = readAdminFilters(url.searchParams)
 	const filters = {
@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	const adminData = await parent()
 
 	if (!adminData.supabaseAvailable || !locals.supabase) {
-		logAdminLoad('admin/dokling/+page.server', { state: 'unavailable' })
+		logAdminLoad('admin/perling/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	}
 
 	if (!adminData.isAdmin) {
-		logAdminLoad('admin/dokling/+page.server', { state: 'forbidden', role: adminData.role })
+		logAdminLoad('admin/perling/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
@@ -116,7 +116,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 		const ditolak = ditolakDoklingResult.count ?? 0
 		const diproses = Math.max(total - selesai - ditolak, 0)
 
-		logAdminLoad('admin/dokling/+page.server', {
+		logAdminLoad('admin/perling/+page.server', {
 			state: 'ok',
 			page: filters.page,
 			pageSize: filters.pageSize,
@@ -141,7 +141,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: false,
-			errorMessage: error instanceof Error ? error.message : 'Gagal memuat data dokling',
+			errorMessage: error instanceof Error ? error.message : 'Gagal memuat data perling',
 			filters,
 			summary: adminData.summary ?? EMPTY_SUMMARY,
 			result: createEmptyResult(filters.page, filters.pageSize),
