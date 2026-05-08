@@ -86,22 +86,19 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 			}),
 			applyPertekMetricFilters(
 				locals.supabase
-					.from('antrian_pengajuan')
+					.from('monitoring_pertek')
 					.select('id', { count: 'exact', head: true })
-					.eq('layanan', 'pertek')
 			),
 			applyPertekMetricFilters(
 				locals.supabase
-					.from('antrian_pengajuan')
+					.from('monitoring_pertek')
 					.select('id', { count: 'exact', head: true })
-					.eq('layanan', 'pertek')
 					.eq('status', 'SK Terbit')
 			),
 			applyPertekMetricFilters(
 				locals.supabase
-					.from('antrian_pengajuan')
+					.from('monitoring_pertek')
 					.select('id', { count: 'exact', head: true })
-					.eq('layanan', 'pertek')
 					.eq('status', 'Ditolak')
 			)
 		])

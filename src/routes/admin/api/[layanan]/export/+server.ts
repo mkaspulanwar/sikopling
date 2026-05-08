@@ -4,9 +4,64 @@ import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import { error } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
+const INTEGRATION_STATUSES = [
+	'Submit',
+	'Uji admin',
+	'Ditolak',
+	'SK/Rekomendasi',
+	'Evaluasi Dokumen',
+	'Verifikasi Integrasi',
+	'Dikembalikan',
+	'Selesai'
+] as const
+
 const escapeCsvValue = (value: string) => {
 	if (!value.includes(',') && !value.includes('"') && !value.includes('\n')) return value
 	return `"${value.replaceAll('"', '""')}"`
+}
+
+const toIntegrasiCsv = (
+	rows: Array<{
+		no_registrasi: string | null
+		tanggal_masuk: string | null
+		instansi: string | null
+		kegiatan: string | null
+		jenis_dokumen: string | null
+		posisi: string | null
+		status: string
+		tanggal_update: string | null
+		keterangan: string | null
+	}>
+) => {
+	const header = [
+		'no_registrasi',
+		'tanggal_masuk',
+		'instansi',
+		'kegiatan',
+		'jenis_dokumen',
+		'posisi',
+		'status',
+		'tanggal_update',
+		'keterangan'
+	]
+
+	const lines = rows.map((row) =>
+		[
+			row.no_registrasi,
+			row.tanggal_masuk ?? '',
+			row.instansi ?? '',
+			row.kegiatan ?? '',
+			row.jenis_dokumen ?? '',
+			row.posisi ?? '',
+			row.status,
+			row.tanggal_update ?? '',
+			row.keterangan ?? ''
+		]
+			.map((value) => escapeCsvValue(String(value)))
+			.join(',')
+	)
+
+	return [header.join(','), ...lines].join('\n')
 }
 
 const toCsv = (
@@ -61,16 +116,57 @@ const buildFileTimestamp = () => {
 }
 
 export const GET: RequestHandler = async ({ locals, params, url }) => {
-	if (!isLayanan(params.layanan)) {
-		throw error(404, 'Layanan tidak ditemukan')
-	}
-
 	const auth = await requireAdminSupabase(locals)
 	if (auth.state === 'unavailable') {
 		throw error(503, 'Supabase belum dikonfigurasi')
 	}
 	if (auth.state === 'unauthorized') {
 		throw error(401, 'Akses ditolak')
+	}
+
+	if (params.layanan === 'integrasi') {
+		const keyword = url.searchParams.get('keyword')?.trim() || undefined
+		const statusRaw = url.searchParams.get('status')
+		const status = INTEGRATION_STATUSES.includes(
+			statusRaw as (typeof INTEGRATION_STATUSES)[number]
+		)
+			? (statusRaw as (typeof INTEGRATION_STATUSES)[number])
+			: undefined
+
+		let query = auth.supabase
+			.from('monitoring_integrasi')
+			.select(
+				'no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, keterangan'
+			)
+			.order('tanggal_update', { ascending: false, nullsFirst: false })
+			.order('created_at', { ascending: false, nullsFirst: false })
+
+		if (status) {
+			query = query.eq('status', status)
+		}
+		if (keyword) {
+			const pattern = `%${keyword}%`
+			query = query.or(
+				`no_registrasi.ilike.${pattern},instansi.ilike.${pattern},kegiatan.ilike.${pattern},jenis_dokumen.ilike.${pattern},keterangan.ilike.${pattern}`
+			)
+		}
+
+		const { data, error: queryError } = await query
+		if (queryError) throw error(400, queryError.message)
+
+		const csvContent = toIntegrasiCsv(data ?? [])
+		const timestamp = buildFileTimestamp()
+
+		return new Response(csvContent, {
+			headers: {
+				'content-type': 'text/csv; charset=utf-8',
+				'content-disposition': `attachment; filename="${params.layanan}-export-${timestamp}.csv"`
+			}
+		})
+	}
+
+	if (!isLayanan(params.layanan)) {
+		throw error(404, 'Layanan tidak ditemukan')
 	}
 
 	const keyword = url.searchParams.get('keyword')?.trim() || undefined

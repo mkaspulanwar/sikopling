@@ -37,7 +37,7 @@
 		| null
 
 	const { data }: { data: PageData } = $props()
-	const layanan = 'dokling' as const
+	const layanan = 'perling' as const
 	const POSITION_OPTIONS = [
 		'Penyusun',
 		'Pemrakarsa',

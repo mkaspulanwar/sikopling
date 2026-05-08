@@ -83,26 +83,23 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 			await Promise.all([
 			listAntrianPengajuan(locals.supabase, {
 				...filters,
-				layanan: 'dokling'
+				layanan: 'perling'
 			}),
 			applyDoklingMetricFilters(
 				locals.supabase
-					.from('antrian_pengajuan')
+					.from('monitoring_perling')
 					.select('id', { count: 'exact', head: true })
-					.eq('layanan', 'dokling')
 			),
 			applyDoklingMetricFilters(
 				locals.supabase
-					.from('antrian_pengajuan')
+					.from('monitoring_perling')
 					.select('id', { count: 'exact', head: true })
-					.eq('layanan', 'dokling')
 					.eq('status', 'SK Terbit')
 			),
 			applyDoklingMetricFilters(
 				locals.supabase
-					.from('antrian_pengajuan')
+					.from('monitoring_perling')
 					.select('id', { count: 'exact', head: true })
-					.eq('layanan', 'dokling')
 					.eq('status', 'Ditolak')
 			)
 		])

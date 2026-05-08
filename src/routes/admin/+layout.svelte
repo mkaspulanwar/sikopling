@@ -8,7 +8,6 @@
 	import { slide } from 'svelte/transition'
 	import type { Snippet } from 'svelte'
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right'
-	import Combine from 'lucide-svelte/icons/combine'
 	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet'
 	import FileText from 'lucide-svelte/icons/file-text'
 	import LayoutDashboard from 'lucide-svelte/icons/layout-dashboard'
@@ -22,9 +21,8 @@
 
 	const navItems = [
 		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
-		{ label: 'Antrian Perling', href: '/admin/perling', icon: FileSpreadsheet },
-		{ label: 'Antrian Pertek', href: '/admin/pertek', icon: FileText },
-		{ label: 'Monitoring Integrasi', href: '/admin/integrasi', icon: Combine },
+		{ label: 'Monitoring Perling', href: '/admin/perling', icon: FileSpreadsheet },
+		{ label: 'Monitoring Pertek', href: '/admin/pertek', icon: FileText },
 		{ label: 'Profil Admin', href: '/admin/profil', icon: UserRound }
 	]
 

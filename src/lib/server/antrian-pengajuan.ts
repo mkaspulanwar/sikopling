@@ -21,11 +21,17 @@ const SORTABLE_COLUMNS = [
 ] as const
 
 type SortColumn = (typeof SORTABLE_COLUMNS)[number]
-
 type SortOrder = 'asc' | 'desc'
-
-type AntrianRow = Database['public']['Tables']['antrian_pengajuan']['Row']
+type MonitoringTableName = 'monitoring_perling' | 'monitoring_pertek'
+type MonitoringRow = Database['public']['Tables']['monitoring_perling']['Row']
 type WorkflowHistoryRow = Database['public']['Tables']['workflow_history']['Row']
+
+type AntrianRow = MonitoringRow & { layanan: Layanan }
+
+const LAYANAN_TABLE_MAP: Record<Layanan, MonitoringTableName> = {
+	perling: 'monitoring_perling',
+	pertek: 'monitoring_pertek'
+}
 
 const STATUS_SELESAI: StatusPengajuan = 'SK Terbit'
 const STATUS_DITOLAK: StatusPengajuan = 'Ditolak'
@@ -35,11 +41,11 @@ const STATUS_PERLU_PERBAIKAN: StatusPengajuan[] = [
 	'Dikembalikan'
 ]
 
-const ANTRIAN_PENGAJUAN_LIST_COLUMNS =
-	'id, layanan, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
+const MONITORING_LIST_COLUMNS =
+	'id, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
 
 const WORKFLOW_HISTORY_COLUMNS =
-	'id, pengajuan_id, old_status, new_status, old_posisi, new_posisi, note, changed_by, changed_at'
+	'id, pengajuan_id, layanan, old_status, new_status, old_posisi, new_posisi, note, changed_by, changed_at'
 
 export type ListAntrianPengajuanParams = {
 	page?: number
@@ -75,7 +81,7 @@ export type AntrianPengajuanSummary = {
 	total: number
 	pending: number
 	selesai: number
-	dokling: number
+	perling: number
 	pertek: number
 	diproses: number
 	ditolak: number
@@ -117,52 +123,98 @@ const normalizeCount = (value: unknown) => {
 	return Number.isFinite(parsed) ? parsed : 0
 }
 
-export const listAntrianPengajuan = async (
-	supabase: SupabaseClient<Database>,
-	params: ListAntrianPengajuanParams = {}
-): Promise<ListAntrianPengajuanResult> => {
-	const page = normalizePage(params.page)
-	const pageSize = normalizePageSize(params.pageSize)
-	const from = (page - 1) * pageSize
-	const to = from + pageSize - 1
+const mapRowsWithLayanan = (rows: MonitoringRow[] | null, layanan: Layanan): AntrianRow[] =>
+	(rows ?? []).map((row) => ({ ...row, layanan }))
 
-	const sortBy = normalizeSortBy(params.sortBy)
-	const sortOrder = normalizeSortOrder(params.sortOrder)
-
-	let query = supabase
-		.from('antrian_pengajuan')
-		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS, { count: 'exact' })
-		.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
-		.range(from, to)
-
-	if (params.layanan && LAYANAN_VALUES.includes(params.layanan)) {
-		query = query.eq('layanan', params.layanan)
-	}
+const applyCommonFilters = <T>(query: T, params: ListAntrianPengajuanParams) => {
+	let nextQuery = query as any
 
 	if (params.status && STATUS_VALUES.includes(params.status)) {
-		query = query.eq('status', params.status)
+		nextQuery = nextQuery.eq('status', params.status)
 	}
 
 	if (params.instansi) {
-		query = query.ilike('instansi', `%${params.instansi.trim()}%`)
+		nextQuery = nextQuery.ilike('instansi', `%${params.instansi.trim()}%`)
 	}
 
 	if (params.jenisDokumen) {
-		query = query.ilike('jenis_dokumen', `%${params.jenisDokumen.trim()}%`)
+		nextQuery = nextQuery.ilike('jenis_dokumen', `%${params.jenisDokumen.trim()}%`)
 	}
 
 	if (params.tanggalMulai) {
-		query = query.gte('tanggal_masuk', params.tanggalMulai)
+		nextQuery = nextQuery.gte('tanggal_masuk', params.tanggalMulai)
 	}
 
 	if (params.tanggalSelesai) {
-		query = query.lte('tanggal_masuk', params.tanggalSelesai)
+		nextQuery = nextQuery.lte('tanggal_masuk', params.tanggalSelesai)
 	}
 
 	if (params.keyword?.trim()) {
 		const keyword = `%${params.keyword.trim()}%`
-		query = query.or(`no_registrasi.ilike.${keyword},instansi.ilike.${keyword},kegiatan.ilike.${keyword}`)
+		nextQuery = nextQuery.or(`no_registrasi.ilike.${keyword},instansi.ilike.${keyword},kegiatan.ilike.${keyword}`)
 	}
+
+	return nextQuery
+}
+
+const compareValues = (left: unknown, right: unknown) => {
+	if (left == null && right == null) return 0
+	if (left == null) return 1
+	if (right == null) return -1
+
+	if (typeof left === 'string' && typeof right === 'string') {
+		return left.localeCompare(right, 'id-ID', { sensitivity: 'base' })
+	}
+
+	if (typeof left === 'number' && typeof right === 'number') {
+		return left - right
+	}
+
+	return String(left).localeCompare(String(right), 'id-ID', { sensitivity: 'base' })
+}
+
+const sortRows = (rows: AntrianRow[], sortBy: SortColumn, sortOrder: SortOrder) =>
+	[...rows].sort((left, right) => {
+		const comparison = compareValues(left[sortBy], right[sortBy])
+		return sortOrder === 'asc' ? comparison : -comparison
+	})
+
+const resolveLayananById = async (supabase: SupabaseClient<Database>, id: string): Promise<Layanan | null> => {
+	const checks = await Promise.all([
+		supabase.from('monitoring_perling').select('id').eq('id', id).maybeSingle(),
+		supabase.from('monitoring_pertek').select('id').eq('id', id).maybeSingle()
+	])
+
+	for (const [index, result] of checks.entries()) {
+		if (result.error) throw result.error
+		if (result.data?.id) {
+			return index === 0 ? 'perling' : 'pertek'
+		}
+	}
+
+	return null
+}
+
+const listSingleLayanan = async (
+	supabase: SupabaseClient<Database>,
+	layanan: Layanan,
+	params: ListAntrianPengajuanParams,
+	page: number,
+	pageSize: number,
+	sortBy: SortColumn,
+	sortOrder: SortOrder
+): Promise<ListAntrianPengajuanResult> => {
+	const from = (page - 1) * pageSize
+	const to = from + pageSize - 1
+	const tableName = LAYANAN_TABLE_MAP[layanan]
+
+	let query = supabase
+		.from(tableName)
+		.select(MONITORING_LIST_COLUMNS, { count: 'exact' })
+		.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
+		.range(from, to)
+
+	query = applyCommonFilters(query, params)
 
 	const { data, count, error } = await query
 	if (error) throw error
@@ -171,7 +223,63 @@ export const listAntrianPengajuan = async (
 	const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
 	return {
-		data: data ?? [],
+		data: mapRowsWithLayanan(data as MonitoringRow[] | null, layanan),
+		total,
+		page,
+		pageSize,
+		totalPages
+	}
+}
+
+export const listAntrianPengajuan = async (
+	supabase: SupabaseClient<Database>,
+	params: ListAntrianPengajuanParams = {}
+): Promise<ListAntrianPengajuanResult> => {
+	const page = normalizePage(params.page)
+	const pageSize = normalizePageSize(params.pageSize)
+	const sortBy = normalizeSortBy(params.sortBy)
+	const sortOrder = normalizeSortOrder(params.sortOrder)
+
+	if (params.layanan && LAYANAN_VALUES.includes(params.layanan)) {
+		return listSingleLayanan(supabase, params.layanan, params, page, pageSize, sortBy, sortOrder)
+	}
+
+	const [perlingResult, pertekResult] = await Promise.all([
+		applyCommonFilters(
+			supabase
+				.from('monitoring_perling')
+				.select(MONITORING_LIST_COLUMNS)
+				.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false }),
+			params
+		),
+		applyCommonFilters(
+			supabase
+				.from('monitoring_pertek')
+				.select(MONITORING_LIST_COLUMNS)
+				.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false }),
+			params
+		)
+	])
+
+	if (perlingResult.error) throw perlingResult.error
+	if (pertekResult.error) throw pertekResult.error
+
+	const mergedRows = sortRows(
+		[
+			...mapRowsWithLayanan(perlingResult.data as MonitoringRow[] | null, 'perling'),
+			...mapRowsWithLayanan(pertekResult.data as MonitoringRow[] | null, 'pertek')
+		],
+		sortBy,
+		sortOrder
+	)
+
+	const total = mergedRows.length
+	const totalPages = Math.max(1, Math.ceil(total / pageSize))
+	const from = (page - 1) * pageSize
+	const to = from + pageSize
+
+	return {
+		data: mergedRows.slice(from, to),
 		total,
 		page,
 		pageSize,
@@ -185,59 +293,55 @@ export const listAntrianPengajuanIds = async (
 ): Promise<ListAntrianPengajuanIdsResult> => {
 	const page = normalizePage(params.page)
 	const pageSize = normalizeIdsPageSize(params.pageSize)
-	const from = (page - 1) * pageSize
-	const to = from + pageSize - 1
-
 	const sortBy = normalizeSortBy(params.sortBy)
 	const sortOrder = normalizeSortOrder(params.sortOrder)
 
-	let query = supabase
-		.from('antrian_pengajuan')
-		.select('id', { count: 'exact' })
-		.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
-		.range(from, to)
-
 	if (params.layanan && LAYANAN_VALUES.includes(params.layanan)) {
-		query = query.eq('layanan', params.layanan)
+		const tableName = LAYANAN_TABLE_MAP[params.layanan]
+		const from = (page - 1) * pageSize
+		const to = from + pageSize - 1
+
+		let query = supabase
+			.from(tableName)
+			.select('id', { count: 'exact' })
+			.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
+			.range(from, to)
+
+		query = applyCommonFilters(query, params)
+
+		const { data, count, error } = await query
+		if (error) throw error
+
+		const total = count ?? 0
+		const totalPages = Math.max(1, Math.ceil(total / pageSize))
+
+		return {
+			data: (data ?? []).map((row: { id: string }) => ({ id: row.id })),
+			total,
+			page,
+			pageSize,
+			totalPages
+		}
 	}
 
-	if (params.status && STATUS_VALUES.includes(params.status)) {
-		query = query.eq('status', params.status)
-	}
+	const fullList = await listAntrianPengajuan(supabase, {
+		...params,
+		page: 1,
+		pageSize: MAX_IDS_PAGE_SIZE,
+		sortBy,
+		sortOrder
+	})
 
-	if (params.instansi) {
-		query = query.ilike('instansi', `%${params.instansi.trim()}%`)
-	}
-
-	if (params.jenisDokumen) {
-		query = query.ilike('jenis_dokumen', `%${params.jenisDokumen.trim()}%`)
-	}
-
-	if (params.tanggalMulai) {
-		query = query.gte('tanggal_masuk', params.tanggalMulai)
-	}
-
-	if (params.tanggalSelesai) {
-		query = query.lte('tanggal_masuk', params.tanggalSelesai)
-	}
-
-	if (params.keyword?.trim()) {
-		const keyword = `%${params.keyword.trim()}%`
-		query = query.or(`no_registrasi.ilike.${keyword},instansi.ilike.${keyword},kegiatan.ilike.${keyword}`)
-	}
-
-	const { data, count, error } = await query
-	if (error) throw error
-
-	const total = count ?? 0
-	const totalPages = Math.max(1, Math.ceil(total / pageSize))
+	const from = (page - 1) * pageSize
+	const to = from + pageSize
+	const ids = fullList.data.slice(from, to).map((row) => ({ id: row.id }))
 
 	return {
-		data: (data ?? []).map((row) => ({ id: row.id })),
-		total,
+		data: ids,
+		total: fullList.total,
 		page,
 		pageSize,
-		totalPages
+		totalPages: Math.max(1, Math.ceil(fullList.total / pageSize))
 	}
 }
 
@@ -254,15 +358,20 @@ export const updateStatusAntrianPengajuan = async (
 		throw new Error('Status pengajuan tidak valid')
 	}
 
+	const layanan = await resolveLayananById(supabase, payload.id)
+	if (!layanan) throw new Error('PENGAJUAN_NOT_FOUND')
+
+	const tableName = LAYANAN_TABLE_MAP[layanan]
+
 	const { data, error } = await supabase
-		.from('antrian_pengajuan')
+		.from(tableName)
 		.update({
 			status: payload.status,
 			posisi: payload.posisi ?? null,
 			tanggal_update: new Date().toISOString().slice(0, 10)
 		})
 		.eq('id', payload.id)
-		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS)
+		.select(MONITORING_LIST_COLUMNS)
 		.single()
 
 	if (error) throw error
@@ -273,6 +382,7 @@ export const updateStatusAntrianPengajuan = async (
 			.from('workflow_history')
 			.select('id')
 			.eq('pengajuan_id', payload.id)
+			.eq('layanan', layanan)
 			.order('changed_at', { ascending: false })
 			.limit(1)
 			.maybeSingle()
@@ -289,7 +399,7 @@ export const updateStatusAntrianPengajuan = async (
 		}
 	}
 
-	return data
+	return { ...(data as MonitoringRow), layanan }
 }
 
 export const createAntrianPengajuan = async (
@@ -311,11 +421,11 @@ export const createAntrianPengajuan = async (
 	}
 
 	const normalizedNoRegistrasi = normalizeNoRegistrasi(payload.noRegistrasi)
+	const tableName = LAYANAN_TABLE_MAP[payload.layanan]
 
 	const { data, error } = await supabase
-		.from('antrian_pengajuan')
+		.from(tableName)
 		.insert({
-			layanan: payload.layanan,
 			no_registrasi: normalizedNoRegistrasi,
 			tanggal_masuk: payload.tanggalMasuk ?? null,
 			instansi: payload.instansi?.trim() || null,
@@ -325,11 +435,11 @@ export const createAntrianPengajuan = async (
 			status: payload.status ?? 'Submit / Masuk',
 			tanggal_update: payload.tanggalUpdate ?? null
 		})
-		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS)
+		.select(MONITORING_LIST_COLUMNS)
 		.single()
 
 	if (error) throw error
-	return data
+	return { ...(data as MonitoringRow), layanan: payload.layanan }
 }
 
 export const updateAntrianPengajuan = async (
@@ -346,7 +456,10 @@ export const updateAntrianPengajuan = async (
 		status?: StatusPengajuan
 	}
 ) => {
-	const updates: Database['public']['Tables']['antrian_pengajuan']['Update'] = {}
+	const layanan = await resolveLayananById(supabase, payload.id)
+	if (!layanan) throw new Error('PENGAJUAN_NOT_FOUND')
+
+	const updates: Database['public']['Tables']['monitoring_perling']['Update'] = {}
 
 	if (payload.noRegistrasi !== undefined) {
 		updates.no_registrasi = normalizeNoRegistrasi(payload.noRegistrasi)
@@ -387,23 +500,32 @@ export const updateAntrianPengajuan = async (
 		throw new Error('Tidak ada perubahan data yang dikirim')
 	}
 
+	const tableName = LAYANAN_TABLE_MAP[layanan]
+
 	const { data, error } = await supabase
-		.from('antrian_pengajuan')
+		.from(tableName)
 		.update(updates)
 		.eq('id', payload.id)
-		.select(ANTRIAN_PENGAJUAN_LIST_COLUMNS)
+		.select(MONITORING_LIST_COLUMNS)
 		.single()
 
 	if (error) throw error
-	return data
+	return { ...(data as MonitoringRow), layanan }
 }
 
 export const deleteAntrianPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: { id: string }
 ) => {
+	const layanan = await resolveLayananById(supabase, payload.id)
+	if (!layanan) {
+		throw new Error('PENGAJUAN_NOT_FOUND')
+	}
+
+	const tableName = LAYANAN_TABLE_MAP[layanan]
+
 	const { data: existingRow, error: existingError } = await supabase
-		.from('antrian_pengajuan')
+		.from(tableName)
 		.select('id')
 		.eq('id', payload.id)
 		.maybeSingle()
@@ -411,7 +533,7 @@ export const deleteAntrianPengajuan = async (
 	if (existingError) throw existingError
 
 	const { data: deletedRow, error } = await supabase
-		.from('antrian_pengajuan')
+		.from(tableName)
 		.delete()
 		.eq('id', payload.id)
 		.select('id')
@@ -430,32 +552,36 @@ export const deleteAntrianPengajuan = async (
 export const getAntrianPengajuanSummary = async (
 	supabase: SupabaseClient<Database>
 ): Promise<AntrianPengajuanSummary> => {
-	const [totalResult, selesaiResult, ditolakResult, doklingResult, pertekResult, perluPerbaikanResult, adminResult] =
-		await Promise.all([
-			supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }),
-			supabase
-				.from('antrian_pengajuan')
-				.select('id', { count: 'exact', head: true })
-				.eq('status', STATUS_SELESAI),
-			supabase
-				.from('antrian_pengajuan')
-				.select('id', { count: 'exact', head: true })
-				.eq('status', STATUS_DITOLAK),
-			supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'dokling'),
-			supabase.from('antrian_pengajuan').select('id', { count: 'exact', head: true }).eq('layanan', 'pertek'),
-			supabase
-				.from('antrian_pengajuan')
-				.select('id', { count: 'exact', head: true })
-				.in('status', STATUS_PERLU_PERBAIKAN),
-			supabase.rpc('count_registered_admins')
-		])
+	const [
+		perlingTotalResult,
+		pertekTotalResult,
+		perlingSelesaiResult,
+		pertekSelesaiResult,
+		perlingDitolakResult,
+		pertekDitolakResult,
+		perlingPerluPerbaikanResult,
+		pertekPerluPerbaikanResult,
+		adminResult
+	] = await Promise.all([
+		supabase.from('monitoring_perling').select('id', { count: 'exact', head: true }),
+		supabase.from('monitoring_pertek').select('id', { count: 'exact', head: true }),
+		supabase.from('monitoring_perling').select('id', { count: 'exact', head: true }).eq('status', STATUS_SELESAI),
+		supabase.from('monitoring_pertek').select('id', { count: 'exact', head: true }).eq('status', STATUS_SELESAI),
+		supabase.from('monitoring_perling').select('id', { count: 'exact', head: true }).eq('status', STATUS_DITOLAK),
+		supabase.from('monitoring_pertek').select('id', { count: 'exact', head: true }).eq('status', STATUS_DITOLAK),
+		supabase.from('monitoring_perling').select('id', { count: 'exact', head: true }).in('status', STATUS_PERLU_PERBAIKAN),
+		supabase.from('monitoring_pertek').select('id', { count: 'exact', head: true }).in('status', STATUS_PERLU_PERBAIKAN),
+		supabase.rpc('count_registered_admins')
+	])
 
-	if (totalResult.error) throw totalResult.error
-	if (selesaiResult.error) throw selesaiResult.error
-	if (ditolakResult.error) throw ditolakResult.error
-	if (doklingResult.error) throw doklingResult.error
-	if (pertekResult.error) throw pertekResult.error
-	if (perluPerbaikanResult.error) throw perluPerbaikanResult.error
+	if (perlingTotalResult.error) throw perlingTotalResult.error
+	if (pertekTotalResult.error) throw pertekTotalResult.error
+	if (perlingSelesaiResult.error) throw perlingSelesaiResult.error
+	if (pertekSelesaiResult.error) throw pertekSelesaiResult.error
+	if (perlingDitolakResult.error) throw perlingDitolakResult.error
+	if (pertekDitolakResult.error) throw pertekDitolakResult.error
+	if (perlingPerluPerbaikanResult.error) throw perlingPerluPerbaikanResult.error
+	if (pertekPerluPerbaikanResult.error) throw pertekPerluPerbaikanResult.error
 	if (adminResult.error) {
 		const missingFunction =
 			adminResult.error.code === 'PGRST202' ||
@@ -463,17 +589,18 @@ export const getAntrianPengajuanSummary = async (
 		if (!missingFunction) throw adminResult.error
 	}
 
-	const total = totalResult.count ?? 0
-	const selesai = selesaiResult.count ?? 0
-	const ditolak = ditolakResult.count ?? 0
-	const dokling = doklingResult.count ?? 0
-	const pertek = pertekResult.count ?? 0
-	const perluPerbaikan = perluPerbaikanResult.count ?? 0
+	const perling = perlingTotalResult.count ?? 0
+	const pertek = pertekTotalResult.count ?? 0
+	const total = perling + pertek
+	const selesai = (perlingSelesaiResult.count ?? 0) + (pertekSelesaiResult.count ?? 0)
+	const ditolak = (perlingDitolakResult.count ?? 0) + (pertekDitolakResult.count ?? 0)
+	const perluPerbaikan =
+		(perlingPerluPerbaikanResult.count ?? 0) + (pertekPerluPerbaikanResult.count ?? 0)
 	const admin = adminResult.error ? 0 : Math.max(normalizeCount(adminResult.data), 0)
 	const diproses = Math.max(total - selesai - ditolak, 0)
 	const pending = Math.max(total - selesai, 0)
 
-	return { total, pending, selesai, dokling, pertek, diproses, ditolak, admin, perluPerbaikan }
+	return { total, pending, selesai, perling, pertek, diproses, ditolak, admin, perluPerbaikan }
 }
 
 export const getWorkflowHistoryByPengajuanIds = async (
@@ -486,6 +613,7 @@ export const getWorkflowHistoryByPengajuanIds = async (
 		.from('workflow_history')
 		.select(WORKFLOW_HISTORY_COLUMNS)
 		.in('pengajuan_id', pengajuanIds)
+		.in('layanan', ['perling', 'pertek'])
 		.order('changed_at', { ascending: false })
 
 	if (error) throw error
@@ -495,7 +623,7 @@ export const getWorkflowHistoryByPengajuanIds = async (
 		if (!historyByPengajuan[row.pengajuan_id]) {
 			historyByPengajuan[row.pengajuan_id] = []
 		}
-		historyByPengajuan[row.pengajuan_id].push(row)
+		historyByPengajuan[row.pengajuan_id].push(row as WorkflowHistoryRow)
 	}
 
 	return historyByPengajuan

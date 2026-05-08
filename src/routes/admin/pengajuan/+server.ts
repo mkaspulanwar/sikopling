@@ -30,7 +30,7 @@ type BulkDeletePayload =
 	  }
 	| {
 			mode: 'allFiltered'
-			layanan: 'dokling' | 'pertek'
+			layanan: 'perling' | 'pertek'
 			keyword?: string
 			status?: StatusPengajuan
 			sortBy?: SortBy
@@ -107,8 +107,8 @@ const parseBulkDeletePayload = (body: unknown): BulkDeletePayload | null => {
 
 	if (payload.mode === 'allFiltered') {
 		const layanan =
-			typeof payload.layanan === 'string' && LAYANAN_VALUES.includes(payload.layanan as 'dokling' | 'pertek')
-				? (payload.layanan as 'dokling' | 'pertek')
+			typeof payload.layanan === 'string' && LAYANAN_VALUES.includes(payload.layanan as 'perling' | 'pertek')
+				? (payload.layanan as 'perling' | 'pertek')
 				: null
 		if (!layanan) return null
 
@@ -152,7 +152,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	const commonParams = {
 		page: parseNumber(query.get('page'), 1),
 		pageSize: parseNumber(query.get('pageSize'), 20),
-		layanan: query.get('layanan') as 'dokling' | 'pertek' | undefined,
+		layanan: query.get('layanan') as 'perling' | 'pertek' | undefined,
 		status: query.get('status') as StatusPengajuan | undefined,
 		instansi: query.get('instansi') ?? undefined,
 		jenisDokumen: query.get('jenisDokumen') ?? undefined,
@@ -281,7 +281,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const posisi = typeof body?.posisi === 'string' ? body.posisi : undefined
 	const status = body?.status as StatusPengajuan | undefined
 
-	if (!LAYANAN_VALUES.includes(layanan as 'dokling' | 'pertek')) {
+	if (!LAYANAN_VALUES.includes(layanan as 'perling' | 'pertek')) {
 		return json({ message: 'Layanan wajib dipilih' }, { status: 400 })
 	}
 
@@ -299,7 +299,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	try {
 		const created = await createAntrianPengajuan(auth.supabase, {
-			layanan: layanan as 'dokling' | 'pertek',
+			layanan: layanan as 'perling' | 'pertek',
 			noRegistrasi,
 			tanggalMasuk,
 			tanggalUpdate,

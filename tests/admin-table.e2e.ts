@@ -49,15 +49,14 @@ const readSupabaseRuntimeConfig = (): SupabaseRuntimeConfig | null => {
 	return { projectUrl, serviceRoleKey }
 }
 
-const buildPengajuanRows = (layanan: 'dokling' | 'pertek', token: string) =>
+const buildPengajuanRows = (layanan: 'perling' | 'pertek', token: string) =>
 	Array.from({ length: SEEDED_ROWS_PER_LAYANAN }, (_, index) => {
 		const rowNumber = String(index + 1).padStart(2, '0')
 		return {
-			layanan,
 			no_registrasi: `${token}-${layanan.toUpperCase()}-${rowNumber}`,
 			instansi: `E2E ${token} ${layanan.toUpperCase()} ${rowNumber}`,
 			kegiatan: `Kegiatan E2E ${token} ${rowNumber}`,
-			jenis_dokumen: layanan === 'dokling' ? 'AMDAL' : 'UKL-UPL',
+			jenis_dokumen: layanan === 'perling' ? 'AMDAL' : 'UKL-UPL',
 			posisi: 'Penyusun',
 			status: 'Submit / Masuk',
 			tanggal_masuk: '2026-04-01',
@@ -84,7 +83,7 @@ const getVisibleTableFirstRowCheckbox = (page: Page) =>
 const runtimeConfig = readSupabaseRuntimeConfig()
 let adminTestContext: AdminTestContext | null = null
 
-test.describe.serial('admin dokling/pertek table e2e', () => {
+test.describe.serial('admin perling/pertek table e2e', () => {
 	test.skip(!runtimeConfig, 'Melewati test admin E2E karena konfigurasi Supabase tidak tersedia')
 
 	test.beforeAll(async () => {
@@ -112,12 +111,15 @@ test.describe.serial('admin dokling/pertek table e2e', () => {
 			throw new Error(createUserResult.error?.message ?? 'Gagal membuat user admin untuk E2E')
 		}
 
-		const doklingRows = buildPengajuanRows('dokling', token)
+		const perlingRows = buildPengajuanRows('perling', token)
 		const pertekRows = buildPengajuanRows('pertek', token)
-		const insertResult = await supabase.from('antrian_pengajuan').insert([...doklingRows, ...pertekRows])
-		if (insertResult.error) {
+		const [insertPerlingResult, insertPertekResult] = await Promise.all([
+			supabase.from('monitoring_perling').insert(perlingRows),
+			supabase.from('monitoring_pertek').insert(pertekRows)
+		])
+		if (insertPerlingResult.error || insertPertekResult.error) {
 			await supabase.auth.admin.deleteUser(createUserResult.data.user.id)
-			throw new Error(insertResult.error.message)
+			throw new Error(insertPerlingResult.error?.message ?? insertPertekResult.error?.message)
 		}
 
 		adminTestContext = {
@@ -132,16 +134,22 @@ test.describe.serial('admin dokling/pertek table e2e', () => {
 	test.afterAll(async () => {
 		if (!adminTestContext) return
 
-		await adminTestContext.supabase
-			.from('antrian_pengajuan')
-			.delete()
-			.like('no_registrasi', `${adminTestContext.token}-%`)
+		await Promise.all([
+			adminTestContext.supabase
+				.from('monitoring_perling')
+				.delete()
+				.like('no_registrasi', `${adminTestContext.token}-%`),
+			adminTestContext.supabase
+				.from('monitoring_pertek')
+				.delete()
+				.like('no_registrasi', `${adminTestContext.token}-%`)
+		])
 
 		await adminTestContext.supabase.auth.admin.deleteUser(adminTestContext.userId)
 		adminTestContext = null
 	})
 
-	test('dokling: rows per page + select all lintas halaman tetap konsisten', async ({ page }) => {
+	test('perling: rows per page + select all lintas halaman tetap konsisten', async ({ page }) => {
 		if (!adminTestContext) throw new Error('Konteks admin E2E belum siap')
 
 		const { token, email, password } = adminTestContext

@@ -62,7 +62,7 @@
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Perling</p>
-			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.dokling)}</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.summary.perling)}</p>
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total Pertek</p>

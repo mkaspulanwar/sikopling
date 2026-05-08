@@ -56,8 +56,8 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	const filters = {
 		page: Math.max(1, Math.floor(readNumber(query.get('page'), 1))),
 		pageSize: Math.min(100, Math.max(10, Math.floor(readNumber(query.get('pageSize'), 20)))),
-		layanan: LAYANAN_VALUES.includes(query.get('layanan') as 'dokling' | 'pertek')
-			? (query.get('layanan') as 'dokling' | 'pertek')
+		layanan: LAYANAN_VALUES.includes(query.get('layanan') as 'perling' | 'pertek')
+			? (query.get('layanan') as 'perling' | 'pertek')
 			: undefined,
 		status: STATUS_VALUES.includes(query.get('status') as (typeof STATUS_VALUES)[number])
 			? (query.get('status') as (typeof STATUS_VALUES)[number])

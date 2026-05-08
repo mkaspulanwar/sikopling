@@ -4,6 +4,17 @@ import { createAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
+const INTEGRATION_STATUSES = [
+	'Submit',
+	'Uji admin',
+	'Ditolak',
+	'SK/Rekomendasi',
+	'Evaluasi Dokumen',
+	'Verifikasi Integrasi',
+	'Dikembalikan',
+	'Selesai'
+] as const
+
 const normalizeHeader = (value: string) => value.toLowerCase().replace(/[^a-z0-9]/g, '')
 const isIsoDate = (value: string | undefined) => Boolean(value && /^\d{4}-\d{2}-\d{2}$/.test(value))
 
@@ -46,10 +57,6 @@ const readCell = (row: string[], columnMap: Map<string, number>, key: string) =>
 }
 
 export const POST: RequestHandler = async ({ locals, params, request }) => {
-	if (!isLayanan(params.layanan)) {
-		return json({ message: 'Layanan tidak ditemukan' }, { status: 404 })
-	}
-
 	const auth = await requireAdminSupabase(locals)
 	if (auth.state === 'unavailable') {
 		return json({ message: 'Supabase belum dikonfigurasi' }, { status: 503 })
@@ -92,6 +99,75 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 	let imported = 0
 	let failed = 0
 	const errors: string[] = []
+
+	if (params.layanan === 'integrasi') {
+		for (const [lineIndex, line] of lines.slice(1).entries()) {
+			const row = parseCsvLine(line, delimiter)
+
+			const noRegistrasi = readCell(row, columnMap, 'noregistrasi')
+			const tanggalMasukRaw = readCell(row, columnMap, 'tanggalmasuk')
+			const instansi = readCell(row, columnMap, 'instansi')
+			const kegiatan = readCell(row, columnMap, 'kegiatan')
+			const jenisDokumen = readCell(row, columnMap, 'jenisdokumen')
+			const posisi = readCell(row, columnMap, 'posisi')
+			const statusRaw = readCell(row, columnMap, 'status')
+			const status = INTEGRATION_STATUSES.includes(
+				statusRaw as (typeof INTEGRATION_STATUSES)[number]
+			)
+				? (statusRaw as (typeof INTEGRATION_STATUSES)[number])
+				: 'Submit'
+			const tanggalUpdateRaw = readCell(row, columnMap, 'tanggalupdate')
+			const keterangan = readCell(row, columnMap, 'keterangan')
+
+			if (!noRegistrasi) {
+				failed += 1
+				errors.push(`Baris ${lineIndex + 2}: no_registrasi kosong`)
+				continue
+			}
+
+			if (tanggalMasukRaw && !isIsoDate(tanggalMasukRaw)) {
+				failed += 1
+				errors.push(`Baris ${lineIndex + 2}: tanggal_masuk harus format YYYY-MM-DD`)
+				continue
+			}
+
+			if (tanggalUpdateRaw && !isIsoDate(tanggalUpdateRaw)) {
+				failed += 1
+				errors.push(`Baris ${lineIndex + 2}: tanggal_update harus format YYYY-MM-DD`)
+				continue
+			}
+
+			try {
+				const { error } = await auth.supabase.from('monitoring_integrasi').insert({
+					no_registrasi: noRegistrasi,
+					tanggal_masuk: tanggalMasukRaw || null,
+					instansi: instansi || null,
+					kegiatan: kegiatan || null,
+					jenis_dokumen: jenisDokumen || null,
+					posisi: posisi || null,
+					status,
+					tanggal_update: tanggalUpdateRaw || null,
+					keterangan: keterangan || null
+				})
+
+				if (error) throw error
+				imported += 1
+			} catch (error) {
+				failed += 1
+				errors.push(`Baris ${lineIndex + 2}: ${error instanceof Error ? error.message : 'gagal disimpan'}`)
+			}
+		}
+
+		return json({
+			imported,
+			failed,
+			errors: errors.slice(0, 12)
+		})
+	}
+
+	if (!isLayanan(params.layanan)) {
+		return json({ message: 'Layanan tidak ditemukan' }, { status: 404 })
+	}
 
 	for (const [lineIndex, line] of lines.slice(1).entries()) {
 		const row = parseCsvLine(line, delimiter)

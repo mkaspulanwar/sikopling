@@ -61,7 +61,7 @@
 	let draftPosisiById = $state<Record<string, string>>({})
 	let draftNoteById = $state<Record<string, string>>({})
 	let createForm = $state({
-		layanan: 'dokling',
+		layanan: 'perling',
 		no_registrasi: '',
 		tanggal_masuk: '',
 		instansi: '',
@@ -226,7 +226,7 @@
 
 		flash = { type: 'success', message: 'Data pengajuan berhasil ditambahkan' }
 		createForm = {
-			layanan: 'dokling',
+			layanan: 'perling',
 			no_registrasi: '',
 			tanggal_masuk: '',
 			instansi: '',
@@ -247,7 +247,7 @@
 				<p class="text-xs font-semibold uppercase tracking-[0.05em] text-(--muted)">Dashboard Admin</p>
 				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-[#20232A] sm:text-[2rem]">Antrian Pengajuan</h1>
 				<p class="mt-2 max-w-3xl text-sm text-(--muted) sm:text-[0.96rem]">
-					Kelola antrean dokling dan pertek dengan tabel operasional, pembaruan status, dan histori workflow.
+					Kelola antrean perling dan pertek dengan tabel operasional, pembaruan status, dan histori workflow.
 				</p>
 			</div>
 			<a
@@ -268,7 +268,7 @@
 				Selesai: <span class="font-semibold text-[#20232A]">{formatNumber(data.summary.selesai)}</span>
 			</div>
 			<div class="rounded-lg border border-[#e7edf5] bg-[#f8fafc] px-3.5 py-2.5 text-sm text-[#475467]">
-				Dokling/Pertek: <span class="font-semibold text-[#20232A]">{formatNumber(data.summary.dokling)} / {formatNumber(data.summary.pertek)}</span>
+				Perling/Pertek: <span class="font-semibold text-[#20232A]">{formatNumber(data.summary.perling)} / {formatNumber(data.summary.pertek)}</span>
 			</div>
 		</div>
 	</header>

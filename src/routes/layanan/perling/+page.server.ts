@@ -3,6 +3,6 @@ import type { PageServerLoad } from './$types'
 
 export const load: PageServerLoad = async ({ fetch }) => {
 	return {
-		queueRows: await getPublicQueueRows('dokling', fetch)
+		queueRows: await getPublicQueueRows('perling', fetch)
 	}
 }

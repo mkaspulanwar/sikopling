@@ -1,4 +1,4 @@
-export const LAYANAN_VALUES = ['dokling', 'pertek'] as const
+export const LAYANAN_VALUES = ['perling', 'pertek'] as const
 
 export const STATUS_VALUES = [
 	'Submit / Masuk',

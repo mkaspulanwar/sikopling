@@ -33,7 +33,7 @@ export const EMPTY_SUMMARY = {
 	total: 0,
 	pending: 0,
 	selesai: 0,
-	dokling: 0,
+	perling: 0,
 	pertek: 0,
 	diproses: 0,
 	ditolak: 0,
@@ -82,7 +82,7 @@ export const readAdminFilters = (query: URLSearchParams): AdminListFilters => ({
 	sortOrder: readSortOrder(query.get('sortOrder'))
 })
 
-export const isLayanan = (value: string): value is Layanan => value === 'dokling' || value === 'pertek'
+export const isLayanan = (value: string): value is Layanan => value === 'perling' || value === 'pertek'
 
 export const logAdminLoad = (source: string, detail?: Record<string, unknown>) => {
 	if (!dev) return
