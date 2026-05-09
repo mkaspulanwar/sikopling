@@ -877,7 +877,7 @@
 								/>
 							</td>
 							<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">{(data.result.page - 1) * data.result.pageSize + index + 1}</td>
-							<td class="px-4 py-4 text-sm font-semibold text-[#20232A]">{row.no_registrasi ?? '-'}</td>
+							<td class="px-4 py-4 text-sm text-[#20232A]">{row.no_registrasi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.instansi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</td>
