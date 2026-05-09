@@ -27,7 +27,7 @@
 		tanggal_update: string
 		instansi: string
 		kegiatan: string
-		jenis_dokumen: string
+		jenis_layanan: string
 		posisi: string
 		status: StatusPengajuan
 	}
@@ -75,7 +75,7 @@
 		tanggal_update: '',
 		instansi: '',
 		kegiatan: '',
-		jenis_dokumen: '',
+		jenis_layanan: '',
 		posisi: 'Penyusun',
 		status: 'Submit / Masuk'
 	})
@@ -92,7 +92,7 @@
 		tanggal_update: row.tanggal_update ?? '',
 		instansi: row.instansi ?? '',
 		kegiatan: row.kegiatan ?? '',
-		jenis_dokumen: row.jenis_dokumen ?? '',
+		jenis_layanan: row.jenis_layanan ?? '',
 		posisi: row.posisi ?? '',
 		status: row.status
 	})
@@ -103,7 +103,7 @@
 		tanggal_update: form.tanggal_update,
 		instansi: form.instansi,
 		kegiatan: form.kegiatan,
-		jenis_dokumen: form.jenis_dokumen,
+		jenis_layanan: form.jenis_layanan,
 		posisi: form.posisi,
 		status: form.status
 	})
@@ -842,7 +842,7 @@
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Tanggal Masuk</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Instansi</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Kegiatan</th>
-					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Jenis Dokumen</th>
+					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Jenis Perling</th>
 					<th class="w-36 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Posisi</th>
 					<th class="w-36 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Status</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Tanggal Update</th>
@@ -881,7 +881,7 @@
 							<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.instansi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</td>
-							<td class="px-4 py-4 text-sm text-[#20232A]">{row.jenis_dokumen ?? '-'}</td>
+							<td class="px-4 py-4 text-sm text-[#20232A]">{row.jenis_layanan ?? '-'}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.posisi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm">
 								<span class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.status)}`}>
@@ -953,7 +953,7 @@
 											</p>
 											<div class="mt-2 flex flex-wrap items-center gap-1.5">
 												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
-													{row.jenis_dokumen ?? '-'}
+													{row.jenis_layanan ?? '-'}
 												</span>
 												<span class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.status)}`}>
 													{row.status}
@@ -1127,8 +1127,8 @@
 						<input type="text" bind:value={createForm.kegiatan} placeholder="Contoh: Membangun gedung baru" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
-						<span class="text-xs font-semibold text-slate-600">Jenis Dokumen</span>
-						<input type="text" bind:value={createForm.jenis_dokumen} placeholder="Contoh: Andal" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+						<span class="text-xs font-semibold text-slate-600">Jenis Perling</span>
+						<input type="text" bind:value={createForm.jenis_layanan} placeholder="Contoh: AMDAL" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
@@ -1212,8 +1212,8 @@
 						<input type="text" bind:value={editForm.kegiatan} placeholder="Contoh: Membangun gedung baru" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
-						<span class="text-xs font-semibold text-slate-600">Jenis Dokumen</span>
-						<input type="text" bind:value={editForm.jenis_dokumen} placeholder="Contoh: Andal" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+						<span class="text-xs font-semibold text-slate-600">Jenis Perling</span>
+						<input type="text" bind:value={editForm.jenis_layanan} placeholder="Contoh: AMDAL" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>

@@ -56,7 +56,7 @@ const buildPengajuanRows = (layanan: 'perling' | 'pertek', token: string) =>
 			no_registrasi: `${token}-${layanan.toUpperCase()}-${rowNumber}`,
 			instansi: `E2E ${token} ${layanan.toUpperCase()} ${rowNumber}`,
 			kegiatan: `Kegiatan E2E ${token} ${rowNumber}`,
-			jenis_dokumen: layanan === 'perling' ? 'AMDAL' : 'UKL-UPL',
+			...(layanan === 'perling' ? { jenis_perling: 'AMDAL' } : { jenis_pertek: 'UKL-UPL' }),
 			posisi: 'Penyusun',
 			status: 'Submit / Masuk',
 			tanggal_masuk: '2026-04-01',

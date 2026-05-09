@@ -9,7 +9,7 @@ export const SORTABLE_COLUMNS = [
 	'tanggal_masuk',
 	'instansi',
 	'kegiatan',
-	'jenis_dokumen',
+	'jenis_layanan',
 	'posisi',
 	'status',
 	'tanggal_update',

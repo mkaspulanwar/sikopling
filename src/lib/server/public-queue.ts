@@ -18,6 +18,17 @@ type PublicQueueRow = {
 	progressUpdatedDate: string
 }
 
+type PublicQueueDbRow = {
+	no_registrasi: string | null
+	tanggal_masuk: string | null
+	instansi: string | null
+	kegiatan: string | null
+	jenis_layanan: string | null
+	posisi: string | null
+	status: string
+	tanggal_update: string | null
+}
+
 export type PublicIntegrationRow = {
 	no: string
 	instansi: string
@@ -40,6 +51,11 @@ const LAYANAN_TABLE_MAP: Record<LayananType, MonitoringTable> = {
 	perling: 'monitoring_perling',
 	pertek: 'monitoring_pertek'
 }
+
+const JENIS_COLUMN_MAP = {
+	perling: 'jenis_perling',
+	pertek: 'jenis_pertek'
+} as const satisfies Record<LayananType, 'jenis_perling' | 'jenis_pertek'>
 
 const resolveServiceClient = (serverFetch: ServerFetch) => {
 	if (!publicEnv.PUBLIC_SUPABASE_URL || !privateEnv.SUPABASE_SERVICE_ROLE_KEY) return null
@@ -137,9 +153,12 @@ export const getPublicQueueRows = async (layanan: LayananType, serverFetch: Serv
 	if (!supabase) return []
 
 	const tableName = LAYANAN_TABLE_MAP[layanan]
+	const jenisColumn = JENIS_COLUMN_MAP[layanan]
 	const { data, error } = await supabase
-		.from(tableName)
-		.select('no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update')
+		.from(tableName as 'monitoring_perling')
+		.select(
+			`no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_layanan:${jenisColumn}, posisi, status, tanggal_update`
+		)
 		.order('tanggal_update', { ascending: false, nullsFirst: false })
 		.limit(300)
 
@@ -148,12 +167,12 @@ export const getPublicQueueRows = async (layanan: LayananType, serverFetch: Serv
 		return []
 	}
 
-	return (data ?? []).map((row) => ({
+	return ((data ?? []) as unknown as PublicQueueDbRow[]).map((row) => ({
 		registrationNo: row.no_registrasi ?? '-',
 		receivedDate: row.tanggal_masuk ?? row.tanggal_update ?? new Date().toISOString().slice(0, 10),
 		agency: row.instansi ?? '-',
 		activity: row.kegiatan ?? '-',
-		documentType: row.jenis_dokumen ?? '-',
+		documentType: row.jenis_layanan ?? '-',
 		position: asQueuePosition(row.posisi),
 		progressStatus: layanan === 'perling' ? mapPerlingStatus(row.status) : mapPertekStatus(row.status),
 		progressUpdatedDate: row.tanggal_update ?? row.tanggal_masuk ?? new Date().toISOString().slice(0, 10)

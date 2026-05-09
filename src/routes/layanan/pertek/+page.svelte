@@ -230,7 +230,7 @@
 		if (positionFilter !== "Semua Jenis") {
 			chips.push({
 				key: "perlingType",
-				label: "Jenis Perling",
+				label: "Jenis Pertek",
 				value: positionFilter,
 			});
 		}
@@ -383,7 +383,7 @@
 			"Tanggal Masuk",
 			"Instansi",
 			"Kegiatan",
-			"Jenis Perling",
+			"Jenis Pertek",
 			"Posisi",
 			"Status",
 			"Tanggal Update",
@@ -653,7 +653,7 @@
 								for="position-filter"
 								class="mb-1 block text-xs font-semibold text-(--muted)"
 							>
-								Jenis Perling
+								Jenis Pertek
 							</label>
 							<div
 								class="relative"
@@ -898,7 +898,7 @@
 							<th
 								class="border-b border-[#64AD31] px-6 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"
 							>
-								Jenis Perling
+								Jenis Pertek
 							</th>
 							<th
 								class="w-28 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white"

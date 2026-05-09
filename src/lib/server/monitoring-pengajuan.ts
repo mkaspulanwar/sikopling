@@ -12,7 +12,7 @@ const SORTABLE_COLUMNS = [
 	'tanggal_masuk',
 	'instansi',
 	'kegiatan',
-	'jenis_dokumen',
+	'jenis_layanan',
 	'posisi',
 	'status',
 	'tanggal_update',
@@ -23,14 +23,20 @@ const SORTABLE_COLUMNS = [
 type SortColumn = (typeof SORTABLE_COLUMNS)[number]
 type SortOrder = 'asc' | 'desc'
 type MonitoringTableName = 'monitoring_perling' | 'monitoring_pertek'
-type MonitoringRow = Database['public']['Tables']['monitoring_perling']['Row']
-
-type MonitoringPengajuanRow = MonitoringRow & { layanan: Layanan }
+type MonitoringBaseRow = Omit<Database['public']['Tables']['monitoring_perling']['Row'], 'jenis_perling'> & {
+	jenis_layanan: string | null
+}
+type MonitoringPengajuanRow = MonitoringBaseRow & { layanan: Layanan }
 
 const LAYANAN_TABLE_MAP: Record<Layanan, MonitoringTableName> = {
 	perling: 'monitoring_perling',
 	pertek: 'monitoring_pertek'
 }
+
+const JENIS_COLUMN_MAP = {
+	perling: 'jenis_perling',
+	pertek: 'jenis_pertek'
+} as const satisfies Record<Layanan, 'jenis_perling' | 'jenis_pertek'>
 
 const STATUS_SELESAI: StatusPengajuan = 'SK Terbit'
 const STATUS_DITOLAK: StatusPengajuan = 'Ditolak'
@@ -40,8 +46,14 @@ const STATUS_PERLU_PERBAIKAN: StatusPengajuan[] = [
 	'Dikembalikan'
 ]
 
-const MONITORING_LIST_COLUMNS =
-	'id, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
+const MONITORING_BASE_COLUMNS =
+	'id, no_registrasi, tanggal_masuk, instansi, kegiatan, posisi, status, tanggal_update, created_at, updated_at'
+
+const getJenisColumn = (layanan: Layanan) => JENIS_COLUMN_MAP[layanan]
+const getSortColumn = (layanan: Layanan, sortBy: SortColumn) =>
+	sortBy === 'jenis_layanan' ? getJenisColumn(layanan) : sortBy
+const getSelectColumns = (layanan: Layanan) =>
+	`${MONITORING_BASE_COLUMNS}, jenis_layanan:${getJenisColumn(layanan)}`
 
 export type ListMonitoringPengajuanParams = {
 	page?: number
@@ -49,7 +61,7 @@ export type ListMonitoringPengajuanParams = {
 	layanan?: Layanan
 	status?: StatusPengajuan
 	instansi?: string
-	jenisDokumen?: string
+	jenisLayanan?: string
 	tanggalMulai?: string
 	tanggalSelesai?: string
 	keyword?: string
@@ -117,10 +129,10 @@ const normalizeCount = (value: unknown) => {
 	return Number.isFinite(parsed) ? parsed : 0
 }
 
-const mapRowsWithLayanan = (rows: MonitoringRow[] | null, layanan: Layanan): MonitoringPengajuanRow[] =>
+const mapRowsWithLayanan = (rows: MonitoringBaseRow[] | null, layanan: Layanan): MonitoringPengajuanRow[] =>
 	(rows ?? []).map((row) => ({ ...row, layanan }))
 
-const applyCommonFilters = <T>(query: T, params: ListMonitoringPengajuanParams) => {
+const applyCommonFilters = <T>(query: T, params: ListMonitoringPengajuanParams, layanan: Layanan) => {
 	let nextQuery = query as any
 
 	if (params.status && STATUS_VALUES.includes(params.status)) {
@@ -131,8 +143,8 @@ const applyCommonFilters = <T>(query: T, params: ListMonitoringPengajuanParams) 
 		nextQuery = nextQuery.ilike('instansi', `%${params.instansi.trim()}%`)
 	}
 
-	if (params.jenisDokumen) {
-		nextQuery = nextQuery.ilike('jenis_dokumen', `%${params.jenisDokumen.trim()}%`)
+	if (params.jenisLayanan) {
+		nextQuery = nextQuery.ilike(getJenisColumn(layanan), `%${params.jenisLayanan.trim()}%`)
 	}
 
 	if (params.tanggalMulai) {
@@ -145,7 +157,9 @@ const applyCommonFilters = <T>(query: T, params: ListMonitoringPengajuanParams) 
 
 	if (params.keyword?.trim()) {
 		const keyword = `%${params.keyword.trim()}%`
-		nextQuery = nextQuery.or(`no_registrasi.ilike.${keyword},instansi.ilike.${keyword},kegiatan.ilike.${keyword}`)
+		nextQuery = nextQuery.or(
+			`no_registrasi.ilike.${keyword},instansi.ilike.${keyword},kegiatan.ilike.${keyword},${getJenisColumn(layanan)}.ilike.${keyword}`
+		)
 	}
 
 	return nextQuery
@@ -201,14 +215,15 @@ const listSingleLayanan = async (
 	const from = (page - 1) * pageSize
 	const to = from + pageSize - 1
 	const tableName = LAYANAN_TABLE_MAP[layanan]
+	const orderColumn = getSortColumn(layanan, sortBy)
 
 	let query = supabase
-		.from(tableName)
-		.select(MONITORING_LIST_COLUMNS, { count: 'exact' })
-		.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
+		.from(tableName as 'monitoring_perling')
+		.select(getSelectColumns(layanan), { count: 'exact' })
+		.order(orderColumn, { ascending: sortOrder === 'asc', nullsFirst: false })
 		.range(from, to)
 
-	query = applyCommonFilters(query, params)
+	query = applyCommonFilters(query, params, layanan)
 
 	const { data, count, error } = await query
 	if (error) throw error
@@ -217,7 +232,7 @@ const listSingleLayanan = async (
 	const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
 	return {
-		data: mapRowsWithLayanan(data as MonitoringRow[] | null, layanan),
+		data: mapRowsWithLayanan(data as unknown as MonitoringBaseRow[] | null, layanan),
 		total,
 		page,
 		pageSize,
@@ -242,16 +257,18 @@ export const listMonitoringPengajuan = async (
 		applyCommonFilters(
 			supabase
 				.from('monitoring_perling')
-				.select(MONITORING_LIST_COLUMNS)
-				.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false }),
-			params
+				.select(getSelectColumns('perling'))
+				.order(getSortColumn('perling', sortBy), { ascending: sortOrder === 'asc', nullsFirst: false }),
+			params,
+			'perling'
 		),
 		applyCommonFilters(
 			supabase
 				.from('monitoring_pertek')
-				.select(MONITORING_LIST_COLUMNS)
-				.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false }),
-			params
+				.select(getSelectColumns('pertek'))
+				.order(getSortColumn('pertek', sortBy), { ascending: sortOrder === 'asc', nullsFirst: false }),
+			params,
+			'pertek'
 		)
 	])
 
@@ -260,8 +277,8 @@ export const listMonitoringPengajuan = async (
 
 	const mergedRows = sortRows(
 		[
-			...mapRowsWithLayanan(perlingResult.data as MonitoringRow[] | null, 'perling'),
-			...mapRowsWithLayanan(pertekResult.data as MonitoringRow[] | null, 'pertek')
+			...mapRowsWithLayanan(perlingResult.data as unknown as MonitoringBaseRow[] | null, 'perling'),
+			...mapRowsWithLayanan(pertekResult.data as unknown as MonitoringBaseRow[] | null, 'pertek')
 		],
 		sortBy,
 		sortOrder
@@ -292,16 +309,17 @@ export const listMonitoringPengajuanIds = async (
 
 	if (params.layanan && LAYANAN_VALUES.includes(params.layanan)) {
 		const tableName = LAYANAN_TABLE_MAP[params.layanan]
+		const orderColumn = getSortColumn(params.layanan, sortBy)
 		const from = (page - 1) * pageSize
 		const to = from + pageSize - 1
 
 		let query = supabase
-			.from(tableName)
+			.from(tableName as 'monitoring_perling')
 			.select('id', { count: 'exact' })
-			.order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
+			.order(orderColumn, { ascending: sortOrder === 'asc', nullsFirst: false })
 			.range(from, to)
 
-		query = applyCommonFilters(query, params)
+		query = applyCommonFilters(query, params, params.layanan)
 
 		const { data, count, error } = await query
 		if (error) throw error
@@ -357,18 +375,18 @@ export const updateStatusMonitoringPengajuan = async (
 	const tableName = LAYANAN_TABLE_MAP[layanan]
 
 	const { data, error } = await supabase
-		.from(tableName)
+		.from(tableName as 'monitoring_perling')
 		.update({
 			status: payload.status,
 			posisi: payload.posisi ?? null,
 			tanggal_update: new Date().toISOString().slice(0, 10)
 		})
 		.eq('id', payload.id)
-		.select(MONITORING_LIST_COLUMNS)
+		.select(getSelectColumns(layanan))
 		.single()
 
 	if (error) throw error
-	return { ...(data as MonitoringRow), layanan }
+	return { ...(data as unknown as MonitoringBaseRow), layanan }
 }
 
 export const createMonitoringPengajuan = async (
@@ -380,7 +398,7 @@ export const createMonitoringPengajuan = async (
 		tanggalUpdate?: string | null
 		instansi?: string | null
 		kegiatan?: string | null
-		jenisDokumen?: string | null
+		jenisLayanan?: string | null
 		posisi?: string | null
 		status?: StatusPengajuan
 	}
@@ -391,24 +409,24 @@ export const createMonitoringPengajuan = async (
 
 	const normalizedNoRegistrasi = normalizeNoRegistrasi(payload.noRegistrasi)
 	const tableName = LAYANAN_TABLE_MAP[payload.layanan]
+	const jenisColumn = getJenisColumn(payload.layanan)
 
-	const { data, error } = await supabase
-		.from(tableName)
+	const { data, error } = await (supabase.from(tableName) as any)
 		.insert({
 			no_registrasi: normalizedNoRegistrasi,
 			tanggal_masuk: payload.tanggalMasuk ?? null,
 			instansi: payload.instansi?.trim() || null,
 			kegiatan: payload.kegiatan?.trim() || null,
-			jenis_dokumen: payload.jenisDokumen?.trim() || null,
+			[jenisColumn]: payload.jenisLayanan?.trim() || null,
 			posisi: payload.posisi?.trim() || null,
 			status: payload.status ?? 'Submit / Masuk',
 			tanggal_update: payload.tanggalUpdate ?? null
 		})
-		.select(MONITORING_LIST_COLUMNS)
+		.select(getSelectColumns(payload.layanan))
 		.single()
 
 	if (error) throw error
-	return { ...(data as MonitoringRow), layanan: payload.layanan }
+	return { ...(data as unknown as MonitoringBaseRow), layanan: payload.layanan }
 }
 
 export const updateMonitoringPengajuan = async (
@@ -420,7 +438,7 @@ export const updateMonitoringPengajuan = async (
 		tanggalUpdate?: string | null
 		instansi?: string | null
 		kegiatan?: string | null
-		jenisDokumen?: string | null
+		jenisLayanan?: string | null
 		posisi?: string | null
 		status?: StatusPengajuan
 	}
@@ -428,7 +446,8 @@ export const updateMonitoringPengajuan = async (
 	const layanan = await resolveLayananById(supabase, payload.id)
 	if (!layanan) throw new Error('PENGAJUAN_NOT_FOUND')
 
-	const updates: Database['public']['Tables']['monitoring_perling']['Update'] = {}
+	const jenisColumn = getJenisColumn(layanan)
+	const updates: Record<string, unknown> = {}
 
 	if (payload.noRegistrasi !== undefined) {
 		updates.no_registrasi = normalizeNoRegistrasi(payload.noRegistrasi)
@@ -450,8 +469,8 @@ export const updateMonitoringPengajuan = async (
 		updates.kegiatan = payload.kegiatan?.trim() || null
 	}
 
-	if (payload.jenisDokumen !== undefined) {
-		updates.jenis_dokumen = payload.jenisDokumen?.trim() || null
+	if (payload.jenisLayanan !== undefined) {
+		updates[jenisColumn] = payload.jenisLayanan?.trim() || null
 	}
 
 	if (payload.posisi !== undefined) {
@@ -471,15 +490,14 @@ export const updateMonitoringPengajuan = async (
 
 	const tableName = LAYANAN_TABLE_MAP[layanan]
 
-	const { data, error } = await supabase
-		.from(tableName)
+	const { data, error } = await (supabase.from(tableName) as any)
 		.update(updates)
 		.eq('id', payload.id)
-		.select(MONITORING_LIST_COLUMNS)
+		.select(getSelectColumns(layanan))
 		.single()
 
 	if (error) throw error
-	return { ...(data as MonitoringRow), layanan }
+	return { ...(data as unknown as MonitoringBaseRow), layanan }
 }
 
 export const deleteMonitoringPengajuan = async (

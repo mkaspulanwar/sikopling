@@ -48,23 +48,25 @@ const toIntegrasiCsv = (
 }
 
 const toCsv = (
+	layanan: 'perling' | 'pertek',
 	rows: Array<{
 		no_registrasi: string | null
 		tanggal_masuk: string | null
 		instansi: string | null
 		kegiatan: string | null
-		jenis_dokumen: string | null
+		jenis_layanan: string | null
 		posisi: string | null
 		status: string
 		tanggal_update: string | null
 	}>
 ) => {
+	const jenisHeader = layanan === 'perling' ? 'jenis_perling' : 'jenis_pertek'
 	const header = [
 		'no_registrasi',
 		'tanggal_masuk',
 		'instansi',
 		'kegiatan',
-		'jenis_dokumen',
+		jenisHeader,
 		'posisi',
 		'status',
 		'tanggal_update'
@@ -76,7 +78,7 @@ const toCsv = (
 			row.tanggal_masuk ?? '',
 			row.instansi ?? '',
 			row.kegiatan ?? '',
-			row.jenis_dokumen ?? '',
+			row.jenis_layanan ?? '',
 			row.posisi ?? '',
 			row.status,
 			row.tanggal_update ?? ''
@@ -178,7 +180,7 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 		page += 1
 	}
 
-	const csvContent = toCsv(allRows)
+	const csvContent = toCsv(params.layanan, allRows)
 	const timestamp = buildFileTimestamp()
 
 	return new Response(csvContent, {

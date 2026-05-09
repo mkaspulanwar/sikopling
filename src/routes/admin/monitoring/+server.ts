@@ -16,7 +16,7 @@ type SortBy =
 	| 'tanggal_masuk'
 	| 'instansi'
 	| 'kegiatan'
-	| 'jenis_dokumen'
+	| 'jenis_layanan'
 	| 'posisi'
 	| 'status'
 	| 'tanggal_update'
@@ -155,7 +155,7 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 		layanan: query.get('layanan') as 'perling' | 'pertek' | undefined,
 		status: query.get('status') as StatusPengajuan | undefined,
 		instansi: query.get('instansi') ?? undefined,
-		jenisDokumen: query.get('jenisDokumen') ?? undefined,
+		jenisLayanan: query.get('jenisLayanan') ?? undefined,
 		tanggalMulai: query.get('tanggalMulai') ?? undefined,
 		tanggalSelesai: query.get('tanggalSelesai') ?? undefined,
 		keyword: query.get('keyword') ?? undefined,
@@ -277,7 +277,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const tanggalUpdate = typeof body?.tanggal_update === 'string' ? body.tanggal_update : undefined
 	const instansi = typeof body?.instansi === 'string' ? body.instansi : undefined
 	const kegiatan = typeof body?.kegiatan === 'string' ? body.kegiatan : undefined
-	const jenisDokumen = typeof body?.jenis_dokumen === 'string' ? body.jenis_dokumen : undefined
+	const jenisLayanan = typeof body?.jenis_layanan === 'string' ? body.jenis_layanan : undefined
 	const posisi = typeof body?.posisi === 'string' ? body.posisi : undefined
 	const status = body?.status as StatusPengajuan | undefined
 
@@ -305,7 +305,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			tanggalUpdate,
 			instansi,
 			kegiatan,
-			jenisDokumen,
+			jenisLayanan,
 			posisi,
 			status
 		})

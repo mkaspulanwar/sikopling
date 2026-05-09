@@ -13,7 +13,7 @@
 		| 'tanggal_masuk'
 		| 'instansi'
 		| 'kegiatan'
-		| 'jenis_dokumen'
+		| 'jenis_layanan'
 		| 'posisi'
 		| 'status'
 		| 'tanggal_update'
@@ -37,7 +37,7 @@
 		tanggal_masuk: 'Tanggal Masuk',
 		instansi: 'Instansi',
 		kegiatan: 'Kegiatan',
-		jenis_dokumen: 'Jenis Dokumen',
+		jenis_layanan: 'Jenis Layanan',
 		posisi: 'Posisi',
 		status: 'Status',
 		tanggal_update: 'Tanggal Update',
@@ -57,7 +57,7 @@
 		tanggal_masuk: '',
 		instansi: '',
 		kegiatan: '',
-		jenis_dokumen: '',
+		jenis_layanan: '',
 		posisi: '',
 		status: 'Submit / Masuk' as StatusPengajuan
 	})
@@ -112,7 +112,7 @@
 			Boolean(data.filters.layanan) ||
 			Boolean(data.filters.status) ||
 			Boolean(data.filters.instansi) ||
-			Boolean(data.filters.jenisDokumen) ||
+			Boolean(data.filters.jenisLayanan) ||
 			Boolean(data.filters.tanggalMulai) ||
 			Boolean(data.filters.tanggalSelesai)
 	)
@@ -205,7 +205,7 @@
 			tanggal_masuk: '',
 			instansi: '',
 			kegiatan: '',
-			jenis_dokumen: '',
+			jenis_layanan: '',
 			posisi: '',
 			status: 'Submit / Masuk'
 		}
@@ -313,8 +313,8 @@
 				<input type="text" bind:value={createForm.kegiatan} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-(--muted)">Jenis Dokumen</span>
-				<input type="text" bind:value={createForm.jenis_dokumen} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
+				<span class="text-xs font-semibold text-(--muted)">Jenis Layanan</span>
+				<input type="text" bind:value={createForm.jenis_layanan} class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
 				<span class="text-xs font-semibold text-(--muted)">Posisi</span>
@@ -368,8 +368,8 @@
 				<input type="text" name="instansi" value={data.filters.instansi ?? ''} placeholder="Nama instansi" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
-				<span class="text-xs font-semibold text-(--muted)">Jenis Dokumen</span>
-				<input type="text" name="jenisDokumen" value={data.filters.jenisDokumen ?? ''} placeholder="AMDAL, UKL-UPL, dll" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
+				<span class="text-xs font-semibold text-(--muted)">Jenis Layanan</span>
+				<input type="text" name="jenisLayanan" value={data.filters.jenisLayanan ?? ''} placeholder="AMDAL, UKL-UPL, dll" class="h-11 rounded-lg border border-[#cfd7e3] bg-white px-3 text-sm text-[#20232A]" />
 			</label>
 			<label class="grid gap-1.5">
 				<span class="text-xs font-semibold text-(--muted)">Tanggal Mulai</span>
@@ -411,7 +411,7 @@
 					<tr>
 						<th class="w-14 border-b border-[#64AD31] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white">No</th>
 						<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Layanan</th>
-						{#each ['no_registrasi', 'tanggal_masuk', 'instansi', 'kegiatan', 'jenis_dokumen', 'posisi', 'status', 'tanggal_update'] as rawColumn}
+						{#each ['no_registrasi', 'tanggal_masuk', 'instansi', 'kegiatan', 'jenis_layanan', 'posisi', 'status', 'tanggal_update'] as rawColumn}
 							{@const column = rawColumn as SortableColumn}
 							<th class="border-b border-[#64AD31] px-4 py-4 text-left align-middle text-sm font-semibold tracking-[0.01em] text-white">
 								<a href={sortHref(column)} class="inline-flex items-center gap-1.5 align-middle hover:text-white/90">
@@ -451,7 +451,7 @@
 								<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</td>
 								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.instansi ?? '-'}</td>
 								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.kegiatan ?? '-'}</td>
-								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.jenis_dokumen ?? '-'}</td>
+								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.jenis_layanan ?? '-'}</td>
 								<td class="px-4 py-4 text-sm text-[#20232A] wrap-break-word">{row.posisi ?? '-'}</td>
 								<td class="px-4 py-4 text-sm"><PengajuanStatusBadge status={row.status} /></td>
 								<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_update)}</td>

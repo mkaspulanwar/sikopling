@@ -34,7 +34,7 @@ export type Database = {
 					created_at: string
 					id: string
 					instansi: string | null
-					jenis_dokumen: string | null
+					jenis_perling: string | null
 					kegiatan: string | null
 					no_registrasi: string | null
 					posisi: string | null
@@ -47,7 +47,7 @@ export type Database = {
 					created_at?: string
 					id?: string
 					instansi?: string | null
-					jenis_dokumen?: string | null
+					jenis_perling?: string | null
 					kegiatan?: string | null
 					no_registrasi?: string | null
 					posisi?: string | null
@@ -60,7 +60,7 @@ export type Database = {
 					created_at?: string
 					id?: string
 					instansi?: string | null
-					jenis_dokumen?: string | null
+					jenis_perling?: string | null
 					kegiatan?: string | null
 					no_registrasi?: string | null
 					posisi?: string | null
@@ -76,7 +76,7 @@ export type Database = {
 					created_at: string
 					id: string
 					instansi: string | null
-					jenis_dokumen: string | null
+					jenis_pertek: string | null
 					kegiatan: string | null
 					no_registrasi: string | null
 					posisi: string | null
@@ -89,7 +89,7 @@ export type Database = {
 					created_at?: string
 					id?: string
 					instansi?: string | null
-					jenis_dokumen?: string | null
+					jenis_pertek?: string | null
 					kegiatan?: string | null
 					no_registrasi?: string | null
 					posisi?: string | null
@@ -102,7 +102,7 @@ export type Database = {
 					created_at?: string
 					id?: string
 					instansi?: string | null
-					jenis_dokumen?: string | null
+					jenis_pertek?: string | null
 					kegiatan?: string | null
 					no_registrasi?: string | null
 					posisi?: string | null

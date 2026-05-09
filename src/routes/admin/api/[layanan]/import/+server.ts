@@ -45,6 +45,14 @@ const readCell = (row: string[], columnMap: Map<string, number>, key: string) =>
 	return row[index]?.trim()
 }
 
+const readFirstCell = (row: string[], columnMap: Map<string, number>, keys: string[]) => {
+	for (const key of keys) {
+		const value = readCell(row, columnMap, key)
+		if (value !== undefined) return value
+	}
+	return undefined
+}
+
 export const POST: RequestHandler = async ({ locals, params, request }) => {
 	const auth = await requireAdminSupabase(locals)
 	if (auth.state === 'unavailable') {
@@ -159,7 +167,10 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		const tanggalMasukRaw = readCell(row, columnMap, 'tanggalmasuk')
 		const instansi = readCell(row, columnMap, 'instansi')
 		const kegiatan = readCell(row, columnMap, 'kegiatan')
-		const jenisDokumen = readCell(row, columnMap, 'jenisdokumen')
+		const jenisLayanan = readFirstCell(row, columnMap, [
+			params.layanan === 'perling' ? 'jenisperling' : 'jenispertek',
+			'jenislayanan'
+		])
 		const posisi = readCell(row, columnMap, 'posisi')
 		const statusRaw = readCell(row, columnMap, 'status')
 		const status = STATUS_VALUES.includes(statusRaw as (typeof STATUS_VALUES)[number])
@@ -185,7 +196,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 				tanggalMasuk: tanggalMasukRaw || undefined,
 				instansi: instansi || undefined,
 				kegiatan: kegiatan || undefined,
-				jenisDokumen: jenisDokumen || undefined,
+				jenisLayanan: jenisLayanan || undefined,
 				posisi: posisi || undefined,
 				status
 			})

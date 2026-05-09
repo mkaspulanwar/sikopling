@@ -8,7 +8,7 @@ const SORTABLE_COLUMNS = [
 	'tanggal_masuk',
 	'instansi',
 	'kegiatan',
-	'jenis_dokumen',
+	'jenis_layanan',
 	'posisi',
 	'status',
 	'tanggal_update',
@@ -60,7 +60,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 			? (query.get('status') as (typeof STATUS_VALUES)[number])
 			: undefined,
 		instansi: readString(query.get('instansi')),
-		jenisDokumen: readString(query.get('jenisDokumen')),
+		jenisLayanan: readString(query.get('jenisLayanan')),
 		tanggalMulai: readDate(query.get('tanggalMulai')),
 		tanggalSelesai: readDate(query.get('tanggalSelesai')),
 		keyword: readString(query.get('keyword')),

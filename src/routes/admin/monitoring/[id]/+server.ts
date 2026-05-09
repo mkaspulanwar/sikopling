@@ -68,7 +68,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 	const hasTanggalUpdateField = Object.prototype.hasOwnProperty.call(body ?? {}, 'tanggal_update')
 	const hasInstansiField = Object.prototype.hasOwnProperty.call(body ?? {}, 'instansi')
 	const hasKegiatanField = Object.prototype.hasOwnProperty.call(body ?? {}, 'kegiatan')
-	const hasJenisDokumenField = Object.prototype.hasOwnProperty.call(body ?? {}, 'jenis_dokumen')
+	const hasJenisLayananField = Object.prototype.hasOwnProperty.call(body ?? {}, 'jenis_layanan')
 	const hasPosisiField = Object.prototype.hasOwnProperty.call(body ?? {}, 'posisi')
 	const hasStatusField = Object.prototype.hasOwnProperty.call(body ?? {}, 'status')
 
@@ -77,7 +77,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 	const tanggalUpdateRaw = typeof body?.tanggal_update === 'string' ? body.tanggal_update.trim() : undefined
 	const instansi = typeof body?.instansi === 'string' ? body.instansi : undefined
 	const kegiatan = typeof body?.kegiatan === 'string' ? body.kegiatan : undefined
-	const jenisDokumen = typeof body?.jenis_dokumen === 'string' ? body.jenis_dokumen : undefined
+	const jenisLayanan = typeof body?.jenis_layanan === 'string' ? body.jenis_layanan : undefined
 	const posisi = typeof body?.posisi === 'string' ? body.posisi : undefined
 	const status = typeof body?.status === 'string' ? (body.status as StatusPengajuan) : undefined
 
@@ -87,7 +87,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 		!hasTanggalUpdateField &&
 		!hasInstansiField &&
 		!hasKegiatanField &&
-		!hasJenisDokumenField &&
+		!hasJenisLayananField &&
 		!hasPosisiField &&
 		!hasStatusField
 	) {
@@ -124,7 +124,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 			tanggalUpdate: hasTanggalUpdateField ? (tanggalUpdateRaw === '' ? null : tanggalUpdateRaw) : undefined,
 			instansi: hasInstansiField ? instansi ?? null : undefined,
 			kegiatan: hasKegiatanField ? kegiatan ?? null : undefined,
-			jenisDokumen: hasJenisDokumenField ? jenisDokumen ?? null : undefined,
+			jenisLayanan: hasJenisLayananField ? jenisLayanan ?? null : undefined,
 			posisi: hasPosisiField ? posisi ?? null : undefined,
 			status: hasStatusField ? status : undefined
 		})
