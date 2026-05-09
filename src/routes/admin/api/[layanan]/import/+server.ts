@@ -1,6 +1,6 @@
 import { INTEGRASI_STATUS_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
 import { isLayanan, requireAdminSupabase } from '$lib/server/admin-route'
-import { createAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { createMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
@@ -179,7 +179,7 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		}
 
 		try {
-			await createAntrianPengajuan(auth.supabase, {
+			await createMonitoringPengajuan(auth.supabase, {
 				layanan: params.layanan,
 				noRegistrasi,
 				tanggalMasuk: tanggalMasukRaw || undefined,

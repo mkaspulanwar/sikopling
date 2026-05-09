@@ -1,6 +1,6 @@
 import { INTEGRASI_STATUS_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
 import { isLayanan, requireAdminSupabase } from '$lib/server/admin-route'
-import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import { error } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
@@ -158,12 +158,12 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 		? (statusRaw as (typeof STATUS_VALUES)[number])
 		: undefined
 
-	const allRows: Awaited<ReturnType<typeof listAntrianPengajuan>>['data'] = []
+	const allRows: Awaited<ReturnType<typeof listMonitoringPengajuan>>['data'] = []
 	let page = 1
 	let totalPages = 1
 
 	while (page <= totalPages) {
-		const result = await listAntrianPengajuan(auth.supabase, {
+		const result = await listMonitoringPengajuan(auth.supabase, {
 			page,
 			pageSize: 100,
 			layanan: params.layanan,

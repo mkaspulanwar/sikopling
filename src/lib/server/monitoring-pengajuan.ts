@@ -25,7 +25,7 @@ type SortOrder = 'asc' | 'desc'
 type MonitoringTableName = 'monitoring_perling' | 'monitoring_pertek'
 type MonitoringRow = Database['public']['Tables']['monitoring_perling']['Row']
 
-type AntrianRow = MonitoringRow & { layanan: Layanan }
+type MonitoringPengajuanRow = MonitoringRow & { layanan: Layanan }
 
 const LAYANAN_TABLE_MAP: Record<Layanan, MonitoringTableName> = {
 	perling: 'monitoring_perling',
@@ -43,7 +43,7 @@ const STATUS_PERLU_PERBAIKAN: StatusPengajuan[] = [
 const MONITORING_LIST_COLUMNS =
 	'id, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
 
-export type ListAntrianPengajuanParams = {
+export type ListMonitoringPengajuanParams = {
 	page?: number
 	pageSize?: number
 	layanan?: Layanan
@@ -57,15 +57,15 @@ export type ListAntrianPengajuanParams = {
 	sortOrder?: SortOrder
 }
 
-export type ListAntrianPengajuanResult = {
-	data: AntrianRow[]
+export type ListMonitoringPengajuanResult = {
+	data: MonitoringPengajuanRow[]
 	total: number
 	page: number
 	pageSize: number
 	totalPages: number
 }
 
-export type ListAntrianPengajuanIdsResult = {
+export type ListMonitoringPengajuanIdsResult = {
 	data: Array<{ id: string }>
 	total: number
 	page: number
@@ -73,7 +73,7 @@ export type ListAntrianPengajuanIdsResult = {
 	totalPages: number
 }
 
-export type AntrianPengajuanSummary = {
+export type MonitoringSummary = {
 	total: number
 	pending: number
 	selesai: number
@@ -117,10 +117,10 @@ const normalizeCount = (value: unknown) => {
 	return Number.isFinite(parsed) ? parsed : 0
 }
 
-const mapRowsWithLayanan = (rows: MonitoringRow[] | null, layanan: Layanan): AntrianRow[] =>
+const mapRowsWithLayanan = (rows: MonitoringRow[] | null, layanan: Layanan): MonitoringPengajuanRow[] =>
 	(rows ?? []).map((row) => ({ ...row, layanan }))
 
-const applyCommonFilters = <T>(query: T, params: ListAntrianPengajuanParams) => {
+const applyCommonFilters = <T>(query: T, params: ListMonitoringPengajuanParams) => {
 	let nextQuery = query as any
 
 	if (params.status && STATUS_VALUES.includes(params.status)) {
@@ -167,7 +167,7 @@ const compareValues = (left: unknown, right: unknown) => {
 	return String(left).localeCompare(String(right), 'id-ID', { sensitivity: 'base' })
 }
 
-const sortRows = (rows: AntrianRow[], sortBy: SortColumn, sortOrder: SortOrder) =>
+const sortRows = (rows: MonitoringPengajuanRow[], sortBy: SortColumn, sortOrder: SortOrder) =>
 	[...rows].sort((left, right) => {
 		const comparison = compareValues(left[sortBy], right[sortBy])
 		return sortOrder === 'asc' ? comparison : -comparison
@@ -192,12 +192,12 @@ const resolveLayananById = async (supabase: SupabaseClient<Database>, id: string
 const listSingleLayanan = async (
 	supabase: SupabaseClient<Database>,
 	layanan: Layanan,
-	params: ListAntrianPengajuanParams,
+	params: ListMonitoringPengajuanParams,
 	page: number,
 	pageSize: number,
 	sortBy: SortColumn,
 	sortOrder: SortOrder
-): Promise<ListAntrianPengajuanResult> => {
+): Promise<ListMonitoringPengajuanResult> => {
 	const from = (page - 1) * pageSize
 	const to = from + pageSize - 1
 	const tableName = LAYANAN_TABLE_MAP[layanan]
@@ -225,10 +225,10 @@ const listSingleLayanan = async (
 	}
 }
 
-export const listAntrianPengajuan = async (
+export const listMonitoringPengajuan = async (
 	supabase: SupabaseClient<Database>,
-	params: ListAntrianPengajuanParams = {}
-): Promise<ListAntrianPengajuanResult> => {
+	params: ListMonitoringPengajuanParams = {}
+): Promise<ListMonitoringPengajuanResult> => {
 	const page = normalizePage(params.page)
 	const pageSize = normalizePageSize(params.pageSize)
 	const sortBy = normalizeSortBy(params.sortBy)
@@ -281,10 +281,10 @@ export const listAntrianPengajuan = async (
 	}
 }
 
-export const listAntrianPengajuanIds = async (
+export const listMonitoringPengajuanIds = async (
 	supabase: SupabaseClient<Database>,
-	params: ListAntrianPengajuanParams = {}
-): Promise<ListAntrianPengajuanIdsResult> => {
+	params: ListMonitoringPengajuanParams = {}
+): Promise<ListMonitoringPengajuanIdsResult> => {
 	const page = normalizePage(params.page)
 	const pageSize = normalizeIdsPageSize(params.pageSize)
 	const sortBy = normalizeSortBy(params.sortBy)
@@ -318,7 +318,7 @@ export const listAntrianPengajuanIds = async (
 		}
 	}
 
-	const fullList = await listAntrianPengajuan(supabase, {
+	const fullList = await listMonitoringPengajuan(supabase, {
 		...params,
 		page: 1,
 		pageSize: MAX_IDS_PAGE_SIZE,
@@ -339,7 +339,7 @@ export const listAntrianPengajuanIds = async (
 	}
 }
 
-export const updateStatusAntrianPengajuan = async (
+export const updateStatusMonitoringPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: {
 		id: string
@@ -371,7 +371,7 @@ export const updateStatusAntrianPengajuan = async (
 	return { ...(data as MonitoringRow), layanan }
 }
 
-export const createAntrianPengajuan = async (
+export const createMonitoringPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: {
 		layanan: Layanan
@@ -411,7 +411,7 @@ export const createAntrianPengajuan = async (
 	return { ...(data as MonitoringRow), layanan: payload.layanan }
 }
 
-export const updateAntrianPengajuan = async (
+export const updateMonitoringPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: {
 		id: string
@@ -482,7 +482,7 @@ export const updateAntrianPengajuan = async (
 	return { ...(data as MonitoringRow), layanan }
 }
 
-export const deleteAntrianPengajuan = async (
+export const deleteMonitoringPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: { id: string }
 ) => {
@@ -518,9 +518,9 @@ export const deleteAntrianPengajuan = async (
 	}
 }
 
-export const getAntrianPengajuanSummary = async (
+export const getMonitoringSummary = async (
 	supabase: SupabaseClient<Database>
-): Promise<AntrianPengajuanSummary> => {
+): Promise<MonitoringSummary> => {
 	const [
 		perlingTotalResult,
 		pertekTotalResult,

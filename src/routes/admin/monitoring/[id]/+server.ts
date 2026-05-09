@@ -1,7 +1,7 @@
 import {
-	deleteAntrianPengajuan,
-	updateAntrianPengajuan
-} from '$lib/server/antrian-pengajuan'
+	deleteMonitoringPengajuan,
+	updateMonitoringPengajuan
+} from '$lib/server/monitoring-pengajuan'
 import { requireAdminSupabase } from '$lib/server/admin-route'
 import { resolveUserRole } from '$lib/server/supabase-auth'
 import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
@@ -117,7 +117,7 @@ export const PATCH: RequestHandler = async ({ locals, params, request }) => {
 	}
 
 	try {
-		const updated = await updateAntrianPengajuan(auth.supabase, {
+		const updated = await updateMonitoringPengajuan(auth.supabase, {
 			id: params.id,
 			noRegistrasi: hasNoRegistrasiField ? noRegistrasi : undefined,
 			tanggalMasuk: hasTanggalMasukField ? (tanggalMasukRaw === '' ? null : tanggalMasukRaw) : undefined,
@@ -155,12 +155,12 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 
 	const { user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
-	if (role !== 'super_admin') {
-		return json({ message: 'Hapus data hanya dapat dilakukan oleh super admin' }, { status: 403 })
+	if (role !== 'admin') {
+		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin' }, { status: 403 })
 	}
 
 	try {
-		await deleteAntrianPengajuan(auth.supabase, { id: params.id })
+		await deleteMonitoringPengajuan(auth.supabase, { id: params.id })
 		return json({ success: true })
 	} catch (error) {
 		const message = extractErrorMessage(error, 'Gagal menghapus data pengajuan')
@@ -171,7 +171,7 @@ export const DELETE: RequestHandler = async ({ locals, params }) => {
 			return json(
 				{
 					message:
-						'Data belum terhapus karena policy database belum mengizinkan role ini. Pastikan policy delete hanya untuk super admin sudah aktif.'
+						'Data belum terhapus karena policy database belum mengizinkan role ini. Pastikan policy delete untuk admin sudah aktif.'
 				},
 				{ status: 403 }
 			)

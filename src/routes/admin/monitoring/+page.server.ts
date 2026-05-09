@@ -1,6 +1,6 @@
 import { LAYANAN_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
 import { EMPTY_SUMMARY, logAdminLoad } from '$lib/server/admin-route'
-import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import type { PageServerLoad } from './$types'
 
 const SORTABLE_COLUMNS = [
@@ -105,7 +105,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	}
 
 	try {
-		const result = await listAntrianPengajuan(locals.supabase, filters)
+		const result = await listMonitoringPengajuan(locals.supabase, filters)
 
 		logAdminLoad('admin/monitoring/+page.server', {
 			state: 'ok',

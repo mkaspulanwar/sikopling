@@ -4,7 +4,7 @@ import {
 	logAdminLoad,
 	readAdminFilters
 } from '$lib/server/admin-route'
-import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import type { PageServerLoad } from './$types'
 
 type LoginHistoryItem = {
@@ -67,7 +67,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	}
 
 	try {
-		const recentResult = await listAntrianPengajuan(locals.supabase, {
+		const recentResult = await listMonitoringPengajuan(locals.supabase, {
 			page: filters.page,
 			pageSize: Math.min(filters.pageSize, 12),
 			keyword: filters.keyword,

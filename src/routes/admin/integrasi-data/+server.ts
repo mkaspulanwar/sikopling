@@ -140,8 +140,8 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 
 	const { user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
-	if (role !== 'super_admin') {
-		return json({ message: 'Hapus data hanya dapat dilakukan oleh super admin' }, { status: 403 })
+	if (role !== 'admin') {
+		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin' }, { status: 403 })
 	}
 
 	let body: unknown

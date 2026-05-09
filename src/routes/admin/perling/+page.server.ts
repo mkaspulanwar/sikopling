@@ -4,7 +4,7 @@ import {
 	logAdminLoad,
 	readAdminFilters
 } from '$lib/server/admin-route'
-import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import type { PageServerLoad } from './$types'
 
 const EMPTY_DOKLING_STATUS_METRICS = {
@@ -81,7 +81,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 
 		const [result, totalDoklingResult, selesaiDoklingResult, ditolakDoklingResult] =
 			await Promise.all([
-			listAntrianPengajuan(locals.supabase, {
+			listMonitoringPengajuan(locals.supabase, {
 				...filters,
 				layanan: 'perling'
 			}),

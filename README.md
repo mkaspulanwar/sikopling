@@ -51,7 +51,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
   - responsive expandable row (mobile),
   - export CSV di sisi klien.
 - **Panel admin** dengan proteksi role:
-  - role valid: `super_admin`, `admin`, `operator`, `reviewer`,
+  - role valid: `admin`,
   - sidebar desktop + mobile drawer,
   - session keep-alive otomatis (`/admin/session`).
 - **Manajemen data admin (dokling/pertek)**:
@@ -97,7 +97,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
 │   │   ├── server/
 │   │   │   ├── admin-route.ts
 │   │   │   ├── admin-session.ts
-│   │   │   ├── antrian-pengajuan.ts
+│   │   │   ├── monitoring-pengajuan.ts
 │   │   │   ├── public-queue.ts
 │   │   │   └── supabase-auth.ts
 │   │   └── supabase/
@@ -172,12 +172,8 @@ SIKOPLING saat ini terdiri dari dua area utama:
 │   └── robots.txt
 ├── supabase/
 │   ├── migrations/                                # SQL migrasi schema & policy
-│   │   ├── 20260423144841_remote_schema.sql
-│   │   ├── 20260423223000_create_antrian_pengajuan.sql
-│   │   ├── 20260424143000_allow_admin_operator_delete_antrian_pengajuan.sql
-│   │   ├── 20260424150000_restrict_delete_to_super_admin.sql
-│   │   ├── 20260426103000_allow_nullable_duplicate_no_registrasi.sql
-│   │   └── 20260509143000_detach_workflow_history.sql
+    ... legacy migration history
+    20260509160000_simplify_roles_to_admin.sql
 │   └── .temp/                                     # Metadata lokal Supabase CLI
 ├── tests/
 │   └── home.e2e.ts                                # E2E Playwright
@@ -237,15 +233,14 @@ SIKOPLING saat ini terdiri dari dua area utama:
 
 Tabel utama:
 
-- `antrian_pengajuan`
-  - menyimpan data antrian dokling/pertek,
-  - memiliki trigger update `updated_at` dan `tanggal_update`,
-  - status dibatasi oleh daftar status pada konstanta aplikasi.
+- `monitoring_perling`
+- `monitoring_pertek`
+- `monitoring_integrasi`
+
+Ketiga tabel monitoring menyimpan data operasional admin, memakai RLS Supabase, dan statusnya dibatasi oleh konstanta aplikasi.
 Catatan policy:
 
-- operasi baca admin: `super_admin`, `admin`, `operator`, `reviewer`,
-- operasi tulis tertentu: dibatasi per policy,
-- operasi hapus data saat ini diproteksi untuk `super_admin`.
+- operasi baca, tulis, update, dan hapus data admin membutuhkan role `admin`.
 
 ## Tech Stack
 

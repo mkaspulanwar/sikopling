@@ -1,11 +1,11 @@
 import { LAYANAN_VALUES, STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
 import {
-	createAntrianPengajuan,
-	deleteAntrianPengajuan,
-	listAntrianPengajuanIds,
-	listAntrianPengajuan,
-	updateStatusAntrianPengajuan
-} from '$lib/server/antrian-pengajuan'
+	createMonitoringPengajuan,
+	deleteMonitoringPengajuan,
+	listMonitoringPengajuanIds,
+	listMonitoringPengajuan,
+	updateStatusMonitoringPengajuan
+} from '$lib/server/monitoring-pengajuan'
 import { requireAdminSupabase } from '$lib/server/admin-route'
 import { resolveUserRole } from '$lib/server/supabase-auth'
 import { json } from '@sveltejs/kit'
@@ -164,11 +164,11 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	}
 
 	if (query.get('selectMode') === 'ids') {
-		const idsResult = await listAntrianPengajuanIds(auth.supabase, commonParams)
+		const idsResult = await listMonitoringPengajuanIds(auth.supabase, commonParams)
 		return json(idsResult)
 	}
 
-	const result = await listAntrianPengajuan(auth.supabase, commonParams)
+	const result = await listMonitoringPengajuan(auth.supabase, commonParams)
 
 	return json(result)
 }
@@ -179,8 +179,8 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 
 	const { user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
-	if (role !== 'super_admin') {
-		return json({ message: 'Hapus data hanya dapat dilakukan oleh super admin' }, { status: 403 })
+	if (role !== 'admin') {
+		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin' }, { status: 403 })
 	}
 
 	let body: unknown
@@ -206,7 +206,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		const collectedIds: string[] = []
 
 		while (page <= totalPages) {
-			const idsResult = await listAntrianPengajuanIds(auth.supabase, {
+			const idsResult = await listMonitoringPengajuanIds(auth.supabase, {
 				page,
 				pageSize: IDS_FETCH_PAGE_SIZE,
 				layanan: payload.layanan,
@@ -240,7 +240,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		const batchResults = await Promise.all(
 			idBatch.map(async (id) => {
 				try {
-					await deleteAntrianPengajuan(auth.supabase, { id })
+					await deleteMonitoringPengajuan(auth.supabase, { id })
 					return { ok: true as const }
 				} catch (error) {
 					const message = extractErrorMessage(error, 'Gagal menghapus data pengajuan')
@@ -298,7 +298,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	}
 
 	try {
-		const created = await createAntrianPengajuan(auth.supabase, {
+		const created = await createMonitoringPengajuan(auth.supabase, {
 			layanan: layanan as 'perling' | 'pertek',
 			noRegistrasi,
 			tanggalMasuk,
@@ -342,7 +342,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		return json({ message: 'status tidak valid' }, { status: 400 })
 	}
 
-	const updated = await updateStatusAntrianPengajuan(auth.supabase, {
+	const updated = await updateStatusMonitoringPengajuan(auth.supabase, {
 		id: body.id,
 		status: body.status,
 		posisi: typeof body.posisi === 'string' ? body.posisi : null

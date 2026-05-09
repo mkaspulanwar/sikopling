@@ -4,7 +4,7 @@ import {
 	logAdminLoad,
 	readAdminFilters
 } from '$lib/server/admin-route'
-import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
+import { listMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import type { PageServerLoad } from './$types'
 
 const EMPTY_PERTEK_STATUS_METRICS = {
@@ -80,7 +80,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 		}
 
 		const [result, totalPertekResult, selesaiPertekResult, ditolakPertekResult] = await Promise.all([
-			listAntrianPengajuan(locals.supabase, {
+			listMonitoringPengajuan(locals.supabase, {
 				...filters,
 				layanan: 'pertek'
 			}),

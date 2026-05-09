@@ -1,5 +1,5 @@
 import { EMPTY_SUMMARY, logAdminLoad } from '$lib/server/admin-route'
-import { getAntrianPengajuanSummary } from '$lib/server/antrian-pengajuan'
+import { getMonitoringSummary } from '$lib/server/monitoring-pengajuan'
 import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import { redirect } from '@sveltejs/kit'
 import type { LayoutServerLoad } from './$types'
@@ -40,7 +40,7 @@ export const load: LayoutServerLoad = async ({ url, locals, depends, untrack }) 
 		}
 	}
 
-	const summary = await getAntrianPengajuanSummary(locals.supabase)
+	const summary = await getMonitoringSummary(locals.supabase)
 	logAdminLoad('admin/+layout.server', { state: 'ok', role })
 
 	return {

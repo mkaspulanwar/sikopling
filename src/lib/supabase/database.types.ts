@@ -1,6 +1,5 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
-type LegacyLayananValue = 'dokling' | 'perling' | 'pertek'
 type LayananValue = 'perling' | 'pertek'
 
 type StatusValue =
@@ -30,51 +29,6 @@ type IntegrasiStatusValue =
 export type Database = {
 	public: {
 		Tables: {
-			antrian_pengajuan: {
-				Row: {
-					created_at: string
-					id: string
-					instansi: string | null
-					jenis_dokumen: string | null
-					kegiatan: string | null
-					layanan: LegacyLayananValue
-					no_registrasi: string | null
-					posisi: string | null
-					status: StatusValue
-					tanggal_masuk: string | null
-					tanggal_update: string | null
-					updated_at: string
-				}
-				Insert: {
-					created_at?: string
-					id?: string
-					instansi?: string | null
-					jenis_dokumen?: string | null
-					kegiatan?: string | null
-					layanan: LegacyLayananValue
-					no_registrasi?: string | null
-					posisi?: string | null
-					status?: StatusValue
-					tanggal_masuk?: string | null
-					tanggal_update?: string | null
-					updated_at?: string
-				}
-				Update: {
-					created_at?: string
-					id?: string
-					instansi?: string | null
-					jenis_dokumen?: string | null
-					kegiatan?: string | null
-					layanan?: LegacyLayananValue
-					no_registrasi?: string | null
-					posisi?: string | null
-					status?: StatusValue
-					tanggal_masuk?: string | null
-					tanggal_update?: string | null
-					updated_at?: string
-				}
-				Relationships: []
-			}
 			monitoring_perling: {
 				Row: {
 					created_at: string

@@ -104,8 +104,8 @@ test.describe.serial('admin perling/pertek table e2e', () => {
 			email,
 			password,
 			email_confirm: true,
-			app_metadata: { role: 'super_admin' },
-			user_metadata: { role: 'super_admin' }
+			app_metadata: { role: 'admin' },
+			user_metadata: { role: 'admin' }
 		})
 		if (createUserResult.error || !createUserResult.data.user) {
 			throw new Error(createUserResult.error?.message ?? 'Gagal membuat user admin untuk E2E')
