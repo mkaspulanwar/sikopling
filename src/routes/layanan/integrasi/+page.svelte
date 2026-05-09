@@ -206,7 +206,19 @@
 		return chips;
 	});
 
-	const isRowExpanded = (queueNo: string) => expandedRows.includes(queueNo);
+	const getRowExpansionKey = (row: QueueRow, rowIndex: number) =>
+		JSON.stringify([
+			rowIndex,
+			row.no,
+			row.instansi,
+			row.kegiatan,
+			row.jenis,
+			row.status,
+			row.posisi,
+			row.tanggalUpdate,
+			row.keterangan,
+		]);
+	const isRowExpanded = (rowKey: string) => expandedRows.includes(rowKey);
 	const resetExpandedAndFirstPage = () => {
 		expandedRows = [];
 		currentPage = 1;
@@ -258,10 +270,10 @@
 		isRowsDropdownOpen = false;
 	};
 
-	const toggleRowExpanded = (queueNo: string) => {
-		expandedRows = isRowExpanded(queueNo)
-			? expandedRows.filter((item) => item !== queueNo)
-			: [...expandedRows, queueNo];
+	const toggleRowExpanded = (rowKey: string) => {
+		expandedRows = isRowExpanded(rowKey)
+			? expandedRows.filter((item) => item !== rowKey)
+			: [...expandedRows, rowKey];
 	};
 	const toggleFilterPanel = () => {
 		isFilterPanelOpen = !isFilterPanelOpen;
@@ -972,6 +984,10 @@
 			{:else}
 				<ul>
 					{#each paginatedRows as row, index}
+						{@const rowExpansionKey = getRowExpansionKey(
+							row,
+							pageStartIndex + index,
+						)}
 						<li
 							class="border-t border-[var(--line)] first:border-t-0"
 						>
@@ -979,10 +995,8 @@
 								type="button"
 								class="grid w-full grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-3 px-3 py-3.5 text-left"
 								onclick={() =>
-									toggleRowExpanded(row.no)}
-								aria-expanded={isRowExpanded(
-									row.no,
-								)}
+									toggleRowExpanded(rowExpansionKey)}
+								aria-expanded={isRowExpanded(rowExpansionKey)}
 							>
 								<p
 									class="pt-0.5 text-center text-sm font-semibold text-[#20232A]"
@@ -1000,11 +1014,6 @@
 												>
 													{row.instansi}
 												</p>
-												<p
-													class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
-												>
-													{row.no}
-												</p>
 												<div
 													class="mt-2 flex flex-wrap items-center gap-1.5"
 												>
@@ -1019,9 +1028,14 @@
 													{row.status}
 												</span>
 											</div>
+											<p
+												class="mt-2 text-[0.75rem] leading-tight text-(--muted)"
+											>
+												Tanggal Update: {formatDate(row.tanggalUpdate)}
+											</p>
 										</div>
 										<span
-											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-(--muted) transition-transform ${isRowExpanded(row.no) ? "rotate-180" : ""}`}
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-(--muted) transition-transform ${isRowExpanded(rowExpansionKey) ? "rotate-180" : ""}`}
 											aria-hidden="true"
 										>
 											<ChevronDown
@@ -1033,7 +1047,7 @@
 								</div>
 							</button>
 
-							{#if isRowExpanded(row.no)}
+							{#if isRowExpanded(rowExpansionKey)}
 								<div
 									class="border-t border-[var(--line)] bg-transparent px-4 py-4"
 								>
@@ -1060,20 +1074,6 @@
 												class="mt-1 text-sm text-[#20232A]"
 											>
 												{row.posisi}
-											</dd>
-										</div>
-										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
-												Tanggal Update
-											</dt>
-											<dd
-												class="mt-1 text-sm text-[#20232A]"
-											>
-												{formatDate(
-													row.tanggalUpdate,
-												)}
 											</dd>
 										</div>
 										<div>

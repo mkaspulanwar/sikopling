@@ -269,8 +269,19 @@
 		return chips;
 	});
 
-	const isRowExpanded = (registrationNo: string) =>
-		expandedRows.includes(registrationNo);
+	const getRowExpansionKey = (row: QueueRow, rowIndex: number) =>
+		JSON.stringify([
+			rowIndex,
+			row.registrationNo,
+			row.receivedDate,
+			row.agency,
+			row.activity,
+			row.documentType,
+			row.position,
+			row.progressStatus,
+			row.progressUpdatedDate,
+		]);
+	const isRowExpanded = (rowKey: string) => expandedRows.includes(rowKey);
 	const resetExpandedAndFirstPage = () => {
 		expandedRows = [];
 		currentPage = 1;
@@ -319,10 +330,10 @@
 		resetExpandedAndFirstPage();
 		isRowsDropdownOpen = false;
 	};
-	const toggleRowExpanded = (registrationNo: string) => {
-		expandedRows = isRowExpanded(registrationNo)
-			? expandedRows.filter((item) => item !== registrationNo)
-			: [...expandedRows, registrationNo];
+	const toggleRowExpanded = (rowKey: string) => {
+		expandedRows = isRowExpanded(rowKey)
+			? expandedRows.filter((item) => item !== rowKey)
+			: [...expandedRows, rowKey];
 	};
 	const toggleFilterPanel = () => {
 		isFilterPanelOpen = !isFilterPanelOpen;
@@ -1039,6 +1050,10 @@
 			{:else}
 				<ul>
 					{#each paginatedRows as row, index}
+						{@const rowExpansionKey = getRowExpansionKey(
+							row,
+							pageStartIndex + index,
+						)}
 						<li
 							class="border-t border-[var(--line)] first:border-t-0"
 						>
@@ -1046,10 +1061,8 @@
 								type="button"
 								class="grid w-full grid-cols-[2.25rem_minmax(0,1fr)] items-start gap-3 px-3 py-3.5 text-left"
 								onclick={() =>
-									toggleRowExpanded(row.registrationNo)}
-								aria-expanded={isRowExpanded(
-									row.registrationNo,
-								)}
+									toggleRowExpanded(rowExpansionKey)}
+								aria-expanded={isRowExpanded(rowExpansionKey)}
 							>
 								<p
 									class="pt-0.5 text-center text-sm font-semibold text-[#20232A]"
@@ -1057,24 +1070,24 @@
 									{pageStartIndex + index + 1}
 								</p>
 
-									<div class="min-w-0">
-										<div
-											class="flex items-start justify-between gap-2"
-										>
-											<div class="min-w-0">
-												<p
-													class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]"
-												>
-													{row.agency}
-												</p>
-												<p
-													class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
-												>
-													{row.registrationNo}
-												</p>
-												<div
-													class="mt-2 flex flex-wrap items-center gap-1.5"
-												>
+								<div class="min-w-0">
+									<div
+										class="flex items-start justify-between gap-2"
+									>
+										<div class="min-w-0">
+											<p
+												class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]"
+											>
+												{row.agency}
+											</p>
+											<p
+												class="mt-1 text-[0.75rem] leading-tight break-all text-(--muted)"
+											>
+												No Registrasi: {row.registrationNo}
+											</p>
+											<div
+												class="mt-2 flex flex-wrap items-center gap-1.5"
+											>
 												<span
 													class="text-[0.75rem] leading-tight text-(--muted)"
 												>
@@ -1086,9 +1099,16 @@
 													{row.progressStatus}
 												</span>
 											</div>
+											<p
+												class="mt-2 text-[0.75rem] leading-tight text-(--muted)"
+											>
+												Tanggal Update: {formatDate(
+													row.progressUpdatedDate,
+												)}
+											</p>
 										</div>
 										<span
-											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-(--muted) transition-transform ${isRowExpanded(row.registrationNo) ? "rotate-180" : ""}`}
+											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-(--muted) transition-transform ${isRowExpanded(rowExpansionKey) ? "rotate-180" : ""}`}
 											aria-hidden="true"
 										>
 											<ChevronDown
@@ -1100,7 +1120,7 @@
 								</div>
 							</button>
 
-							{#if isRowExpanded(row.registrationNo)}
+							{#if isRowExpanded(rowExpansionKey)}
 								<div
 									class="border-t border-[var(--line)] bg-transparent px-4 py-4"
 								>
@@ -1139,20 +1159,6 @@
 												class="mt-1 text-sm text-[#20232A]"
 											>
 												{row.position}
-											</dd>
-										</div>
-										<div>
-											<dt
-												class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]"
-											>
-												Tanggal Update
-											</dt>
-											<dd
-												class="mt-1 text-sm text-[#20232A]"
-											>
-												{formatDate(
-													row.progressUpdatedDate,
-												)}
 											</dd>
 										</div>
 									</dl>
