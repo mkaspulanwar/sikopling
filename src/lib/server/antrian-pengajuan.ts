@@ -24,7 +24,6 @@ type SortColumn = (typeof SORTABLE_COLUMNS)[number]
 type SortOrder = 'asc' | 'desc'
 type MonitoringTableName = 'monitoring_perling' | 'monitoring_pertek'
 type MonitoringRow = Database['public']['Tables']['monitoring_perling']['Row']
-type WorkflowHistoryRow = Database['public']['Tables']['workflow_history']['Row']
 
 type AntrianRow = MonitoringRow & { layanan: Layanan }
 
@@ -43,9 +42,6 @@ const STATUS_PERLU_PERBAIKAN: StatusPengajuan[] = [
 
 const MONITORING_LIST_COLUMNS =
 	'id, no_registrasi, tanggal_masuk, instansi, kegiatan, jenis_dokumen, posisi, status, tanggal_update, created_at, updated_at'
-
-const WORKFLOW_HISTORY_COLUMNS =
-	'id, pengajuan_id, layanan, old_status, new_status, old_posisi, new_posisi, note, changed_by, changed_at'
 
 export type ListAntrianPengajuanParams = {
 	page?: number
@@ -88,8 +84,6 @@ export type AntrianPengajuanSummary = {
 	admin: number
 	perluPerbaikan: number
 }
-
-export type WorkflowHistoryByPengajuan = Record<string, WorkflowHistoryRow[]>
 
 const normalizePage = (value?: number) => {
 	if (!value || Number.isNaN(value) || value < 1) return DEFAULT_PAGE
@@ -351,7 +345,6 @@ export const updateStatusAntrianPengajuan = async (
 		id: string
 		status: StatusPengajuan
 		posisi?: string | null
-		note?: string | null
 	}
 ) => {
 	if (!STATUS_VALUES.includes(payload.status)) {
@@ -375,30 +368,6 @@ export const updateStatusAntrianPengajuan = async (
 		.single()
 
 	if (error) throw error
-
-	const cleanedNote = payload.note?.trim()
-	if (cleanedNote) {
-		const { data: latestHistory, error: latestHistoryError } = await supabase
-			.from('workflow_history')
-			.select('id')
-			.eq('pengajuan_id', payload.id)
-			.eq('layanan', layanan)
-			.order('changed_at', { ascending: false })
-			.limit(1)
-			.maybeSingle()
-
-		if (latestHistoryError) throw latestHistoryError
-
-		if (latestHistory?.id) {
-			const { error: updateHistoryError } = await supabase
-				.from('workflow_history')
-				.update({ note: cleanedNote })
-				.eq('id', latestHistory.id)
-
-			if (updateHistoryError) throw updateHistoryError
-		}
-	}
-
 	return { ...(data as MonitoringRow), layanan }
 }
 
@@ -601,30 +570,4 @@ export const getAntrianPengajuanSummary = async (
 	const pending = Math.max(total - selesai, 0)
 
 	return { total, pending, selesai, perling, pertek, diproses, ditolak, admin, perluPerbaikan }
-}
-
-export const getWorkflowHistoryByPengajuanIds = async (
-	supabase: SupabaseClient<Database>,
-	pengajuanIds: string[]
-): Promise<WorkflowHistoryByPengajuan> => {
-	if (pengajuanIds.length === 0) return {}
-
-	const { data, error } = await supabase
-		.from('workflow_history')
-		.select(WORKFLOW_HISTORY_COLUMNS)
-		.in('pengajuan_id', pengajuanIds)
-		.in('layanan', ['perling', 'pertek'])
-		.order('changed_at', { ascending: false })
-
-	if (error) throw error
-
-	const historyByPengajuan: WorkflowHistoryByPengajuan = {}
-	for (const row of data ?? []) {
-		if (!historyByPengajuan[row.pengajuan_id]) {
-			historyByPengajuan[row.pengajuan_id] = []
-		}
-		historyByPengajuan[row.pengajuan_id].push(row as WorkflowHistoryRow)
-	}
-
-	return historyByPengajuan
 }

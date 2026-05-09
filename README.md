@@ -61,11 +61,10 @@ SIKOPLING saat ini terdiri dari dua area utama:
   - import CSV (`/admin/api/[layanan]/import`),
   - export CSV (`/admin/api/[layanan]/export`),
   - metrik ringkasan per layanan (total/selesai/diproses/ditolak).
-- **Antrian admin umum** (`/admin/pengajuan`) untuk lintas layanan:
+- **Monitoring admin umum** (`/admin/monitoring`) untuk lintas layanan:
   - filter komprehensif,
   - sorting server-side,
-  - update status + posisi + catatan,
-  - tampilan histori workflow per pengajuan.
+  - update status + posisi.
 - **Integrasi Supabase SSR** + manajemen cookie auth (termasuk opsi "ingat saya").
 - **Vercel Analytics** di root layout.
 
@@ -146,7 +145,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
 │           ├── pertek/
 │           │   ├── +page.server.ts
 │           │   └── +page.svelte
-│           ├── pengajuan/
+│           ├── monitoring/
 │           │   ├── +page.server.ts
 │           │   ├── +page.svelte
 │           │   ├── +server.ts
@@ -175,11 +174,10 @@ SIKOPLING saat ini terdiri dari dua area utama:
 │   ├── migrations/                                # SQL migrasi schema & policy
 │   │   ├── 20260423144841_remote_schema.sql
 │   │   ├── 20260423223000_create_antrian_pengajuan.sql
-│   │   ├── 20260423232000_create_workflow_history.sql
-│   │   ├── 20260423235500_allow_update_workflow_history_note.sql
 │   │   ├── 20260424143000_allow_admin_operator_delete_antrian_pengajuan.sql
 │   │   ├── 20260424150000_restrict_delete_to_super_admin.sql
-│   │   └── 20260426103000_allow_nullable_duplicate_no_registrasi.sql
+│   │   ├── 20260426103000_allow_nullable_duplicate_no_registrasi.sql
+│   │   └── 20260509143000_detach_workflow_history.sql
 │   └── .temp/                                     # Metadata lokal Supabase CLI
 ├── tests/
 │   └── home.e2e.ts                                # E2E Playwright
@@ -218,7 +216,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
 | `/admin/dashboard` | Ringkasan metrik dan aktivitas login |
 | `/admin/perling` | Operasional data antrian perling |
 | `/admin/pertek` | Operasional data antrian pertek |
-| `/admin/pengajuan` | Operasional lintas layanan + workflow |
+| `/admin/monitoring` | Monitoring operasional lintas layanan |
 | `/admin/profil` | Informasi akun admin aktif |
 | `/admin/pengaturan` | Halaman preferensi UI admin (placeholder fungsional) |
 
@@ -227,11 +225,11 @@ SIKOPLING saat ini terdiri dari dua area utama:
 | Endpoint | Method | Fungsi |
 | --- | --- | --- |
 | `/admin/session` | `GET`, `POST` | Keep-alive sesi admin |
-| `/admin/pengajuan` | `GET` | List data pengajuan (server-side filter/sort/page) |
-| `/admin/pengajuan` | `POST` | Create pengajuan |
-| `/admin/pengajuan` | `PATCH` | Update status + posisi + note |
-| `/admin/pengajuan/[id]` | `PATCH` | Update detail data per id |
-| `/admin/pengajuan/[id]` | `DELETE` | Hapus data (dibatasi role) |
+| `/admin/monitoring` | `GET` | List data monitoring (server-side filter/sort/page) |
+| `/admin/monitoring` | `POST` | Create data monitoring |
+| `/admin/monitoring` | `PATCH` | Update status + posisi |
+| `/admin/monitoring/[id]` | `PATCH` | Update detail data per id |
+| `/admin/monitoring/[id]` | `DELETE` | Hapus data (dibatasi role) |
 | `/admin/api/[layanan]/import` | `POST` | Import CSV (`dokling`/`pertek`) |
 | `/admin/api/[layanan]/export` | `GET` | Export CSV (`dokling`/`pertek`) |
 
@@ -243,11 +241,6 @@ Tabel utama:
   - menyimpan data antrian dokling/pertek,
   - memiliki trigger update `updated_at` dan `tanggal_update`,
   - status dibatasi oleh daftar status pada konstanta aplikasi.
-- `workflow_history`
-  - menyimpan histori perubahan status/posisi,
-  - tercatat otomatis melalui trigger `log_antrian_status_change`,
-  - mendukung update `note` untuk catatan workflow.
-
 Catatan policy:
 
 - operasi baca admin: `super_admin`, `admin`, `operator`, `reviewer`,
@@ -335,3 +328,4 @@ Ikuti panduan di [contributing.md](./contributing.md).
 ## Lisensi
 
 Lisensi mengikuti file [LICENSE](./LICENSE).
+

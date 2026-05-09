@@ -30,14 +30,6 @@
 		year: 'numeric'
 	})
 
-	const dateTimeFormatter = new Intl.DateTimeFormat('id-ID', {
-		day: '2-digit',
-		month: 'short',
-		year: 'numeric',
-		hour: '2-digit',
-		minute: '2-digit'
-	})
-
 	const numberFormatter = new Intl.NumberFormat('id-ID')
 
 	const sortLabels: Record<SortableColumn, string> = {
@@ -59,7 +51,6 @@
 	let expandedRowsById = $state<Record<string, boolean>>({})
 	let draftStatusById = $state<Record<string, StatusPengajuan>>({})
 	let draftPosisiById = $state<Record<string, string>>({})
-	let draftNoteById = $state<Record<string, string>>({})
 	let createForm = $state({
 		layanan: 'perling',
 		no_registrasi: '',
@@ -76,25 +67,9 @@
 		return dateFormatter.format(new Date(`${value}T00:00:00`))
 	}
 
-	const formatDateTime = (value: string) => dateTimeFormatter.format(new Date(value))
 	const formatNumber = (value: number) => numberFormatter.format(value)
-	const refreshAdminPengajuanData = async () => {
-		await Promise.all([invalidate('admin:summary'), invalidate('admin:pengajuan')])
-	}
-
-	const getRowHistory = (pengajuanId: string) => {
-		const historyMap = data.historyByPengajuan as Record<
-			string,
-			Array<{
-				old_status: string | null
-				new_status: string
-				old_posisi: string | null
-				new_posisi: string | null
-				note: string | null
-				changed_at: string
-			}>
-		>
-		return historyMap[pengajuanId] ?? []
+	const refreshAdminMonitoringData = async () => {
+		await Promise.all([invalidate('admin:summary'), invalidate('admin:monitoring')])
 	}
 
 	const buildQuery = (overrides: Record<string, string | number | undefined | null>) => {
@@ -176,7 +151,7 @@
 		pendingRowId = id
 		flash = null
 
-		const response = await fetch('/admin/pengajuan', {
+		const response = await fetch('/admin/monitoring', {
 			method: 'PATCH',
 			headers: {
 				'content-type': 'application/json'
@@ -184,8 +159,7 @@
 			body: JSON.stringify({
 				id,
 				status,
-				posisi: draftPosisiById[id] ?? null,
-				note: draftNoteById[id] ?? null
+				posisi: draftPosisiById[id] ?? null
 			})
 		})
 
@@ -198,11 +172,11 @@
 		}
 
 		flash = { type: 'success', message: `Status untuk ${id.slice(0, 8)} berhasil diperbarui` }
-		await refreshAdminPengajuanData()
+		await refreshAdminMonitoringData()
 		pendingRowId = null
 	}
 
-	const submitCreatePengajuan = async () => {
+	const submitCreateMonitoringData = async () => {
 		if (!createForm.no_registrasi.trim()) {
 			flash = { type: 'error', message: 'No registrasi wajib diisi' }
 			return
@@ -211,7 +185,7 @@
 		isCreating = true
 		flash = null
 
-		const response = await fetch('/admin/pengajuan', {
+		const response = await fetch('/admin/monitoring', {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
 			body: JSON.stringify(createForm)
@@ -224,7 +198,7 @@
 			return
 		}
 
-		flash = { type: 'success', message: 'Data pengajuan berhasil ditambahkan' }
+		flash = { type: 'success', message: 'Data monitoring berhasil ditambahkan' }
 		createForm = {
 			layanan: 'perling',
 			no_registrasi: '',
@@ -235,7 +209,7 @@
 			posisi: '',
 			status: 'Submit / Masuk'
 		}
-		await refreshAdminPengajuanData()
+		await refreshAdminMonitoringData()
 		isCreating = false
 	}
 </script>
@@ -245,9 +219,9 @@
 		<div class="flex flex-wrap items-start justify-between gap-3">
 			<div>
 				<p class="text-xs font-semibold uppercase tracking-[0.05em] text-(--muted)">Dashboard Admin</p>
-				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-[#20232A] sm:text-[2rem]">Antrian Pengajuan</h1>
+				<h1 class="mt-1 text-2xl font-semibold tracking-tight text-[#20232A] sm:text-[2rem]">Monitoring Lintas Layanan</h1>
 				<p class="mt-2 max-w-3xl text-sm text-(--muted) sm:text-[0.96rem]">
-					Kelola antrean perling dan pertek dengan tabel operasional, pembaruan status, dan histori workflow.
+					Kelola antrean perling dan pertek dengan tabel operasional dan pembaruan status.
 				</p>
 			</div>
 			<a
@@ -302,8 +276,8 @@
 
 	<section class="rounded-xl border border-[#d7dee8] bg-white p-4 sm:p-5">
 		<div class="flex flex-wrap items-center justify-between gap-2">
-			<h2 class="text-base font-semibold text-[#20232A] sm:text-lg">Tambah Pengajuan Baru</h2>
-			<p class="text-xs text-(--muted)">Isi kolom sesuai data pengajuan lalu simpan.</p>
+			<h2 class="text-base font-semibold text-[#20232A] sm:text-lg">Tambah Data Monitoring</h2>
+			<p class="text-xs text-(--muted)">Isi kolom sesuai data layanan lalu simpan.</p>
 		</div>
 		<div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 			<label class="grid gap-1.5">
@@ -348,8 +322,8 @@
 			</label>
 		</div>
 		<div class="mt-3 flex justify-end">
-			<button type="button" onclick={submitCreatePengajuan} disabled={isCreating || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
-				{isCreating ? 'Menyimpan...' : 'Tambah Pengajuan'}
+			<button type="button" onclick={submitCreateMonitoringData} disabled={isCreating || data.unavailable} class="inline-flex h-10 items-center rounded-lg bg-[#64AD31] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">
+				{isCreating ? 'Menyimpan...' : 'Tambah Data'}
 			</button>
 		</div>
 	</section>
@@ -503,33 +477,13 @@
 								<tr class="border-t border-[#e9edf3] bg-[#f8fafc]">
 									<td colspan="11" class="px-4 py-4">
 										<div class="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
-											<div class="grid gap-3 md:grid-cols-2">
+											<div class="grid gap-3">
 												<input type="text" placeholder="Posisi terbaru" value={draftPosisiById[row.id] ?? row.posisi ?? ''} onchange={(event) => {
 													draftPosisiById[row.id] = (event.currentTarget as HTMLInputElement).value
-												}} class="h-10 rounded-lg border border-[#cfd7e3] bg-white px-3 text-xs text-[#20232A]" />
-												<input type="text" placeholder="Catatan perubahan (opsional)" value={draftNoteById[row.id] ?? ''} onchange={(event) => {
-													draftNoteById[row.id] = (event.currentTarget as HTMLInputElement).value
 												}} class="h-10 rounded-lg border border-[#cfd7e3] bg-white px-3 text-xs text-[#20232A]" />
 											</div>
 											<div class="flex flex-wrap items-start gap-2 xl:justify-end">
 												<button type="button" onclick={() => submitStatusUpdate(row.id)} disabled={pendingRowId === row.id || data.unavailable} class="h-10 rounded-lg bg-[#64AD31] px-3 text-xs font-semibold text-white transition enabled:hover:bg-[#4f8925] disabled:cursor-not-allowed disabled:bg-slate-300">{pendingRowId === row.id ? 'Menyimpan...' : 'Simpan Status'}</button>
-												<details class="min-w-48 rounded-lg border border-[#d7dee8] bg-white p-2.5">
-													<summary class="cursor-pointer text-xs font-semibold text-[#334155]">History ({getRowHistory(row.id).length})</summary>
-													{#if getRowHistory(row.id).length === 0}
-														<p class="mt-2 text-xs text-(--muted)">Belum ada histori perubahan.</p>
-													{:else}
-														<ul class="mt-2 space-y-2">
-															{#each getRowHistory(row.id) as history}
-																<li class="rounded-md border border-[#d7dee8] bg-[#f8fafc] px-2 py-1.5 text-[11px] text-[#475467]">
-																	<p class="font-semibold text-[#20232A]">{history.old_status ?? 'Belum ada'} -> {history.new_status}</p>
-																	<p>Posisi: {history.old_posisi ?? '-'} -> {history.new_posisi ?? '-'}</p>
-																	<p>Catatan: {history.note ?? '-'}</p>
-																	<p class="text-(--muted)">{formatDateTime(history.changed_at)}</p>
-																</li>
-															{/each}
-														</ul>
-													{/if}
-												</details>
 											</div>
 										</div>
 									</td>
@@ -544,7 +498,7 @@
 		<div class="mt-1 overflow-hidden rounded-xl border-y border-[#d7dee8] bg-transparent md:hidden">
 			<div class="grid grid-cols-[2.25rem_minmax(0,1fr)] items-center gap-3 border-b border-[#64AD31] bg-[#64AD31] px-3 py-4 text-[0.78rem] font-semibold tracking-[0.01em] text-white">
 				<span class="text-center">No</span>
-				<span class="text-sm">Detail Pengajuan</span>
+				<span class="text-sm">Detail Monitoring</span>
 			</div>
 			{#if data.result.data.length === 0}
 				<div class="px-6 py-12 text-center">
@@ -587,3 +541,4 @@
 		</footer>
 	</div>
 </section>
+

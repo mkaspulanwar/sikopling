@@ -1,9 +1,6 @@
 import { LAYANAN_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
 import { EMPTY_SUMMARY, logAdminLoad } from '$lib/server/admin-route'
-import {
-	getWorkflowHistoryByPengajuanIds,
-	listAntrianPengajuan
-} from '$lib/server/antrian-pengajuan'
+import { listAntrianPengajuan } from '$lib/server/antrian-pengajuan'
 import type { PageServerLoad } from './$types'
 
 const SORTABLE_COLUMNS = [
@@ -48,7 +45,7 @@ const readSortBy = (value: string | null) => {
 const readSortOrder = (value: string | null): 'asc' | 'desc' => (value === 'asc' ? 'asc' : 'desc')
 
 export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
-	depends('admin:pengajuan')
+	depends('admin:monitoring')
 
 	const query = url.searchParams
 	const adminData = await parent()
@@ -72,7 +69,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	}
 
 	if (!adminData.supabaseAvailable || !locals.supabase) {
-		logAdminLoad('admin/pengajuan/+page.server', { state: 'unavailable' })
+		logAdminLoad('admin/monitoring/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
@@ -85,13 +82,12 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 				page: filters.page,
 				pageSize: filters.pageSize,
 				totalPages: 1
-			},
-			historyByPengajuan: {}
+			}
 		}
 	}
 
 	if (!adminData.isAdmin) {
-		logAdminLoad('admin/pengajuan/+page.server', { state: 'forbidden', role: adminData.role })
+		logAdminLoad('admin/monitoring/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
@@ -104,19 +100,14 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 				page: filters.page,
 				pageSize: filters.pageSize,
 				totalPages: 1
-			},
-			historyByPengajuan: {}
+			}
 		}
 	}
 
 	try {
 		const result = await listAntrianPengajuan(locals.supabase, filters)
-		const historyByPengajuan = await getWorkflowHistoryByPengajuanIds(
-			locals.supabase,
-			result.data.map((row) => row.id)
-		)
 
-		logAdminLoad('admin/pengajuan/+page.server', {
+		logAdminLoad('admin/monitoring/+page.server', {
 			state: 'ok',
 			page: filters.page,
 			pageSize: filters.pageSize,
@@ -129,8 +120,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 			errorMessage: null,
 			filters,
 			summary: adminData.summary,
-			result,
-			historyByPengajuan
+			result
 		}
 	} catch (error) {
 		const message = error instanceof Error ? error.message : 'Gagal memuat data pengajuan'
@@ -146,8 +136,8 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 				page: filters.page,
 				pageSize: filters.pageSize,
 				totalPages: 1
-			},
-			historyByPengajuan: {}
+			}
 		}
 	}
 }
+

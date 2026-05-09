@@ -209,8 +209,8 @@
 				return 'Kontak Sikopling';
 			case '/login':
 				return 'Login Sikopling';
-			case '/admin/pengajuan':
-				return 'Admin Pengajuan Sikopling';
+			case '/admin/monitoring':
+				return 'Admin Monitoring Sikopling';
 			case '/admin':
 			case '/admin/dashboard':
 				return 'Dashboard Admin Sikopling';
@@ -276,3 +276,4 @@
 		<ChatbotWidget />
 	{/if}
 </div>
+

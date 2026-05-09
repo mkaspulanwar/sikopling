@@ -2,7 +2,6 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 
 type LegacyLayananValue = 'dokling' | 'perling' | 'pertek'
 type LayananValue = 'perling' | 'pertek'
-type WorkflowLayananValue = 'perling' | 'pertek' | 'integrasi'
 
 type StatusValue =
 	| 'Submit / Masuk'
@@ -27,8 +26,6 @@ type IntegrasiStatusValue =
 	| 'SK/Rekom Terbit'
 	| 'Ditolak'
 	| 'Lainnya'
-
-type WorkflowStatusValue = StatusValue | IntegrasiStatusValue
 
 export type Database = {
 	public: {
@@ -198,45 +195,6 @@ export type Database = {
 					status?: IntegrasiStatusValue
 					tanggal_update?: string | null
 					updated_at?: string
-				}
-				Relationships: []
-			}
-			workflow_history: {
-				Row: {
-					changed_at: string
-					changed_by: string | null
-					id: string
-					layanan: WorkflowLayananValue
-					new_posisi: string | null
-					new_status: WorkflowStatusValue
-					note: string | null
-					old_posisi: string | null
-					old_status: WorkflowStatusValue | null
-					pengajuan_id: string
-				}
-				Insert: {
-					changed_at?: string
-					changed_by?: string | null
-					id?: string
-					layanan: WorkflowLayananValue
-					new_posisi?: string | null
-					new_status: WorkflowStatusValue
-					note?: string | null
-					old_posisi?: string | null
-					old_status?: WorkflowStatusValue | null
-					pengajuan_id: string
-				}
-				Update: {
-					changed_at?: string
-					changed_by?: string | null
-					id?: string
-					layanan?: WorkflowLayananValue
-					new_posisi?: string | null
-					new_status?: WorkflowStatusValue
-					note?: string | null
-					old_posisi?: string | null
-					old_status?: WorkflowStatusValue | null
-					pengajuan_id?: string
 				}
 				Relationships: []
 			}

@@ -345,8 +345,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 	const updated = await updateStatusAntrianPengajuan(auth.supabase, {
 		id: body.id,
 		status: body.status,
-		posisi: typeof body.posisi === 'string' ? body.posisi : null,
-		note: typeof body.note === 'string' ? body.note : null
+		posisi: typeof body.posisi === 'string' ? body.posisi : null
 	})
 
 	return json({ data: updated })

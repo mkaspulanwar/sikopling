@@ -489,7 +489,7 @@
 		isSavingCreate = true
 		flash = null
 
-		const response = await fetch('/admin/pengajuan', {
+		const response = await fetch('/admin/monitoring', {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
@@ -527,7 +527,7 @@
 		isSavingEdit = true
 		flash = null
 
-		const response = await fetch(`/admin/pengajuan/${editRowId}`, {
+		const response = await fetch(`/admin/monitoring/${editRowId}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
@@ -566,7 +566,7 @@
 					}
 				: { mode: 'ids', ids: deleteTarget.ids }
 
-		const response = await fetch('/admin/pengajuan', {
+		const response = await fetch('/admin/monitoring', {
 			method: 'DELETE',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
@@ -1275,6 +1275,7 @@
 		</div>
 	</div>
 {/if}
+
 
 
 
