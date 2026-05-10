@@ -11,7 +11,7 @@
 	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet'
 	import FileText from 'lucide-svelte/icons/file-text'
 	import GitBranch from 'lucide-svelte/icons/git-branch'
-	import LayoutDashboard from 'lucide-svelte/icons/layout-dashboard'
+	import LayoutGrid from 'lucide-svelte/icons/layout-grid'
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
 	import PanelLeftOpen from 'lucide-svelte/icons/panel-left-open'
 	import SquareArrowRightExit from 'lucide-svelte/icons/square-arrow-right-exit'
@@ -21,7 +21,7 @@
 	let { children, data }: { children: Snippet; data: LayoutData } = $props()
 
 	const navItems = [
-		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutGrid },
 		{ label: 'Monitoring Perling', href: '/admin/perling', icon: FileSpreadsheet },
 		{ label: 'Monitoring Pertek', href: '/admin/pertek', icon: FileText },
 		{ label: 'Monitoring Integrasi', href: '/admin/integrasi', icon: GitBranch },

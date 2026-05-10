@@ -21,6 +21,7 @@
 	};
 	type PengumumanItem = {
 		title: string;
+		href?: string;
 	};
 	type TentangItem = {
 		title: string;
@@ -71,9 +72,18 @@
 		}
 	];
 	const pengumumanItems: PengumumanItem[] = [
-		{ title: 'Penerbitan Persetujuan Lingkungan' },
-		{ title: 'Penerbitan Persetujuan Teknis' },
-		{ title: 'Penerbitan Integrasi' }
+		{
+			title: 'Penerbitan Persetujuan Lingkungan',
+			href: '/pengumuman/perling'
+		},
+		{
+			title: 'Penerbitan Persetujuan Teknis',
+			href: '/pengumuman/pertek'
+		},
+		{
+			title: 'Penerbitan Integrasi',
+			href: '/pengumuman/integrasi'
+		}
 	];
 	const tentangItems: TentangItem[] = [
 		{
@@ -96,7 +106,7 @@
 
 	const showNavMenus = true;
 	const SEARCH_INDEX_CACHE_KEY = 'sikopling:universal-search-index';
-	const SEARCH_INDEX_CACHE_VERSION = 5;
+	const SEARCH_INDEX_CACHE_VERSION = 6;
 	const SEARCH_INDEX_CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 	const SEARCH_INDEX_MAX_ROUTES = 48;
 	const SEARCH_INDEX_CRAWL_MAX_DEPTH = 3;
@@ -119,6 +129,24 @@
 			title: 'Monitoring Integrasi',
 			category: 'Layanan',
 			priority: 95
+		},
+		{
+			path: '/pengumuman/perling',
+			title: 'Penerbitan Persetujuan Lingkungan',
+			category: 'Halaman',
+			priority: 90
+		},
+		{
+			path: '/pengumuman/pertek',
+			title: 'Penerbitan Persetujuan Teknis',
+			category: 'Halaman',
+			priority: 89
+		},
+		{
+			path: '/pengumuman/integrasi',
+			title: 'Penerbitan Integrasi',
+			category: 'Halaman',
+			priority: 88
 		},
 		{ path: '/profil', title: 'Profil', category: 'Halaman', priority: 66 },
 		{ path: '/kebijakan-privasi', title: 'Kebijakan Privasi', category: 'Halaman', priority: 62 },
@@ -166,6 +194,33 @@
 			content: 'Monitoring integrasi, sinkronisasi layanan, status integrasi, posisi, dan keterangan.',
 			keywords: ['integrasi', 'monitoring integrasi', 'sinkronisasi', 'layanan'],
 			priority: 95
+		}),
+		buildSearchDocument({
+			title: 'Penerbitan Persetujuan Lingkungan',
+			description: 'Pengumuman daftar penerbitan persetujuan lingkungan.',
+			href: '/pengumuman/perling',
+			category: 'Halaman',
+			content: 'Penerbitan persetujuan lingkungan, instansi, kegiatan, nomor SK, dan tanggal.',
+			keywords: ['pengumuman', 'penerbitan', 'persetujuan lingkungan', 'no sk'],
+			priority: 90
+		}),
+		buildSearchDocument({
+			title: 'Penerbitan Persetujuan Teknis',
+			description: 'Pengumuman daftar penerbitan persetujuan teknis.',
+			href: '/pengumuman/pertek',
+			category: 'Halaman',
+			content: 'Penerbitan persetujuan teknis, instansi, kegiatan, nomor SK, dan tanggal.',
+			keywords: ['pengumuman', 'penerbitan', 'persetujuan teknis', 'pertek', 'no sk'],
+			priority: 89
+		}),
+		buildSearchDocument({
+			title: 'Penerbitan Integrasi',
+			description: 'Pengumuman daftar penerbitan integrasi.',
+			href: '/pengumuman/integrasi',
+			category: 'Halaman',
+			content: 'Penerbitan integrasi, instansi, kegiatan, nomor SK, dan tanggal.',
+			keywords: ['pengumuman', 'penerbitan', 'integrasi', 'no sk'],
+			priority: 88
 		}),
 		buildSearchDocument({
 			title: 'Profil',
@@ -964,10 +1019,12 @@
 
 	const isLandingPage = () => page.url.pathname === '/';
 	const isLayananRoute = () => page.url.pathname.startsWith('/layanan');
+	const isPengumumanRoute = () => page.url.pathname.startsWith('/pengumuman');
 	const isTentangRoute = () => tentangItems.some((item) => item.href === page.url.pathname);
 	const isPathActive = (path: string) => page.url.pathname === path;
 	const isLayananActive = () =>
 		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
+	const isPengumumanActive = () => isPengumumanRoute();
 	const isTentangActive = () => isTentangRoute();
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const isMobileMenuActive = () => isMobileOpen || isMobileMenuAnimating;
@@ -1204,7 +1261,7 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(false)} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								class={`${desktopLinkClass(isPengumumanActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
 								aria-expanded={isPengumumanOpen}
 								aria-haspopup="true"
 								onclick={() =>
@@ -1224,13 +1281,23 @@
 								>
 									<div class="space-y-1">
 										{#each pengumumanItems as item}
-											<div
-												role="menuitem"
-												aria-disabled="true"
-												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)]"
-											>
-												{item.title}
-											</div>
+											{#if item.href}
+												<a
+													href={item.href}
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													onclick={handlePengumumanItemClick}
+												>
+													{item.title}
+												</a>
+											{:else}
+												<div
+													role="menuitem"
+													aria-disabled="true"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)]"
+												>
+													{item.title}
+												</div>
+											{/if}
 										{/each}
 									</div>
 								</div>
@@ -1410,20 +1477,27 @@
 						transition:slide={{ duration: 280, easing: cubicInOut }}
 					>
 						{#each pengumumanItems as item}
-							<div
-								class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155]"
-								onclick={handlePengumumanItemClick}
-								onkeydown={(event) => {
-									if (event.key === 'Enter' || event.key === ' ') {
-										event.preventDefault();
-										handlePengumumanItemClick();
-									}
-								}}
-								role="button"
-								tabindex="0"
-							>
-								<span>{item.title}</span>
-							</div>
+							{#if item.href}
+								<a href={item.href} class={mobileLayananItemClass()} onclick={handlePengumumanItemClick}>
+									<span>{item.title}</span>
+									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+								</a>
+							{:else}
+								<div
+									class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155]"
+									onclick={handlePengumumanItemClick}
+									onkeydown={(event) => {
+										if (event.key === 'Enter' || event.key === ' ') {
+											event.preventDefault();
+											handlePengumumanItemClick();
+										}
+									}}
+									role="button"
+									tabindex="0"
+								>
+									<span>{item.title}</span>
+								</div>
+							{/if}
 						{/each}
 					</div>
 				{/if}

@@ -197,6 +197,12 @@
 				return 'Monitoring Persetujuan Teknis';
 			case '/layanan/integrasi':
 				return 'Monitoring Integrasi';
+			case '/pengumuman/perling':
+				return 'Penerbitan Persetujuan Lingkungan';
+			case '/pengumuman/pertek':
+				return 'Penerbitan Persetujuan Teknis';
+			case '/pengumuman/integrasi':
+				return 'Penerbitan Integrasi';
 			case '/profil':
 				return 'Profil Sikopling';
 			case '/tentang':
