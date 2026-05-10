@@ -16,56 +16,8 @@
 	type SortOption = "Terbaru" | "Terlama" | "Instansi A-Z" | "Instansi Z-A";
 	type FilterChipKey = "search" | "sort";
 
-	const publishingRows: PublishingRow[] = [
-		{
-			agency: "PT Hijau Borneo Sentosa",
-			activity: "Pengembangan kawasan industri ringan berwawasan lingkungan",
-			skNumber: "660/PL-047/DLH/2026",
-			date: "2026-04-30",
-		},
-		{
-			agency: "Dinas Perumahan dan Kawasan Permukiman Kota Banjarbaru",
-			activity: "Pembangunan kawasan permukiman terpadu Sungai Ulin",
-			skNumber: "660/PL-043/DLH/2026",
-			date: "2026-04-24",
-		},
-		{
-			agency: "PT Agro Lestari Mandiri",
-			activity: "Peningkatan kapasitas kebun dan fasilitas pengolahan hasil perkebunan",
-			skNumber: "660/PL-039/DLH/2026",
-			date: "2026-04-18",
-		},
-		{
-			agency: "CV Mitra Konstruksi Banua",
-			activity: "Kegiatan pembangunan jalan akses dan area penunjang pergudangan",
-			skNumber: "660/PL-032/DLH/2026",
-			date: "2026-04-05",
-		},
-		{
-			agency: "PT Surya Pangan Kalimantan",
-			activity: "Pembangunan fasilitas produksi dan penyimpanan bahan pangan",
-			skNumber: "660/PL-026/DLH/2026",
-			date: "2026-03-25",
-		},
-		{
-			agency: "Yayasan Pendidikan Banua Cendekia",
-			activity: "Pembangunan gedung sekolah dan fasilitas laboratorium terpadu",
-			skNumber: "660/PL-021/DLH/2026",
-			date: "2026-03-14",
-		},
-		{
-			agency: "PT Bumi Tambang Sejahtera",
-			activity: "Penataan area stockpile dan fasilitas pendukung operasional",
-			skNumber: "660/PL-016/DLH/2026",
-			date: "2026-02-28",
-		},
-		{
-			agency: "Pemerintah Kabupaten Hulu Sungai Selatan",
-			activity: "Revitalisasi kawasan wisata alam dan fasilitas pelayanan pengunjung",
-			skNumber: "660/PL-011/DLH/2026",
-			date: "2026-02-13",
-		},
-	];
+	const { data }: { data: { publishingRows: PublishingRow[] } } = $props();
+	const publishingRows = $derived(data.publishingRows);
 
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 	const dateFormatter = new Intl.DateTimeFormat("id-ID", {
@@ -495,7 +447,7 @@
 							<tr>
 								<td colspan="5" class="px-6 py-12 text-center">
 									<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
-									<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
+									<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau hubungi kami</p>
 								</td>
 							</tr>
 						{:else}
@@ -523,7 +475,7 @@
 			{#if totalFilteredRows === 0}
 				<div class="px-6 py-12 text-center">
 					<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
-					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
+					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau hubungi kami</p>
 				</div>
 			{:else}
 				<ul>

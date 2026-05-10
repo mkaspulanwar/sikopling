@@ -16,56 +16,8 @@
 	type SortOption = "Terbaru" | "Terlama" | "Instansi A-Z" | "Instansi Z-A";
 	type FilterChipKey = "search" | "sort";
 
-	const publishingRows: PublishingRow[] = [
-		{
-			agency: "PT Barito Makmur Sejahtera",
-			activity: "Pembangunan fasilitas pergudangan dan pendukung operasional",
-			skNumber: "660/041/DLH/2026",
-			date: "2026-04-28",
-		},
-		{
-			agency: "Dinas Pekerjaan Umum Kabupaten Banjar",
-			activity: "Peningkatan jaringan drainase kawasan perkotaan",
-			skNumber: "660/038/DLH/2026",
-			date: "2026-04-22",
-		},
-		{
-			agency: "PT Citra Energi Lestari",
-			activity: "Pengembangan area workshop dan penyimpanan alat berat",
-			skNumber: "660/035/DLH/2026",
-			date: "2026-04-16",
-		},
-		{
-			agency: "CV Rimba Jaya Abadi",
-			activity: "Operasional industri pengolahan hasil hutan bukan kayu",
-			skNumber: "660/029/DLH/2026",
-			date: "2026-04-03",
-		},
-		{
-			agency: "PT Tirta Alam Persada",
-			activity: "Pembangunan instalasi pengolahan air bersih",
-			skNumber: "660/024/DLH/2026",
-			date: "2026-03-21",
-		},
-		{
-			agency: "Koperasi Produksi Bumi Lestari",
-			activity: "Kegiatan budidaya perkebunan terpadu",
-			skNumber: "660/019/DLH/2026",
-			date: "2026-03-12",
-		},
-		{
-			agency: "PT Pelabuhan Nusantara Kalsel",
-			activity: "Penataan fasilitas terminal barang dan area penunjang",
-			skNumber: "660/014/DLH/2026",
-			date: "2026-02-27",
-		},
-		{
-			agency: "RSUD Sehat Bersama",
-			activity: "Pengembangan gedung pelayanan kesehatan terpadu",
-			skNumber: "660/009/DLH/2026",
-			date: "2026-02-11",
-		},
-	];
+	const { data }: { data: { publishingRows: PublishingRow[] } } = $props();
+	const publishingRows = $derived(data.publishingRows);
 
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 	const dateFormatter = new Intl.DateTimeFormat("id-ID", {
@@ -495,7 +447,7 @@
 							<tr>
 								<td colspan="5" class="px-6 py-12 text-center">
 									<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
-									<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
+									<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau hubungi kami</p>
 								</td>
 							</tr>
 						{:else}
@@ -523,7 +475,7 @@
 			{#if totalFilteredRows === 0}
 				<div class="px-6 py-12 text-center">
 					<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
-					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
+					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau hubungi kami</p>
 				</div>
 			{:else}
 				<ul>

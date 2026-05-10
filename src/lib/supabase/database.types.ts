@@ -152,6 +152,96 @@ export type Database = {
 				}
 				Relationships: []
 			}
+			pengumuman_perling: {
+				Row: {
+					created_at: string
+					id: string
+					instansi: string | null
+					kegiatan: string | null
+					no_sk: string | null
+					tanggal: string | null
+					updated_at: string
+				}
+				Insert: {
+					created_at?: string
+					id?: string
+					instansi?: string | null
+					kegiatan?: string | null
+					no_sk?: string | null
+					tanggal?: string | null
+					updated_at?: string
+				}
+				Update: {
+					created_at?: string
+					id?: string
+					instansi?: string | null
+					kegiatan?: string | null
+					no_sk?: string | null
+					tanggal?: string | null
+					updated_at?: string
+				}
+				Relationships: []
+			}
+			pengumuman_pertek: {
+				Row: {
+					created_at: string
+					id: string
+					instansi: string | null
+					kegiatan: string | null
+					no_sk: string | null
+					tanggal: string | null
+					updated_at: string
+				}
+				Insert: {
+					created_at?: string
+					id?: string
+					instansi?: string | null
+					kegiatan?: string | null
+					no_sk?: string | null
+					tanggal?: string | null
+					updated_at?: string
+				}
+				Update: {
+					created_at?: string
+					id?: string
+					instansi?: string | null
+					kegiatan?: string | null
+					no_sk?: string | null
+					tanggal?: string | null
+					updated_at?: string
+				}
+				Relationships: []
+			}
+			pengumuman_integrasi: {
+				Row: {
+					created_at: string
+					id: string
+					instansi: string | null
+					kegiatan: string | null
+					no_sk: string | null
+					tanggal: string | null
+					updated_at: string
+				}
+				Insert: {
+					created_at?: string
+					id?: string
+					instansi?: string | null
+					kegiatan?: string | null
+					no_sk?: string | null
+					tanggal?: string | null
+					updated_at?: string
+				}
+				Update: {
+					created_at?: string
+					id?: string
+					instansi?: string | null
+					kegiatan?: string | null
+					no_sk?: string | null
+					tanggal?: string | null
+					updated_at?: string
+				}
+				Relationships: []
+			}
 		}
 		Views: Record<string, never>
 		Functions: {

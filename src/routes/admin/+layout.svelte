@@ -25,6 +25,9 @@
 		{ label: 'Monitoring Perling', href: '/admin/perling', icon: FileSpreadsheet },
 		{ label: 'Monitoring Pertek', href: '/admin/pertek', icon: FileText },
 		{ label: 'Monitoring Integrasi', href: '/admin/integrasi', icon: GitBranch },
+		{ label: 'Penerbitan Perling', href: '/admin/pengumuman/perling', icon: FileSpreadsheet },
+		{ label: 'Penerbitan Pertek', href: '/admin/pengumuman/pertek', icon: FileText },
+		{ label: 'Penerbitan Integrasi', href: '/admin/pengumuman/integrasi', icon: GitBranch },
 		{ label: 'Profil Admin', href: '/admin/profil', icon: UserRound }
 	]
 

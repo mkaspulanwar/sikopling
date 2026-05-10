@@ -226,6 +226,12 @@
 				return 'Admin Pertek Sikopling';
 			case '/admin/integrasi':
 				return 'Admin Integrasi Sikopling';
+			case '/admin/pengumuman/perling':
+				return 'Admin Penerbitan Perling Sikopling';
+			case '/admin/pengumuman/pertek':
+				return 'Admin Penerbitan Pertek Sikopling';
+			case '/admin/pengumuman/integrasi':
+				return 'Admin Penerbitan Integrasi Sikopling';
 			case '/admin/profil':
 				return 'Profil Admin Sikopling';
 			case '/admin/pengaturan':

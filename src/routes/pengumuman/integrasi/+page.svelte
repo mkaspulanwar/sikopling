@@ -16,56 +16,8 @@
 	type SortOption = "Terbaru" | "Terlama" | "Instansi A-Z" | "Instansi Z-A";
 	type FilterChipKey = "search" | "sort";
 
-	const publishingRows: PublishingRow[] = [
-		{
-			agency: "PT Lintas Energi Banua",
-			activity: "Integrasi dokumen lingkungan untuk terminal energi dan fasilitas utilitas",
-			skNumber: "660/INT-052/DLH/2026",
-			date: "2026-05-02",
-		},
-		{
-			agency: "PT Samudra Logistik Kalimantan",
-			activity: "Integrasi kegiatan pergudangan, depo kontainer, dan jalur distribusi",
-			skNumber: "660/INT-048/DLH/2026",
-			date: "2026-04-26",
-		},
-		{
-			agency: "Dinas Perhubungan Provinsi Kalimantan Selatan",
-			activity: "Integrasi pengembangan simpul transportasi darat dan fasilitas pendukung",
-			skNumber: "660/INT-044/DLH/2026",
-			date: "2026-04-20",
-		},
-		{
-			agency: "PT Mineral Terpadu Nusantara",
-			activity: "Integrasi area pengolahan mineral dan fasilitas pengelolaan lingkungan",
-			skNumber: "660/INT-037/DLH/2026",
-			date: "2026-04-09",
-		},
-		{
-			agency: "PT Nusantara Bioenergi Lestari",
-			activity: "Integrasi fasilitas produksi bioenergi dan pemanfaatan limbah organik",
-			skNumber: "660/INT-031/DLH/2026",
-			date: "2026-03-29",
-		},
-		{
-			agency: "Perumda Air Minum Tirta Banua",
-			activity: "Integrasi jaringan intake, pengolahan air, dan reservoir distribusi",
-			skNumber: "660/INT-027/DLH/2026",
-			date: "2026-03-18",
-		},
-		{
-			agency: "PT Kawasan Industri Martapura",
-			activity: "Integrasi pengembangan kavling industri dan instalasi utilitas kawasan",
-			skNumber: "660/INT-020/DLH/2026",
-			date: "2026-03-03",
-		},
-		{
-			agency: "PT Pelindo Multi Terminal Banjar",
-			activity: "Integrasi terminal curah, akses pelabuhan, dan area layanan penunjang",
-			skNumber: "660/INT-015/DLH/2026",
-			date: "2026-02-17",
-		},
-	];
+	const { data }: { data: { publishingRows: PublishingRow[] } } = $props();
+	const publishingRows = $derived(data.publishingRows);
 
 	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 	const dateFormatter = new Intl.DateTimeFormat("id-ID", {
@@ -495,7 +447,7 @@
 							<tr>
 								<td colspan="5" class="px-6 py-12 text-center">
 									<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
-									<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
+									<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau hubungi kami</p>
 								</td>
 							</tr>
 						{:else}
@@ -523,7 +475,7 @@
 			{#if totalFilteredRows === 0}
 				<div class="px-6 py-12 text-center">
 					<p class="text-base font-semibold text-(--ink)">Data tidak ditemukan</p>
-					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau reset filter.</p>
+					<p class="mt-1 text-sm text-(--muted)">Coba ubah kata kunci pencarian atau hubungi kami</p>
 				</div>
 			{:else}
 				<ul>
