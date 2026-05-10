@@ -945,18 +945,15 @@
 											<p class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]">
 												{row.instansi ?? '-'}
 											</p>
-											<p class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]">
-												{row.jenis_integrasi ?? '-'}
-											</p>
 											<div class="mt-2 flex flex-wrap items-center gap-1.5">
 												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
-													{row.posisi ?? '-'}
+													{row.jenis_integrasi ?? '-'}
 												</span>
 												<span class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.status)}`}>
 													{row.status}
 												</span>
 											</div>
-											<p class="mt-2 text-[0.75rem] text-[var(--muted)]">Update: {formatDate(row.tanggal_update)}</p>
+											<p class="mt-2 text-[0.75rem] text-[var(--muted)]">Tanggal Update: {formatDate(row.tanggal_update)}</p>
 										</div>
 										<span
 											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.id) ? 'rotate-180' : ''}`}
@@ -970,10 +967,6 @@
 							{#if isRowExpanded(row.id)}
 								<div class={`border-t border-[var(--line)] px-4 py-4 ${isRowSelected(row.id) ? 'bg-[#f4fbea]' : 'bg-transparent'}`}>
 									<dl class="space-y-4">
-										<div>
-											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">Jenis Integrasi</dt>
-											<dd class="mt-1 text-sm text-[#20232A]">{row.jenis_integrasi ?? '-'}</dd>
-										</div>
 										<div>
 											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">Kegiatan</dt>
 											<dd class="mt-1 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</dd>

@@ -949,7 +949,7 @@
 												{row.instansi ?? '-'}
 											</p>
 											<p class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]">
-												{row.no_registrasi ?? '-'}
+												No Registrasi: {row.no_registrasi ?? '-'}
 											</p>
 											<div class="mt-2 flex flex-wrap items-center gap-1.5">
 												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
@@ -959,7 +959,7 @@
 													{row.status}
 												</span>
 											</div>
-											<p class="mt-2 text-[0.75rem] text-[var(--muted)]">Update: {formatDate(row.tanggal_update)}</p>
+											<p class="mt-2 text-[0.75rem] text-[var(--muted)]">Tanggal Update: {formatDate(row.tanggal_update)}</p>
 										</div>
 										<span
 											class={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-transparent text-[var(--muted)] transition-transform ${isRowExpanded(row.id) ? 'rotate-180' : ''}`}
