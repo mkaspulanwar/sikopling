@@ -974,7 +974,7 @@
 									</p>
 									<p class="mt-1 text-sm text-(--muted)">
 										Coba ubah kata kunci pencarian atau
-										reset filter.
+										hubungi kami
 									</p>
 								</td>
 							</tr>
@@ -1044,7 +1044,7 @@
 						Data tidak ditemukan
 					</p>
 					<p class="mt-1 text-sm text-(--muted)">
-						Coba ubah kata kunci pencarian atau reset filter.
+						Coba ubah kata kunci pencarian atau hubungi kami
 					</p>
 				</div>
 			{:else}

@@ -857,7 +857,7 @@
 				{#if data.result.data.length === 0}
 					<tr>
 						<td colspan="9" class="px-6 py-12 text-center">
-							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data integrasi.</p>
+							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data monitoring Integrasi.</p>
 							<p class="mt-1 text-sm text-[var(--muted)]">Silakan tambah baris baru.</p>
 						</td>
 					</tr>
@@ -919,7 +919,10 @@
 			</div>
 
 			{#if data.result.data.length === 0}
-				<p class="px-2 py-8 text-center text-sm text-slate-500">Belum ada data integrasi.</p>
+				<div class="px-2 py-8 text-center">
+					<p class="text-sm font-semibold text-slate-600">Belum ada data monitoring Integrasi.</p>
+					<p class="mt-1 text-sm text-slate-500">Silakan tambah baris baru.</p>
+				</div>
 			{:else}
 				<ul>
 					{#each data.result.data as row, index}
