@@ -8,8 +8,12 @@
 	import { slide } from 'svelte/transition'
 	import type { Snippet } from 'svelte'
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right'
+	import ChevronDown from 'lucide-svelte/icons/chevron-down'
+	import ChevronRight from 'lucide-svelte/icons/chevron-right'
 	import FileSpreadsheet from 'lucide-svelte/icons/file-spreadsheet'
 	import FileText from 'lucide-svelte/icons/file-text'
+	import FolderCheck from 'lucide-svelte/icons/folder-check'
+	import FolderClock from 'lucide-svelte/icons/folder-clock'
 	import GitBranch from 'lucide-svelte/icons/git-branch'
 	import LayoutGrid from 'lucide-svelte/icons/layout-grid'
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
@@ -20,20 +24,30 @@
 
 	let { children, data }: { children: Snippet; data: LayoutData } = $props()
 
+	const monitoringItems = [
+		{ label: 'Persetujuan Lingkungan', href: '/admin/layanan/perling', icon: FileSpreadsheet },
+		{ label: 'Persetujuan Teknis', href: '/admin/layanan/pertek', icon: FileText },
+		{ label: 'Integrasi', href: '/admin/layanan/integrasi', icon: GitBranch }
+	]
+
+	const pengumumanItems = [
+		{ label: 'Persetujuan Lingkungan', href: '/admin/pengumuman/perling', icon: FileSpreadsheet },
+		{ label: 'Persetujuan Teknis', href: '/admin/pengumuman/pertek', icon: FileText },
+		{ label: 'Integrasi', href: '/admin/pengumuman/integrasi', icon: GitBranch }
+	]
+
 	const navItems = [
-		{ label: 'Dashboard', href: '/admin/dashboard', icon: LayoutGrid },
-		{ label: 'Monitoring Perling', href: '/admin/layanan/perling', icon: FileSpreadsheet },
-		{ label: 'Monitoring Pertek', href: '/admin/layanan/pertek', icon: FileText },
-		{ label: 'Monitoring Integrasi', href: '/admin/layanan/integrasi', icon: GitBranch },
-		{ label: 'Penerbitan Perling', href: '/admin/pengumuman/perling', icon: FileSpreadsheet },
-		{ label: 'Penerbitan Pertek', href: '/admin/pengumuman/pertek', icon: FileText },
-		{ label: 'Penerbitan Integrasi', href: '/admin/pengumuman/integrasi', icon: GitBranch },
-		{ label: 'Profil Admin', href: '/admin/profil', icon: UserRound }
+		{ type: 'link' as const, label: 'Dashboard', href: '/admin/dashboard', icon: LayoutGrid },
+		{ type: 'group' as const, label: 'Monitoring', icon: FolderClock, items: monitoringItems },
+		{ type: 'group' as const, label: 'Pengumuman', icon: FolderCheck, items: pengumumanItems },
+		{ type: 'link' as const, label: 'Profil', href: '/admin/profil', icon: UserRound }
 	]
 
 	let isSidebarCollapsed = $state(false)
 	let isMobileMenuOpen = $state(false)
 	let mobileMenuMotionState = $state<'idle' | 'opening' | 'closing'>('idle')
+	let isMonitoringOpen = $state(false)
+	let isPengumumanOpen = $state(false)
 	const ADMIN_KEEP_ALIVE_INTERVAL_MS = 12 * 60 * 1000
 	const KEEP_ALIVE_LEADER_KEY = 'admin_keep_alive_leader'
 	const KEEP_ALIVE_LEADER_LEASE_MS = 90 * 1000
@@ -53,6 +67,23 @@
 	const isNavActive = (href: string) =>
 		pathname === href || (href !== '/admin/dashboard' && pathname.startsWith(`${href}/`))
 
+	const isNavGroupActive = (items: typeof monitoringItems) => items.some((item) => isNavActive(item.href))
+
+	const isNavGroupOpen = (label: string) => (label === 'Monitoring' ? isMonitoringOpen : isPengumumanOpen)
+
+	const toggleNavGroup = (label: string) => {
+		if (isSidebarCollapsed) {
+			isSidebarCollapsed = false
+		}
+
+		if (label === 'Monitoring') {
+			isMonitoringOpen = !isMonitoringOpen
+			return
+		}
+
+		isPengumumanOpen = !isPengumumanOpen
+	}
+
 	const toggleMobileMenu = () => {
 		isMobileMenuOpen = !isMobileMenuOpen
 	}
@@ -64,6 +95,11 @@
 	const closeMobileMenu = () => {
 		isMobileMenuOpen = false
 	}
+
+	$effect(() => {
+		if (pathname.startsWith('/admin/layanan')) isMonitoringOpen = true
+		if (pathname.startsWith('/admin/pengumuman')) isPengumumanOpen = true
+	})
 
 	const handleWindowKeydown = (event: KeyboardEvent) => {
 		if (event.key === 'Escape') closeMobileMenu()
@@ -84,7 +120,13 @@
 		}`
 
 	const mobileNavLinkClass = () =>
-		'group flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-[var(--muted)] transition-colors duration-200 hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]'
+		'group flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)]'
+
+	const mobileNavGroupButtonClass = () =>
+		'group flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-left text-sm font-semibold text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)]'
+
+	const mobileNavSubLinkClass = () =>
+		'group flex h-10 w-full items-center justify-between gap-3 rounded-lg border border-transparent px-3 py-2 text-sm font-normal text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)]'
 
 	const handleMobileMenuIntroStart = () => {
 		mobileMenuMotionState = 'opening'
@@ -264,7 +306,7 @@
 			<button
 				type="button"
 				onclick={toggleSidebar}
-				class={`inline-flex items-center justify-center text-[var(--muted)] transition-colors duration-200 hover:bg-[var(--accent-soft)] hover:text-[var(--ink)] ${
+				class={`inline-flex items-center justify-center text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)] ${
 					isSidebarCollapsed ? 'h-11 w-full shrink-0 rounded-xl bg-transparent' : 'h-11 w-11 rounded-xl bg-transparent'
 				}`}
 				aria-label={isSidebarCollapsed ? 'Buka sidebar' : 'Tutup sidebar'}
@@ -281,39 +323,110 @@
 
 		<nav class="mt-3 space-y-2">
 			{#each navItems as item}
-				{@const active = isNavActive(item.href)}
-				<a
-					href={item.href}
-					title={isSidebarCollapsed ? item.label : undefined}
-					class={`admin-sidebar-link group flex h-11 items-center overflow-hidden rounded-xl border text-sm font-semibold ${
-						isSidebarCollapsed ? 'justify-start gap-0 px-[13.5px]' : 'justify-start gap-3 px-2.5'
-					} ${
-						active
-							? isSidebarCollapsed
-								? 'border-transparent bg-[var(--secondary-soft)] text-[#2f6f1b]'
-								: 'border-[#d7ebc8] bg-[var(--secondary-soft)] text-[#2f6f1b]'
-							: 'border-transparent text-[var(--muted)] hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]'
-					}`}
-				>
-					<span
-						class={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${
+				{#if item.type === 'link'}
+					{@const active = isNavActive(item.href)}
+					<a
+						href={item.href}
+						title={isSidebarCollapsed ? item.label : undefined}
+						class={`admin-sidebar-link group flex h-11 items-center overflow-hidden rounded-xl border text-sm font-semibold ${
+							isSidebarCollapsed ? 'justify-start gap-0 px-[13.5px]' : 'justify-start gap-3 px-2.5'
+						} ${
 							active
-								? 'bg-transparent text-[var(--secondary)]'
-								: 'bg-transparent text-[var(--muted)] group-hover:text-[var(--ink)]'
+								? isSidebarCollapsed
+									? 'border-transparent bg-[var(--secondary-soft)] text-[#20232A]'
+									: 'border-transparent bg-[var(--secondary-soft)] text-[#20232A]'
+								: 'border-transparent text-[#20232A] hover:bg-[var(--accent-soft)]'
 						}`}
 					>
-						<item.icon class="h-[1.02rem] w-[1.02rem] shrink-0" />
-					</span>
-					<span
-						class={`admin-sidebar-label min-w-0 truncate whitespace-nowrap ${
-							isSidebarCollapsed
-								? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
-								: 'is-expanded max-w-[13.5rem] translate-x-0 opacity-100'
-						}`}
-					>
-						{item.label}
-					</span>
-				</a>
+						<span
+							class={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${
+								active
+									? 'bg-transparent text-[#20232A]'
+									: 'bg-transparent text-[#20232A]'
+							}`}
+						>
+							<item.icon class="h-[18px] w-[18px] shrink-0" />
+						</span>
+						<span
+							class={`admin-sidebar-label min-w-0 truncate whitespace-nowrap ${
+								isSidebarCollapsed
+									? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
+									: 'is-expanded max-w-[13.5rem] translate-x-0 opacity-100'
+							}`}
+						>
+							{item.label}
+						</span>
+					</a>
+				{:else}
+					{@const active = isNavGroupActive(item.items)}
+					{@const open = isNavGroupOpen(item.label)}
+					<div class="space-y-1">
+						<button
+							type="button"
+							title={isSidebarCollapsed ? item.label : undefined}
+							class={`admin-sidebar-link group flex h-11 w-full items-center overflow-hidden rounded-xl border text-left text-sm font-semibold ${
+								isSidebarCollapsed ? 'justify-start gap-0 px-[13.5px]' : 'justify-start gap-3 px-2.5'
+							} ${
+								active
+									? isSidebarCollapsed
+										? 'border-transparent bg-[var(--secondary-soft)] text-[#20232A]'
+										: 'border-transparent bg-[var(--secondary-soft)] text-[#20232A]'
+									: 'border-transparent text-[#20232A] hover:bg-[var(--accent-soft)]'
+							}`}
+							aria-expanded={open}
+							onclick={() => toggleNavGroup(item.label)}
+						>
+							<span
+								class={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 ${
+									active
+										? 'bg-transparent text-[#20232A]'
+										: 'bg-transparent text-[#20232A]'
+								}`}
+							>
+								<item.icon class="h-[18px] w-[18px] shrink-0" />
+							</span>
+							<span
+								class={`admin-sidebar-label min-w-0 flex-1 truncate whitespace-nowrap ${
+									isSidebarCollapsed
+										? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
+										: 'is-expanded max-w-[10.5rem] translate-x-0 opacity-100'
+								}`}
+							>
+								{item.label}
+							</span>
+							<span
+								class={`admin-sidebar-label inline-flex shrink-0 items-center justify-center text-current ${
+									isSidebarCollapsed
+										? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
+										: 'is-expanded max-w-[1.25rem] translate-x-0 opacity-100'
+								}`}
+							>
+								<ChevronRight class={`h-4 w-4 transition-transform duration-200 ease-out ${open ? 'rotate-90' : 'rotate-0'}`} />
+							</span>
+						</button>
+
+						{#if open && !isSidebarCollapsed}
+							<div
+								class="admin-sidebar-submenu relative space-y-1 pl-[2.85rem]"
+								transition:slide={{ duration: 180, easing: cubicInOut }}
+							>
+								{#each item.items as subItem}
+									{@const subActive = isNavActive(subItem.href)}
+									<a
+										href={subItem.href}
+										class={`admin-sidebar-submenu-link group flex h-10 items-center rounded-lg border px-2.5 text-sm transition-colors duration-200 ${
+											subActive
+												? 'border-transparent bg-[var(--secondary-soft)] text-[#20232A]'
+												: 'border-transparent text-[#20232A] hover:bg-[var(--accent-soft)]'
+										}`}
+									>
+										<span class="min-w-0 truncate">{subItem.label}</span>
+									</a>
+								{/each}
+							</div>
+						{/if}
+					</div>
+				{/if}
 			{/each}
 		</nav>
 
@@ -392,12 +505,67 @@
 				>
 					<div class="nav-shell max-h-[calc(100dvh-4.4rem)] overflow-y-auto pb-4 pt-2">
 						<nav class="flex flex-col gap-1.5">
-							{#each navItems as item}
-								<a href={item.href} onclick={closeMobileMenu} class={mobileNavLinkClass()}>
-									<span class="truncate">{item.label}</span>
-									<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-								</a>
-							{/each}
+							<a href="/admin/dashboard" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
+								<span class="truncate">Dashboard</span>
+								<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+							</a>
+
+							<div class="space-y-1">
+								<button
+									type="button"
+									class={mobileNavGroupButtonClass()}
+									aria-expanded={isMonitoringOpen}
+									onclick={() => toggleNavGroup('Monitoring')}
+								>
+									<span class="truncate">Monitoring</span>
+									<ChevronDown class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMonitoringOpen ? 'rotate-180' : 'rotate-0'}`} strokeWidth={2.2} />
+								</button>
+
+								{#if isMonitoringOpen}
+									<div
+										class="ml-3 w-[calc(100%-0.75rem)] space-y-1 border-l border-[#cfd7e3] py-1 pl-3"
+										transition:slide={{ duration: 220, easing: cubicInOut }}
+									>
+										{#each monitoringItems as item}
+											<a href={item.href} onclick={closeMobileMenu} class={mobileNavSubLinkClass()}>
+												<span class="truncate">{item.label}</span>
+												<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+											</a>
+										{/each}
+									</div>
+								{/if}
+							</div>
+
+							<div class="space-y-1">
+								<button
+									type="button"
+									class={mobileNavGroupButtonClass()}
+									aria-expanded={isPengumumanOpen}
+									onclick={() => toggleNavGroup('Pengumuman')}
+								>
+									<span class="truncate">Pengumuman</span>
+									<ChevronDown class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isPengumumanOpen ? 'rotate-180' : 'rotate-0'}`} strokeWidth={2.2} />
+								</button>
+
+								{#if isPengumumanOpen}
+									<div
+										class="ml-3 w-[calc(100%-0.75rem)] space-y-1 border-l border-[#cfd7e3] py-1 pl-3"
+										transition:slide={{ duration: 220, easing: cubicInOut }}
+									>
+										{#each pengumumanItems as item}
+											<a href={item.href} onclick={closeMobileMenu} class={mobileNavSubLinkClass()}>
+												<span class="truncate">{item.label}</span>
+												<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+											</a>
+										{/each}
+									</div>
+								{/if}
+							</div>
+
+							<a href="/admin/profil" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
+								<span class="truncate">Profil</span>
+								<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+							</a>
 						</nav>
 
 						<a
@@ -421,6 +589,7 @@
 
 <style>
 	.admin-sidebar-desktop {
+		font-family: var(--font-body);
 		transition: width 340ms cubic-bezier(0.22, 1, 0.36, 1);
 	}
 
@@ -445,12 +614,38 @@
 	}
 
 	.admin-sidebar-link {
+		font-family: var(--font-body);
+		font-size: 0.875rem;
+		font-weight: 600;
+		line-height: 1.25rem;
 		transition:
 			padding 340ms cubic-bezier(0.22, 1, 0.36, 1),
 			gap 340ms cubic-bezier(0.22, 1, 0.36, 1),
 			background-color 200ms ease,
 			color 200ms ease,
 			border-color 200ms ease;
+	}
+
+	button.admin-sidebar-link {
+		font-family: var(--font-body);
+	}
+
+	.admin-sidebar-submenu-link {
+		font-family: var(--font-body);
+		font-size: 0.875rem;
+		font-weight: 400;
+		line-height: 1.25rem;
+	}
+
+	.admin-sidebar-submenu::before {
+		content: '';
+		position: absolute;
+		bottom: 0.35rem;
+		left: 1.55rem;
+		top: 0.35rem;
+		width: 1px;
+		border-radius: 999px;
+		background: #cfd7e3;
 	}
 
 	.admin-sidebar-label {

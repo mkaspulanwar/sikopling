@@ -5,4 +5,4 @@
 	const { data }: { data: PageData } = $props()
 </script>
 
-<PengumumanAdminpage {data} announcementType="pertek" title="Penerbitan Pertek" />
+<PengumumanAdminpage {data} announcementType="pertek" title="Penerbitan Persetujuan Teknis" />
