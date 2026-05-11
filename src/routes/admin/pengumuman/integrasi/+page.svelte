@@ -1,8 +1,8 @@
 <script lang="ts">
-	import PenerbitanAdminPage from '$lib/components/admin/PenerbitanAdminPage.svelte'
+	import PengumumanAdminpage from '$lib/components/admin/PengumumanAdminpage.svelte'
 	import type { PageData } from './$types'
 
 	const { data }: { data: PageData } = $props()
 </script>
 
-<PenerbitanAdminPage {data} announcementType="integrasi" title="Penerbitan Integrasi" />
+<PengumumanAdminpage {data} announcementType="integrasi" title="Penerbitan Integrasi" />
