@@ -1112,7 +1112,7 @@
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
-			'relative inline-flex items-center py-2.5 lg:py-2 text-base lg:text-[1rem] font-medium tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
+			'relative inline-flex items-center py-2.5 lg:py-2 text-base lg:text-[1rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
 		if (shouldUseLightNav()) {
 			return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-white hover:text-[#77D37F]'}`;
 		}
@@ -1129,7 +1129,7 @@
 		`flex w-full items-center justify-between gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} text-[#0f172a] hover:bg-[#f4f8fc]`;
 
 	const mobileLayananItemClass = () =>
-		'menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155] transition-colors duration-200 hover:bg-[#f4f8fc] hover:text-[#2f8f2f]';
+		'menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] font-normal leading-[1.25] tracking-[0.002em] text-[#334155] transition-colors duration-200 hover:bg-[#f4f8fc] hover:text-[#2f8f2f]';
 
 	const mobileMenuPanelClass = () =>
 		`mobile-menu-panel relative -mt-px bg-white px-4 pt-3 pb-4 lg:hidden ${
@@ -1207,7 +1207,7 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isLayananActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								class={`${desktopLinkClass(isLayananActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
 								aria-expanded={isLayananOpen}
 								aria-haspopup="true"
 								onclick={() => (isLayananOpen ? closeLayananMenu() : openLayananMenu())}
@@ -1229,7 +1229,7 @@
 											{#if item.href}
 												<a
 													href={mapSectionHref(item.href)}
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handleLayananItemClick}
 												>
 													{item.title}
@@ -1237,7 +1237,7 @@
 											{:else}
 												<button
 													type="button"
-													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												>
 													{item.title}
 												</button>
@@ -1261,7 +1261,7 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isPengumumanActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								class={`${desktopLinkClass(isPengumumanActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
 								aria-expanded={isPengumumanOpen}
 								aria-haspopup="true"
 								onclick={() =>
@@ -1284,7 +1284,7 @@
 											{#if item.href}
 												<a
 													href={item.href}
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handlePengumumanItemClick}
 												>
 													{item.title}
@@ -1293,7 +1293,7 @@
 												<div
 													role="menuitem"
 													aria-disabled="true"
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)]"
 												>
 													{item.title}
 												</div>
@@ -1317,7 +1317,7 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isTentangActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-medium`}
+								class={`${desktopLinkClass(isTentangActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
 								aria-expanded={isTentangOpen}
 								aria-haspopup="true"
 								onclick={() => (isTentangOpen ? closeTentangMenu() : openTentangMenu())}
@@ -1338,7 +1338,7 @@
 										{#each tentangItems as item}
 											<a
 												href={item.href}
-												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] [font-weight:350] text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												onclick={handleTentangItemClick}
 											>
 												{item.title}
@@ -1484,7 +1484,7 @@
 								</a>
 							{:else}
 								<div
-									class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] [font-weight:350] leading-[1.25] tracking-[0.002em] text-[#334155]"
+									class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] font-normal leading-[1.25] tracking-[0.002em] text-[#334155]"
 									onclick={handlePengumumanItemClick}
 									onkeydown={(event) => {
 										if (event.key === 'Enter' || event.key === ' ') {
