@@ -358,7 +358,7 @@
 		}
 		isSavingCreate = true
 		flash = null
-		const response = await fetch('/admin/pengumuman-data', {
+		const response = await fetch('/admin/pengumuman', {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
@@ -418,7 +418,7 @@
 						excludedIds: deleteTarget.excludedIds
 					}
 				: { mode: 'ids', type: announcementType, ids: deleteTarget.ids }
-		const response = await fetch('/admin/pengumuman-data', {
+		const response = await fetch('/admin/pengumuman', {
 			method: 'DELETE',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
