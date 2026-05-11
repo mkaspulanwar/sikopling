@@ -120,13 +120,13 @@
 		}`
 
 	const mobileNavLinkClass = () =>
-		'group flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-transparent px-3 py-2.5 text-sm font-semibold text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)]'
+		'admin-mobile-menu-link group flex w-full items-center justify-between gap-2 rounded-lg border border-transparent px-4 py-3 text-left text-[1rem] leading-[1.25] tracking-[0.002em] text-[#20232A] transition-colors duration-200 hover:bg-[#f4f8fc]'
 
 	const mobileNavGroupButtonClass = () =>
-		'group flex h-11 w-full items-center justify-between gap-3 rounded-xl border border-transparent bg-transparent px-3 py-2.5 text-left text-sm font-semibold text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)]'
+		'admin-mobile-menu-link group flex w-full appearance-none items-center justify-between gap-2 rounded-lg border border-transparent bg-transparent px-4 py-3 text-left text-[1rem] leading-[1.25] tracking-[0.002em] text-[#20232A] transition-colors duration-200 hover:bg-[#f4f8fc]'
 
 	const mobileNavSubLinkClass = () =>
-		'group flex h-10 w-full items-center justify-between gap-3 rounded-lg border border-transparent px-3 py-2 text-sm font-normal text-[#20232A] transition-colors duration-200 hover:bg-[var(--accent-soft)]'
+		'group flex w-full items-center justify-between gap-2 rounded-lg border border-transparent px-3 py-2 text-left text-[1rem] leading-[1.25] tracking-[0.002em] text-[#20232A] transition-colors duration-200 hover:bg-[#f4f8fc]'
 
 	const handleMobileMenuIntroStart = () => {
 		mobileMenuMotionState = 'opening'
@@ -463,7 +463,7 @@
 
 	<div class={`admin-main-shell min-w-0 flex-1 ${isSidebarCollapsed ? 'lg:pl-[95px]' : 'lg:pl-[285px]'}`}>
 		<header class={mobileHeaderClass()}>
-			<div class="nav-shell py-3">
+			<div class="nav-shell py-4">
 				<div class="flex items-center justify-between gap-3">
 					<a
 						href="/admin/dashboard"
@@ -474,13 +474,13 @@
 						<img
 							src="/layout/logo_sikopling.png"
 							alt="Logo Sikopling"
-							class="h-auto w-[9.8rem] object-contain sm:w-[10.4rem]"
+							class="h-auto w-[11.4rem] object-contain sm:w-[12rem]"
 						/>
 					</a>
 					<button
 						type="button"
 						onclick={toggleMobileMenu}
-						class={`mobile-menu-toggle inline-flex h-10 w-10 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] transition-colors duration-200 hover:bg-[var(--accent-soft)] ${
+						class={`mobile-menu-toggle inline-flex h-11 w-11 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)] text-[var(--ink)] transition-colors duration-200 hover:bg-[var(--accent-soft)] ${
 							isMobileMenuOpen ? 'is-open' : ''
 						}`}
 						aria-expanded={isMobileMenuOpen}
@@ -507,7 +507,7 @@
 						<nav class="flex flex-col gap-1.5">
 							<a href="/admin/dashboard" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
 								<span class="truncate">Dashboard</span>
-								<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+								<ArrowUpRight class="h-4 w-4 opacity-75" />
 							</a>
 
 							<div class="space-y-1">
@@ -527,9 +527,9 @@
 										transition:slide={{ duration: 220, easing: cubicInOut }}
 									>
 										{#each monitoringItems as item}
-											<a href={item.href} onclick={closeMobileMenu} class={mobileNavSubLinkClass()}>
+											<a href={item.href} onclick={closeMobileMenu} class={`admin-mobile-submenu-link ${mobileNavSubLinkClass()}`}>
 												<span class="truncate">{item.label}</span>
-												<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+												<ArrowUpRight class="h-4 w-4 opacity-75" />
 											</a>
 										{/each}
 									</div>
@@ -553,9 +553,9 @@
 										transition:slide={{ duration: 220, easing: cubicInOut }}
 									>
 										{#each pengumumanItems as item}
-											<a href={item.href} onclick={closeMobileMenu} class={mobileNavSubLinkClass()}>
+											<a href={item.href} onclick={closeMobileMenu} class={`admin-mobile-submenu-link ${mobileNavSubLinkClass()}`}>
 												<span class="truncate">{item.label}</span>
-												<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+												<ArrowUpRight class="h-4 w-4 opacity-75" />
 											</a>
 										{/each}
 									</div>
@@ -564,7 +564,7 @@
 
 							<a href="/admin/profil" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
 								<span class="truncate">Profil</span>
-								<ArrowUpRight class="h-4 w-4 opacity-75 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+								<ArrowUpRight class="h-4 w-4 opacity-75" />
 							</a>
 						</nav>
 
@@ -646,6 +646,16 @@
 		width: 1px;
 		border-radius: 999px;
 		background: #cfd7e3;
+	}
+
+	.admin-mobile-menu-link {
+		font-family: var(--font-body);
+		font-weight: 600;
+	}
+
+	.admin-mobile-submenu-link {
+		font-family: var(--font-body);
+		font-weight: 400;
 	}
 
 	.admin-sidebar-label {
