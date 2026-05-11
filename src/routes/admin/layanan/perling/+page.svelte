@@ -489,7 +489,7 @@
 		isSavingCreate = true
 		flash = null
 
-		const response = await fetch('/admin/monitoring', {
+		const response = await fetch('/admin/layanan', {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
@@ -527,11 +527,14 @@
 		isSavingEdit = true
 		flash = null
 
-		const response = await fetch(`/admin/monitoring/${editRowId}`, {
+		const response = await fetch(`/admin/layanan/${editRowId}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify(normalizePayload(editForm))
+			body: JSON.stringify({
+				layanan,
+				...normalizePayload(editForm)
+			})
 		})
 
 		const payload = await response.json().catch(() => ({ message: 'Gagal memproses respons server' }))
@@ -564,9 +567,9 @@
 						sortOrder: data.filters.sortOrder,
 						excludedIds: deleteTarget.excludedIds
 					}
-				: { mode: 'ids', ids: deleteTarget.ids }
+				: { mode: 'ids', layanan, ids: deleteTarget.ids }
 
-		const response = await fetch('/admin/monitoring', {
+		const response = await fetch('/admin/layanan', {
 			method: 'DELETE',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },

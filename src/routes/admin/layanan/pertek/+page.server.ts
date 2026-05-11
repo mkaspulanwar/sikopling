@@ -36,7 +36,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	const adminData = await parent()
 
 	if (!adminData.supabaseAvailable || !locals.supabase) {
-		logAdminLoad('admin/pertek/+page.server', { state: 'unavailable' })
+		logAdminLoad('admin/layanan/pertek/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
@@ -49,7 +49,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	}
 
 	if (!adminData.isAdmin) {
-		logAdminLoad('admin/pertek/+page.server', { state: 'forbidden', role: adminData.role })
+		logAdminLoad('admin/layanan/pertek/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
@@ -112,7 +112,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 		const ditolak = ditolakPertekResult.count ?? 0
 		const diproses = Math.max(total - selesai - ditolak, 0)
 
-		logAdminLoad('admin/pertek/+page.server', {
+		logAdminLoad('admin/layanan/pertek/+page.server', {
 			state: 'ok',
 			page: filters.page,
 			pageSize: filters.pageSize,

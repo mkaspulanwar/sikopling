@@ -1,17 +1,29 @@
-import { LAYANAN_VALUES, STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
+import { requireAdminSupabase } from '$lib/server/admin-route'
+import {
+	createMonitoringIntegrasi,
+	deleteMonitoringIntegrasi,
+	listMonitoringIntegrasi,
+	listMonitoringIntegrasiIds
+} from '$lib/server/monitoring-integrasi'
 import {
 	createMonitoringPengajuan,
 	deleteMonitoringPengajuan,
-	listMonitoringPengajuanIds,
 	listMonitoringPengajuan,
+	listMonitoringPengajuanIds,
 	updateStatusMonitoringPengajuan
 } from '$lib/server/monitoring-pengajuan'
-import { requireAdminSupabase } from '$lib/server/admin-route'
 import { resolveUserRole } from '$lib/server/supabase-auth'
+import {
+	INTEGRASI_STATUS_VALUES,
+	LAYANAN_VALUES,
+	STATUS_VALUES,
+	type IntegrasiStatus,
+	type StatusPengajuan
+} from '$lib/supabase/constants'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
-type SortBy =
+type PengajuanSortBy =
 	| 'no_registrasi'
 	| 'tanggal_masuk'
 	| 'instansi'
@@ -23,17 +35,20 @@ type SortBy =
 	| 'created_at'
 	| 'updated_at'
 
+type LayananMonitoring = 'perling' | 'pertek' | 'integrasi'
+
 type BulkDeletePayload =
 	| {
 			mode: 'ids'
+			layanan: LayananMonitoring
 			ids: string[]
 	  }
 	| {
 			mode: 'allFiltered'
-			layanan: 'perling' | 'pertek'
+			layanan: LayananMonitoring
 			keyword?: string
-			status?: StatusPengajuan
-			sortBy?: SortBy
+			status?: StatusPengajuan | IntegrasiStatus
+			sortBy?: string
 			sortOrder?: 'asc' | 'desc'
 			excludedIds?: string[]
 	  }
@@ -48,6 +63,7 @@ const parseNumber = (value: string | null, fallback: number) => {
 }
 
 const isIsoDate = (value: string | undefined) => !value || /^\d{4}-\d{2}-\d{2}$/.test(value)
+
 const extractErrorMessage = (error: unknown, fallback: string) => {
 	if (error instanceof Error) return error.message
 	if (typeof error === 'object' && error) {
@@ -57,11 +73,12 @@ const extractErrorMessage = (error: unknown, fallback: string) => {
 			hint?: unknown
 			code?: unknown
 		}
-		const message = typeof maybeError.message === 'string' ? maybeError.message : ''
-		const details = typeof maybeError.details === 'string' ? maybeError.details : ''
-		const hint = typeof maybeError.hint === 'string' ? maybeError.hint : ''
-		const code = typeof maybeError.code === 'string' ? maybeError.code : ''
-		const chunks = [message, details, hint, code ? `code=${code}` : ''].filter(Boolean)
+		const chunks = [
+			typeof maybeError.message === 'string' ? maybeError.message : '',
+			typeof maybeError.details === 'string' ? maybeError.details : '',
+			typeof maybeError.hint === 'string' ? maybeError.hint : '',
+			typeof maybeError.code === 'string' ? `code=${maybeError.code}` : ''
+		].filter(Boolean)
 		if (chunks.length > 0) return chunks.join(' | ')
 	}
 	return fallback
@@ -85,10 +102,17 @@ const ensureAdminSession = async (locals: App.Locals) => {
 	return { supabase: auth.supabase }
 }
 
-const normalizeDeleteErrorMessage = (message: string) => {
-	if (message === 'PENGAJUAN_NOT_FOUND') {
-		return 'Data pengajuan tidak ditemukan'
+const readLayananMonitoring = (value: unknown): LayananMonitoring | null => {
+	if (value === 'integrasi') return 'integrasi'
+	if (typeof value === 'string' && LAYANAN_VALUES.includes(value as 'perling' | 'pertek')) {
+		return value as 'perling' | 'pertek'
 	}
+	return null
+}
+
+const normalizeDeleteErrorMessage = (message: string) => {
+	if (message === 'PENGAJUAN_NOT_FOUND') return 'Data pengajuan tidak ditemukan'
+	if (message === 'INTEGRASI_NOT_FOUND') return 'Data integrasi tidak ditemukan'
 	if (message === 'DELETE_BLOCKED_BY_POLICY') {
 		return 'Hapus data belum diizinkan oleh policy database untuk role ini'
 	}
@@ -98,28 +122,27 @@ const normalizeDeleteErrorMessage = (message: string) => {
 const parseBulkDeletePayload = (body: unknown): BulkDeletePayload | null => {
 	if (typeof body !== 'object' || body === null) return null
 	const payload = body as Record<string, unknown>
+	const layanan = readLayananMonitoring(payload.layanan)
+	if (!layanan) return null
 
 	if (payload.mode === 'ids') {
 		if (!Array.isArray(payload.ids)) return null
 		const ids = payload.ids.filter((value): value is string => typeof value === 'string' && value.trim() !== '')
-		return { mode: 'ids', ids: Array.from(new Set(ids)) }
+		return { mode: 'ids', layanan, ids: Array.from(new Set(ids)) }
 	}
 
 	if (payload.mode === 'allFiltered') {
-		const layanan =
-			typeof payload.layanan === 'string' && LAYANAN_VALUES.includes(payload.layanan as 'perling' | 'pertek')
-				? (payload.layanan as 'perling' | 'pertek')
-				: null
-		if (!layanan) return null
-
 		const keyword = typeof payload.keyword === 'string' ? payload.keyword : undefined
 		const status =
-			typeof payload.status === 'string' && STATUS_VALUES.includes(payload.status as StatusPengajuan)
-				? (payload.status as StatusPengajuan)
-				: undefined
-		const sortBy = typeof payload.sortBy === 'string' ? (payload.sortBy as SortBy) : undefined
-		const sortOrder =
-			payload.sortOrder === 'asc' || payload.sortOrder === 'desc' ? payload.sortOrder : undefined
+			layanan === 'integrasi'
+				? typeof payload.status === 'string' && INTEGRASI_STATUS_VALUES.includes(payload.status as IntegrasiStatus)
+					? (payload.status as IntegrasiStatus)
+					: undefined
+				: typeof payload.status === 'string' && STATUS_VALUES.includes(payload.status as StatusPengajuan)
+					? (payload.status as StatusPengajuan)
+					: undefined
+		const sortBy = typeof payload.sortBy === 'string' ? payload.sortBy : undefined
+		const sortOrder = payload.sortOrder === 'asc' || payload.sortOrder === 'desc' ? payload.sortOrder : undefined
 		const excludedIds = Array.isArray(payload.excludedIds)
 			? Array.from(
 					new Set(
@@ -130,15 +153,7 @@ const parseBulkDeletePayload = (body: unknown): BulkDeletePayload | null => {
 				)
 			: []
 
-		return {
-			mode: 'allFiltered',
-			layanan,
-			keyword,
-			status,
-			sortBy,
-			sortOrder,
-			excludedIds
-		}
+		return { mode: 'allFiltered', layanan, keyword, status, sortBy, sortOrder, excludedIds }
 	}
 
 	return null
@@ -149,28 +164,44 @@ export const GET: RequestHandler = async ({ locals, url }) => {
 	if (auth.error) return auth.error
 
 	const query = url.searchParams
+	const layanan = readLayananMonitoring(query.get('layanan'))
+
+	if (layanan === 'integrasi') {
+		const commonParams = {
+			page: parseNumber(query.get('page'), 1),
+			pageSize: parseNumber(query.get('pageSize'), 20),
+			status: query.get('status') as IntegrasiStatus | undefined,
+			keyword: query.get('keyword') ?? undefined,
+			sortBy: query.get('sortBy') as never,
+			sortOrder: (query.get('sortOrder') as 'asc' | 'desc' | undefined) ?? 'desc'
+		}
+
+		if (query.get('selectMode') === 'ids') {
+			return json(await listMonitoringIntegrasiIds(auth.supabase, commonParams))
+		}
+
+		return json(await listMonitoringIntegrasi(auth.supabase, commonParams))
+	}
+
 	const commonParams = {
 		page: parseNumber(query.get('page'), 1),
 		pageSize: parseNumber(query.get('pageSize'), 20),
-		layanan: query.get('layanan') as 'perling' | 'pertek' | undefined,
+		layanan: layanan as 'perling' | 'pertek' | undefined,
 		status: query.get('status') as StatusPengajuan | undefined,
 		instansi: query.get('instansi') ?? undefined,
 		jenisLayanan: query.get('jenisLayanan') ?? undefined,
 		tanggalMulai: query.get('tanggalMulai') ?? undefined,
 		tanggalSelesai: query.get('tanggalSelesai') ?? undefined,
 		keyword: query.get('keyword') ?? undefined,
-		sortBy: query.get('sortBy') as SortBy | undefined,
+		sortBy: query.get('sortBy') as PengajuanSortBy | undefined,
 		sortOrder: (query.get('sortOrder') as 'asc' | 'desc' | undefined) ?? 'desc'
 	}
 
 	if (query.get('selectMode') === 'ids') {
-		const idsResult = await listMonitoringPengajuanIds(auth.supabase, commonParams)
-		return json(idsResult)
+		return json(await listMonitoringPengajuanIds(auth.supabase, commonParams))
 	}
 
-	const result = await listMonitoringPengajuan(auth.supabase, commonParams)
-
-	return json(result)
+	return json(await listMonitoringPengajuan(auth.supabase, commonParams))
 }
 
 export const DELETE: RequestHandler = async ({ locals, request }) => {
@@ -191,9 +222,7 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 	}
 
 	const payload = parseBulkDeletePayload(body)
-	if (!payload) {
-		return json({ message: 'Payload hapus massal tidak valid' }, { status: 400 })
-	}
+	if (!payload) return json({ message: 'Payload hapus massal tidak valid' }, { status: 400 })
 
 	let targetIds: string[] = []
 
@@ -206,21 +235,29 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		const collectedIds: string[] = []
 
 		while (page <= totalPages) {
-			const idsResult = await listMonitoringPengajuanIds(auth.supabase, {
-				page,
-				pageSize: IDS_FETCH_PAGE_SIZE,
-				layanan: payload.layanan,
-				keyword: payload.keyword,
-				status: payload.status,
-				sortBy: payload.sortBy,
-				sortOrder: payload.sortOrder
-			})
+			const idsResult =
+				payload.layanan === 'integrasi'
+					? await listMonitoringIntegrasiIds(auth.supabase, {
+							page,
+							pageSize: IDS_FETCH_PAGE_SIZE,
+							keyword: payload.keyword,
+							status: payload.status as IntegrasiStatus | undefined,
+							sortBy: payload.sortBy as never,
+							sortOrder: payload.sortOrder
+						})
+					: await listMonitoringPengajuanIds(auth.supabase, {
+							page,
+							pageSize: IDS_FETCH_PAGE_SIZE,
+							layanan: payload.layanan,
+							keyword: payload.keyword,
+							status: payload.status as StatusPengajuan | undefined,
+							sortBy: payload.sortBy as PengajuanSortBy | undefined,
+							sortOrder: payload.sortOrder
+						})
 
 			totalPages = Math.max(idsResult.totalPages, 1)
 			for (const row of idsResult.data) {
-				if (!excludedIdSet.has(row.id)) {
-					collectedIds.push(row.id)
-				}
+				if (!excludedIdSet.has(row.id)) collectedIds.push(row.id)
 			}
 			page += 1
 		}
@@ -240,21 +277,22 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 		const batchResults = await Promise.all(
 			idBatch.map(async (id) => {
 				try {
-					await deleteMonitoringPengajuan(auth.supabase, { id })
+					if (payload.layanan === 'integrasi') {
+						await deleteMonitoringIntegrasi(auth.supabase, { id })
+					} else {
+						await deleteMonitoringPengajuan(auth.supabase, { id })
+					}
 					return { ok: true as const }
 				} catch (error) {
-					const message = extractErrorMessage(error, 'Gagal menghapus data pengajuan')
+					const message = extractErrorMessage(error, 'Gagal menghapus data layanan')
 					return { ok: false as const, message: normalizeDeleteErrorMessage(message) }
 				}
 			})
 		)
 
 		for (const result of batchResults) {
-			if (result.ok) {
-				successCount += 1
-			} else {
-				failedMessages.push(result.message)
-			}
+			if (result.ok) successCount += 1
+			else failedMessages.push(result.message)
 		}
 	}
 
@@ -271,7 +309,38 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	if (auth.error) return auth.error
 
 	const body = await request.json()
-	const layanan = typeof body?.layanan === 'string' ? body.layanan : ''
+	const layanan = readLayananMonitoring(body?.layanan)
+
+	if (!layanan) return json({ message: 'Layanan wajib dipilih' }, { status: 400 })
+
+	if (layanan === 'integrasi') {
+		const tanggalUpdate = typeof body?.tanggal_update === 'string' ? body.tanggal_update.trim() : undefined
+		const status = typeof body?.status === 'string' ? (body.status as IntegrasiStatus) : undefined
+
+		if (!isIsoDate(tanggalUpdate)) {
+			return json({ message: 'Format tanggal update harus YYYY-MM-DD' }, { status: 400 })
+		}
+
+		if (status && !INTEGRASI_STATUS_VALUES.includes(status)) {
+			return json({ message: 'Status tidak valid' }, { status: 400 })
+		}
+
+		try {
+			const created = await createMonitoringIntegrasi(auth.supabase, {
+				instansi: typeof body?.instansi === 'string' ? body.instansi : undefined,
+				kegiatan: typeof body?.kegiatan === 'string' ? body.kegiatan : undefined,
+				jenisIntegrasi: typeof body?.jenis_integrasi === 'string' ? body.jenis_integrasi : undefined,
+				posisi: typeof body?.posisi === 'string' ? body.posisi : undefined,
+				status,
+				tanggalUpdate,
+				keterangan: typeof body?.keterangan === 'string' ? body.keterangan : undefined
+			})
+			return json({ data: created }, { status: 201 })
+		} catch (error) {
+			return json({ message: extractErrorMessage(error, 'Gagal menambahkan data integrasi') }, { status: 400 })
+		}
+	}
+
 	const noRegistrasi = typeof body?.no_registrasi === 'string' ? body.no_registrasi : null
 	const tanggalMasuk = typeof body?.tanggal_masuk === 'string' ? body.tanggal_masuk : undefined
 	const tanggalUpdate = typeof body?.tanggal_update === 'string' ? body.tanggal_update : undefined
@@ -280,10 +349,6 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 	const jenisLayanan = typeof body?.jenis_layanan === 'string' ? body.jenis_layanan : undefined
 	const posisi = typeof body?.posisi === 'string' ? body.posisi : undefined
 	const status = body?.status as StatusPengajuan | undefined
-
-	if (!LAYANAN_VALUES.includes(layanan as 'perling' | 'pertek')) {
-		return json({ message: 'Layanan wajib dipilih' }, { status: 400 })
-	}
 
 	if (!isIsoDate(tanggalMasuk)) {
 		return json({ message: 'Format tanggal masuk harus YYYY-MM-DD' }, { status: 400 })
@@ -299,7 +364,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 
 	try {
 		const created = await createMonitoringPengajuan(auth.supabase, {
-			layanan: layanan as 'perling' | 'pertek',
+			layanan,
 			noRegistrasi,
 			tanggalMasuk,
 			tanggalUpdate,

@@ -87,7 +87,7 @@
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Pengajuan Terbaru</h2>
 				<a
-					href="/admin/perling"
+					href="/admin/layanan/perling"
 					class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--muted)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
 				>
 					Lihat antrian

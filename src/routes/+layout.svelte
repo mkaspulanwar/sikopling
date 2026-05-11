@@ -215,16 +215,14 @@
 				return 'Kontak Sikopling';
 			case '/login':
 				return 'Login Sikopling';
-			case '/admin/monitoring':
-				return 'Admin Monitoring Sikopling';
 			case '/admin':
 			case '/admin/dashboard':
 				return 'Dashboard Admin Sikopling';
-			case '/admin/perling':
+			case '/admin/layanan/perling':
 				return 'Admin Perling Sikopling';
-			case '/admin/pertek':
+			case '/admin/layanan/pertek':
 				return 'Admin Pertek Sikopling';
-			case '/admin/integrasi':
+			case '/admin/layanan/integrasi':
 				return 'Admin Integrasi Sikopling';
 			case '/admin/pengumuman/perling':
 				return 'Admin Penerbitan Perling Sikopling';

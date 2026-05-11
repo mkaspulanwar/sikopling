@@ -153,7 +153,7 @@ test.describe.serial('admin perling/pertek table e2e', () => {
 		if (!adminTestContext) throw new Error('Konteks admin E2E belum siap')
 
 		const { token, email, password } = adminTestContext
-		const startPath = `/admin/perling?keyword=${encodeURIComponent(token)}&sortBy=created_at&sortOrder=asc&pageSize=10`
+		const startPath = `/admin/layanan/perling?keyword=${encodeURIComponent(token)}&sortBy=created_at&sortOrder=asc&pageSize=10`
 		await loginAsAdmin(page, email, password, startPath)
 
 		await expect(page.getByRole('heading', { name: 'Data Antrian Dokumen Lingkungan' })).toBeVisible()
@@ -184,7 +184,7 @@ test.describe.serial('admin perling/pertek table e2e', () => {
 		if (!adminTestContext) throw new Error('Konteks admin E2E belum siap')
 
 		const { token, email, password } = adminTestContext
-		const startPath = `/admin/pertek?keyword=${encodeURIComponent(token)}&sortBy=created_at&sortOrder=asc&pageSize=5`
+		const startPath = `/admin/layanan/pertek?keyword=${encodeURIComponent(token)}&sortBy=created_at&sortOrder=asc&pageSize=5`
 		await loginAsAdmin(page, email, password, startPath)
 
 		await expect(page.getByRole('heading', { name: 'Data Antrian Persetujuan Lingkungan' })).toBeVisible()

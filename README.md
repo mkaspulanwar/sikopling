@@ -61,7 +61,7 @@ SIKOPLING saat ini terdiri dari dua area utama:
   - import CSV (`/admin/api/[layanan]/import`),
   - export CSV (`/admin/api/[layanan]/export`),
   - metrik ringkasan per layanan (total/selesai/diproses/ditolak).
-- **Monitoring admin umum** (`/admin/monitoring`) untuk lintas layanan:
+- **Endpoint admin layanan** (`/admin/layanan`) untuk aksi data monitoring:
   - filter komprehensif,
   - sorting server-side,
   - update status + posisi.
@@ -210,9 +210,9 @@ SIKOPLING saat ini terdiri dari dua area utama:
 | --- | --- |
 | `/admin` | Redirect 307 ke `/admin/dashboard` |
 | `/admin/dashboard` | Ringkasan metrik dan aktivitas login |
-| `/admin/perling` | Operasional data antrian perling |
-| `/admin/pertek` | Operasional data antrian pertek |
-| `/admin/monitoring` | Monitoring operasional lintas layanan |
+| `/admin/layanan/perling` | Operasional data antrian perling |
+| `/admin/layanan/pertek` | Operasional data antrian pertek |
+| `/admin/layanan/integrasi` | Operasional data monitoring integrasi |
 | `/admin/profil` | Informasi akun admin aktif |
 | `/admin/pengaturan` | Halaman preferensi UI admin (placeholder fungsional) |
 
@@ -221,11 +221,11 @@ SIKOPLING saat ini terdiri dari dua area utama:
 | Endpoint | Method | Fungsi |
 | --- | --- | --- |
 | `/admin/session` | `GET`, `POST` | Keep-alive sesi admin |
-| `/admin/monitoring` | `GET` | List data monitoring (server-side filter/sort/page) |
-| `/admin/monitoring` | `POST` | Create data monitoring |
-| `/admin/monitoring` | `PATCH` | Update status + posisi |
-| `/admin/monitoring/[id]` | `PATCH` | Update detail data per id |
-| `/admin/monitoring/[id]` | `DELETE` | Hapus data (dibatasi role) |
+| `/admin/layanan` | `GET` | List data monitoring (server-side filter/sort/page) |
+| `/admin/layanan` | `POST` | Create data monitoring |
+| `/admin/layanan` | `PATCH` | Update status + posisi |
+| `/admin/layanan/[id]` | `PATCH` | Update detail data per id |
+| `/admin/layanan/[id]` | `DELETE` | Hapus data (dibatasi role) |
 | `/admin/api/[layanan]/import` | `POST` | Import CSV (`dokling`/`pertek`) |
 | `/admin/api/[layanan]/export` | `GET` | Export CSV (`dokling`/`pertek`) |
 

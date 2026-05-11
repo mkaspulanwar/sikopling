@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/state'
-	import { INTEGRASI_STATUS_VALUES, type IntegrasiStatus } from '$lib/supabase/constants'
+	import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
 	import PositionDropdown from '$lib/components/admin/PositionDropdown.svelte'
 	import StatusDropdown from '$lib/components/admin/StatusDropdown.svelte'
 	import { cubicOut } from 'svelte/easing'
@@ -22,13 +22,14 @@
 	type QueueRow = PageData['result']['data'][number]
 	type SelectedRowsById = Record<string, QueueRow>
 	type QueueForm = {
-		jenis_integrasi: string
+		no_registrasi: string
+		tanggal_masuk: string
 		tanggal_update: string
 		instansi: string
 		kegiatan: string
-		keterangan: string
+		jenis_layanan: string
 		posisi: string
-		status: IntegrasiStatus
+		status: StatusPengajuan
 	}
 	type DeleteTarget =
 		| { mode: 'ids'; ids: string[] }
@@ -36,16 +37,11 @@
 		| null
 
 	const { data }: { data: PageData } = $props()
-	const layanan = 'integrasi' as const
+	const layanan = 'pertek' as const
 	const POSITION_OPTIONS = [
 		'Penyusun',
-		'Sekretariat TU',
 		'Pemrakarsa',
-		'Lainnya'
-	] as const
-	const INTEGRATION_TYPE_OPTIONS = [
-		'PKPLH',
-		'SKKL',
+		'Sekretariat TU',
 		'Lainnya'
 	] as const
 
@@ -57,24 +53,31 @@
 
 	const numberFormatter = new Intl.NumberFormat('id-ID')
 
-	const statusBadgeClassMap: Record<IntegrasiStatus, string> = {
-		Submit: 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]',
-		'Uji Admin': 'border-[#8f67b0] bg-[#ede3f7] text-[#5f3888]',
-		'Uji Substansi': 'border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]',
-		'Drafting SK/Rekom': 'border-[#a8b8d6] bg-[#edf2ff] text-[#274472]',
-		'SK/Rekom Terbit': 'border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]',
+	const statusBadgeClassMap: Record<StatusPengajuan, string> = {
+		'Submit / Masuk': 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]',
+		'Perbaikan Uji Administrasi': 'border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]',
+		'Penjadwalan Rapat': 'border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]',
+		'Drafting SK': 'border-[#a8b8d6] bg-[#edf2ff] text-[#274472]',
+		'SK Terbit': 'border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]',
+		'Belum Submit Perbaikan': 'border-[#e8b5a3] bg-[#fff2ed] text-[#8a3a2f]',
+		'Uji Administrasi': 'border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]',
 		Ditolak: 'border-[#e1a5a5] bg-[#fff0f0] text-[#8c2f2f]',
-		Lainnya: 'border-[#d5d8de] bg-[#f4f5f7] text-[#4b5563]'
+		'Pasca Sidang': 'border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]',
+		'Evaluasi Dokumen': 'border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]',
+		Hold: 'border-[#d5d8de] bg-[#f4f5f7] text-[#4b5563]',
+		Dikembalikan: 'border-[#d9a98a] bg-[#fff1e8] text-[#8a4522]',
+		'Penilaian KA': 'border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]'
 	}
 
 	const createInitialForm = (): QueueForm => ({
-		jenis_integrasi: 'PKPLH',
+		no_registrasi: '',
+		tanggal_masuk: '',
 		tanggal_update: '',
 		instansi: '',
 		kegiatan: '',
-		keterangan: '',
+		jenis_layanan: '',
 		posisi: 'Penyusun',
-		status: 'Submit'
+		status: 'Submit / Masuk'
 	})
 	const ROWS_PER_PAGE_OPTIONS = [5, 10, 20] as const
 	type RowsPerPageOption = (typeof ROWS_PER_PAGE_OPTIONS)[number]
@@ -84,21 +87,23 @@
 			: 10
 
 	const formFromRow = (row: QueueRow): QueueForm => ({
-		jenis_integrasi: row.jenis_integrasi ?? '',
+		no_registrasi: row.no_registrasi ?? '',
+		tanggal_masuk: row.tanggal_masuk ?? '',
 		tanggal_update: row.tanggal_update ?? '',
 		instansi: row.instansi ?? '',
 		kegiatan: row.kegiatan ?? '',
-		keterangan: row.keterangan ?? '',
+		jenis_layanan: row.jenis_layanan ?? '',
 		posisi: row.posisi ?? '',
 		status: row.status
 	})
 
 	const normalizePayload = (form: QueueForm) => ({
-		jenis_integrasi: form.jenis_integrasi,
+		no_registrasi: form.no_registrasi,
+		tanggal_masuk: form.tanggal_masuk,
 		tanggal_update: form.tanggal_update,
 		instansi: form.instansi,
 		kegiatan: form.kegiatan,
-		keterangan: form.keterangan,
+		jenis_layanan: form.jenis_layanan,
 		posisi: form.posisi,
 		status: form.status
 	})
@@ -117,7 +122,7 @@
 	let isAllFilteredSelected = $state(false)
 	let excludedRowIds = $state<string[]>([])
 	let filterKeyword = $state('')
-	let filterStatus = $state<IntegrasiStatus | ''>('')
+	let filterStatus = $state<StatusPengajuan | ''>('')
 	let rowsPerPage = $state<RowsPerPageOption>(getInitialRowsPerPage())
 	let isRowsDropdownOpen = $state(false)
 	let rowsDropdownElement = $state<HTMLDivElement | null>(null)
@@ -173,9 +178,9 @@
 
 	const formatDate = (value: string | null) => (value ? dateFormatter.format(new Date(`${value}T00:00:00`)) : '-')
 	const formatNumber = (value: number) => numberFormatter.format(value)
-	const getStatusBadgeClass = (status: IntegrasiStatus) => statusBadgeClassMap[status]
+	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status]
 	const refreshPage = async () => {
-		await Promise.all([invalidate('admin:summary'), invalidate('admin:integrasi')])
+		await Promise.all([invalidate('admin:summary'), invalidate('admin:pertek')])
 	}
 
 	const buildListUrl = (params: URLSearchParams) => {
@@ -472,10 +477,6 @@
 	}
 
 	const submitCreate = async () => {
-		if (!createForm.jenis_integrasi.trim()) {
-			flash = { type: 'error', message: 'Jenis integrasi wajib diisi' }
-			return
-		}
 		if (!createForm.tanggal_update.trim()) {
 			flash = { type: 'error', message: 'Tanggal update wajib diisi' }
 			return
@@ -488,11 +489,14 @@
 		isSavingCreate = true
 		flash = null
 
-		const response = await fetch('/admin/integrasi-data', {
+		const response = await fetch('/admin/layanan', {
 			method: 'POST',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify(normalizePayload(createForm))
+			body: JSON.stringify({
+				layanan,
+				...normalizePayload(createForm)
+			})
 		})
 
 		const payload = await response.json().catch(() => ({ message: 'Gagal memproses respons server' }))
@@ -504,17 +508,13 @@
 
 		isCreateModalOpen = false
 		createForm = createInitialForm()
-		flash = { type: 'success', message: 'Data integrasi berhasil ditambahkan.' }
+		flash = { type: 'success', message: 'Data pertek berhasil ditambahkan.' }
 		await refreshPage()
 		isSavingCreate = false
 	}
 
 	const submitEdit = async () => {
 		if (!editRowId) return
-		if (!editForm.jenis_integrasi.trim()) {
-			flash = { type: 'error', message: 'Jenis integrasi wajib diisi' }
-			return
-		}
 		if (!editForm.tanggal_update.trim()) {
 			flash = { type: 'error', message: 'Tanggal update wajib diisi' }
 			return
@@ -527,11 +527,14 @@
 		isSavingEdit = true
 		flash = null
 
-		const response = await fetch(`/admin/integrasi/${editRowId}`, {
+		const response = await fetch(`/admin/layanan/${editRowId}`, {
 			method: 'PATCH',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify(normalizePayload(editForm))
+			body: JSON.stringify({
+				layanan,
+				...normalizePayload(editForm)
+			})
 		})
 
 		const payload = await response.json().catch(() => ({ message: 'Gagal memproses respons server' }))
@@ -543,7 +546,7 @@
 
 		isEditModalOpen = false
 		editRowId = null
-		flash = { type: 'success', message: 'Data integrasi berhasil diperbarui.' }
+		flash = { type: 'success', message: 'Data pertek berhasil diperbarui.' }
 		await refreshPage()
 		isSavingEdit = false
 	}
@@ -557,15 +560,16 @@
 			deleteTarget.mode === 'allFiltered'
 				? {
 						mode: 'allFiltered',
+						layanan,
 						keyword: data.filters.keyword ?? undefined,
 						status: data.filters.status ?? undefined,
 						sortBy: data.filters.sortBy,
 						sortOrder: data.filters.sortOrder,
 						excludedIds: deleteTarget.excludedIds
 					}
-				: { mode: 'ids', ids: deleteTarget.ids }
+				: { mode: 'ids', layanan, ids: deleteTarget.ids }
 
-		const response = await fetch('/admin/integrasi-data', {
+		const response = await fetch('/admin/layanan', {
 			method: 'DELETE',
 			credentials: 'include',
 			headers: { 'content-type': 'application/json' },
@@ -606,7 +610,7 @@
 
 		flash = {
 			type: 'success',
-			message: successCount > 1 ? `${successCount} data integrasi berhasil dihapus.` : 'Data integrasi berhasil dihapus.'
+			message: successCount > 1 ? `${successCount} data pertek berhasil dihapus.` : 'Data pertek berhasil dihapus.'
 		}
 		isDeleting = false
 	}
@@ -622,7 +626,7 @@
 	{/if}
 	{#if data.requiresSupabaseAuth}
 		<p class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-			Akses halaman integrasi membutuhkan akun admin pada Supabase Auth.
+			Akses halaman persetujuan teknis membutuhkan akun admin pada Supabase Auth.
 		</p>
 	{/if}
 	{#if data.errorMessage}
@@ -666,10 +670,10 @@
 			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full"></div>
 			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--surface)]">Dashboard Admin</p>
 			<h1 class="mt-2 text-2xl font-semibold tracking-tight text-[var(--surface)] sm:text-[2rem]">
-				Monitoring Integrasi
+				Monitoring Persetujuan Teknis
 			</h1>
 			<p class="mt-2 max-w-3xl text-sm text-[var(--surface)] sm:text-[0.96rem]">
-				Kelola status, pembaruan, dan tindak lanjut integrasi dalam satu alur kerja admin yang konsisten.
+				Kelola status, pembaruan, dan tindak lanjut persetujuan teknis dalam satu alur kerja admin yang konsisten.
 			</p>
 		</div>
 		<div class="mt-4 flex flex-wrap gap-2 sm:mt-5">
@@ -701,19 +705,19 @@
 	<div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Total</p>
-			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.integrasiStatusMetrics.total)}</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.total)}</p>
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Selesai</p>
-			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.integrasiStatusMetrics.selesai)}</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.selesai)}</p>
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Diproses</p>
-			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.integrasiStatusMetrics.diproses)}</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.diproses)}</p>
 		</article>
 		<article class="rounded-xl border border-[#d7dee8] bg-white px-4 py-5 text-center">
 			<p class="text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500">Ditolak</p>
-			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.integrasiStatusMetrics.ditolak)}</p>
+			<p class="mt-2 text-2xl font-semibold text-slate-900">{formatNumber(data.pertekStatusMetrics.ditolak)}</p>
 		</article>
 	</div>
 
@@ -837,20 +841,21 @@
 						/>
 					</th>
 					<th class="w-14 border-b border-[#64AD31] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white">No</th>
+					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">No Registrasi</th>
+					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Tanggal Masuk</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Instansi</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Kegiatan</th>
-					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Jenis Integrasi</th>
+					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Jenis Pertek</th>
 					<th class="w-36 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Posisi</th>
 					<th class="w-36 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Status</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Tanggal Update</th>
-					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Keterangan</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#if data.result.data.length === 0}
 					<tr>
-						<td colspan="9" class="px-6 py-12 text-center">
-							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data integrasi.</p>
+						<td colspan="10" class="px-6 py-12 text-center">
+							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data persetujuan teknis.</p>
 							<p class="mt-1 text-sm text-[var(--muted)]">Silakan tambah baris baru.</p>
 						</td>
 					</tr>
@@ -871,13 +876,15 @@
 									}}
 									class="h-4 w-4 cursor-pointer rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31] disabled:cursor-not-allowed"
 									style="accent-color: #64AD31;"
-									aria-label={`Pilih data ${row.jenis_integrasi}`}
+									aria-label={`Pilih data ${row.no_registrasi}`}
 								/>
 							</td>
 							<td class="w-14 px-3 py-4 text-center text-sm text-[#20232A]">{(data.result.page - 1) * data.result.pageSize + index + 1}</td>
+							<td class="px-4 py-4 text-sm text-[#20232A]">{row.no_registrasi ?? '-'}</td>
+							<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.instansi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</td>
-							<td class="px-4 py-4 text-sm text-[#20232A]">{row.jenis_integrasi ?? '-'}</td>
+							<td class="px-4 py-4 text-sm text-[#20232A]">{row.jenis_layanan ?? '-'}</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{row.posisi ?? '-'}</td>
 							<td class="px-4 py-4 text-sm">
 								<span class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.72rem] leading-tight font-medium ${getStatusBadgeClass(row.status)}`}>
@@ -885,7 +892,6 @@
 								</span>
 							</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_update)}</td>
-							<td class="px-4 py-4 text-sm text-[#20232A]">{row.keterangan ?? '-'}</td>
 						</tr>
 					{/each}
 				{/if}
@@ -908,11 +914,11 @@
 					/>
 				</span>
 				<span class="text-center">No</span>
-				<span class="text-sm">Detail Integrasi</span>
+				<span class="text-sm">Detail Dokumen</span>
 			</div>
 
 			{#if data.result.data.length === 0}
-				<p class="px-2 py-8 text-center text-sm text-slate-500">Belum ada data integrasi.</p>
+				<p class="px-2 py-8 text-center text-sm text-slate-500">Belum ada data persetujuan teknis.</p>
 			{:else}
 				<ul>
 					{#each data.result.data as row, index}
@@ -928,7 +934,7 @@
 										}}
 										class="h-4 w-4 cursor-pointer rounded border-[#c3cfdd] bg-white text-white checked:border-[#64AD31] checked:bg-[#64AD31] focus:ring-[#64AD31] disabled:cursor-not-allowed"
 										style="accent-color: #64AD31;"
-										aria-label={`Pilih data ${row.jenis_integrasi}`}
+										aria-label={`Pilih data ${row.no_registrasi}`}
 									/>
 								</span>
 								<p class="pt-0.5 text-center text-sm font-semibold text-[#20232A]">
@@ -945,9 +951,12 @@
 											<p class="pr-1 text-sm leading-snug font-semibold whitespace-normal break-words text-[#20232A]">
 												{row.instansi ?? '-'}
 											</p>
+											<p class="mt-1 text-[0.75rem] leading-tight break-all text-[var(--muted)]">
+												No Registrasi: {row.no_registrasi ?? '-'}
+											</p>
 											<div class="mt-2 flex flex-wrap items-center gap-1.5">
 												<span class="text-[0.75rem] leading-tight text-[var(--muted)]">
-													{row.jenis_integrasi ?? '-'}
+													{row.jenis_layanan ?? '-'}
 												</span>
 												<span class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.75rem] leading-tight ${getStatusBadgeClass(row.status)}`}>
 													{row.status}
@@ -968,16 +977,16 @@
 								<div class={`border-t border-[var(--line)] px-4 py-4 ${isRowSelected(row.id) ? 'bg-[#f4fbea]' : 'bg-transparent'}`}>
 									<dl class="space-y-4">
 										<div>
+											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">Tanggal Masuk</dt>
+											<dd class="mt-1 text-sm text-[#20232A]">{formatDate(row.tanggal_masuk)}</dd>
+										</div>
+										<div>
 											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">Kegiatan</dt>
 											<dd class="mt-1 text-sm leading-relaxed text-[#20232A]">{row.kegiatan ?? '-'}</dd>
 										</div>
 										<div>
 											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">Posisi</dt>
 											<dd class="mt-1 text-sm text-[#20232A]">{row.posisi ?? '-'}</dd>
-										</div>
-										<div>
-											<dt class="text-[0.76rem] font-semibold tracking-[0.01em] text-[#20232A]">Keterangan</dt>
-											<dd class="mt-1 text-sm leading-relaxed text-[#20232A]">{row.keterangan ?? '-'}</dd>
 										</div>
 									</dl>
 								</div>
@@ -990,7 +999,7 @@
 	</section>
 
 	<footer class="mt-6 pt-2">
-		<nav aria-label="Navigasi halaman antrian integrasi admin" class="mx-auto flex flex-wrap items-center justify-center gap-1.5">
+		<nav aria-label="Navigasi halaman antrian persetujuan teknis admin" class="mx-auto flex flex-wrap items-center justify-center gap-1.5">
 			<a
 				href={buildQuery({ page: 1 })}
 				onclick={(event) => {
@@ -1075,22 +1084,29 @@
 			<div class="max-h-[78vh] overflow-y-auto px-5 py-4">
 				<div class="grid gap-3 sm:grid-cols-2">
 					<label class="grid gap-1.5">
-						<span class="text-xs font-semibold text-slate-600">Jenis Integrasi *</span>
-						<PositionDropdown
-							bind:value={createForm.jenis_integrasi}
-							options={INTEGRATION_TYPE_OPTIONS}
-							disabled={isSavingCreate || data.unavailable}
-							placeholder="Contoh: PKPLH"
-							placement="bottom"
-						/>
+						<span class="text-xs font-semibold text-slate-600">No Registrasi *</span>
+						<input type="text" bind:value={createForm.no_registrasi} placeholder="Contoh: 68A929AEDE796" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Status</span>
 						<StatusDropdown
 							bind:value={createForm.status}
-							options={INTEGRASI_STATUS_VALUES}
+							options={STATUS_VALUES}
 							disabled={isSavingCreate || data.unavailable}
 						/>
+					</label>
+					<label class="grid gap-1.5">
+						<span class="text-xs font-semibold text-slate-600">Tanggal Masuk</span>
+						<div class="group relative">
+							<input
+								type="date"
+								bind:value={createForm.tanggal_masuk}
+								class="modern-date-input h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"
+							/>
+							<span class="pointer-events-none absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#c7ddb7] bg-[#f2f9ea] text-[#4f6f3d] transition group-focus-within:border-[#89b866] group-focus-within:bg-[#e8f4db] group-focus-within:text-[#2f6b1f]">
+								<Calendar class="h-4 w-4" />
+							</span>
+						</div>
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Tanggal Update *</span>
@@ -1105,16 +1121,6 @@
 							</span>
 						</div>
 					</label>
-					<label class="grid gap-1.5">
-						<span class="text-xs font-semibold text-slate-600">Posisi</span>
-						<PositionDropdown
-							bind:value={createForm.posisi}
-							options={POSITION_OPTIONS}
-							disabled={isSavingCreate || data.unavailable}
-							placeholder="Contoh: Koordinator Tim"
-							placement="bottom"
-						/>
-					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Instansi</span>
 						<input type="text" bind:value={createForm.instansi} placeholder="Contoh: Dinas Lingkungan Hidup Kalsel" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
@@ -1124,8 +1130,17 @@
 						<input type="text" bind:value={createForm.kegiatan} placeholder="Contoh: Membangun gedung baru" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
-						<span class="text-xs font-semibold text-slate-600">Keterangan</span>
-						<textarea bind:value={createForm.keterangan} rows="3" placeholder="Catatan atau keterangan tambahan" class="min-h-24 rounded-lg border border-[#c9dcb8] bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"></textarea>
+						<span class="text-xs font-semibold text-slate-600">Jenis Pertek</span>
+						<input type="text" bind:value={createForm.jenis_layanan} placeholder="Contoh: Air Limbah" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+					</label>
+					<label class="grid gap-1.5 sm:col-span-2">
+						<span class="text-xs font-semibold text-slate-600">Posisi</span>
+						<PositionDropdown
+							bind:value={createForm.posisi}
+							options={POSITION_OPTIONS}
+							disabled={isSavingCreate || data.unavailable}
+							placeholder="Contoh: Koordinator Tim"
+						/>
 					</label>
 				</div>
 			</div>
@@ -1154,22 +1169,29 @@
 			<div class="max-h-[78vh] overflow-y-auto px-5 py-4">
 				<div class="grid gap-3 sm:grid-cols-2">
 					<label class="grid gap-1.5">
-						<span class="text-xs font-semibold text-slate-600">Jenis Integrasi *</span>
-						<PositionDropdown
-							bind:value={editForm.jenis_integrasi}
-							options={INTEGRATION_TYPE_OPTIONS}
-							disabled={isSavingEdit || data.unavailable}
-							placeholder="Contoh: PKPLH"
-							placement="bottom"
-						/>
+						<span class="text-xs font-semibold text-slate-600">No Registrasi *</span>
+						<input type="text" bind:value={editForm.no_registrasi} placeholder="Contoh: 68A929AEDE796" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Status</span>
 						<StatusDropdown
 							bind:value={editForm.status}
-							options={INTEGRASI_STATUS_VALUES}
+							options={STATUS_VALUES}
 							disabled={isSavingEdit || data.unavailable}
 						/>
+					</label>
+					<label class="grid gap-1.5">
+						<span class="text-xs font-semibold text-slate-600">Tanggal Masuk</span>
+						<div class="group relative">
+							<input
+								type="date"
+								bind:value={editForm.tanggal_masuk}
+								class="modern-date-input h-11 w-full rounded-xl border border-[#c9dcb8] bg-white px-3 pr-12 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"
+							/>
+							<span class="pointer-events-none absolute right-3 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg border border-[#c7ddb7] bg-[#f2f9ea] text-[#4f6f3d] transition group-focus-within:border-[#89b866] group-focus-within:bg-[#e8f4db] group-focus-within:text-[#2f6b1f]">
+								<Calendar class="h-4 w-4" />
+							</span>
+						</div>
 					</label>
 					<label class="grid gap-1.5">
 						<span class="text-xs font-semibold text-slate-600">Tanggal Update *</span>
@@ -1184,16 +1206,6 @@
 							</span>
 						</div>
 					</label>
-					<label class="grid gap-1.5">
-						<span class="text-xs font-semibold text-slate-600">Posisi</span>
-						<PositionDropdown
-							bind:value={editForm.posisi}
-							options={POSITION_OPTIONS}
-							disabled={isSavingEdit || data.unavailable}
-							placeholder="Contoh: Koordinator Tim"
-							placement="bottom"
-						/>
-					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Instansi</span>
 						<input type="text" bind:value={editForm.instansi} placeholder="Contoh: Dinas Lingkungan Hidup Kalsel" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
@@ -1203,8 +1215,17 @@
 						<input type="text" bind:value={editForm.kegiatan} placeholder="Contoh: Membangun gedung baru" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
-						<span class="text-xs font-semibold text-slate-600">Keterangan</span>
-						<textarea bind:value={editForm.keterangan} rows="3" placeholder="Catatan atau keterangan tambahan" class="min-h-24 rounded-lg border border-[#c9dcb8] bg-white px-3 py-2.5 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none"></textarea>
+						<span class="text-xs font-semibold text-slate-600">Jenis Pertek</span>
+						<input type="text" bind:value={editForm.jenis_layanan} placeholder="Contoh: Air Limbah" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+					</label>
+					<label class="grid gap-1.5 sm:col-span-2">
+						<span class="text-xs font-semibold text-slate-600">Posisi</span>
+						<PositionDropdown
+							bind:value={editForm.posisi}
+							options={POSITION_OPTIONS}
+							disabled={isSavingEdit || data.unavailable}
+							placeholder="Contoh: Koordinator Tim"
+						/>
 					</label>
 				</div>
 			</div>
@@ -1257,7 +1278,6 @@
 		</div>
 	</div>
 {/if}
-
 
 
 

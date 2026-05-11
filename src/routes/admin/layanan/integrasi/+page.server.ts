@@ -41,7 +41,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	const adminData = await parent()
 
 	if (!adminData.supabaseAvailable || !locals.supabase) {
-		logAdminLoad('admin/integrasi/+page.server', { state: 'unavailable' })
+		logAdminLoad('admin/layanan/integrasi/+page.server', { state: 'unavailable' })
 		return {
 			unavailable: true,
 			requiresSupabaseAuth: false,
@@ -54,7 +54,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 	}
 
 	if (!adminData.isAdmin) {
-		logAdminLoad('admin/integrasi/+page.server', { state: 'forbidden', role: adminData.role })
+		logAdminLoad('admin/layanan/integrasi/+page.server', { state: 'forbidden', role: adminData.role })
 		return {
 			unavailable: false,
 			requiresSupabaseAuth: true,
@@ -122,7 +122,7 @@ export const load: PageServerLoad = async ({ locals, url, parent, depends }) => 
 		const ditolak = ditolakIntegrasiResult.count ?? 0
 		const diproses = Math.max(total - selesai - ditolak, 0)
 
-		logAdminLoad('admin/integrasi/+page.server', {
+		logAdminLoad('admin/layanan/integrasi/+page.server', {
 			state: 'ok',
 			page: filters.page,
 			pageSize: filters.pageSize,
