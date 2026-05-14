@@ -297,7 +297,12 @@
 
   .horizontal-scroll-wrapper {
     overflow: hidden;
+    height: 100vh;
+    height: 100svh;
     height: 100dvh;
+    min-height: 100vh;
+    min-height: 100svh;
+    min-height: 100dvh;
     background: transparent;
   }
 
@@ -362,7 +367,8 @@
     display: flex;
     align-items: center;
     height: 100%;
-    padding-left: 45vw;
+    box-sizing: border-box;
+    padding: clamp(8.25rem, 12vw, 11.5rem) 0 clamp(4.5rem, 7vw, 6.5rem) 45vw;
   }
 
   .horizontal > div {
@@ -476,11 +482,12 @@
   @media (min-width: 768px) and (max-width: 1279px) {
     .horizontal-scroll-wrapper {
       height: clamp(32rem, 78dvh, 52rem);
+      min-height: clamp(32rem, 78dvh, 52rem);
     }
 
     .horizontal {
       align-items: center;
-      padding-left: 18vw;
+      padding: clamp(7rem, 11vw, 9rem) 0 clamp(4rem, 6vw, 5rem) 18vw;
     }
 
     .horizontal > div {
