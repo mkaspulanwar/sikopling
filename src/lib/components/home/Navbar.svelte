@@ -55,7 +55,7 @@
 		documents: SearchDocument[];
 	};
 
-	const layananSectionIds = ['layanan-dashboard', 'layanan-dokumen'];
+	const layananSectionIds = ['layanan-dokumen'];
 
 	const layananItems: LayananItem[] = [
 		{
@@ -974,6 +974,8 @@
 		if (typeof window === 'undefined') return;
 		const currentScrollY = Math.max(window.scrollY, 0);
 		const scrollDelta = currentScrollY - lastScrollY;
+		const isHorizontalScrollNavLocked =
+			document.documentElement.dataset.horizontalScrollNavLock === 'true';
 		isScrolled = currentScrollY > 18;
 		if (isMobileViewport) {
 			isNavVisible = true;
@@ -983,6 +985,8 @@
 
 		if (currentScrollY <= 8) {
 			isNavVisible = true;
+		} else if (isHorizontalScrollNavLocked) {
+			isNavVisible = false;
 		} else if (Math.abs(scrollDelta) >= 4) {
 			isNavVisible = scrollDelta < 0;
 		}
@@ -1870,4 +1874,3 @@
 		}
 	}
 </style>
-

@@ -18,12 +18,98 @@
 
   let sectionEl: HTMLElement | null = null;
   let horizontalEl: HTMLElement | null = null;
+  let wrapperEl: HTMLElement | null = null;
+  let progressTrackEl: HTMLButtonElement | null = null;
   let isEnhanced = $state(false);
+  let scrollProgress = $state(0);
+  let isProgressDragging = false;
+  let enhancedScrollTrigger: any = null;
+  let enhancedLenis: any = null;
+
+  const setNavScrollLock = (isLocked: boolean) => {
+    if (typeof document === "undefined") return;
+
+    document.documentElement.dataset.horizontalScrollNavLock = isLocked
+      ? "true"
+      : "false";
+  };
+
+  const clampProgress = (value: number) => Math.min(Math.max(value, 0), 1);
+
+  const setNativeProgress = () => {
+    if (!wrapperEl) {
+      scrollProgress = 0;
+      return;
+    }
+
+    const maxScrollLeft = wrapperEl.scrollWidth - wrapperEl.clientWidth;
+    if (maxScrollLeft <= 0) {
+      scrollProgress = 0;
+      return;
+    }
+
+    scrollProgress = clampProgress(wrapperEl.scrollLeft / maxScrollLeft);
+  };
+
+  const applyProgress = (nextProgress: number) => {
+    const normalizedProgress = clampProgress(nextProgress);
+
+    if (isEnhanced && enhancedScrollTrigger) {
+      const targetY =
+        enhancedScrollTrigger.start +
+        (enhancedScrollTrigger.end - enhancedScrollTrigger.start) *
+          normalizedProgress;
+
+      if (enhancedLenis) {
+        enhancedLenis.scrollTo(targetY, { immediate: false, duration: 0.85 });
+      } else {
+        window.scrollTo({ top: targetY, behavior: "smooth" });
+      }
+      return;
+    }
+
+    if (!wrapperEl) return;
+
+    const maxScrollLeft = wrapperEl.scrollWidth - wrapperEl.clientWidth;
+    wrapperEl.scrollTo({
+      left: maxScrollLeft * normalizedProgress,
+      behavior: "smooth",
+    });
+  };
+
+  const updateProgressFromPointer = (clientX: number) => {
+    if (!progressTrackEl) return;
+
+    const { left, width } = progressTrackEl.getBoundingClientRect();
+    if (width <= 0) return;
+
+    applyProgress((clientX - left) / width);
+  };
+
+  const handleProgressPointerDown = (event: PointerEvent) => {
+    isProgressDragging = true;
+    progressTrackEl?.setPointerCapture(event.pointerId);
+    updateProgressFromPointer(event.clientX);
+  };
+
+  const handleProgressPointerMove = (event: PointerEvent) => {
+    if (!isProgressDragging) return;
+    updateProgressFromPointer(event.clientX);
+  };
+
+  const handleProgressPointerUp = (event: PointerEvent) => {
+    if (!isProgressDragging) return;
+    isProgressDragging = false;
+    progressTrackEl?.releasePointerCapture(event.pointerId);
+    updateProgressFromPointer(event.clientX);
+  };
 
   const initHorizontalScroll = async (): Promise<Cleanup> => {
     if (!sectionEl || !horizontalEl) return () => {};
     if (!window.matchMedia(`(min-width: ${ENHANCE_MIN_WIDTH}px)`).matches) {
       isEnhanced = false;
+      setNavScrollLock(false);
+      setNativeProgress();
       return () => {};
     }
 
@@ -47,6 +133,7 @@
         prevent: (node: Element | null) =>
           Boolean(node?.closest?.("[data-lenis-prevent]")),
       });
+      enhancedLenis = lenis;
       lenis.on("scroll", ScrollTrigger.update);
 
       const tickerFn = (time: number) => lenis.raf(time * 1000);
@@ -64,8 +151,15 @@
           pin: sectionEl,
           scrub: true,
           invalidateOnRefresh: true,
+          onToggle: (self: any) => {
+            setNavScrollLock(self.isActive);
+          },
+          onUpdate: (self: any) => {
+            scrollProgress = clampProgress(self.progress);
+          },
         },
       });
+      enhancedScrollTrigger = mainTween.scrollTrigger;
 
       const cardTweens = Array.from(
         horizontalEl.querySelectorAll<HTMLElement>(".card"),
@@ -99,10 +193,16 @@
 
         gsap.ticker.remove(tickerFn);
         lenis.destroy();
+        enhancedScrollTrigger = null;
+        enhancedLenis = null;
+        setNavScrollLock(false);
         isEnhanced = false;
       };
     } catch (error) {
       console.error("Horizontal scroll enhancement failed:", error);
+      enhancedScrollTrigger = null;
+      enhancedLenis = null;
+      setNavScrollLock(false);
       isEnhanced = false;
       return () => {};
     }
@@ -111,6 +211,15 @@
   onMount(() => {
     let isUnmounted = false;
     let cleanup: Cleanup = () => {};
+    const handleNativeScroll = () => {
+      if (isEnhanced) return;
+      setNativeProgress();
+    };
+    const handleResize = () => setNativeProgress();
+
+    wrapperEl?.addEventListener("scroll", handleNativeScroll, { passive: true });
+    window.addEventListener("resize", handleResize);
+    requestAnimationFrame(setNativeProgress);
 
     void initHorizontalScroll().then((teardown) => {
       if (isUnmounted) {
@@ -122,6 +231,9 @@
 
     return () => {
       isUnmounted = true;
+      wrapperEl?.removeEventListener("scroll", handleNativeScroll);
+      window.removeEventListener("resize", handleResize);
+      setNavScrollLock(false);
       cleanup();
     };
   });
@@ -131,7 +243,7 @@
   <div class="horizontal-scroll-header">
     {@render header?.()}
   </div>
-  <div class="horizontal-scroll-wrapper">
+  <div class="horizontal-scroll-wrapper" bind:this={wrapperEl}>
     <div class="horizontal" bind:this={horizontalEl}>
       {#each cards as card}
         <div>
@@ -141,6 +253,27 @@
         </div>
       {/each}
     </div>
+  </div>
+  <div class="horizontal-progress-shell">
+    <button
+      type="button"
+      class="horizontal-progress-track"
+      bind:this={progressTrackEl}
+      aria-label="Progress geser layanan dokumen"
+      onpointerdown={handleProgressPointerDown}
+      onpointermove={handleProgressPointerMove}
+      onpointerup={handleProgressPointerUp}
+      onpointercancel={handleProgressPointerUp}
+    >
+      <span
+        class="horizontal-progress-fill"
+        style={`transform: scaleX(${Math.max(scrollProgress, 0.04)});`}
+      ></span>
+      <span
+        class="horizontal-progress-thumb"
+        style={`left: calc(${scrollProgress * 100}% - 0.5rem);`}
+      ></span>
+    </button>
   </div>
 </section>
 
@@ -166,6 +299,63 @@
     overflow: hidden;
     height: 100dvh;
     background: transparent;
+  }
+
+  .horizontal-progress-shell {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(1rem, 2.4vw, 1.65rem);
+    z-index: 6;
+    width: min(22rem, calc(100vw - 2.5rem));
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+
+  .horizontal-progress-track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 0.8rem;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.26);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.14),
+      0 10px 24px rgba(10, 18, 14, 0.16);
+    cursor: ew-resize;
+    pointer-events: auto;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    touch-action: none;
+    overflow: hidden;
+  }
+
+  .horizontal-progress-fill {
+    position: absolute;
+    inset: 0;
+    transform-origin: left center;
+    background: linear-gradient(
+      90deg,
+      rgba(229, 246, 196, 0.92) 0%,
+      rgba(145, 211, 107, 0.98) 52%,
+      rgba(255, 199, 106, 0.96) 100%
+    );
+    border-radius: inherit;
+  }
+
+  .horizontal-progress-thumb {
+    position: absolute;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 999px;
+    background: #fffef7;
+    border: 1px solid rgba(69, 96, 52, 0.16);
+    box-shadow:
+      0 4px 10px rgba(10, 18, 14, 0.18),
+      0 0 0 3px rgba(255, 255, 255, 0.12);
+    transform: translateY(-50%);
   }
 
   .horizontal {
@@ -355,7 +545,7 @@
   @media (max-width: 767px) {
     #horizontal-scroll {
       overflow: visible;
-      padding-bottom: 2rem;
+      padding-bottom: 3.75rem;
     }
 
     .horizontal-scroll-header {
@@ -394,6 +584,20 @@
     .horizontal .card {
       width: min(88vw, 25rem);
       padding: clamp(14px, 3.4vw, 24px) clamp(16px, 4vw, 28px);
+    }
+
+    .horizontal-progress-shell {
+      bottom: 1.15rem;
+      width: min(16rem, calc(100vw - 2rem));
+    }
+
+    .horizontal-progress-track {
+      height: 0.72rem;
+    }
+
+    .horizontal-progress-thumb {
+      width: 0.92rem;
+      height: 0.92rem;
     }
   }
 </style>

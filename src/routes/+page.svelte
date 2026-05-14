@@ -1,11 +1,9 @@
 ﻿<script lang="ts">
-	import { browser } from "$app/environment";
 	import ArrowRight from "lucide-svelte/icons/arrow-right";
 	import Plus from "lucide-svelte/icons/plus";
 	import { onMount } from "svelte";
 	import { cubicOut } from "svelte/easing";
 	import { slide } from "svelte/transition";
-	import type { DotLottie } from "@lottiefiles/dotlottie-svelte";
 	import type { PageData } from "./$types";
 	import HorizontalScroll from "$lib/components/home/HorizontalScroll.svelte";
 	import StackedCard from "$lib/components/home/StackedCard.svelte";
@@ -14,14 +12,6 @@
 		id: string;
 		question: string;
 		answer: string;
-	};
-	type StatItem = {
-		key: string;
-		label: string;
-		target: number;
-		suffix: string;
-		description: string;
-		note?: string;
 	};
 
 	type StepItem = {
@@ -36,41 +26,6 @@
 
 	let { data }: { data: PageData } = $props();
 
-	const statItems = $derived.by<StatItem[]>(() => [
-		{
-			key: "total",
-			label: "Total Pengajuan",
-			target: data.summary.total,
-			suffix: "+",
-			description:
-				"Total pengajuan dokumen yang tercatat pada dashboard admin SIKOPLING.",
-		},
-		{
-			key: "selesai",
-			label: "Pengajuan Selesai",
-			target: data.summary.selesai,
-			suffix: "+",
-			description:
-				"Jumlah dokumen pengajuan yang sudah selesai berdasarkan dashboard admin SIKOPLING.",
-		},
-		{
-			key: "waktu",
-			label: "Rata-rata Waktu Proses",
-			target: 7,
-			suffix: " Hari Kerja",
-			description:
-				"Kecepatan layanan untuk mendukung proses pengajuan yang mudah dan cepat.",
-			note: "Rentang SLA: 5-10 hari kerja sesuai jenis dokumen.",
-		},
-		{
-			key: "kepuasan",
-			label: "Index Kepuasan",
-			target: 98,
-			suffix: "%",
-			description:
-				"Persentase tingkat kepuasan pemrakarsa berdasarkan survei layanan SIKOPLING.",
-		},
-	]);
 	const homeFaqItems: HomeFaqItem[] = [
 		{
 			id: "faq-layanan",
@@ -93,27 +48,6 @@
 			answer: "Setiap pemrakarsa memperoleh tautan pemantauan untuk melihat tahapan dokumen secara berkala. Jika membutuhkan penjelasan lebih lanjut, Anda dapat menghubungi kanal Chatbot atau Customer Service SIKOPLING.",
 		},
 	];
-	const statLeafLayout = {
-		left: ["total", "kepuasan"],
-		right: ["selesai", "waktu"],
-	} as const;
-
-	const statLeafSubtitles: Record<string, string> = {
-		total: "Total Dokumen",
-		kepuasan: "Tingkat Kepuasan",
-		selesai: "Surat Keputusan Terbit",
-		waktu: "Waktu Layanan",
-	};
-
-	const pickStatItem = (key: string) =>
-		statItems.find((item) => item.key === key);
-	const leftLeafStats = $derived(statLeafLayout.left
-		.map((key) => pickStatItem(key))
-		.filter((item): item is StatItem => Boolean(item)));
-	const rightLeafStats = $derived(statLeafLayout.right
-		.map((key) => pickStatItem(key))
-		.filter((item): item is StatItem => Boolean(item)));
-
 	const serviceSteps: StepItem[] = [
 		{
 			title: "Media Interaktif",
@@ -169,112 +103,7 @@
 	];
 	let activeHomeFaqId = $state<string | null>(null);
 	let heroSection: HTMLElement | null = $state(null);
-	let statSection: HTMLElement | null = $state(null);
 	let isHeroScrollIndicatorVisible = $state(true);
-	let isCounterStarted = $state(false);
-	let statValues = $state<Record<string, number>>({
-		total: 0,
-		selesai: 0,
-		waktu: 0,
-		kepuasan: 0,
-	});
-
-	let animationFrameId = 0;
-
-	let dotLottie: DotLottie | null = null;
-	let DotLottieComponent = $state<any>(null);
-	let isLottieLoaded = false;
-	let isStatSectionVisible = false;
-	let removeLottieListeners: (() => void) | null = null;
-
-	const numberFormatter = new Intl.NumberFormat("id-ID");
-
-	const getTargetValues = () =>
-		Object.fromEntries(
-			statItems.map((item) => [item.key, item.target]),
-		) as Record<string, number>;
-
-	const syncLottiePlayback = () => {
-		if (!dotLottie || !isLottieLoaded) return;
-		if (isStatSectionVisible) {
-			dotLottie.play();
-			return;
-		}
-		dotLottie.pause();
-	};
-
-	const startCounterAnimation = () => {
-		if (isCounterStarted) return;
-		isCounterStarted = true;
-
-		if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-			statValues = getTargetValues();
-			return;
-		}
-
-		const startedAt = performance.now();
-		const duration = 1800;
-		const stagger = 140;
-
-		const tick = (now: number) => {
-			const nextValues: Record<string, number> = {};
-			let isCompleted = true;
-
-			for (const [index, item] of statItems.entries()) {
-				const localElapsed = now - startedAt - index * stagger;
-				const progress = Math.min(
-					Math.max(localElapsed / duration, 0),
-					1,
-				);
-				const easedProgress = 1 - Math.pow(1 - progress, 4);
-
-				nextValues[item.key] = item.target * easedProgress;
-
-				if (progress < 1) {
-					isCompleted = false;
-				}
-			}
-
-			statValues = nextValues;
-
-			if (!isCompleted) {
-				animationFrameId = requestAnimationFrame(tick);
-			}
-		};
-
-		animationFrameId = requestAnimationFrame(tick);
-	};
-
-	const formatLeafStatValue = (item: StatItem) => {
-		const roundedValue = Math.round(statValues[item.key] ?? 0);
-		if (item.key === "waktu") {
-			return `${numberFormatter.format(roundedValue)} Hari`;
-		}
-		return `${numberFormatter.format(roundedValue)}${item.suffix}`;
-	};
-
-	const setDotLottieRef = (instance: DotLottie | null) => {
-		removeLottieListeners?.();
-		removeLottieListeners = null;
-
-		dotLottie = instance;
-		isLottieLoaded = false;
-
-		if (!instance) return;
-
-		instance.stop(); // pastikan dari awal tidak jalan duluan
-
-		const handleLoad = () => {
-			isLottieLoaded = true;
-			syncLottiePlayback();
-		};
-
-		instance.addEventListener("load", handleLoad);
-
-		removeLottieListeners = () => {
-			instance.removeEventListener("load", handleLoad);
-		};
-	};
 
 	const easeInOutCubic = (progress: number) =>
 		progress < 0.5
@@ -337,17 +166,7 @@
 		activeHomeFaqId = activeHomeFaqId === id ? null : id;
 	};
 	onMount(() => {
-		let isUnmounted = false;
 		let heroObserver: IntersectionObserver | null = null;
-		let statObserver: IntersectionObserver | null = null;
-
-		if (browser) {
-			void import("@lottiefiles/dotlottie-svelte").then((module) => {
-				if (!isUnmounted) {
-					DotLottieComponent = module.DotLottieSvelte;
-				}
-			});
-		}
 
 		if (heroSection) {
 			heroObserver = new IntersectionObserver(
@@ -360,27 +179,8 @@
 			heroObserver.observe(heroSection);
 		}
 
-		if (statSection) {
-			statObserver = new IntersectionObserver(
-				([entry]) => {
-					isStatSectionVisible = entry.isIntersecting;
-					if (entry.isIntersecting) {
-						startCounterAnimation();
-					}
-					syncLottiePlayback();
-				},
-				{ threshold: 0.4, rootMargin: "100px 0px -80px 0px" },
-			);
-
-			statObserver.observe(statSection);
-		}
-
 		return () => {
-			isUnmounted = true;
 			heroObserver?.disconnect();
-			statObserver?.disconnect();
-			cancelAnimationFrame(animationFrameId);
-			removeLottieListeners?.();
 		};
 	});
 </script>
@@ -443,7 +243,7 @@
 		type="button"
 		class="hero-scroll-indicator"
 		class:hero-scroll-indicator-hidden={!isHeroScrollIndicatorVisible}
-		aria-label="Scroll ke bagian Statistik Layanan"
+		aria-label="Scroll ke bagian Layanan SIKOPLING"
 		onclick={scrollToDashboard}
 	>
 		<span class="hero-scroll-label">Scroll to Explore</span>
@@ -550,146 +350,6 @@
 </section>
 <section class=" scroll-mt-28">
 	<StackedCard />
-</section>
-<section
-	id="layanan-dashboard"
-	class="scroll-mt-28 bg-[var(--canvas)] py-12 sm:py-30"
->
-	<div class="page-shell" bind:this={statSection}>
-		<div class="mx-auto max-w-4xl text-center">
-			<p
-				class="text-xs font-semibold tracking-[0.12em] text-[var(--secondary)] uppercase"
-			>
-				Statistik Layanan
-			</p>
-			<h2
-				class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
-			>
-				Capaian SIKOPLING Secara Ringkas
-			</h2>
-			<p
-				class="mt-3 hidden sm:block text-base leading-relaxed text-[var(--muted)] sm:text-lg"
-			>
-				Metrik performa layanan konsultasi dan persetujuan lingkungan.
-			</p>
-		</div>
-
-		<div
-			class="-mx-2 mt-3 grid grid-cols-[minmax(0,1fr)_minmax(7.2rem,8.6rem)_minmax(0,1fr)] items-start gap-x-1 gap-y-1.5 sm:mx-0 sm:mt-6 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,14rem)_minmax(0,1fr)] sm:gap-x-4 lg:grid-cols-[minmax(18rem,26rem)_minmax(26rem,34rem)_minmax(18rem,26rem)] lg:items-center lg:gap-x-2"
-		>
-			<div class="grid gap-1.5 sm:gap-3 lg:gap-6">
-				{#each leftLeafStats as item, index}
-					<article
-						class="stat-leaf-card mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]"
-						class:stat-leaf-card-visible={isCounterStarted}
-						style={`--stat-delay: ${index * 110}ms;`}
-					>
-						<div
-							class="flex min-h-[2rem] items-end justify-center px-1 py-0 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]"
-						>
-							<h3
-								class="text-[0.82rem] leading-[1.12] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl"
-							>
-								{item.label}
-							</h3>
-						</div>
-						<div
-							class="relative -mt-4 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]"
-						>
-							<img
-								src="/layout/daun-kiri.svg"
-								alt=""
-								aria-hidden="true"
-								class="h-[8.4rem] w-full max-w-[14.2rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
-							/>
-							<div
-								class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4"
-							>
-								<p
-									class="font-hero-title text-[1rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
-								>
-									{formatLeafStatValue(item)}
-								</p>
-							</div>
-						</div>
-						<div
-							class="flex min-h-[0.9rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]"
-						>
-							<p
-								class="-mt-8 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
-							>
-								{statLeafSubtitles[item.key]}
-							</p>
-						</div>
-					</article>
-				{/each}
-			</div>
-
-			<div
-				class="pointer-events-none relative z-20 mx-auto flex w-full self-center items-center justify-center overflow-visible"
-			>
-				<div
-					class="stat-tree-lottie aspect-square w-[clamp(12rem,58vw,20.5rem)] sm:w-[clamp(12rem,34vw,14rem)] lg:w-[clamp(20rem,28vw,34rem)]"
-				>
-					{#if DotLottieComponent}
-						<DotLottieComponent
-							src="/layout/tree.lottie"
-							autoplay={false}
-							dotLottieRefCallback={setDotLottieRef}
-						/>
-					{/if}
-				</div>
-			</div>
-
-			<div class="grid gap-1.5 sm:gap-3 lg:gap-6">
-				{#each rightLeafStats as item, index}
-					<article
-						class="stat-leaf-card mx-auto grid w-full max-w-[12.8rem] bg-transparent text-center sm:max-w-[14rem] lg:max-w-[26rem]"
-						class:stat-leaf-card-visible={isCounterStarted}
-						style={`--stat-delay: ${(index + leftLeafStats.length) * 110}ms;`}
-					>
-						<div
-							class="flex min-h-[2rem] items-end justify-center px-1 py-0 sm:min-h-[4.75rem] sm:px-2 lg:min-h-[5.5rem]"
-						>
-							<h3
-								class="text-[0.82rem] leading-[1.12] font-semibold tracking-tight text-[var(--ink)] uppercase sm:text-base lg:text-2xl"
-							>
-								{item.label}
-							</h3>
-						</div>
-						<div
-							class="relative -mt-4 flex min-h-[4.6rem] items-center justify-center sm:-mt-1 lg:-mt-10 sm:min-h-[6.2rem] lg:min-h-[8.2rem]"
-						>
-							<img
-								src="/layout/daun-kanan.svg"
-								alt=""
-								aria-hidden="true"
-								class="h-[8.4rem] w-full max-w-[14.2rem] object-contain sm:h-[6.8rem] sm:max-w-[13.6rem] lg:h-[8.8rem] lg:max-w-[25rem]"
-							/>
-							<div
-								class="absolute inset-0 flex items-center justify-center px-1 sm:px-2 lg:px-4"
-							>
-								<p
-									class="font-hero-title text-[1rem] leading-none font-bold text-white sm:text-[1.85rem] lg:text-[3.2rem]"
-								>
-									{formatLeafStatValue(item)}
-								</p>
-							</div>
-						</div>
-						<div
-							class="flex min-h-[0.9rem] items-start justify-center px-1 pt-0 pb-0 sm:min-h-[1.2rem]"
-						>
-							<p
-								class="-mt-8 lg:-mt-20 text-[0.58rem] leading-tight font-semibold tracking-[0.06em] text-[var(--ink)] uppercase sm:text-[0.64rem] lg:text-sm"
-							>
-								{statLeafSubtitles[item.key]}
-							</p>
-						</div>
-					</article>
-				{/each}
-			</div>
-		</div>
-	</div>
 </section>
 
 <section id="layanan-dokumen" class=" scroll-mt-28">
@@ -927,19 +587,6 @@
 		object-fit: cover;
 	}
 
-	.stat-tree-lottie {
-		background-color: transparent;
-	}
-
-	.stat-tree-lottie :global(canvas),
-	.stat-tree-lottie :global(svg),
-	.stat-tree-lottie :global(dotlottie-player) {
-		width: 100% !important;
-		height: 100% !important;
-		display: block;
-		background-color: transparent !important;
-	}
-
 	.demo-stage {
 		isolation: isolate;
 	}
@@ -988,33 +635,6 @@
 		}
 		50% {
 			transform: translate3d(0, -5px, 0);
-		}
-	}
-
-	@keyframes stat-leaf-reveal {
-		0% {
-			opacity: 0;
-			transform: translate3d(0, 22px, 0) scale(0.97);
-			filter: blur(8px);
-		}
-		100% {
-			opacity: 1;
-			transform: translate3d(0, 0, 0) scale(1);
-			filter: blur(0);
-		}
-	}
-
-	@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-		.stat-leaf-card {
-			opacity: 0;
-			transform: translate3d(0, 22px, 0) scale(0.97);
-			filter: blur(8px);
-			will-change: transform, opacity, filter;
-		}
-
-		.stat-leaf-card-visible {
-			animation: stat-leaf-reveal 720ms cubic-bezier(0.22, 1, 0.36, 1)
-				var(--stat-delay, 0ms) both;
 		}
 	}
 
