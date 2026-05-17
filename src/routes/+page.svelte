@@ -363,7 +363,7 @@
 						Layanan Dokumen Lingkungan
 					</p>
 					<h2
-						class="mt-2 sm:mt-6 text-[clamp(1rem,3vw,4rem)] font-semibold leading-tight tracking-tight text-white"
+						class="mt-2 sm:mt-6 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.7rem]"
 					>
 						JENIS JENIS SIKOPLING
 					</h2>

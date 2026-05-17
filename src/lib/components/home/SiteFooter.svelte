@@ -116,7 +116,7 @@
 							class="maskot-panel flex items-end justify-center rounded-l-[1.75rem] rounded-r-none bg-[#676767] pt-3 sm:px-3 xl:h-full xl:min-h-0 xl:rounded-none xl:bg-transparent xl:p-0"
 						>
 							<img
-								src="/layout/maskot.svg"
+								src="/layout/maskot.png"
 								alt="Maskot Sikopling"
 								class="maskot-image block h-auto w-full object-contain xl:h-full xl:w-full xl:max-w-none xl:-translate-y-6 xl:object-contain"
 							/>

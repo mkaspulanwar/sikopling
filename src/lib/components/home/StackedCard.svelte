@@ -399,7 +399,7 @@
 
     @media (max-width: 768px) {
         .quality-section {
-            background: linear-gradient(180deg, #f9f6ee 0%, #ffffff 100%);
+            background: #ffffff;
             padding-top: 4.5rem;
             padding-bottom: 5.5rem;
             padding-inline: clamp(1.05rem, 2.4vw, 2.25rem);
@@ -410,13 +410,13 @@
         }
 
         .quality-content {
-            align-items: flex-start;
+            align-items: center;
             gap: 1rem;
             text-align: center;
         }
 
         .quality-title {
-            font-size: clamp(3rem, 12vw, 3.8rem);
+            font-size: clamp(1.875rem, 8vw, 2.25rem);
             max-width: 20ch;
             text-align: center;
         }
@@ -520,12 +520,12 @@
             width: min(100%, 19rem);
         }
         .quality-content {
-            align-items: flex-start;
+            align-items: center;
             gap: 1rem;
             text-align: center;
         }
         .quality-title {
-            font-size: clamp(2rem, 9vw, 2.4rem);
+            font-size: clamp(1.875rem, 7.5vw, 2.2rem);
             max-width: 17ch;
         }
         .quality-description {

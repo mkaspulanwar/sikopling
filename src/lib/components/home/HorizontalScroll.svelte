@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { Snippet } from "svelte";
+  import ArrowLeftRight from "lucide-svelte/icons/arrow-left-right";
 
   type Cleanup = () => void;
 
@@ -13,7 +14,7 @@
   ];
 
   const MAIN_TRIGGER_ID = "home-horizontal-scroll-main";
-  const ENHANCE_MIN_WIDTH = 1024;
+  const DESKTOP_MIN_WIDTH = 1024;
   const { header }: { header?: Snippet } = $props();
 
   let sectionEl: HTMLElement | null = null;
@@ -104,11 +105,21 @@
     updateProgressFromPointer(event.clientX);
   };
 
+  const teardownEnhancedScrollState = () => {
+    enhancedScrollTrigger?.kill?.();
+    enhancedScrollTrigger = null;
+
+    enhancedLenis?.destroy?.();
+    enhancedLenis = null;
+
+    setNavScrollLock(false);
+    isEnhanced = false;
+  };
+
   const initHorizontalScroll = async (): Promise<Cleanup> => {
     if (!sectionEl || !horizontalEl) return () => {};
-    if (!window.matchMedia(`(min-width: ${ENHANCE_MIN_WIDTH}px)`).matches) {
-      isEnhanced = false;
-      setNavScrollLock(false);
+    if (!window.matchMedia(`(min-width: ${DESKTOP_MIN_WIDTH}px)`).matches) {
+      teardownEnhancedScrollState();
       setNativeProgress();
       return () => {};
     }
@@ -193,17 +204,11 @@
 
         gsap.ticker.remove(tickerFn);
         lenis.destroy();
-        enhancedScrollTrigger = null;
-        enhancedLenis = null;
-        setNavScrollLock(false);
-        isEnhanced = false;
+        teardownEnhancedScrollState();
       };
     } catch (error) {
       console.error("Horizontal scroll enhancement failed:", error);
-      enhancedScrollTrigger = null;
-      enhancedLenis = null;
-      setNavScrollLock(false);
-      isEnhanced = false;
+      teardownEnhancedScrollState();
       return () => {};
     }
   };
@@ -211,28 +216,50 @@
   onMount(() => {
     let isUnmounted = false;
     let cleanup: Cleanup = () => {};
+    const desktopMediaQuery = window.matchMedia(
+      `(min-width: ${DESKTOP_MIN_WIDTH}px)`,
+    );
+
+    const syncModeByViewport = async () => {
+      cleanup();
+      cleanup = () => {};
+      setNativeProgress();
+
+      if (!desktopMediaQuery.matches) {
+        teardownEnhancedScrollState();
+        return;
+      }
+
+      const nextCleanup = await initHorizontalScroll();
+      if (isUnmounted) {
+        nextCleanup();
+        return;
+      }
+
+      cleanup = nextCleanup;
+    };
+
     const handleNativeScroll = () => {
       if (isEnhanced) return;
       setNativeProgress();
     };
     const handleResize = () => setNativeProgress();
+    const handleViewportChange = () => {
+      void syncModeByViewport();
+    };
 
     wrapperEl?.addEventListener("scroll", handleNativeScroll, { passive: true });
     window.addEventListener("resize", handleResize);
+    desktopMediaQuery.addEventListener("change", handleViewportChange);
     requestAnimationFrame(setNativeProgress);
 
-    void initHorizontalScroll().then((teardown) => {
-      if (isUnmounted) {
-        teardown();
-        return;
-      }
-      cleanup = teardown;
-    });
+    void syncModeByViewport();
 
     return () => {
       isUnmounted = true;
       wrapperEl?.removeEventListener("scroll", handleNativeScroll);
       window.removeEventListener("resize", handleResize);
+      desktopMediaQuery.removeEventListener("change", handleViewportChange);
       setNavScrollLock(false);
       cleanup();
     };
@@ -242,6 +269,12 @@
 <section id="horizontal-scroll" class:enhanced={isEnhanced} bind:this={sectionEl}>
   <div class="horizontal-scroll-header">
     {@render header?.()}
+  </div>
+  <div class="horizontal-mobile-hint" aria-hidden="true">
+    <span class="horizontal-mobile-hint-icon">
+      <ArrowLeftRight strokeWidth={2.2} />
+    </span>
+    <span>Geser kartu</span>
   </div>
   <div class="horizontal-scroll-wrapper" bind:this={wrapperEl}>
     <div class="horizontal" bind:this={horizontalEl}>
@@ -280,7 +313,7 @@
 <style>
   #horizontal-scroll {
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background-image: url("/home/gradient-texture.jpg");
     background-size: cover;
     background-position: center;
@@ -295,14 +328,14 @@
     z-index: 5;
   }
 
+  .horizontal-mobile-hint {
+    display: none;
+  }
+
   .horizontal-scroll-wrapper {
-    overflow: hidden;
-    height: 100vh;
-    height: 100svh;
-    height: 100dvh;
-    min-height: 100vh;
-    min-height: 100svh;
-    min-height: 100dvh;
+    overflow: visible;
+    height: auto;
+    min-height: 0;
     background: transparent;
   }
 
@@ -365,19 +398,20 @@
 
   .horizontal {
     display: flex;
-    align-items: center;
-    height: 100%;
+    align-items: stretch;
+    height: auto;
     box-sizing: border-box;
-    padding: clamp(8.25rem, 12vw, 11.5rem) 0 clamp(4.5rem, 7vw, 6.5rem) 45vw;
+    padding: 0 1rem 0.25rem;
   }
 
   .horizontal > div {
-    margin: 0 4vw;
+    margin: 0 0.75rem 0 0;
     flex: 0 0 auto;
+    scroll-snap-align: start;
   }
 
   .horizontal > div:last-child {
-    margin: 0 6vw 0 4vw;
+    margin: 0 1rem 0 0;
   }
 
   .horizontal .card {
@@ -479,23 +513,61 @@
     }
   }
 
-  @media (min-width: 768px) and (max-width: 1279px) {
-    .horizontal-scroll-wrapper {
-      height: clamp(32rem, 78dvh, 52rem);
-      min-height: clamp(32rem, 78dvh, 52rem);
+  @media (min-width: 1024px) {
+    #horizontal-scroll.enhanced {
+      overflow: hidden;
     }
 
+    #horizontal-scroll.enhanced .horizontal-scroll-header {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 5;
+      margin-bottom: 0;
+    }
+
+    #horizontal-scroll.enhanced .horizontal-scroll-wrapper {
+      overflow: hidden;
+      height: 100vh;
+      height: 100svh;
+      height: 100dvh;
+      min-height: 100vh;
+      min-height: 100svh;
+      min-height: 100dvh;
+    }
+
+    #horizontal-scroll.enhanced .horizontal {
+      align-items: center;
+      height: 100%;
+      padding: clamp(8.25rem, 12vw, 11.5rem) 0 clamp(4.5rem, 7vw, 6.5rem) 45vw;
+    }
+
+    #horizontal-scroll.enhanced .horizontal > div {
+      margin: 0 4vw;
+    }
+
+    #horizontal-scroll.enhanced .horizontal > div:last-child {
+      margin: 0 6vw 0 4vw;
+    }
+
+    #horizontal-scroll.enhanced .horizontal .card {
+      width: clamp(300px, 38vw, 720px);
+    }
+  }
+
+  @media (min-width: 768px) and (max-width: 1279px) {
     .horizontal {
       align-items: center;
-      padding: clamp(7rem, 11vw, 9rem) 0 clamp(4rem, 6vw, 5rem) 18vw;
+      padding: 0 1.5rem 0.25rem;
     }
 
     .horizontal > div {
-      margin: 0 2.5vw;
+      margin: 0 1rem 0 0;
     }
 
     .horizontal > div:last-child {
-      margin: 0 10vw 0 2.5vw;
+      margin: 0 1.5rem 0 0;
     }
 
     .horizontal .card {
@@ -519,9 +591,11 @@
     #horizontal-scroll:not(.enhanced) .horizontal-scroll-wrapper {
       height: auto;
       overflow-x: auto;
-      overflow-y: visible;
+      overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 1.5rem;
     }
 
     #horizontal-scroll:not(.enhanced) .horizontal-scroll-wrapper::-webkit-scrollbar {
@@ -551,22 +625,62 @@
 
   @media (max-width: 767px) {
     #horizontal-scroll {
-      overflow: visible;
-      padding-bottom: 3.75rem;
+      width: 100vw;
+      margin-inline: calc(50% - 50vw);
+      min-height: 40rem;
+      padding: 1.5rem 0;
+      display: flex;
+      flex-direction: column;
     }
 
     .horizontal-scroll-header {
       position: static;
-      z-index: auto;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
+      flex: 0 0 auto;
+    }
+
+    .horizontal-mobile-hint {
+      display: inline-flex;
+      align-items: center;
+      align-self: center;
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+      padding: 0.42rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.14);
+      color: rgba(255, 255, 255, 0.92);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .horizontal-mobile-hint-icon {
+      width: 0.95rem;
+      height: 0.95rem;
+      flex: 0 0 auto;
+    }
+
+    .horizontal-mobile-hint-icon :global(svg) {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .horizontal-scroll-wrapper {
-      height: auto;
+      flex: 1;
+      display: flex;
+      align-items: center;
       overflow-x: auto;
-      overflow-y: visible;
+      overflow-y: hidden;
       -webkit-overflow-scrolling: touch;
       scrollbar-width: none;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 1rem;
     }
 
     .horizontal-scroll-wrapper::-webkit-scrollbar {
@@ -594,17 +708,7 @@
     }
 
     .horizontal-progress-shell {
-      bottom: 1.15rem;
-      width: min(16rem, calc(100vw - 2rem));
-    }
-
-    .horizontal-progress-track {
-      height: 0.72rem;
-    }
-
-    .horizontal-progress-thumb {
-      width: 0.92rem;
-      height: 0.92rem;
+      display: none;
     }
   }
 </style>
