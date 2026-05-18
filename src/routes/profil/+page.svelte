@@ -273,7 +273,7 @@
 
 			<div class="space-y-4">
 				<figure class="tilt-right overflow-hidden rounded-[1.5rem] border border-[#dce8d5] bg-[#f8fbf6] p-4">
-					<img src="/layout/maskot.svg" alt="Maskot SIKOPLING" class="mx-auto h-[18rem] w-auto sm:h-[20rem]" />
+					<img src="/layout/maskot.png" alt="Maskot SIKOPLING" class="mx-auto h-[18rem] w-auto sm:h-[20rem]" />
 				</figure>
 				<div class="rounded-2xl border border-[#dce8d5] bg-[#f4faee] p-4 sm:p-5">
 					<p class="text-xs font-semibold tracking-[0.1em] text-[#6f8d46] uppercase">Catatan Layanan</p>
@@ -456,4 +456,3 @@
 		}
 	}
 </style>
-

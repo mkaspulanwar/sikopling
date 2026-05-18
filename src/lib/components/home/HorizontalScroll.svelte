@@ -15,6 +15,10 @@
 
   const MAIN_TRIGGER_ID = "home-horizontal-scroll-main";
   const DESKTOP_MIN_WIDTH = 1024;
+  // Tweak this to make the navbar hide earlier/later while approaching the section.
+  const NAV_LOCK_START = "top 52%";
+  // Extra scroll distance after the horizontal track finishes before navbar reappears.
+  const NAV_LOCK_RELEASE_BUFFER_PX = 1480;
   const { header }: { header?: Snippet } = $props();
 
   let sectionEl: HTMLElement | null = null;
@@ -24,6 +28,7 @@
   let isEnhanced = $state(false);
   let scrollProgress = $state(0);
   let isProgressDragging = false;
+  let navLockTrigger: any = null;
   let enhancedScrollTrigger: any = null;
   let enhancedLenis: any = null;
 
@@ -33,6 +38,18 @@
     document.documentElement.dataset.horizontalScrollNavLock = isLocked
       ? "true"
       : "false";
+  };
+
+  const getNavLockEndDistance = () => {
+    if (!horizontalEl) {
+      return window.innerHeight + NAV_LOCK_RELEASE_BUFFER_PX;
+    }
+
+    const horizontalScrollDistance = Math.max(
+      horizontalEl.scrollWidth - window.innerWidth,
+      0,
+    );
+    return horizontalScrollDistance + NAV_LOCK_RELEASE_BUFFER_PX;
   };
 
   const clampProgress = (value: number) => Math.min(Math.max(value, 0), 1);
@@ -106,6 +123,9 @@
   };
 
   const teardownEnhancedScrollState = () => {
+    navLockTrigger?.kill?.();
+    navLockTrigger = null;
+
     enhancedScrollTrigger?.kill?.();
     enhancedScrollTrigger = null;
 
@@ -140,6 +160,8 @@
       ScrollTrigger.getById(MAIN_TRIGGER_ID)?.kill();
 
       const lenis = new Lenis({
+        lerp: 0.16,
+        wheelMultiplier: 1.1,
         // Allow native scroll inside modal/popup containers.
         prevent: (node: Element | null) =>
           Boolean(node?.closest?.("[data-lenis-prevent]")),
@@ -150,6 +172,19 @@
       const tickerFn = (time: number) => lenis.raf(time * 1000);
       gsap.ticker.add(tickerFn);
       gsap.ticker.lagSmoothing(0);
+
+      navLockTrigger?.kill?.();
+      navLockTrigger = ScrollTrigger.create({
+        trigger: sectionEl,
+        start: NAV_LOCK_START,
+        end: () => `+=${getNavLockEndDistance()}`,
+        onToggle: (self: any) => {
+          setNavScrollLock(self.isActive);
+        },
+        onRefresh: (self: any) => {
+          setNavScrollLock(self.isActive);
+        },
+      });
 
       const mainTween = gsap.to(horizontalEl, {
         x: () => -(horizontalEl!.scrollWidth - window.innerWidth),
@@ -162,9 +197,6 @@
           pin: sectionEl,
           scrub: true,
           invalidateOnRefresh: true,
-          onToggle: (self: any) => {
-            setNavScrollLock(self.isActive);
-          },
           onUpdate: (self: any) => {
             scrollProgress = clampProgress(self.progress);
           },
@@ -314,7 +346,7 @@
   #horizontal-scroll {
     position: relative;
     overflow: visible;
-    background-image: url("/home/gradient-texture.jpg");
+    background-image: url("/home/gradient-texture.png");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;

@@ -267,7 +267,7 @@
 <section
 	id="product-demo-loop"
 	class="relative overflow-hidden bg-[#060a12] bg-cover bg-center py-14 sm:py-20 lg:py-24"
-	style="background-image: url('/home/gradient-texture.jpg');"
+	style="background-image: url('/home/gradient-texture.png');"
 >
 	<div class="absolute inset-0 -z-10 bg-black/24"></div>
 	<div

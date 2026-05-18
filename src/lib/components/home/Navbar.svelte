@@ -973,7 +973,6 @@
 	const updateScrollState = () => {
 		if (typeof window === 'undefined') return;
 		const currentScrollY = Math.max(window.scrollY, 0);
-		const scrollDelta = currentScrollY - lastScrollY;
 		const isHorizontalScrollNavLocked =
 			document.documentElement.dataset.horizontalScrollNavLock === 'true';
 		isScrolled = currentScrollY > 18;
@@ -983,12 +982,11 @@
 			return;
 		}
 
-		if (currentScrollY <= 8) {
-			isNavVisible = true;
-		} else if (isHorizontalScrollNavLocked) {
+		// Tetap sembunyikan navbar hanya saat section horizontal scroll mengunci nav.
+		if (isHorizontalScrollNavLocked) {
 			isNavVisible = false;
-		} else if (Math.abs(scrollDelta) >= 4) {
-			isNavVisible = scrollDelta < 0;
+		} else {
+			isNavVisible = true;
 		}
 
 		lastScrollY = currentScrollY;
@@ -1104,8 +1102,10 @@
 		isMobileTentangOpen;
 
 	const navClass = () =>
-		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform] duration-[360ms] ease-[cubic-bezier(0.22,1,0.36,1)] ${
-			shouldShowNav() ? 'translate-y-0 opacity-100 pointer-events-auto' : '-translate-y-full opacity-0 pointer-events-none'
+		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform,filter] duration-[680ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
+			shouldShowNav()
+				? 'translate-y-0 scale-100 opacity-100 blur-0 pointer-events-auto'
+				: '-translate-y-[110%] scale-[0.985] opacity-0 blur-[1px] pointer-events-none'
 		} ${
 			isMobileMenuActive()
 				? 'mobile-nav-solid bg-white text-[var(--ink)] shadow-none'
