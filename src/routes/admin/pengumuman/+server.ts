@@ -6,7 +6,7 @@ import {
 } from '$lib/server/admin-announcements'
 import type { AnnouncementType } from '$lib/server/admin-announcements'
 import { requireAdminSupabase } from '$lib/server/admin-route'
-import { resolveUserRole } from '$lib/server/supabase-auth'
+import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import { json } from '@sveltejs/kit'
 import type { RequestHandler } from './$types'
 
@@ -34,7 +34,7 @@ const ensureAdmin = async (locals: App.Locals) => {
 		return { error: json({ message: 'Supabase belum dikonfigurasi' }, { status: 503 }) }
 	}
 	if (auth.state === 'unauthorized') {
-		return { error: json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 }) }
+		return { error: json({ message: 'Perlu login Supabase Auth dengan role admin atau super admin' }, { status: 401 }) }
 	}
 	return { supabase: auth.supabase }
 }
@@ -101,8 +101,8 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 	if (auth.error) return auth.error
 
 	const { user } = await locals.safeGetSession()
-	if (resolveUserRole(user) !== 'admin') {
-		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin' }, { status: 403 })
+	if (!isAdminRole(resolveUserRole(user))) {
+		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin atau super admin' }, { status: 403 })
 	}
 
 	let body: unknown

@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js'
 
-export const ADMIN_ROLES = new Set(['admin'])
+export const ADMIN_ROLES = new Set(['admin', 'super_admin'])
 
 const normalizeRole = (value: unknown) =>
 	typeof value === 'string' ? value.trim().toLowerCase() : null
@@ -22,3 +22,4 @@ export const resolveUserRole = (user: User | null) => {
 }
 
 export const isAdminRole = (role: string | null) => Boolean(role && ADMIN_ROLES.has(role))
+export const isSuperAdminRole = (role: string | null) => role === 'super_admin'

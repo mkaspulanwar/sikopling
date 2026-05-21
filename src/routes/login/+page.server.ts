@@ -90,7 +90,7 @@ export const actions: Actions = {
 		if (!isAdminRole(role)) {
 			await locals.supabase.auth.signOut()
 			return fail(403, {
-				error: 'Akun berhasil login tetapi belum memiliki role admin.',
+				error: 'Akun berhasil login tetapi belum memiliki role admin atau super admin.',
 				redirectTo,
 				remember
 			})

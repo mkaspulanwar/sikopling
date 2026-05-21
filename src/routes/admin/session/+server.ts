@@ -10,7 +10,7 @@ const keepAlive: RequestHandler = async ({ locals }) => {
 	}
 
 	if (auth.state === 'unauthorized') {
-		return json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 })
+		return json({ message: 'Perlu login Supabase Auth dengan role admin atau super admin' }, { status: 401 })
 	}
 
 	return new Response(null, { status: 204 })

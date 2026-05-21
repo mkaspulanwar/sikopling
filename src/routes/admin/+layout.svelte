@@ -15,6 +15,7 @@
 	import FolderCheck from 'lucide-svelte/icons/folder-check'
 	import FolderClock from 'lucide-svelte/icons/folder-clock'
 	import GitBranch from 'lucide-svelte/icons/git-branch'
+	import History from 'lucide-svelte/icons/history'
 	import LayoutGrid from 'lucide-svelte/icons/layout-grid'
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
 	import PanelLeftOpen from 'lucide-svelte/icons/panel-left-open'
@@ -36,12 +37,22 @@
 		{ label: 'Integrasi', href: '/admin/pengumuman/integrasi', icon: GitBranch }
 	]
 
-	const navItems = [
-		{ type: 'link' as const, label: 'Dashboard', href: '/admin/dashboard', icon: LayoutGrid },
-		{ type: 'group' as const, label: 'Monitoring', icon: FolderClock, items: monitoringItems },
-		{ type: 'group' as const, label: 'Pengumuman', icon: FolderCheck, items: pengumumanItems },
-		{ type: 'link' as const, label: 'Profil', href: '/admin/profil', icon: UserRound }
-	]
+	const isSuperAdmin = $derived.by(() => data.role === 'super_admin')
+
+	const navItems = $derived.by(() => {
+		const items = [
+			{ type: 'link' as const, label: 'Dashboard', href: '/admin/dashboard', icon: LayoutGrid },
+			{ type: 'group' as const, label: 'Monitoring', icon: FolderClock, items: monitoringItems },
+			{ type: 'group' as const, label: 'Pengumuman', icon: FolderCheck, items: pengumumanItems }
+		]
+
+		if (isSuperAdmin) {
+			items.push({ type: 'link' as const, label: 'Audit Log', href: '/admin/audit-log', icon: History })
+		}
+
+		items.push({ type: 'link' as const, label: 'Profil', href: '/admin/profil', icon: UserRound })
+		return items
+	})
 
 	let isSidebarCollapsed = $state(false)
 	let isMobileMenuOpen = $state(false)
@@ -561,6 +572,13 @@
 									</div>
 								{/if}
 							</div>
+
+							{#if isSuperAdmin}
+								<a href="/admin/audit-log" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
+									<span class="truncate">Audit Log</span>
+									<ArrowUpRight class="h-4 w-4 opacity-75" />
+								</a>
+							{/if}
 
 							<a href="/admin/profil" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
 								<span class="truncate">Profil</span>

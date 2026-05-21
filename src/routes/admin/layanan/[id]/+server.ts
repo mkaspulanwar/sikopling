@@ -1,7 +1,7 @@
 import { requireAdminSupabase } from '$lib/server/admin-route'
 import { deleteMonitoringIntegrasi, updateMonitoringIntegrasi } from '$lib/server/monitoring-integrasi'
 import { deleteMonitoringPengajuan, updateMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
-import { resolveUserRole } from '$lib/server/supabase-auth'
+import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import {
 	INTEGRASI_STATUS_VALUES,
 	STATUS_VALUES,
@@ -51,7 +51,7 @@ const resolveAdminContext = async (locals: App.Locals) => {
 	if (auth.state === 'unauthorized') {
 		return {
 			ok: false,
-			response: json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 })
+			response: json({ message: 'Perlu login Supabase Auth dengan role admin atau super admin' }, { status: 401 })
 		} satisfies AdminContext
 	}
 
@@ -228,8 +228,8 @@ export const DELETE: RequestHandler = async ({ locals, params, request }) => {
 
 	const { user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
-	if (role !== 'admin') {
-		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin' }, { status: 403 })
+	if (!isAdminRole(role)) {
+		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin atau super admin' }, { status: 403 })
 	}
 
 	let layanan: unknown

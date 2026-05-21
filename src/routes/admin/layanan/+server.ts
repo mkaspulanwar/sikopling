@@ -12,7 +12,7 @@ import {
 	listMonitoringPengajuanIds,
 	updateStatusMonitoringPengajuan
 } from '$lib/server/monitoring-pengajuan'
-import { resolveUserRole } from '$lib/server/supabase-auth'
+import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import {
 	INTEGRASI_STATUS_VALUES,
 	LAYANAN_VALUES,
@@ -95,7 +95,7 @@ const ensureAdminSession = async (locals: App.Locals) => {
 
 	if (auth.state === 'unauthorized') {
 		return {
-			error: json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 })
+			error: json({ message: 'Perlu login Supabase Auth dengan role admin atau super admin' }, { status: 401 })
 		}
 	}
 
@@ -210,8 +210,8 @@ export const DELETE: RequestHandler = async ({ locals, request }) => {
 
 	const { user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
-	if (role !== 'admin') {
-		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin' }, { status: 403 })
+	if (!isAdminRole(role)) {
+		return json({ message: 'Hapus data hanya dapat dilakukan oleh admin atau super admin' }, { status: 403 })
 	}
 
 	let body: unknown
@@ -384,7 +384,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 			normalized.includes('auth session missing') ||
 			normalized.includes('permission denied')
 		) {
-			return json({ message: 'Perlu login Supabase Auth dengan role admin' }, { status: 401 })
+			return json({ message: 'Perlu login Supabase Auth dengan role admin atau super admin' }, { status: 401 })
 		}
 		if (message.toLowerCase().includes('duplicate key')) {
 			return json({ message: 'No registrasi sudah digunakan' }, { status: 409 })

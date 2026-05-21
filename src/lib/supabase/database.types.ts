@@ -242,6 +242,90 @@ export type Database = {
 				}
 				Relationships: []
 			}
+			admin_profiles: {
+				Row: {
+					created_at: string
+					created_by: string | null
+					email: string
+					full_name: string | null
+					id: string
+					is_active: boolean
+					last_login_at: string | null
+					role: 'admin' | 'super_admin'
+					updated_at: string
+					updated_by: string | null
+				}
+				Insert: {
+					created_at?: string
+					created_by?: string | null
+					email: string
+					full_name?: string | null
+					id: string
+					is_active?: boolean
+					last_login_at?: string | null
+					role?: 'admin' | 'super_admin'
+					updated_at?: string
+					updated_by?: string | null
+				}
+				Update: {
+					created_at?: string
+					created_by?: string | null
+					email?: string
+					full_name?: string | null
+					id?: string
+					is_active?: boolean
+					last_login_at?: string | null
+					role?: 'admin' | 'super_admin'
+					updated_at?: string
+					updated_by?: string | null
+				}
+				Relationships: []
+			}
+			admin_audit_logs: {
+				Row: {
+					action: string
+					after_data: Json
+					actor_email: string | null
+					actor_id: string
+					actor_role: string | null
+					before_data: Json
+					created_at: string
+					id: string
+					metadata: Json
+					resource_id: string | null
+					resource_type: string
+					summary: string | null
+				}
+				Insert: {
+					action: string
+					after_data?: Json
+					actor_email?: string | null
+					actor_id?: string
+					actor_role?: string | null
+					before_data?: Json
+					created_at?: string
+					id?: string
+					metadata?: Json
+					resource_id?: string | null
+					resource_type: string
+					summary?: string | null
+				}
+				Update: {
+					action?: string
+					after_data?: Json
+					actor_email?: string | null
+					actor_id?: string
+					actor_role?: string | null
+					before_data?: Json
+					created_at?: string
+					id?: string
+					metadata?: Json
+					resource_id?: string | null
+					resource_type?: string
+					summary?: string | null
+				}
+				Relationships: []
+			}
 		}
 		Views: Record<string, never>
 		Functions: {

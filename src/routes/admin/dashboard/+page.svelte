@@ -1,13 +1,41 @@
 <script lang="ts">
 	import type { PageData } from './$types'
 	import ArrowRight from 'lucide-svelte/icons/arrow-right'
+	import Bell from 'lucide-svelte/icons/bell'
+	import Search from 'lucide-svelte/icons/search'
+	import Settings2 from 'lucide-svelte/icons/settings-2'
 
 	const { data }: { data: PageData } = $props()
+
+	type AdminProfileUser = {
+		email?: string | null
+		user_metadata?: {
+			full_name?: unknown
+			name?: unknown
+			display_name?: unknown
+			username?: unknown
+		} | null
+	}
 
 	const dateFormatter = new Intl.DateTimeFormat('id-ID', {
 		day: '2-digit',
 		month: 'short',
 		year: 'numeric'
+	})
+	const headerDateFormatter = new Intl.DateTimeFormat('id-ID', {
+		weekday: 'long',
+		day: 'numeric',
+		month: 'long',
+		year: 'numeric'
+	})
+	const calendarDayFormatter = new Intl.DateTimeFormat('id-ID', {
+		day: '2-digit'
+	})
+	const calendarMonthFormatter = new Intl.DateTimeFormat('id-ID', {
+		month: 'short'
+	})
+	const calendarWeekdayFormatter = new Intl.DateTimeFormat('id-ID', {
+		weekday: 'short'
 	})
 	const dateTimeFormatter = new Intl.DateTimeFormat('id-ID', {
 		day: '2-digit',
@@ -25,17 +53,108 @@
 		return Number.isNaN(parsed.getTime()) ? '-' : dateTimeFormatter.format(parsed)
 	}
 	const formatNumber = (value: number) => numberFormatter.format(value)
+
+	const resolveAccountLabel = (user: AdminProfileUser | null | undefined) => {
+		const metadata = user?.user_metadata ?? {}
+		const candidates = [
+			metadata.full_name,
+			metadata.name,
+			metadata.display_name,
+			metadata.username,
+			user?.email?.split('@')[0]
+		]
+
+		for (const candidate of candidates) {
+			if (typeof candidate === 'string' && candidate.trim()) {
+				return candidate.trim()
+			}
+		}
+
+		return 'Admin Sikopling'
+	}
+
+	const accountLabel = $derived.by(() => resolveAccountLabel(data.user as AdminProfileUser | null | undefined))
+	const todayDate = $derived.by(() => new Date())
+	const todayLabel = $derived.by(() => headerDateFormatter.format(new Date()))
+	const todayDayLabel = $derived.by(() => calendarDayFormatter.format(todayDate))
+	const todayMonthLabel = $derived.by(() => calendarMonthFormatter.format(todayDate).toUpperCase())
+	const todayWeekdayLabel = $derived.by(() => calendarWeekdayFormatter.format(todayDate))
+	const profileInitials = $derived.by(
+		() =>
+			accountLabel
+				.split(/[\s._-]+/)
+				.filter(Boolean)
+				.slice(0, 2)
+				.map((part) => part[0]?.toUpperCase() ?? '')
+				.join('') || 'AS'
+	)
 </script>
 
 <section class="mx-auto w-full max-w-[1320px] space-y-6">
-	<header class="overflow-hidden rounded-3xl border border-[var(--line)] bg-[#64AD31] p-6 sm:p-7">
-		<div class="relative">
-			<div class="pointer-events-none absolute -right-20 -top-20 h-52 w-52 rounded-full"></div>
-			<p class="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--surface)]">Dashboard Admin</p>
-			<h1 class="mt-2 text-2xl font-semibold tracking-tight text-[var(--surface)] sm:text-[2rem]">Control Center Sikopling</h1>
-			<p class="mt-2 max-w-3xl text-sm text-[var(--surface)] sm:text-[0.96rem]">
-				Pantau volume dokumen lingkungan dan persetujuan teknis secara real-time, lalu lanjutkan ke halaman operasional untuk tindakan berikutnya.
-			</p>
+	<header class="rounded-3xl border border-[var(--line)] bg-[var(--surface)] p-4 sm:p-5">
+		<div class="flex flex-col gap-5">
+			<div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+				<div class="flex w-full min-w-0 flex-col gap-4 lg:max-w-3xl">
+					<div class="flex flex-col gap-3 lg:flex-row lg:items-center">
+						<label
+							class="flex h-12 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-[var(--line)] bg-white px-4 text-[var(--muted)] transition focus-within:border-[#64AD31]"
+						>
+							<Search class="h-5 w-5 shrink-0" aria-hidden="true" />
+							<input
+								type="search"
+								placeholder="Cari pengajuan, instansi, atau nomor registrasi"
+								class="w-full appearance-none border-0 bg-transparent text-sm font-medium text-[var(--ink)] outline-none ring-0 shadow-none focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none placeholder:text-[var(--muted)]"
+								aria-label="Cari pengajuan di dashboard admin"
+							/>
+						</label>
+
+						<div
+							class="flex h-17 w-17 shrink-0 flex-col overflow-hidden rounded-2xl border border-[var(--line)] bg-white text-center"
+							aria-label={`Tanggal hari ini ${todayLabel}`}
+						>
+							<span class="bg-[#64AD31] px-2 py-1 text-[0.62rem] font-semibold uppercase tracking-[0.14em] text-white">
+								{todayMonthLabel}
+							</span>
+							<span class="pt-1 text-xl font-semibold leading-none text-[var(--ink)]">{todayDayLabel}</span>
+							<span class="pb-1 text-[0.68rem] font-medium text-[var(--muted)]">{todayWeekdayLabel}</span>
+						</div>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-2 self-start lg:self-auto">
+					<a
+						href="/admin/pengaturan"
+						class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)] text-[var(--muted)] transition hover:border-[#64AD31] hover:text-[var(--ink)]"
+						aria-label="Buka pengaturan admin"
+					>
+						<Settings2 class="h-5 w-5" aria-hidden="true" />
+					</a>
+
+					<button
+						type="button"
+						class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)] text-[var(--muted)] transition hover:border-[#64AD31] hover:text-[var(--ink)]"
+						aria-label="Lihat notifikasi admin"
+					>
+						<Bell class="h-5 w-5" aria-hidden="true" />
+						<span class="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-[#64AD31]" aria-hidden="true"></span>
+					</button>
+
+					<a
+						href="/admin/profil"
+						class="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[var(--line)] bg-[#6278d6] text-sm font-semibold text-white transition hover:brightness-95"
+						aria-label="Buka profil admin"
+					>
+						{profileInitials}
+					</a>
+				</div>
+			</div>
+
+			<div class="space-y-2">
+				<p class="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--muted)]">Selamat datang kembali</p>
+				<h1 class="max-w-4xl text-[2.15rem] font-semibold leading-[0.96] tracking-tight text-[var(--ink)] sm:text-[3.1rem] lg:text-[3.75rem]">
+					<div class=" text-[#64AD31] uppercase">{accountLabel}</div>
+				</h1>
+			</div>
 		</div>
 	</header>
 
@@ -46,7 +165,7 @@
 	{/if}
 	{#if data.requiresSupabaseAuth}
 		<p class="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-			Halaman admin membutuhkan akun Supabase Auth dengan role admin.
+			Halaman admin membutuhkan akun Supabase Auth dengan role admin atau super admin.
 		</p>
 	{/if}
 	{#if data.errorMessage}
