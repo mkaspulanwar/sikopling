@@ -16,6 +16,7 @@
 	import FolderClock from 'lucide-svelte/icons/folder-clock'
 	import GitBranch from 'lucide-svelte/icons/git-branch'
 	import History from 'lucide-svelte/icons/history'
+	import House from 'lucide-svelte/icons/house'
 	import LayoutGrid from 'lucide-svelte/icons/layout-grid'
 	import PanelLeftClose from 'lucide-svelte/icons/panel-left-close'
 	import PanelLeftOpen from 'lucide-svelte/icons/panel-left-open'
@@ -30,7 +31,7 @@
 		{ label: 'Persetujuan Teknis', href: '/admin/layanan/pertek', icon: FileText },
 		{ label: 'Integrasi', href: '/admin/layanan/integrasi', icon: GitBranch }
 	]
-
+	
 	const pengumumanItems = [
 		{ label: 'Persetujuan Lingkungan', href: '/admin/pengumuman/perling', icon: FileSpreadsheet },
 		{ label: 'Persetujuan Teknis', href: '/admin/pengumuman/pertek', icon: FileText },
@@ -443,6 +444,27 @@
 
 		<div class="mt-auto border-t border-[var(--line)] pt-4">
 			<a
+				href="/"
+				title={isSidebarCollapsed ? 'Kembali ke Website' : undefined}
+				class={`mb-2 flex h-11 items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-sm font-semibold text-[var(--ink)] transition-colors duration-200 hover:border-[#64AD31] hover:bg-[var(--accent-soft)] ${
+					isSidebarCollapsed ? 'w-full justify-center px-0' : 'w-full justify-center gap-2 px-3'
+				}`}
+			>
+				<span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+					<House class="h-[1.02rem] w-[1.02rem] shrink-0" />
+				</span>
+				<span
+					class={`admin-sidebar-label whitespace-nowrap ${
+						isSidebarCollapsed
+							? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
+							: 'is-expanded max-w-[10rem] translate-x-0 opacity-100'
+					}`}
+				>
+					Kembali ke Website
+				</span>
+			</a>
+
+			<a
 				href="/logout"
 				title={isSidebarCollapsed ? 'Logout' : undefined}
 				class={`flex h-11 items-center rounded-xl border border-[#d64545] bg-[#d64545] text-sm font-semibold text-white transition-colors duration-200 hover:border-[#c63d3d] hover:bg-[#c63d3d] hover:text-white ${
@@ -587,9 +609,18 @@
 						</nav>
 
 						<a
+							href="/"
+							onclick={closeMobileMenu}
+							class="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 text-sm font-semibold text-[var(--ink)] transition-colors duration-200 hover:border-[#64AD31] hover:bg-[var(--accent-soft)]"
+						>
+							<House class="h-4.5 w-4.5" />
+							<span>Kembali ke Website</span>
+						</a>
+
+						<a
 							href="/logout"
 							onclick={closeMobileMenu}
-							class="mt-3 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#d64545] bg-[#d64545] px-3 text-sm font-semibold text-white transition-colors duration-200 hover:border-[#c63d3d] hover:bg-[#c63d3d] hover:text-white"
+							class="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#d64545] bg-[#d64545] px-3 text-sm font-semibold text-white transition-colors duration-200 hover:border-[#c63d3d] hover:bg-[#c63d3d] hover:text-white"
 						>
 							<SquareArrowRightExit class="h-4.5 w-4.5" />
 							<span>Logout</span>

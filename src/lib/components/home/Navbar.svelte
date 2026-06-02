@@ -11,7 +11,6 @@
 	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
 	import ChevronDown from 'lucide-svelte/icons/chevron-down';
 	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import LogIn from 'lucide-svelte/icons/log-in';
 	import Search from 'lucide-svelte/icons/search';
 	import X from 'lucide-svelte/icons/x';
 
@@ -152,7 +151,6 @@
 		{ path: '/kebijakan-privasi', title: 'Kebijakan Privasi', category: 'Halaman', priority: 62 },
 		{ path: '/ketentuan-layanan', title: 'Ketentuan Layanan', category: 'Halaman', priority: 61 },
 		{ path: '/kontak', title: 'Kontak', category: 'Halaman', priority: 64 },
-		{ path: '/login', title: 'Login', category: 'Halaman', priority: 60 }
 	];
 	const searchRouteTitleOverrides: Record<string, string> = Object.fromEntries(
 		searchableRouteSeeds.map((route) => [route.path, route.title])
@@ -258,15 +256,6 @@
 			keywords: ['kontak', 'bantuan', 'cs', 'layanan'],
 			priority: 64
 		}),
-		buildSearchDocument({
-			title: 'Login',
-			description: 'Masuk ke akun SIKOPLING untuk mengakses layanan dan pemantauan dokumen.',
-			href: '/login',
-			category: 'Halaman',
-			content: 'Masuk akun, autentikasi pengguna, dan akses dashboard layanan.',
-			keywords: ['login', 'masuk', 'akun', 'autentikasi'],
-			priority: 60
-		})
 	];
 
 	let isLayananOpen = $state(false);
@@ -387,7 +376,6 @@
 		if (pathname === '/kontak') return 64;
 		if (pathname === '/kebijakan-privasi') return 62;
 		if (pathname === '/ketentuan-layanan') return 61;
-		if (pathname === '/login') return 60;
 		return 58;
 	}
 	function toTitleCase(value: string) {
@@ -1158,11 +1146,11 @@
 				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
 		}`;
 
-	const loginButtonClass = () =>
-		`hidden h-11 lg:h-10 items-center justify-center gap-2 rounded-lg border px-5 lg:px-4 text-base lg:text-[1rem] font-medium transition-colors lg:inline-flex ${
+	const searchActionButtonClass = () =>
+		`cursor-pointer inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors lg:h-10 lg:w-auto lg:gap-2 lg:px-4 lg:rounded-full ${
 			shouldUseLightNav()
-				? 'border-white/30 bg-white/10 text-white'
-				: 'border-[#64AD31] bg-[#64AD31] text-white'
+				? 'border-white/25 bg-white/10 text-white'
+				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
 		}`;
 </script>
 
@@ -1356,26 +1344,18 @@
 				</ul>
 			{/if}
 
-			<div class="flex items-center gap-2 lg:justify-self-end">
+			<div class="flex items-center gap-2 lg:justify-self-end lg:gap-3">
 				<button
 					type="button"
-					class={actionButtonClass()}
+					class={searchActionButtonClass()}
 					aria-label="Buka universal search"
 					aria-haspopup="dialog"
 					aria-expanded={isSearchOpen}
 					onclick={() => void openSearchModal()}
 				>
 					<Search class="h-5 w-5 lg:h-4.5 lg:w-4.5" strokeWidth={2} aria-hidden="true" />
+					<span class="hidden lg:inline">Cari</span>
 				</button>
-
-				<a href="/login" class={`${loginButtonClass()} nav-menu-font`}>
-					<LogIn
-						class="h-4 w-4 lg:h-[1.05rem] lg:w-[1.05rem]"
-						strokeWidth={2.15}
-						aria-hidden="true"
-					/>
-					<span>Login</span>
-				</a>
 
 				{#if showNavMenus}
 					<button
@@ -1539,14 +1519,6 @@
 						{/each}
 					</div>
 				{/if}
-				<a
-					href="/login"
-					class="nav-menu-font mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#64AD31] px-5 py-2.5 text-[0.98rem] font-semibold text-white transition-colors hover:bg-[#558f2a]"
-					onclick={closeMenus}
-				>
-					<LogIn class="h-[1.1rem] w-[1.1rem]" strokeWidth={2.15} aria-hidden="true" />
-					<span>Login</span>
-				</a>
 			</div>
 		</div>
 	{/if}
