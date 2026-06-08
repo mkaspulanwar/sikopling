@@ -29,13 +29,13 @@
 	const monitoringItems = [
 		{ label: 'Persetujuan Lingkungan', href: '/admin/layanan/perling', icon: FileSpreadsheet },
 		{ label: 'Persetujuan Teknis', href: '/admin/layanan/pertek', icon: FileText },
-		{ label: 'Integrasi', href: '/admin/layanan/integrasi', icon: GitBranch }
+		{ label: 'Perubahan Tanpa\nDokumen', href: '/admin/layanan/integrasi', icon: GitBranch }
 	]
 	
 	const pengumumanItems = [
 		{ label: 'Persetujuan Lingkungan', href: '/admin/pengumuman/perling', icon: FileSpreadsheet },
 		{ label: 'Persetujuan Teknis', href: '/admin/pengumuman/pertek', icon: FileText },
-		{ label: 'Integrasi', href: '/admin/pengumuman/integrasi', icon: GitBranch }
+		{ label: 'Perubahan Tanpa\nDokumen', href: '/admin/pengumuman/integrasi', icon: GitBranch }
 	]
 
 	const isSuperAdmin = $derived.by(() => data.role === 'super_admin')
@@ -333,7 +333,7 @@
 			</button>
 		</div>
 
-		<nav class="mt-3 space-y-2">
+		<nav class="admin-sidebar-nav mt-3 min-h-0 flex-1 space-y-2 overflow-y-auto pr-1">
 			{#each navItems as item}
 				{#if item.type === 'link'}
 					{@const active = isNavActive(item.href)}
@@ -398,7 +398,7 @@
 								<item.icon class="h-[18px] w-[18px] shrink-0" />
 							</span>
 							<span
-								class={`admin-sidebar-label min-w-0 flex-1 truncate whitespace-nowrap ${
+								class={`admin-sidebar-label min-w-0 flex-1 whitespace-pre-line break-words leading-tight ${
 									isSidebarCollapsed
 										? 'is-collapsed max-w-0 -translate-x-1 opacity-0'
 										: 'is-expanded max-w-[10.5rem] translate-x-0 opacity-100'
@@ -432,7 +432,7 @@
 												: 'border-transparent text-[#20232A] hover:bg-[var(--accent-soft)]'
 										}`}
 									>
-										<span class="min-w-0 truncate">{subItem.label}</span>
+										<span class="min-w-0 whitespace-pre-line break-words leading-tight">{subItem.label}</span>
 									</a>
 								{/each}
 							</div>
@@ -442,7 +442,7 @@
 			{/each}
 		</nav>
 
-		<div class="mt-auto border-t border-[var(--line)] pt-4">
+		<div class="mt-4 shrink-0 border-t border-[var(--line)] pt-4">
 			<a
 				href="/"
 				title={isSidebarCollapsed ? 'Kembali ke Website' : undefined}
@@ -684,6 +684,32 @@
 		font-size: 0.875rem;
 		font-weight: 400;
 		line-height: 1.25rem;
+	}
+
+	.admin-sidebar-nav {
+		scrollbar-width: thin;
+		scrollbar-color: rgba(96, 110, 127, 0.42) transparent;
+		scrollbar-gutter: stable;
+		-ms-overflow-style: auto;
+	}
+
+	.admin-sidebar-nav::-webkit-scrollbar {
+		width: 10px;
+	}
+
+	.admin-sidebar-nav::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	.admin-sidebar-nav::-webkit-scrollbar-thumb {
+		border-radius: 999px;
+		border: 3px solid transparent;
+		background-clip: content-box;
+		background-color: rgba(96, 110, 127, 0.42);
+	}
+
+	.admin-sidebar-nav::-webkit-scrollbar-thumb:hover {
+		background-color: rgba(72, 87, 104, 0.58);
 	}
 
 	.admin-sidebar-submenu::before {

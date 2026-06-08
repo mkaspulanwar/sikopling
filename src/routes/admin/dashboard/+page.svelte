@@ -129,7 +129,7 @@
 
 <section class="mx-auto w-full max-w-[1320px] space-y-6">
 	<header class={dashboardPreferences.stickyToolbar ? 'sticky top-[4.75rem] z-30 lg:top-4' : undefined}>
-		<div class="flex items-center gap-2 rounded-[1.35rem] border border-[var(--line)] bg-[var(--surface)]/90 p-2 shadow-[0_16px_36px_-22px_rgba(15,23,42,0.45)] backdrop-blur-xl sm:gap-3 sm:p-2.5">
+		<div class="flex items-center gap-2 rounded-[1.35rem] border border-[var(--line)] bg-[var(--surface)]/90 p-2 sm:gap-3 sm:p-2.5">
 			<form method="GET" class="min-w-0 flex-1">
 				<label
 					class="flex h-11 min-w-0 items-center gap-2.5 rounded-[0.95rem] border border-transparent bg-[#f5f8fb] px-3 text-[var(--muted)] transition focus-within:border-[#64AD31] focus-within:bg-white"
