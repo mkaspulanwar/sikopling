@@ -1,18 +1,18 @@
 ﻿<script lang="ts">
-	import { onMount, tick } from 'svelte';
-	import { goto } from '$app/navigation';
-	import { cubicInOut } from 'svelte/easing';
-	import { fade, fly, slide } from 'svelte/transition';
-	import { page } from '$app/state';
+	import { onMount, tick } from "svelte";
+	import { goto } from "$app/navigation";
+	import { cubicInOut } from "svelte/easing";
+	import { fade, fly, slide } from "svelte/transition";
+	import { page } from "$app/state";
 	import {
 		UNIVERSAL_SEARCH_BLOCKED_PATH_PREFIXES,
-		UNIVERSAL_SEARCH_QUERY_PARAM
-	} from '$lib/constants/universal-search';
-	import ArrowUpRight from 'lucide-svelte/icons/arrow-up-right';
-	import ChevronDown from 'lucide-svelte/icons/chevron-down';
-	import ChevronRight from 'lucide-svelte/icons/chevron-right';
-	import Search from 'lucide-svelte/icons/search';
-	import X from 'lucide-svelte/icons/x';
+		UNIVERSAL_SEARCH_QUERY_PARAM,
+	} from "$lib/constants/universal-search";
+	import ArrowUpRight from "lucide-svelte/icons/arrow-up-right";
+	import ChevronDown from "lucide-svelte/icons/chevron-down";
+	import ChevronRight from "lucide-svelte/icons/chevron-right";
+	import Search from "lucide-svelte/icons/search";
+	import X from "lucide-svelte/icons/x";
 
 	type LayananItem = {
 		title: string;
@@ -26,7 +26,7 @@
 		title: string;
 		href: string;
 	};
-	type SearchCategory = 'Halaman' | 'Bagian' | 'Layanan';
+	type SearchCategory = "Halaman" | "Bagian" | "Layanan";
 	type SearchRoute = {
 		path: string;
 		title: string;
@@ -54,207 +54,275 @@
 		documents: SearchDocument[];
 	};
 
-	const layananSectionIds = ['layanan-dokumen'];
+	const layananSectionIds = ["layanan-dokumen"];
 
 	const layananItems: LayananItem[] = [
 		{
-			title: 'Monitoring Persetujuan Lingkungan',
-			href: '/layanan/perling'
+			title: "Monitoring Persetujuan Lingkungan",
+			href: "/layanan/perling",
 		},
 		{
-			title: 'Monitoring Persetujuan Teknis',
-			href: '/layanan/pertek'
+			title: "Monitoring Persetujuan Teknis",
+			href: "/layanan/pertek",
 		},
 		{
-			title: 'Monitoring Integrasi',
-			href: '/layanan/integrasi'
-		}
+			title: "Monitoring Integrasi",
+			href: "/layanan/integrasi",
+		},
 	];
 	const pengumumanItems: PengumumanItem[] = [
 		{
-			title: 'Penerbitan Persetujuan Lingkungan',
-			href: '/pengumuman/perling'
+			title: "Penerbitan Persetujuan Lingkungan",
+			href: "/pengumuman/perling",
 		},
 		{
-			title: 'Penerbitan Persetujuan Teknis',
-			href: '/pengumuman/pertek'
+			title: "Penerbitan Persetujuan Teknis",
+			href: "/pengumuman/pertek",
 		},
 		{
-			title: 'Penerbitan Integrasi',
-			href: '/pengumuman/integrasi'
-		}
+			title: "Penerbitan Integrasi",
+			href: "/pengumuman/integrasi",
+		},
 	];
 	const tentangItems: TentangItem[] = [
 		{
-			title: 'Profil',
-			href: '/profil'
+			title: "Profil",
+			href: "/profil",
 		},
 		{
-			title: 'Kebijakan Privasi',
-			href: '/kebijakan-privasi'
+			title: "Kebijakan Privasi",
+			href: "/kebijakan-privasi",
 		},
 		{
-			title: 'Ketentuan Layanan',
-			href: '/ketentuan-layanan'
+			title: "Ketentuan Layanan",
+			href: "/ketentuan-layanan",
 		},
 		{
-			title: 'Kontak',
-			href: '/kontak'
-		}
+			title: "Kontak",
+			href: "/kontak",
+		},
 	];
 
 	const showNavMenus = true;
-	const SEARCH_INDEX_CACHE_KEY = 'sikopling:universal-search-index';
+	const SEARCH_INDEX_CACHE_KEY = "sikopling:universal-search-index";
 	const SEARCH_INDEX_CACHE_VERSION = 6;
 	const SEARCH_INDEX_CACHE_TTL_MS = 1000 * 60 * 60 * 24;
 	const SEARCH_INDEX_MAX_ROUTES = 48;
 	const SEARCH_INDEX_CRAWL_MAX_DEPTH = 3;
 	const searchableRouteSeeds: SearchRoute[] = [
-		{ path: '/', title: 'Beranda', category: 'Halaman', priority: 96 },
+		{ path: "/", title: "Beranda", category: "Halaman", priority: 96 },
 		{
-			path: '/layanan/perling',
-			title: 'Monitoring Persetujuan Lingkungan',
-			category: 'Layanan',
-			priority: 99
+			path: "/layanan/perling",
+			title: "Monitoring Persetujuan Lingkungan",
+			category: "Layanan",
+			priority: 99,
 		},
 		{
-			path: '/layanan/pertek',
-			title: 'Monitoring Persetujuan Teknis',
-			category: 'Layanan',
-			priority: 97
+			path: "/layanan/pertek",
+			title: "Monitoring Persetujuan Teknis",
+			category: "Layanan",
+			priority: 97,
 		},
 		{
-			path: '/layanan/integrasi',
-			title: 'Monitoring Integrasi',
-			category: 'Layanan',
-			priority: 95
+			path: "/layanan/integrasi",
+			title: "Monitoring Integrasi",
+			category: "Layanan",
+			priority: 95,
 		},
 		{
-			path: '/pengumuman/perling',
-			title: 'Penerbitan Persetujuan Lingkungan',
-			category: 'Halaman',
-			priority: 90
+			path: "/pengumuman/perling",
+			title: "Penerbitan Persetujuan Lingkungan",
+			category: "Halaman",
+			priority: 90,
 		},
 		{
-			path: '/pengumuman/pertek',
-			title: 'Penerbitan Persetujuan Teknis',
-			category: 'Halaman',
-			priority: 89
+			path: "/pengumuman/pertek",
+			title: "Penerbitan Persetujuan Teknis",
+			category: "Halaman",
+			priority: 89,
 		},
 		{
-			path: '/pengumuman/integrasi',
-			title: 'Penerbitan Integrasi',
-			category: 'Halaman',
-			priority: 88
+			path: "/pengumuman/integrasi",
+			title: "Penerbitan Integrasi",
+			category: "Halaman",
+			priority: 88,
 		},
-		{ path: '/profil', title: 'Profil', category: 'Halaman', priority: 66 },
-		{ path: '/kebijakan-privasi', title: 'Kebijakan Privasi', category: 'Halaman', priority: 62 },
-		{ path: '/ketentuan-layanan', title: 'Ketentuan Layanan', category: 'Halaman', priority: 61 },
-		{ path: '/kontak', title: 'Kontak', category: 'Halaman', priority: 64 },
+		{ path: "/profil", title: "Profil", category: "Halaman", priority: 66 },
+		{
+			path: "/kebijakan-privasi",
+			title: "Kebijakan Privasi",
+			category: "Halaman",
+			priority: 62,
+		},
+		{
+			path: "/ketentuan-layanan",
+			title: "Ketentuan Layanan",
+			category: "Halaman",
+			priority: 61,
+		},
+		{ path: "/kontak", title: "Kontak", category: "Halaman", priority: 64 },
 	];
-	const searchRouteTitleOverrides: Record<string, string> = Object.fromEntries(
-		searchableRouteSeeds.map((route) => [route.path, route.title])
-	);
+	const searchRouteTitleOverrides: Record<string, string> =
+		Object.fromEntries(
+			searchableRouteSeeds.map((route) => [route.path, route.title]),
+		);
 	const fallbackSearchDocuments: SearchDocument[] = [
 		buildSearchDocument({
-			title: 'Beranda',
-			description: 'Halaman utama SIKOPLING dengan ringkasan layanan dan informasi terbaru.',
-			href: '/',
-			category: 'Halaman',
-			content: 'Beranda, informasi layanan, alur pengajuan, dan panduan SIKOPLING.',
-			keywords: ['beranda', 'home', 'SIKOPLING', 'layanan lingkungan'],
-			priority: 96
-		}),
-		buildSearchDocument({
-			title: 'Monitoring Persetujuan Lingkungan',
-			description: 'Layanan pemantauan progres pengajuan dokumen lingkungan.',
-			href: '/layanan/perling',
-			category: 'Layanan',
+			title: "Beranda",
+			description:
+				"Halaman utama SIKOPLING dengan ringkasan layanan dan informasi terbaru.",
+			href: "/",
+			category: "Halaman",
 			content:
-				'Dokumen lingkungan, status antrian, pemrakarsa, progres layanan, persetujuan lingkungan.',
-			keywords: ['dokumen', 'lingkungan', 'antrian', 'amdal', 'ukl-upl', 'delh', 'dplh'],
-			priority: 99
+				"Beranda, informasi layanan, alur pengajuan, dan panduan SIKOPLING.",
+			keywords: ["beranda", "home", "SIKOPLING", "layanan lingkungan"],
+			priority: 96,
 		}),
 		buildSearchDocument({
-			title: 'Monitoring Persetujuan Teknis',
-			description: 'Layanan pencarian antrian persetujuan teknis lingkungan.',
-			href: '/layanan/pertek',
-			category: 'Layanan',
-			content: 'Persetujuan teknis, air limbah, progres evaluasi dokumen dan penjadwalan rapat.',
-			keywords: ['pertek', 'persetujuan teknis', 'air', 'limbah', 'lingkungan'],
-			priority: 97
+			title: "Monitoring Persetujuan Lingkungan",
+			description:
+				"Layanan pemantauan progres pengajuan dokumen lingkungan.",
+			href: "/layanan/perling",
+			category: "Layanan",
+			content:
+				"Dokumen lingkungan, status antrian, pemrakarsa, progres layanan, persetujuan lingkungan.",
+			keywords: [
+				"dokumen",
+				"lingkungan",
+				"antrian",
+				"amdal",
+				"ukl-upl",
+				"delh",
+				"dplh",
+			],
+			priority: 99,
 		}),
 		buildSearchDocument({
-			title: 'Monitoring Integrasi',
-			description: 'Layanan pencarian antrian monitoring integrasi SIKOPLING.',
-			href: '/layanan/integrasi',
-			category: 'Layanan',
-			content: 'Monitoring integrasi, sinkronisasi layanan, status integrasi, posisi, dan keterangan.',
-			keywords: ['integrasi', 'monitoring integrasi', 'sinkronisasi', 'layanan'],
-			priority: 95
+			title: "Monitoring Persetujuan Teknis",
+			description:
+				"Layanan pencarian antrian persetujuan teknis lingkungan.",
+			href: "/layanan/pertek",
+			category: "Layanan",
+			content:
+				"Persetujuan teknis, air limbah, progres evaluasi dokumen dan penjadwalan rapat.",
+			keywords: [
+				"pertek",
+				"persetujuan teknis",
+				"air",
+				"limbah",
+				"lingkungan",
+			],
+			priority: 97,
 		}),
 		buildSearchDocument({
-			title: 'Penerbitan Persetujuan Lingkungan',
-			description: 'Pengumuman daftar penerbitan persetujuan lingkungan.',
-			href: '/pengumuman/perling',
-			category: 'Halaman',
-			content: 'Penerbitan persetujuan lingkungan, instansi, kegiatan, nomor SK, dan tanggal.',
-			keywords: ['pengumuman', 'penerbitan', 'persetujuan lingkungan', 'no sk'],
-			priority: 90
+			title: "Monitoring Integrasi",
+			description:
+				"Layanan pencarian antrian monitoring integrasi SIKOPLING.",
+			href: "/layanan/integrasi",
+			category: "Layanan",
+			content:
+				"Monitoring integrasi, sinkronisasi layanan, status integrasi, posisi, dan keterangan.",
+			keywords: [
+				"integrasi",
+				"monitoring integrasi",
+				"sinkronisasi",
+				"layanan",
+			],
+			priority: 95,
 		}),
 		buildSearchDocument({
-			title: 'Penerbitan Persetujuan Teknis',
-			description: 'Pengumuman daftar penerbitan persetujuan teknis.',
-			href: '/pengumuman/pertek',
-			category: 'Halaman',
-			content: 'Penerbitan persetujuan teknis, instansi, kegiatan, nomor SK, dan tanggal.',
-			keywords: ['pengumuman', 'penerbitan', 'persetujuan teknis', 'pertek', 'no sk'],
-			priority: 89
+			title: "Penerbitan Persetujuan Lingkungan",
+			description: "Pengumuman daftar penerbitan persetujuan lingkungan.",
+			href: "/pengumuman/perling",
+			category: "Halaman",
+			content:
+				"Penerbitan persetujuan lingkungan, instansi, kegiatan, nomor SK, dan tanggal.",
+			keywords: [
+				"pengumuman",
+				"penerbitan",
+				"persetujuan lingkungan",
+				"no sk",
+			],
+			priority: 90,
 		}),
 		buildSearchDocument({
-			title: 'Penerbitan Integrasi',
-			description: 'Pengumuman daftar penerbitan integrasi.',
-			href: '/pengumuman/integrasi',
-			category: 'Halaman',
-			content: 'Penerbitan integrasi, instansi, kegiatan, nomor SK, dan tanggal.',
-			keywords: ['pengumuman', 'penerbitan', 'integrasi', 'no sk'],
-			priority: 88
+			title: "Penerbitan Persetujuan Teknis",
+			description: "Pengumuman daftar penerbitan persetujuan teknis.",
+			href: "/pengumuman/pertek",
+			category: "Halaman",
+			content:
+				"Penerbitan persetujuan teknis, instansi, kegiatan, nomor SK, dan tanggal.",
+			keywords: [
+				"pengumuman",
+				"penerbitan",
+				"persetujuan teknis",
+				"pertek",
+				"no sk",
+			],
+			priority: 89,
 		}),
 		buildSearchDocument({
-			title: 'Profil',
-			description: 'Profil SIKOPLING, tujuan layanan, dan komitmen pelayanan lingkungan.',
-			href: '/profil',
-			category: 'Halaman',
-			content: 'Profil SIKOPLING, visi misi, dan informasi umum layanan.',
-			keywords: ['profil', 'tentang', 'informasi layanan', 'SIKOPLING'],
-			priority: 66
+			title: "Penerbitan Integrasi",
+			description: "Pengumuman daftar penerbitan integrasi.",
+			href: "/pengumuman/integrasi",
+			category: "Halaman",
+			content:
+				"Penerbitan integrasi, instansi, kegiatan, nomor SK, dan tanggal.",
+			keywords: ["pengumuman", "penerbitan", "integrasi", "no sk"],
+			priority: 88,
 		}),
 		buildSearchDocument({
-			title: 'Kebijakan Privasi',
-			description: 'Informasi pengelolaan data pribadi pengguna layanan SIKOPLING.',
-			href: '/kebijakan-privasi',
-			category: 'Halaman',
-			content: 'Kebijakan privasi, perlindungan data, hak pengguna, dan ketentuan data pribadi.',
-			keywords: ['privasi', 'data pribadi', 'perlindungan data', 'kebijakan'],
-			priority: 62
+			title: "Profil",
+			description:
+				"Profil SIKOPLING, tujuan layanan, dan komitmen pelayanan lingkungan.",
+			href: "/profil",
+			category: "Halaman",
+			content: "Profil SIKOPLING, visi misi, dan informasi umum layanan.",
+			keywords: ["profil", "tentang", "informasi layanan", "SIKOPLING"],
+			priority: 66,
 		}),
 		buildSearchDocument({
-			title: 'Ketentuan Layanan',
-			description: 'Syarat dan ketentuan penggunaan layanan digital SIKOPLING.',
-			href: '/ketentuan-layanan',
-			category: 'Halaman',
-			content: 'Ketentuan layanan, syarat penggunaan, hak dan kewajiban pengguna.',
-			keywords: ['ketentuan', 'syarat layanan', 'terms', 'kebijakan layanan'],
-			priority: 61
+			title: "Kebijakan Privasi",
+			description:
+				"Informasi pengelolaan data pribadi pengguna layanan SIKOPLING.",
+			href: "/kebijakan-privasi",
+			category: "Halaman",
+			content:
+				"Kebijakan privasi, perlindungan data, hak pengguna, dan ketentuan data pribadi.",
+			keywords: [
+				"privasi",
+				"data pribadi",
+				"perlindungan data",
+				"kebijakan",
+			],
+			priority: 62,
 		}),
 		buildSearchDocument({
-			title: 'Kontak',
-			description: 'Informasi kontak untuk bantuan dan konsultasi layanan SIKOPLING.',
-			href: '/kontak',
-			category: 'Halaman',
-			content: 'Kontak layanan, bantuan pengguna, dan kanal komunikasi resmi.',
-			keywords: ['kontak', 'bantuan', 'cs', 'layanan'],
-			priority: 64
+			title: "Ketentuan Layanan",
+			description:
+				"Syarat dan ketentuan penggunaan layanan digital SIKOPLING.",
+			href: "/ketentuan-layanan",
+			category: "Halaman",
+			content:
+				"Ketentuan layanan, syarat penggunaan, hak dan kewajiban pengguna.",
+			keywords: [
+				"ketentuan",
+				"syarat layanan",
+				"terms",
+				"kebijakan layanan",
+			],
+			priority: 61,
+		}),
+		buildSearchDocument({
+			title: "Kontak",
+			description:
+				"Informasi kontak untuk bantuan dan konsultasi layanan SIKOPLING.",
+			href: "/kontak",
+			category: "Halaman",
+			content:
+				"Kontak layanan, bantuan pengguna, dan kanal komunikasi resmi.",
+			keywords: ["kontak", "bantuan", "cs", "layanan"],
+			priority: 64,
 		}),
 	];
 
@@ -263,20 +331,26 @@
 	let isTentangOpen = $state(false);
 	let isMobileOpen = $state(false);
 	let isMobileMenuAnimating = $state(false);
-	let mobileMenuMotionState = $state<'idle' | 'opening' | 'closing'>('idle');
+	let mobileMenuMotionState = $state<"idle" | "opening" | "closing">("idle");
 	let isMobileLayananOpen = $state(false);
 	let isMobilePengumumanOpen = $state(false);
 	let isMobileTentangOpen = $state(false);
 	let isSearchOpen = $state(false);
-	let searchQuery = $state('');
+	let searchQuery = $state("");
 	let searchInput = $state<HTMLInputElement | null>(null);
 	let isSearchIndexing = $state(false);
-	let universalSearchDocuments = $state<SearchDocument[]>(fallbackSearchDocuments);
+	let universalSearchDocuments = $state<SearchDocument[]>(
+		fallbackSearchDocuments,
+	);
 	let isMobileViewport = $state(false);
-	let isScrolled = $state(typeof window !== 'undefined' ? window.scrollY > 18 : false);
+	let isScrolled = $state(
+		typeof window !== "undefined" ? window.scrollY > 18 : false,
+	);
 	let isNavVisible = $state(true);
-	let lastScrollY = $state(typeof window !== 'undefined' ? window.scrollY : 0);
-	let currentHash = $state('');
+	let lastScrollY = $state(
+		typeof window !== "undefined" ? window.scrollY : 0,
+	);
+	let currentHash = $state("");
 	let layananDropdown = $state<HTMLDivElement | null>(null);
 	let pengumumanDropdown = $state<HTMLDivElement | null>(null);
 	let tentangDropdown = $state<HTMLDivElement | null>(null);
@@ -286,13 +360,13 @@
 	const desktopNavBreakpoint = 1024;
 
 	function cleanText(value: string) {
-		return value.replace(/\s+/g, ' ').trim();
+		return value.replace(/\s+/g, " ").trim();
 	}
 	function normalizeSearchText(value: string) {
 		return cleanText(value)
-			.toLocaleLowerCase('id-ID')
-			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '');
+			.toLocaleLowerCase("id-ID")
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "");
 	}
 	function makeSnippet(value: string, maxLength = 165) {
 		const text = cleanText(value);
@@ -301,36 +375,42 @@
 	}
 	function createSearchId(value: string) {
 		return normalizeSearchText(value)
-			.replace(/[^a-z0-9]+/g, '-')
-			.replace(/^-+|-+$/g, '')
+			.replace(/[^a-z0-9]+/g, "-")
+			.replace(/^-+|-+$/g, "")
 			.slice(0, 92);
 	}
-	function resolveSearchHref(path: string, sectionId = '') {
-		const normalizedSectionId = sectionId.replace(/^#/, '').trim();
+	function resolveSearchHref(path: string, sectionId = "") {
+		const normalizedSectionId = sectionId.replace(/^#/, "").trim();
 		if (!normalizedSectionId) return path;
-		return path === '/' ? `/#${normalizedSectionId}` : `${path}#${normalizedSectionId}`;
+		return path === "/"
+			? `/#${normalizedSectionId}`
+			: `${path}#${normalizedSectionId}`;
 	}
 	function normalizeSearchPathname(pathname: string) {
 		const trimmedPathname = pathname.trim();
-		if (!trimmedPathname) return '/';
-		const withLeadingSlash = trimmedPathname.startsWith('/') ? trimmedPathname : `/${trimmedPathname}`;
-		return withLeadingSlash.replace(/\/+$/, '') || '/';
+		if (!trimmedPathname) return "/";
+		const withLeadingSlash = trimmedPathname.startsWith("/")
+			? trimmedPathname
+			: `/${trimmedPathname}`;
+		return withLeadingSlash.replace(/\/+$/, "") || "/";
 	}
 	function getPathnameFromSearchHref(href: string) {
 		const trimmedHref = cleanText(href);
-		if (!trimmedHref) return '/';
+		if (!trimmedHref) return "/";
 		try {
-			const parsedUrl = new URL(trimmedHref, 'https://sikopling.local');
+			const parsedUrl = new URL(trimmedHref, "https://sikopling.local");
 			return normalizeSearchPathname(parsedUrl.pathname);
 		} catch {
-			const pathnameCandidate = trimmedHref.split('#')[0]?.split('?')[0] ?? '';
+			const pathnameCandidate =
+				trimmedHref.split("#")[0]?.split("?")[0] ?? "";
 			return normalizeSearchPathname(pathnameCandidate);
 		}
 	}
 	function isSearchHrefBlocked(href: string) {
 		const pathname = getPathnameFromSearchHref(href);
 		return UNIVERSAL_SEARCH_BLOCKED_PATH_PREFIXES.some(
-			(prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
+			(prefix) =>
+				pathname === prefix || pathname.startsWith(`${prefix}/`),
 		);
 	}
 	function isStaticAssetPath(pathname: string) {
@@ -339,27 +419,33 @@
 	function isSearchPathAllowed(pathname: string) {
 		const normalizedPathname = normalizeSearchPathname(pathname);
 		if (isSearchHrefBlocked(normalizedPathname)) return false;
-		if (normalizedPathname.startsWith('/_')) return false;
-		if (normalizedPathname === '/404' || normalizedPathname === '/500') return false;
+		if (normalizedPathname.startsWith("/_")) return false;
+		if (normalizedPathname === "/404" || normalizedPathname === "/500")
+			return false;
 		if (isStaticAssetPath(normalizedPathname)) return false;
 		return true;
 	}
-	function resolveSearchPathFromHref(href: string, basePath = '/') {
+	function resolveSearchPathFromHref(href: string, basePath = "/") {
 		const trimmedHref = cleanText(href);
 		if (!trimmedHref) return null;
 		if (
-			trimmedHref.startsWith('#') ||
-			trimmedHref.startsWith('mailto:') ||
-			trimmedHref.startsWith('tel:') ||
-			trimmedHref.startsWith('javascript:')
+			trimmedHref.startsWith("#") ||
+			trimmedHref.startsWith("mailto:") ||
+			trimmedHref.startsWith("tel:") ||
+			trimmedHref.startsWith("javascript:")
 		) {
 			return null;
 		}
 		try {
 			const normalizedBasePath = normalizeSearchPathname(basePath);
-			const parsedUrl = new URL(trimmedHref, `https://sikopling.local${normalizedBasePath}`);
-			if (parsedUrl.origin !== 'https://sikopling.local') return null;
-			const normalizedPathname = normalizeSearchPathname(parsedUrl.pathname);
+			const parsedUrl = new URL(
+				trimmedHref,
+				`https://sikopling.local${normalizedBasePath}`,
+			);
+			if (parsedUrl.origin !== "https://sikopling.local") return null;
+			const normalizedPathname = normalizeSearchPathname(
+				parsedUrl.pathname,
+			);
 			if (!isSearchPathAllowed(normalizedPathname)) return null;
 			return normalizedPathname;
 		} catch {
@@ -367,34 +453,34 @@
 		}
 	}
 	function inferSearchRouteCategory(pathname: string): SearchCategory {
-		return pathname.startsWith('/layanan') ? 'Layanan' : 'Halaman';
+		return pathname.startsWith("/layanan") ? "Layanan" : "Halaman";
 	}
 	function inferSearchRoutePriority(pathname: string) {
-		if (pathname === '/') return 96;
-		if (pathname.startsWith('/layanan')) return 88;
-		if (pathname === '/profil') return 66;
-		if (pathname === '/kontak') return 64;
-		if (pathname === '/kebijakan-privasi') return 62;
-		if (pathname === '/ketentuan-layanan') return 61;
+		if (pathname === "/") return 96;
+		if (pathname.startsWith("/layanan")) return 88;
+		if (pathname === "/profil") return 66;
+		if (pathname === "/kontak") return 64;
+		if (pathname === "/kebijakan-privasi") return 62;
+		if (pathname === "/ketentuan-layanan") return 61;
 		return 58;
 	}
 	function toTitleCase(value: string) {
 		return value
-			.split(' ')
+			.split(" ")
 			.filter(Boolean)
 			.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ');
+			.join(" ");
 	}
 	function inferSearchRouteTitle(pathname: string) {
 		const override = searchRouteTitleOverrides[pathname];
 		if (override) return override;
-		if (pathname === '/') return 'Beranda';
+		if (pathname === "/") return "Beranda";
 		const fromSegments = pathname
-			.split('/')
+			.split("/")
 			.filter(Boolean)
-			.map((segment) => segment.replace(/[-_]+/g, ' '));
-		if (fromSegments.length === 0) return 'Halaman';
-		return toTitleCase(fromSegments.join(' '));
+			.map((segment) => segment.replace(/[-_]+/g, " "));
+		if (fromSegments.length === 0) return "Halaman";
+		return toTitleCase(fromSegments.join(" "));
 	}
 	function buildSearchRoute(pathname: string): SearchRoute {
 		const normalizedPathname = normalizeSearchPathname(pathname);
@@ -402,17 +488,19 @@
 			path: normalizedPathname,
 			title: inferSearchRouteTitle(normalizedPathname),
 			category: inferSearchRouteCategory(normalizedPathname),
-			priority: inferSearchRoutePriority(normalizedPathname)
+			priority: inferSearchRoutePriority(normalizedPathname),
 		};
 	}
 	function collectSearchablePathsFromHtml(html: string, currentPath: string) {
 		const parser = new DOMParser();
-		const parsedDocument = parser.parseFromString(html, 'text/html');
-		const linkElements = Array.from(parsedDocument.querySelectorAll<HTMLAnchorElement>('a[href]'));
+		const parsedDocument = parser.parseFromString(html, "text/html");
+		const linkElements = Array.from(
+			parsedDocument.querySelectorAll<HTMLAnchorElement>("a[href]"),
+		);
 		const nextPaths = new Set<string>();
 
 		for (const linkElement of linkElements) {
-			const href = linkElement.getAttribute('href') ?? '';
+			const href = linkElement.getAttribute("href") ?? "";
 			const path = resolveSearchPathFromHref(href, currentPath);
 			if (!path) continue;
 			nextPaths.add(path);
@@ -423,20 +511,24 @@
 		const normalizedQuery = cleanText(query);
 		if (!normalizedQuery) return href;
 		try {
-			const parsedUrl = new URL(href, 'https://sikopling.local');
-			parsedUrl.searchParams.set(UNIVERSAL_SEARCH_QUERY_PARAM, normalizedQuery);
+			const parsedUrl = new URL(href, "https://sikopling.local");
+			parsedUrl.searchParams.set(
+				UNIVERSAL_SEARCH_QUERY_PARAM,
+				normalizedQuery,
+			);
 			const pathname = normalizeSearchPathname(parsedUrl.pathname);
 			const search = parsedUrl.searchParams.toString();
-			return `${pathname}${search ? `?${search}` : ''}${parsedUrl.hash}`;
+			return `${pathname}${search ? `?${search}` : ""}${parsedUrl.hash}`;
 		} catch {
-			const [pathWithQuery = '/', hashPart = ''] = href.split('#');
-			const [pathnamePart = '/', queryPart = ''] = pathWithQuery.split('?');
+			const [pathWithQuery = "/", hashPart = ""] = href.split("#");
+			const [pathnamePart = "/", queryPart = ""] =
+				pathWithQuery.split("?");
 			const params = new URLSearchParams(queryPart);
 			params.set(UNIVERSAL_SEARCH_QUERY_PARAM, normalizedQuery);
 			const pathname = normalizeSearchPathname(pathnamePart);
 			const search = params.toString();
-			const hash = hashPart ? `#${hashPart}` : '';
-			return `${pathname}${search ? `?${search}` : ''}${hash}`;
+			const hash = hashPart ? `#${hashPart}` : "";
+			return `${pathname}${search ? `?${search}` : ""}${hash}`;
 		}
 	}
 	function buildSearchDocument(params: {
@@ -458,12 +550,14 @@
 			priority: params.priority ?? 70,
 			normalizedTitle: normalizeSearchText(params.title),
 			normalizedDescription: normalizeSearchText(params.description),
-			normalizedKeywords: normalizeSearchText((params.keywords ?? []).join(' ')),
-			normalizedContent: normalizeSearchText(params.content ?? '')
+			normalizedKeywords: normalizeSearchText(
+				(params.keywords ?? []).join(" "),
+			),
+			normalizedContent: normalizeSearchText(params.content ?? ""),
 		};
 	}
 	const getSearchDocumentSignalScore = (document: SearchDocument) => {
-		const categoryBonus = document.category === 'Bagian' ? 0 : 120;
+		const categoryBonus = document.category === "Bagian" ? 0 : 120;
 		return (
 			categoryBonus +
 			document.normalizedTitle.length * 2 +
@@ -472,24 +566,30 @@
 			document.normalizedContent.length * 2.2
 		);
 	};
-	const mergeSearchDocuments = (preferred: SearchDocument, secondary: SearchDocument): SearchDocument => ({
+	const mergeSearchDocuments = (
+		preferred: SearchDocument,
+		secondary: SearchDocument,
+	): SearchDocument => ({
 		...preferred,
 		description:
 			preferred.description.length >= secondary.description.length
 				? preferred.description
 				: secondary.description,
 		normalizedDescription:
-			preferred.normalizedDescription.length >= secondary.normalizedDescription.length
+			preferred.normalizedDescription.length >=
+			secondary.normalizedDescription.length
 				? preferred.normalizedDescription
 				: secondary.normalizedDescription,
 		normalizedKeywords:
-			preferred.normalizedKeywords.length >= secondary.normalizedKeywords.length
+			preferred.normalizedKeywords.length >=
+			secondary.normalizedKeywords.length
 				? preferred.normalizedKeywords
 				: secondary.normalizedKeywords,
 		normalizedContent:
-			preferred.normalizedContent.length >= secondary.normalizedContent.length
+			preferred.normalizedContent.length >=
+			secondary.normalizedContent.length
 				? preferred.normalizedContent
-				: secondary.normalizedContent
+				: secondary.normalizedContent,
 	});
 	const dedupeSearchDocuments = (documents: SearchDocument[]) => {
 		const documentMap = new Map<string, SearchDocument>();
@@ -504,7 +604,8 @@
 			const shouldReplacePrevious =
 				document.priority > previous.priority ||
 				(document.priority === previous.priority &&
-					getSearchDocumentSignalScore(document) > getSearchDocumentSignalScore(previous));
+					getSearchDocumentSignalScore(document) >
+						getSearchDocumentSignalScore(previous));
 			const preferred = shouldReplacePrevious ? document : previous;
 			const secondary = shouldReplacePrevious ? previous : document;
 			documentMap.set(key, mergeSearchDocuments(preferred, secondary));
@@ -512,22 +613,31 @@
 		return [...documentMap.values()];
 	};
 	const isSearchCategory = (value: unknown): value is SearchCategory =>
-		value === 'Halaman' || value === 'Bagian' || value === 'Layanan';
+		value === "Halaman" || value === "Bagian" || value === "Layanan";
 	const toSearchDocument = (value: unknown): SearchDocument | null => {
-		if (!value || typeof value !== 'object') return null;
+		if (!value || typeof value !== "object") return null;
 		const candidate = value as Record<string, unknown>;
-		const title = typeof candidate.title === 'string' ? cleanText(candidate.title) : '';
-		const description = typeof candidate.description === 'string' ? cleanText(candidate.description) : '';
-		const href = typeof candidate.href === 'string' ? cleanText(candidate.href) : '';
+		const title =
+			typeof candidate.title === "string"
+				? cleanText(candidate.title)
+				: "";
+		const description =
+			typeof candidate.description === "string"
+				? cleanText(candidate.description)
+				: "";
+		const href =
+			typeof candidate.href === "string" ? cleanText(candidate.href) : "";
 		const category = candidate.category;
 		const priority =
-			typeof candidate.priority === 'number' && Number.isFinite(candidate.priority)
+			typeof candidate.priority === "number" &&
+			Number.isFinite(candidate.priority)
 				? candidate.priority
 				: 70;
-		if (!title || !description || !href || !isSearchCategory(category)) return null;
+		if (!title || !description || !href || !isSearchCategory(category))
+			return null;
 		if (isSearchHrefBlocked(href)) return null;
 		const id =
-			typeof candidate.id === 'string' && candidate.id.trim()
+			typeof candidate.id === "string" && candidate.id.trim()
 				? candidate.id
 				: createSearchId(`${href}-${title}`);
 		return {
@@ -538,29 +648,40 @@
 			category,
 			priority,
 			normalizedTitle:
-				typeof candidate.normalizedTitle === 'string'
+				typeof candidate.normalizedTitle === "string"
 					? candidate.normalizedTitle
 					: normalizeSearchText(title),
 			normalizedDescription:
-				typeof candidate.normalizedDescription === 'string'
+				typeof candidate.normalizedDescription === "string"
 					? candidate.normalizedDescription
 					: normalizeSearchText(description),
 			normalizedKeywords:
-				typeof candidate.normalizedKeywords === 'string' ? candidate.normalizedKeywords : '',
+				typeof candidate.normalizedKeywords === "string"
+					? candidate.normalizedKeywords
+					: "",
 			normalizedContent:
-				typeof candidate.normalizedContent === 'string' ? candidate.normalizedContent : ''
+				typeof candidate.normalizedContent === "string"
+					? candidate.normalizedContent
+					: "",
 		};
 	};
 	const readSearchIndexCache = () => {
-		if (typeof window === 'undefined') return null;
+		if (typeof window === "undefined") return null;
 		try {
-			const rawValue = window.localStorage.getItem(SEARCH_INDEX_CACHE_KEY);
+			const rawValue = window.localStorage.getItem(
+				SEARCH_INDEX_CACHE_KEY,
+			);
 			if (!rawValue) return null;
-			const parsedValue = JSON.parse(rawValue) as Partial<SearchIndexCachePayload>;
+			const parsedValue = JSON.parse(
+				rawValue,
+			) as Partial<SearchIndexCachePayload>;
 			const isExpired =
-				typeof parsedValue.savedAt !== 'number' ||
+				typeof parsedValue.savedAt !== "number" ||
 				Date.now() - parsedValue.savedAt > SEARCH_INDEX_CACHE_TTL_MS;
-			if (parsedValue.version !== SEARCH_INDEX_CACHE_VERSION || isExpired) {
+			if (
+				parsedValue.version !== SEARCH_INDEX_CACHE_VERSION ||
+				isExpired
+			) {
 				window.localStorage.removeItem(SEARCH_INDEX_CACHE_KEY);
 				return null;
 			}
@@ -570,113 +691,157 @@
 			}
 			const cachedDocuments = parsedValue.documents
 				.map((document) => toSearchDocument(document))
-				.filter((document): document is SearchDocument => Boolean(document));
+				.filter((document): document is SearchDocument =>
+					Boolean(document),
+				);
 			if (cachedDocuments.length === 0) {
 				window.localStorage.removeItem(SEARCH_INDEX_CACHE_KEY);
 				return null;
 			}
 			return dedupeSearchDocuments(cachedDocuments);
 		} catch (error) {
-			console.warn('Gagal membaca cache pencarian universal.', error);
+			console.warn("Gagal membaca cache pencarian universal.", error);
 			return null;
 		}
 	};
 	const writeSearchIndexCache = (documents: SearchDocument[]) => {
-		if (typeof window === 'undefined') return;
+		if (typeof window === "undefined") return;
 		const payload: SearchIndexCachePayload = {
 			version: SEARCH_INDEX_CACHE_VERSION,
 			savedAt: Date.now(),
-			documents: dedupeSearchDocuments(documents)
+			documents: dedupeSearchDocuments(documents),
 		};
 		try {
-			window.localStorage.setItem(SEARCH_INDEX_CACHE_KEY, JSON.stringify(payload));
+			window.localStorage.setItem(
+				SEARCH_INDEX_CACHE_KEY,
+				JSON.stringify(payload),
+			);
 		} catch (error) {
-			console.warn('Gagal menyimpan cache pencarian universal.', error);
+			console.warn("Gagal menyimpan cache pencarian universal.", error);
 		}
 	};
 	const searchCategoryBadgeClass = (category: SearchCategory) => {
 		switch (category) {
-			case 'Layanan':
-				return 'border-[#b3db8d] bg-[#eff8e3] text-[#3f6e16]';
-			case 'Bagian':
-				return 'border-[#c8d0dd] bg-[#f3f6fb] text-[#3b4d65]';
-			case 'Halaman':
+			case "Layanan":
+				return "border-[#b3db8d] bg-[#eff8e3] text-[#3f6e16]";
+			case "Bagian":
+				return "border-[#c8d0dd] bg-[#f3f6fb] text-[#3b4d65]";
+			case "Halaman":
 			default:
-				return 'border-[#cad2da] bg-[#f4f6f9] text-[#465364]';
+				return "border-[#cad2da] bg-[#f4f6f9] text-[#465364]";
 		}
 	};
-	const extractSearchDocumentsFromHtml = (route: SearchRoute, html: string) => {
+	const extractSearchDocumentsFromHtml = (
+		route: SearchRoute,
+		html: string,
+	) => {
 		if (isSearchHrefBlocked(route.path)) return [];
 		const parser = new DOMParser();
-		const parsedDocument = parser.parseFromString(html, 'text/html');
-		const mainContent = parsedDocument.querySelector('main') ?? parsedDocument.body;
+		const parsedDocument = parser.parseFromString(html, "text/html");
+		const mainContent =
+			parsedDocument.querySelector("main") ?? parsedDocument.body;
 		const indexingRoot = mainContent.cloneNode(true) as HTMLElement;
 		for (const element of indexingRoot.querySelectorAll<HTMLElement>(
-			'nav, footer, [data-universal-search-exclude="true"]'
+			'nav, footer, [data-universal-search-exclude="true"]',
 		)) {
 			element.remove();
 		}
 		const parsedPageTitle = cleanText(
-			parsedDocument.querySelector('title')?.textContent?.replace(/\|\s*SIKOPLING\s*$/i, '') ?? ''
+			parsedDocument
+				.querySelector("title")
+				?.textContent?.replace(/\|\s*SIKOPLING\s*$/i, "") ?? "",
 		);
 		const pageDescription = cleanText(
-			parsedDocument.querySelector('meta[name="description"]')?.getAttribute('content') ?? ''
+			parsedDocument
+				.querySelector('meta[name="description"]')
+				?.getAttribute("content") ?? "",
 		);
-		const pageTextContent = cleanText(indexingRoot.textContent ?? '');
+		const pageTextContent = cleanText(indexingRoot.textContent ?? "");
 		const documents: SearchDocument[] = [];
 
 		if (pageTextContent.length > 35) {
 			documents.push(
 				buildSearchDocument({
 					title: parsedPageTitle || route.title,
-					description: pageDescription || makeSnippet(pageTextContent, 150),
+					description:
+						pageDescription || makeSnippet(pageTextContent, 150),
 					href: route.path,
 					category: route.category,
 					content: pageTextContent,
-					keywords: [route.title, route.category, 'SIKOPLING', 'layanan lingkungan'],
-					priority: route.priority
-				})
+					keywords: [
+						route.title,
+						route.category,
+						"SIKOPLING",
+						"layanan lingkungan",
+					],
+					priority: route.priority,
+				}),
 			);
 		}
 
-		const sectionElements = Array.from(indexingRoot.querySelectorAll<HTMLElement>('section, article'));
-		for (const [sectionIndex, sectionElement] of sectionElements.entries()) {
-			const sectionTitle = cleanText(sectionElement.querySelector('h1,h2,h3')?.textContent ?? '');
-			const sectionText = cleanText(sectionElement.textContent ?? '');
+		const sectionElements = Array.from(
+			indexingRoot.querySelectorAll<HTMLElement>("section, article"),
+		);
+		for (const [
+			sectionIndex,
+			sectionElement,
+		] of sectionElements.entries()) {
+			const sectionTitle = cleanText(
+				sectionElement.querySelector("h1,h2,h3")?.textContent ?? "",
+			);
+			const sectionText = cleanText(sectionElement.textContent ?? "");
 			if (!sectionTitle && sectionText.length < 65) continue;
 
-			const sectionDescription = cleanText(sectionElement.querySelector('p')?.textContent ?? '');
+			const sectionDescription = cleanText(
+				sectionElement.querySelector("p")?.textContent ?? "",
+			);
 			const sectionId = sectionElement.id;
 			documents.push(
 				buildSearchDocument({
 					title: sectionTitle || `${route.title} ${sectionIndex + 1}`,
 					description: makeSnippet(sectionDescription || sectionText),
 					href: resolveSearchHref(route.path, sectionId),
-					category: 'Bagian',
+					category: "Bagian",
 					content: sectionText,
-					keywords: [route.title, route.category, sectionId.replace(/-/g, ' '), 'lingkungan'],
-					priority: Math.max(route.priority - Math.min(sectionIndex * 4, 24), 38)
-				})
+					keywords: [
+						route.title,
+						route.category,
+						sectionId.replace(/-/g, " "),
+						"lingkungan",
+					],
+					priority: Math.max(
+						route.priority - Math.min(sectionIndex * 4, 24),
+						38,
+					),
+				}),
 			);
 		}
 
 		return dedupeSearchDocuments(documents);
 	};
-	const computeSearchScore = (document: SearchDocument, normalizedQuery: string) => {
+	const computeSearchScore = (
+		document: SearchDocument,
+		normalizedQuery: string,
+	) => {
 		if (!normalizedQuery) return 0;
 		let score = 0;
-		const queryTokens = normalizedQuery.split(' ').filter((token) => token.length > 1);
+		const queryTokens = normalizedQuery
+			.split(" ")
+			.filter((token) => token.length > 1);
 
 		if (document.normalizedTitle.startsWith(normalizedQuery)) score += 140;
-		else if (document.normalizedTitle.includes(normalizedQuery)) score += 108;
+		else if (document.normalizedTitle.includes(normalizedQuery))
+			score += 108;
 		if (document.normalizedKeywords.includes(normalizedQuery)) score += 78;
-		if (document.normalizedDescription.includes(normalizedQuery)) score += 42;
+		if (document.normalizedDescription.includes(normalizedQuery))
+			score += 42;
 		if (document.normalizedContent.includes(normalizedQuery)) score += 30;
 
 		for (const queryToken of queryTokens) {
 			if (document.normalizedTitle.includes(queryToken)) score += 22;
 			if (document.normalizedKeywords.includes(queryToken)) score += 17;
-			if (document.normalizedDescription.includes(queryToken)) score += 10;
+			if (document.normalizedDescription.includes(queryToken))
+				score += 10;
 			if (document.normalizedContent.includes(queryToken)) score += 6;
 		}
 
@@ -684,32 +849,37 @@
 		return score + document.priority;
 	};
 	const hydrateUniversalSearchIndex = async () => {
-		if (isSearchIndexing || typeof window === 'undefined') return;
+		if (isSearchIndexing || typeof window === "undefined") return;
 		isSearchIndexing = true;
 
 		try {
-			const currentPath = normalizeSearchPathname(window.location.pathname);
+			const currentPath = normalizeSearchPathname(
+				window.location.pathname,
+			);
 			const currentRoute = buildSearchRoute(currentPath);
 			const dynamicDocuments = extractSearchDocumentsFromHtml(
 				currentRoute,
-				document.documentElement.outerHTML
+				document.documentElement.outerHTML,
 			);
 
 			const nextDocuments = dedupeSearchDocuments([
 				...fallbackSearchDocuments,
-				...dynamicDocuments
+				...dynamicDocuments,
 			]);
 			universalSearchDocuments = nextDocuments;
 			writeSearchIndexCache(nextDocuments);
 		} catch (error) {
-			console.error('Gagal memperbarui indeks pencarian universal.', error);
+			console.error(
+				"Gagal memperbarui indeks pencarian universal.",
+				error,
+			);
 		} finally {
 			isSearchIndexing = false;
 		}
 	};
 	const shouldAutoFocusSearch = () => {
-		if (typeof window === 'undefined') return false;
-		return window.matchMedia('(min-width: 1024px)').matches;
+		if (typeof window === "undefined") return false;
+		return window.matchMedia("(min-width: 1024px)").matches;
 	};
 	const openSearchModal = async () => {
 		isSearchOpen = true;
@@ -722,10 +892,12 @@
 		searchInput?.focus();
 		searchInput?.select();
 	};
-	const closeSearchModalWithOptions = (options?: { clearQuery?: boolean }) => {
+	const closeSearchModalWithOptions = (options?: {
+		clearQuery?: boolean;
+	}) => {
 		isSearchOpen = false;
 		if (options?.clearQuery ?? true) {
-			searchQuery = '';
+			searchQuery = "";
 		}
 	};
 	const closeSearchModal = () => {
@@ -740,13 +912,15 @@
 		event.preventDefault();
 		const targetHref = target.href;
 		closeSearchModalWithOptions({ clearQuery: false });
-		searchQuery = '';
+		searchQuery = "";
 		void goto(targetHref);
 	};
 	const normalizedSearchQuery = $derived(normalizeSearchText(searchQuery));
 	const cleanedSearchQuery = $derived(cleanText(searchQuery));
 	const suggestedSearchResults = $derived.by(() =>
-		[...universalSearchDocuments].sort((left, right) => right.priority - left.priority).slice(0, 8)
+		[...universalSearchDocuments]
+			.sort((left, right) => right.priority - left.priority)
+			.slice(0, 8),
 	);
 	const searchResults = $derived.by(() => {
 		const query = normalizedSearchQuery;
@@ -755,14 +929,17 @@
 		return universalSearchDocuments
 			.map((document) => ({
 				document,
-				score: computeSearchScore(document, query)
+				score: computeSearchScore(document, query),
 			}))
 			.filter((result) => result.score > 0)
 			.sort(
 				(left, right) =>
 					right.score - left.score ||
 					right.document.priority - left.document.priority ||
-					left.document.title.localeCompare(right.document.title, 'id-ID')
+					left.document.title.localeCompare(
+						right.document.title,
+						"id-ID",
+					),
 			)
 			.slice(0, 14)
 			.map((result) => result.document);
@@ -860,22 +1037,22 @@
 
 	const handleMobileMenuIntroStart = () => {
 		isMobileMenuAnimating = true;
-		mobileMenuMotionState = 'opening';
+		mobileMenuMotionState = "opening";
 	};
 
 	const handleMobileMenuIntroEnd = () => {
 		isMobileMenuAnimating = false;
-		mobileMenuMotionState = 'idle';
+		mobileMenuMotionState = "idle";
 	};
 
 	const handleMobileMenuOutroStart = () => {
 		isMobileMenuAnimating = true;
-		mobileMenuMotionState = 'closing';
+		mobileMenuMotionState = "closing";
 	};
 
 	const handleMobileMenuOutroEnd = () => {
 		isMobileMenuAnimating = false;
-		mobileMenuMotionState = 'idle';
+		mobileMenuMotionState = "idle";
 		if (!isMobileOpen) {
 			isMobileLayananOpen = false;
 			isMobilePengumumanOpen = false;
@@ -888,7 +1065,11 @@
 		if (layananDropdown && target && !layananDropdown.contains(target)) {
 			closeLayananMenu();
 		}
-		if (pengumumanDropdown && target && !pengumumanDropdown.contains(target)) {
+		if (
+			pengumumanDropdown &&
+			target &&
+			!pengumumanDropdown.contains(target)
+		) {
 			closePengumumanMenu();
 		}
 		if (tentangDropdown && target && !tentangDropdown.contains(target)) {
@@ -898,28 +1079,43 @@
 
 	const handleLayananFocusOut = (event: FocusEvent) => {
 		const nextFocusTarget = event.relatedTarget as Node | null;
-		if (layananDropdown && nextFocusTarget && layananDropdown.contains(nextFocusTarget)) {
+		if (
+			layananDropdown &&
+			nextFocusTarget &&
+			layananDropdown.contains(nextFocusTarget)
+		) {
 			return;
 		}
 		closeLayananMenu();
 	};
 	const handlePengumumanFocusOut = (event: FocusEvent) => {
 		const nextFocusTarget = event.relatedTarget as Node | null;
-		if (pengumumanDropdown && nextFocusTarget && pengumumanDropdown.contains(nextFocusTarget)) {
+		if (
+			pengumumanDropdown &&
+			nextFocusTarget &&
+			pengumumanDropdown.contains(nextFocusTarget)
+		) {
 			return;
 		}
 		closePengumumanMenu();
 	};
 	const handleTentangFocusOut = (event: FocusEvent) => {
 		const nextFocusTarget = event.relatedTarget as Node | null;
-		if (tentangDropdown && nextFocusTarget && tentangDropdown.contains(nextFocusTarget)) {
+		if (
+			tentangDropdown &&
+			nextFocusTarget &&
+			tentangDropdown.contains(nextFocusTarget)
+		) {
 			return;
 		}
 		closeTentangMenu();
 	};
 
 	const handleWindowKeydown = (event: KeyboardEvent) => {
-		if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+		if (
+			(event.metaKey || event.ctrlKey) &&
+			event.key.toLowerCase() === "k"
+		) {
 			event.preventDefault();
 			if (isSearchOpen) {
 				closeSearchModal();
@@ -929,7 +1125,7 @@
 			return;
 		}
 
-		if (event.key === 'Escape') {
+		if (event.key === "Escape") {
 			if (isSearchOpen) {
 				closeSearchModal();
 				return;
@@ -939,7 +1135,7 @@
 	};
 
 	const updateViewportState = () => {
-		if (typeof window === 'undefined') return;
+		if (typeof window === "undefined") return;
 		const wasMobileViewport = isMobileViewport;
 		isMobileViewport = window.innerWidth < desktopNavBreakpoint;
 		if (isMobileViewport) {
@@ -951,7 +1147,7 @@
 		if (wasMobileViewport) {
 			isMobileOpen = false;
 			isMobileMenuAnimating = false;
-			mobileMenuMotionState = 'idle';
+			mobileMenuMotionState = "idle";
 			isMobileLayananOpen = false;
 			isMobilePengumumanOpen = false;
 			isMobileTentangOpen = false;
@@ -959,10 +1155,10 @@
 	};
 
 	const updateScrollState = () => {
-		if (typeof window === 'undefined') return;
+		if (typeof window === "undefined") return;
 		const currentScrollY = Math.max(window.scrollY, 0);
 		const isHorizontalScrollNavLocked =
-			document.documentElement.dataset.horizontalScrollNavLock === 'true';
+			document.documentElement.dataset.horizontalScrollNavLock === "true";
 		isScrolled = currentScrollY > 18;
 		if (isMobileViewport) {
 			isNavVisible = true;
@@ -981,12 +1177,13 @@
 	};
 
 	const updateHashState = () => {
-		if (typeof window === 'undefined') return;
-		currentHash = window.location.hash.replace(/^#/, '');
+		if (typeof window === "undefined") return;
+		currentHash = window.location.hash.replace(/^#/, "");
 	};
 
 	onMount(() => {
-		lastScrollY = typeof window !== 'undefined' ? Math.max(window.scrollY, 0) : 0;
+		lastScrollY =
+			typeof window !== "undefined" ? Math.max(window.scrollY, 0) : 0;
 		updateViewportState();
 		isNavVisible = true;
 		updateScrollState();
@@ -997,9 +1194,9 @@
 		}
 		void hydrateUniversalSearchIndex();
 		const frameId = requestAnimationFrame(updateScrollState);
-		window.addEventListener('resize', updateViewportState);
+		window.addEventListener("resize", updateViewportState);
 		return () => {
-			window.removeEventListener('resize', updateViewportState);
+			window.removeEventListener("resize", updateViewportState);
 			cancelAnimationFrame(frameId);
 			clearLayananCloseTimer();
 			clearPengumumanCloseTimer();
@@ -1007,28 +1204,37 @@
 		};
 	});
 
-	const isLandingPage = () => page.url.pathname === '/';
-	const isLayananRoute = () => page.url.pathname.startsWith('/layanan');
-	const isPengumumanRoute = () => page.url.pathname.startsWith('/pengumuman');
-	const isTentangRoute = () => tentangItems.some((item) => item.href === page.url.pathname);
+	const isLandingPage = () => page.url.pathname === "/";
+	const isLayananRoute = () => page.url.pathname.startsWith("/layanan");
+	const isPengumumanRoute = () => page.url.pathname.startsWith("/pengumuman");
+	const isTentangRoute = () =>
+		tentangItems.some((item) => item.href === page.url.pathname);
 	const isPathActive = (path: string) => page.url.pathname === path;
 	const isLayananActive = () =>
-		isLayananRoute() || (isLandingPage() && layananSectionIds.includes(currentHash));
+		isLayananRoute() ||
+		(isLandingPage() && layananSectionIds.includes(currentHash));
 	const isPengumumanActive = () => isPengumumanRoute();
 	const isTentangActive = () => isTentangRoute();
 	const useLightNav = () => isLandingPage() && !isScrolled;
 	const isMobileMenuActive = () => isMobileOpen || isMobileMenuAnimating;
 	const shouldUseLightNav = () => useLightNav() && !isMobileMenuActive();
 	const navHref = (sectionId: string) =>
-		sectionId === 'beranda' ? '/' : isLandingPage() ? `#${sectionId}` : `/#${sectionId}`;
+		sectionId === "beranda"
+			? "/"
+			: isLandingPage()
+				? `#${sectionId}`
+				: `/#${sectionId}`;
 	const scrollToBeranda = () => {
-		if (typeof window === 'undefined') return;
-		const berandaSection = document.getElementById('beranda');
+		if (typeof window === "undefined") return;
+		const berandaSection = document.getElementById("beranda");
 		if (berandaSection) {
-			berandaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+			berandaSection.scrollIntoView({
+				behavior: "smooth",
+				block: "start",
+			});
 			return;
 		}
-		window.scrollTo({ top: 0, behavior: 'smooth' });
+		window.scrollTo({ top: 0, behavior: "smooth" });
 	};
 	const handleBerandaClick = (event: MouseEvent) => {
 		closeMenus();
@@ -1038,14 +1244,14 @@
 		if (window.location.hash) {
 			history.replaceState(
 				history.state,
-				'',
-				`${window.location.pathname}${window.location.search}`
+				"",
+				`${window.location.pathname}${window.location.search}`,
 			);
 		}
-		currentHash = '';
+		currentHash = "";
 	};
 	const mapSectionHref = (href: string) => {
-		if (href.startsWith('/')) return href;
+		if (href.startsWith("/")) return href;
 		return isLandingPage() ? href : `/${href}`;
 	};
 
@@ -1070,7 +1276,7 @@
 
 	$effect(() => {
 		page.url.pathname;
-		if (typeof window === 'undefined') return;
+		if (typeof window === "undefined") return;
 		lastScrollY = Math.max(window.scrollY, 0);
 		isNavVisible = true;
 		const frameId = requestAnimationFrame(updateScrollState);
@@ -1092,27 +1298,27 @@
 	const navClass = () =>
 		`fixed inset-x-0 top-0 z-40 [font-family:var(--font-body)] transition-[background-color,box-shadow,color,opacity,transform,filter] duration-[680ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
 			shouldShowNav()
-				? 'translate-y-0 scale-100 opacity-100 blur-0 pointer-events-auto'
-				: '-translate-y-[110%] scale-[0.985] opacity-0 blur-[1px] pointer-events-none'
+				? "translate-y-0 scale-100 opacity-100 blur-0 pointer-events-auto"
+				: "-translate-y-[110%] scale-[0.985] opacity-0 blur-[1px] pointer-events-none"
 		} ${
 			isMobileMenuActive()
-				? 'mobile-nav-solid bg-white text-[var(--ink)] shadow-none'
+				? "mobile-nav-solid bg-white text-[var(--ink)] shadow-none"
 				: shouldUseLightNav()
-					? 'bg-transparent text-white shadow-none'
-				: 'bg-[var(--surface)] text-[var(--ink)] shadow-none'
+					? "bg-transparent text-white shadow-none"
+					: "bg-[var(--surface)] text-[var(--ink)] shadow-none"
 		}`;
 
 	const desktopLinkClass = (isActive = false) => {
 		const baseClass =
-			'relative inline-flex items-center py-2.5 lg:py-2 text-base lg:text-[1rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200';
+			"relative inline-flex items-center py-3 lg:py-2.5 text-[1.05rem] lg:text-[1.06rem] font-semibold tracking-[0.002em] menu-item-static nav-menu-font transition-colors duration-200";
 		if (shouldUseLightNav()) {
-			return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-white hover:text-[#77D37F]'}`;
+			return `${baseClass} ${isActive ? "text-[#77D37F]" : "text-white hover:text-[#77D37F]"}`;
 		}
-		return `${baseClass} ${isActive ? 'text-[#77D37F]' : 'text-black hover:text-[#77D37F]'}`;
+		return `${baseClass} ${isActive ? "text-[#77D37F]" : "text-black hover:text-[#77D37F]"}`;
 	};
 
 	const mobileNavBaseClass =
-		'menu-item-static nav-menu-font w-full rounded-lg px-4 py-3 text-left text-[1rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200';
+		"menu-item-static nav-menu-font w-full rounded-xl px-[1.125rem] py-[0.875rem] text-left text-[1.05rem] font-semibold leading-[1.25] tracking-[0.002em] transition-colors duration-200";
 
 	const mobileLinkClass = () =>
 		`flex w-full items-center justify-between gap-2 ${mobileNavBaseClass} text-[#0f172a] hover:bg-[#f4f8fc]`;
@@ -1121,36 +1327,38 @@
 		`flex w-full items-center justify-between gap-2 appearance-none border-0 bg-transparent ${mobileNavBaseClass} text-[#0f172a] hover:bg-[#f4f8fc]`;
 
 	const mobileLayananItemClass = () =>
-		'menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2 text-left text-[1rem] font-normal leading-[1.25] tracking-[0.002em] text-[#334155] transition-colors duration-200 hover:bg-[#f4f8fc] hover:text-[#2f8f2f]';
+		"menu-item-static nav-menu-font flex w-full items-center justify-between gap-2 rounded-xl px-3.5 py-2.5 text-left text-[0.98rem] font-normal leading-[1.25] tracking-[0.002em] text-[#334155] transition-colors duration-200 hover:bg-[#f4f8fc] hover:text-[#2f8f2f]";
 
 	const mobileMenuPanelClass = () =>
-		`mobile-menu-panel relative -mt-px bg-white px-4 pt-3 pb-4 lg:hidden ${
-			mobileMenuMotionState === 'opening'
-				? 'is-opening'
-				: mobileMenuMotionState === 'closing'
-					? 'is-closing'
-					: ''
+		`mobile-menu-panel relative -mt-px bg-white px-5 pt-4 pb-5 lg:hidden ${
+			mobileMenuMotionState === "opening"
+				? "is-opening"
+				: mobileMenuMotionState === "closing"
+					? "is-closing"
+					: ""
 		}`;
 
-	const mobileArrowIconClass = 'h-3.5 w-3.5 shrink-0 opacity-80';
+	const mobileArrowIconClass = "h-4 w-4 shrink-0 opacity-80";
 
 	const logoClass = () =>
-		`h-auto w-[11.4rem] object-contain transition-[filter] duration-300 sm:w-[12rem] lg:w-[13rem] ${
-			shouldUseLightNav() ? 'brightness-0 invert' : 'brightness-100 saturate-100'
+		`h-auto w-[12.2rem] object-contain transition-[filter] duration-300 sm:w-[12.8rem] lg:w-[13.8rem] ${
+			shouldUseLightNav()
+				? "brightness-0 invert"
+				: "brightness-100 saturate-100"
 		}`;
 
 	const actionButtonClass = () =>
-		`cursor-pointer inline-flex h-11 w-11 lg:h-10 lg:w-10 items-center justify-center rounded-lg border transition-colors ${
+		`cursor-pointer inline-flex h-12 w-12 lg:h-11 lg:w-11 items-center justify-center rounded-xl border transition-colors ${
 			shouldUseLightNav()
-				? 'border-white/25 bg-white/10 text-white'
-				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
+				? "border-white/25 bg-white/10 text-white"
+				: "border-(--line) bg-(--surface) text-(--ink)"
 		}`;
 
 	const searchActionButtonClass = () =>
-		`cursor-pointer inline-flex h-11 w-11 items-center justify-center rounded-lg border transition-colors lg:h-10 lg:w-auto lg:gap-2 lg:px-4 lg:rounded-full ${
+		`cursor-pointer inline-flex h-12 w-12 items-center justify-center rounded-xl border transition-colors lg:h-11 lg:w-auto lg:gap-2.5 lg:px-5 lg:rounded-full ${
 			shouldUseLightNav()
-				? 'border-white/25 bg-white/10 text-white'
-				: 'border-[var(--line)] bg-[var(--surface)] text-[var(--ink)]'
+				? "border-white/25 bg-white/10 text-white"
+				: "border-(--line) bg-(--surface) text-(--ink)"
 		}`;
 </script>
 
@@ -1163,11 +1371,15 @@
 />
 
 <nav class={navClass()}>
-	<div class="nav-shell nav-shell-desktop-spacious py-4 lg:py-3.5">
+	<div class="nav-shell nav-shell-desktop-spacious py-5 lg:py-4">
 		<div
-			class="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-10"
+			class="flex items-center justify-between gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:gap-12"
 		>
-			<a href="/" class="flex min-w-0 items-center" onclick={handleBerandaClick}>
+			<a
+				href="/"
+				class="flex min-w-0 items-center"
+				onclick={handleBerandaClick}
+			>
 				<img
 					src="/layout/logo_sikopling.png"
 					alt="Logo SIKOPLING DLH Prov Kalsel"
@@ -1176,10 +1388,12 @@
 			</a>
 
 			{#if showNavMenus}
-				<ul class="hidden items-center gap-7 lg:flex lg:justify-self-center xl:gap-9">
+				<ul
+					class="hidden items-center gap-8 lg:flex lg:justify-self-center xl:gap-10"
+				>
 					<li>
 						<a
-							href={navHref('beranda')}
+							href={navHref("beranda")}
 							class={desktopLinkClass(false)}
 							onclick={handleBerandaClick}
 						>
@@ -1199,14 +1413,17 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isLayananActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
+								class={`${desktopLinkClass(isLayananActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 leading-[1.2] font-semibold!`}
 								aria-expanded={isLayananOpen}
 								aria-haspopup="true"
-								onclick={() => (isLayananOpen ? closeLayananMenu() : openLayananMenu())}
+								onclick={() =>
+									isLayananOpen
+										? closeLayananMenu()
+										: openLayananMenu()}
 							>
 								<span>Layanan</span>
 								<ChevronDown
-									class={`h-4 w-4 transition-transform duration-200 ${isLayananOpen ? 'rotate-180' : ''}`}
+									class={`h-4 w-4 transition-transform duration-200 ${isLayananOpen ? "rotate-180" : ""}`}
 									strokeWidth={2.2}
 									aria-hidden="true"
 								/>
@@ -1214,14 +1431,16 @@
 
 							{#if isLayananOpen}
 								<div
-									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,18.5rem)] -translate-x-1/2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,18.5rem)] -translate-x-1/2 rounded-[10px] border border-(--line) bg-(--surface) p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
 								>
 									<div class="space-y-1">
 										{#each layananItems as item}
 											{#if item.href}
 												<a
-													href={mapSectionHref(item.href)}
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													href={mapSectionHref(
+														item.href,
+													)}
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-(--ink) transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handleLayananItemClick}
 												>
 													{item.title}
@@ -1229,7 +1448,7 @@
 											{:else}
 												<button
 													type="button"
-													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full appearance-none rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-(--ink) transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												>
 													{item.title}
 												</button>
@@ -1253,15 +1472,17 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isPengumumanActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
+								class={`${desktopLinkClass(isPengumumanActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 leading-[1.2] font-semibold!`}
 								aria-expanded={isPengumumanOpen}
 								aria-haspopup="true"
 								onclick={() =>
-									isPengumumanOpen ? closePengumumanMenu() : openPengumumanMenu()}
+									isPengumumanOpen
+										? closePengumumanMenu()
+										: openPengumumanMenu()}
 							>
 								<span>Pengumuman</span>
 								<ChevronDown
-									class={`h-4 w-4 transition-transform duration-200 ${isPengumumanOpen ? 'rotate-180' : ''}`}
+									class={`h-4 w-4 transition-transform duration-200 ${isPengumumanOpen ? "rotate-180" : ""}`}
 									strokeWidth={2.2}
 									aria-hidden="true"
 								/>
@@ -1269,14 +1490,14 @@
 
 							{#if isPengumumanOpen}
 								<div
-									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,20.5rem)] -translate-x-1/2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,20.5rem)] -translate-x-1/2 rounded-[10px] border border-(--line) bg-(--surface) p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
 								>
 									<div class="space-y-1">
 										{#each pengumumanItems as item}
 											{#if item.href}
 												<a
 													href={item.href}
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-(--ink) transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 													onclick={handlePengumumanItemClick}
 												>
 													{item.title}
@@ -1285,7 +1506,7 @@
 												<div
 													role="menuitem"
 													aria-disabled="true"
-													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)]"
+													class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-(--ink)"
 												>
 													{item.title}
 												</div>
@@ -1309,14 +1530,17 @@
 						>
 							<button
 								type="button"
-								class={`${desktopLinkClass(isTentangActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 [line-height:1.2] !font-semibold`}
+								class={`${desktopLinkClass(isTentangActive())} cursor-pointer appearance-none items-center gap-1.5 border-0 bg-transparent px-0 leading-[1.2] font-semibold!`}
 								aria-expanded={isTentangOpen}
 								aria-haspopup="true"
-								onclick={() => (isTentangOpen ? closeTentangMenu() : openTentangMenu())}
+								onclick={() =>
+									isTentangOpen
+										? closeTentangMenu()
+										: openTentangMenu()}
 							>
 								<span>Tentang</span>
 								<ChevronDown
-									class={`h-4 w-4 transition-transform duration-200 ${isTentangOpen ? 'rotate-180' : ''}`}
+									class={`h-4 w-4 transition-transform duration-200 ${isTentangOpen ? "rotate-180" : ""}`}
 									strokeWidth={2.2}
 									aria-hidden="true"
 								/>
@@ -1324,13 +1548,13 @@
 
 							{#if isTentangOpen}
 								<div
-									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,18.5rem)] -translate-x-1/2 rounded-[10px] border border-[var(--line)] bg-[var(--surface)] p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
+									class="absolute top-[calc(100%+0.875rem)] left-1/2 w-[min(88vw,18.5rem)] -translate-x-1/2 rounded-[10px] border border-(--line) bg-(--surface) p-2 shadow-[0_20px_45px_-25px_rgba(15,23,42,0.32)]"
 								>
 									<div class="space-y-1">
 										{#each tentangItems as item}
 											<a
 												href={item.href}
-												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-[var(--ink)] transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
+												class="menu-item-static nav-menu-font block w-full rounded-lg px-3.5 py-2.5 text-left text-[0.9375rem] font-normal text-(--ink) transition-colors duration-150 hover:bg-[#f8fbf4] hover:text-[#3EB14A]"
 												onclick={handleTentangItemClick}
 											>
 												{item.title}
@@ -1344,7 +1568,9 @@
 				</ul>
 			{/if}
 
-			<div class="flex items-center gap-2 lg:justify-self-end lg:gap-3">
+			<div
+				class="flex items-center gap-2.5 lg:justify-self-end lg:gap-3.5"
+			>
 				<button
 					type="button"
 					class={searchActionButtonClass()}
@@ -1353,22 +1579,37 @@
 					aria-expanded={isSearchOpen}
 					onclick={() => void openSearchModal()}
 				>
-					<Search class="h-5 w-5 lg:h-4.5 lg:w-4.5" strokeWidth={2} aria-hidden="true" />
+					<Search
+						class="h-5 w-5 lg:h-4.5 lg:w-4.5"
+						strokeWidth={2}
+						aria-hidden="true"
+					/>
 					<span class="hidden lg:inline">Cari</span>
 				</button>
 
 				{#if showNavMenus}
 					<button
 						type="button"
-						class={`${actionButtonClass()} mobile-menu-toggle ${isMobileOpen ? 'is-open' : ''} lg:hidden`}
+						class={`${actionButtonClass()} mobile-menu-toggle ${isMobileOpen ? "is-open" : ""} lg:hidden`}
 						aria-expanded={isMobileOpen}
-						aria-label={isMobileOpen ? 'Tutup menu' : 'Buka menu'}
+						aria-label={isMobileOpen ? "Tutup menu" : "Buka menu"}
 						onclick={toggleMobileMenu}
 					>
-						<span class="sr-only">{isMobileOpen ? 'Tutup menu' : 'Buka menu'}</span>
-						<span class="mobile-menu-toggle__line line--top" aria-hidden="true"></span>
-						<span class="mobile-menu-toggle__line line--middle" aria-hidden="true"></span>
-						<span class="mobile-menu-toggle__line line--bottom" aria-hidden="true"></span>
+						<span class="sr-only"
+							>{isMobileOpen ? "Tutup menu" : "Buka menu"}</span
+						>
+						<span
+							class="mobile-menu-toggle__line line--top"
+							aria-hidden="true"
+						></span>
+						<span
+							class="mobile-menu-toggle__line line--middle"
+							aria-hidden="true"
+						></span>
+						<span
+							class="mobile-menu-toggle__line line--bottom"
+							aria-hidden="true"
+						></span>
 					</button>
 				{/if}
 			</div>
@@ -1384,10 +1625,20 @@
 			onoutrostart={handleMobileMenuOutroStart}
 			onoutroend={handleMobileMenuOutroEnd}
 		>
-			<div class="mobile-menu-panel__content flex w-full flex-col items-start gap-2.5">
-				<a href={navHref('beranda')} class={mobileLinkClass()} onclick={handleBerandaClick}>
+			<div
+				class="mobile-menu-panel__content flex w-full flex-col items-start gap-2.5"
+			>
+				<a
+					href={navHref("beranda")}
+					class={mobileLinkClass()}
+					onclick={handleBerandaClick}
+				>
 					<span>Beranda</span>
-					<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+					<ArrowUpRight
+						class={mobileArrowIconClass}
+						strokeWidth={2.2}
+						aria-hidden="true"
+					/>
 				</a>
 
 				<button
@@ -1404,7 +1655,7 @@
 				>
 					<span class="font-semibold">Layanan</span>
 					<ChevronDown
-						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobileLayananOpen ? 'rotate-180' : ''}`}
+						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobileLayananOpen ? "rotate-180" : ""}`}
 						strokeWidth={2.2}
 						aria-hidden="true"
 					/>
@@ -1423,12 +1674,23 @@
 									onclick={handleLayananItemClick}
 								>
 									<span>{item.title}</span>
-									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+									<ArrowUpRight
+										class={mobileArrowIconClass}
+										strokeWidth={2.2}
+										aria-hidden="true"
+									/>
 								</a>
 							{:else}
-								<button type="button" class={mobileLayananItemClass()}>
+								<button
+									type="button"
+									class={mobileLayananItemClass()}
+								>
 									<span>{item.title}</span>
-									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+									<ArrowUpRight
+										class={mobileArrowIconClass}
+										strokeWidth={2.2}
+										aria-hidden="true"
+									/>
 								</button>
 							{/if}
 						{/each}
@@ -1449,7 +1711,7 @@
 				>
 					<span class="font-semibold">Pengumuman</span>
 					<ChevronDown
-						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobilePengumumanOpen ? 'rotate-180' : ''}`}
+						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobilePengumumanOpen ? "rotate-180" : ""}`}
 						strokeWidth={2.2}
 						aria-hidden="true"
 					/>
@@ -1462,16 +1724,27 @@
 					>
 						{#each pengumumanItems as item}
 							{#if item.href}
-								<a href={item.href} class={mobileLayananItemClass()} onclick={handlePengumumanItemClick}>
+								<a
+									href={item.href}
+									class={mobileLayananItemClass()}
+									onclick={handlePengumumanItemClick}
+								>
 									<span>{item.title}</span>
-									<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+									<ArrowUpRight
+										class={mobileArrowIconClass}
+										strokeWidth={2.2}
+										aria-hidden="true"
+									/>
 								</a>
 							{:else}
 								<div
-									class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] font-normal leading-[1.25] tracking-[0.002em] text-[#334155]"
+									class="menu-item-static nav-menu-font flex w-full items-center rounded-lg px-3 py-2 text-left text-[1rem] font-normal leading-tight tracking-[0.002em] text-[#334155]"
 									onclick={handlePengumumanItemClick}
 									onkeydown={(event) => {
-										if (event.key === 'Enter' || event.key === ' ') {
+										if (
+											event.key === "Enter" ||
+											event.key === " "
+										) {
 											event.preventDefault();
 											handlePengumumanItemClick();
 										}
@@ -1500,7 +1773,7 @@
 				>
 					<span class="font-semibold">Tentang</span>
 					<ChevronDown
-						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobileTentangOpen ? 'rotate-180' : ''}`}
+						class={`h-4 w-4 shrink-0 transition-transform duration-300 ease-out ${isMobileTentangOpen ? "rotate-180" : ""}`}
 						strokeWidth={2.2}
 						aria-hidden="true"
 					/>
@@ -1512,9 +1785,17 @@
 						transition:slide={{ duration: 280, easing: cubicInOut }}
 					>
 						{#each tentangItems as item}
-							<a href={item.href} class={mobileLayananItemClass()} onclick={handleTentangItemClick}>
+							<a
+								href={item.href}
+								class={mobileLayananItemClass()}
+								onclick={handleTentangItemClick}
+							>
 								<span>{item.title}</span>
-								<ArrowUpRight class={mobileArrowIconClass} strokeWidth={2.2} aria-hidden="true" />
+								<ArrowUpRight
+									class={mobileArrowIconClass}
+									strokeWidth={2.2}
+									aria-hidden="true"
+								/>
 							</a>
 						{/each}
 					</div>
@@ -1527,7 +1808,7 @@
 {#if isSearchOpen}
 	<button
 		type="button"
-		class="fixed inset-0 z-[82] bg-slate-950/34 backdrop-blur-sm backdrop-saturate-150 [-webkit-backdrop-filter:blur(8px)]"
+		class="fixed inset-0 z-82 bg-slate-950/34 backdrop-blur-sm backdrop-saturate-150 [-webkit-backdrop-filter:blur(8px)]"
 		aria-label="Tutup universal search"
 		onclick={closeSearchModal}
 		transition:fade={{ duration: 140 }}
@@ -1539,18 +1820,22 @@
 		aria-labelledby="universal-search-heading"
 		data-lenis-prevent
 		data-lenis-prevent-wheel
-		class="fixed inset-x-4 top-[5.15rem] z-[86] mx-auto w-auto max-w-3xl sm:inset-x-6 sm:top-[5.15rem] sm:w-full"
+		class="fixed inset-x-4 top-[5.15rem] z-86 mx-auto w-auto max-w-3xl sm:inset-x-6 sm:top-[5.15rem] sm:w-full"
 		transition:fly={{ y: -10, duration: 170 }}
 	>
 		<div
-			class="flex max-h-[min(62svh,28rem)] flex-col rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-3 shadow-[0_36px_80px_-34px_rgba(15,23,42,0.62)] sm:max-h-[min(66vh,31rem)] sm:p-4"
+			class="flex max-h-[min(62svh,28rem)] flex-col rounded-2xl border border-(--line) bg-(--surface) p-3 shadow-[0_36px_80px_-34px_rgba(15,23,42,0.62)] sm:max-h-[min(66vh,31rem)] sm:p-4"
 		>
 			<div class="flex items-stretch gap-2 sm:gap-2.5">
 				<div
-					class="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-xl border border-[var(--line)] bg-white px-2.5 transition-colors focus-within:border-[#8ebf63] sm:px-3.5"
+					class="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-xl border border-(--line) bg-white px-2.5 transition-colors focus-within:border-[#8ebf63] sm:px-3.5"
 				>
-					<span class="inline-flex text-[var(--muted)]">
-						<Search class="h-4 w-4 sm:h-4.5 sm:w-4.5" strokeWidth={2.2} aria-hidden="true" />
+					<span class="inline-flex text-(--muted)">
+						<Search
+							class="h-4 w-4 sm:h-4.5 sm:w-4.5"
+							strokeWidth={2.2}
+							aria-hidden="true"
+						/>
 					</span>
 					<input
 						bind:this={searchInput}
@@ -1559,7 +1844,7 @@
 						inputmode="search"
 						autocomplete="off"
 						placeholder="Cari halaman, layanan, atau dokumen"
-						class="universal-search-input h-full w-full border-0 bg-transparent text-base text-[var(--ink)] placeholder:text-[var(--muted)] shadow-none outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 sm:text-[0.98rem]"
+						class="universal-search-input h-full w-full border-0 bg-transparent text-base text-(--ink) placeholder:text-(--muted) shadow-none outline-none ring-0 focus:border-transparent focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 sm:text-[0.98rem]"
 						aria-label="Cari konten website"
 					/>
 				</div>
@@ -1573,13 +1858,18 @@
 				</button>
 			</div>
 
-			<div class="mt-3 flex items-start justify-between gap-3 border-t border-[var(--line)] pt-3">
+			<div
+				class="mt-3 flex items-start justify-between gap-3 border-t border-(--line) pt-3"
+			>
 				<div class="min-w-0">
-					<p id="universal-search-heading" class="text-[0.95rem] font-semibold text-[var(--ink)]">
+					<p
+						id="universal-search-heading"
+						class="text-[0.95rem] font-semibold text-(--ink)"
+					>
 						Pencarian Terpadu
 					</p>
 					{#if normalizedSearchQuery}
-						<p class="mt-0.5 truncate text-xs text-[var(--muted)]">
+						<p class="mt-0.5 truncate text-xs text-(--muted)">
 							Hasil untuk "{searchQuery.trim()}"
 						</p>
 					{/if}
@@ -1597,35 +1887,42 @@
 			<div
 				data-lenis-prevent
 				data-lenis-prevent-wheel
-				class="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-xl border border-[var(--line)] bg-[var(--surface)]"
+				class="mt-3 min-h-0 flex-1 overflow-y-auto overscroll-contain rounded-xl border border-(--line) bg-(--surface)"
 			>
 				{#if searchResults.length > 0}
-					<ul class="divide-y divide-[var(--line)]">
+					<ul class="divide-y divide-(--line)">
 						{#each searchResults as result}
 							<li>
 								<a
-									href={buildSearchResultHref(result.href, cleanedSearchQuery)}
+									href={buildSearchResultHref(
+										result.href,
+										cleanedSearchQuery,
+									)}
 									class="group flex items-start justify-between gap-2.5 px-3 py-3.5 transition-colors hover:bg-[#f8fbf4] sm:gap-3 sm:px-4"
 									onclick={handleSearchResultClick}
 								>
 									<div class="min-w-0">
 										<p
-											class="truncate text-[0.97rem] font-medium text-[var(--ink)] group-hover:text-[#3EB14A]"
+											class="truncate text-[0.97rem] font-medium text-(--ink) group-hover:text-[#3EB14A]"
 										>
 											{result.title}
 										</p>
-										<p class="mt-1 line-clamp-2 text-[0.86rem] leading-relaxed text-[var(--muted)]">
+										<p
+											class="mt-1 line-clamp-2 text-[0.86rem] leading-relaxed text-(--muted)"
+										>
 											{result.description}
 										</p>
 									</div>
-									<div class="flex shrink-0 items-center gap-1.5 sm:gap-2">
+									<div
+										class="flex shrink-0 items-center gap-1.5 sm:gap-2"
+									>
 										<span
 											class={`inline-flex items-center rounded-md border px-2 py-0.5 text-[0.6rem] font-semibold tracking-[0.07em] uppercase sm:text-[0.64rem] ${searchCategoryBadgeClass(result.category)}`}
 										>
 											{result.category}
 										</span>
 										<ChevronRight
-											class="h-4 w-4 text-[var(--muted)] transition-colors group-hover:text-[#3EB14A]"
+											class="h-4 w-4 text-(--muted) transition-colors group-hover:text-[#3EB14A]"
 											strokeWidth={2}
 											aria-hidden="true"
 										/>
@@ -1636,11 +1933,12 @@
 					</ul>
 				{:else}
 					<div class="px-4 py-8 text-center">
-						<p class="text-[0.95rem] font-medium text-[var(--ink)]">
+						<p class="text-[0.95rem] font-medium text-(--ink)">
 							Tidak ada hasil untuk "{searchQuery.trim()}"
 						</p>
-						<p class="mt-1.5 text-[0.85rem] text-[var(--muted)]">
-							Coba kata kunci seperti "lingkungan", "dokumen", atau "pertek".
+						<p class="mt-1.5 text-[0.85rem] text-(--muted)">
+							Coba kata kunci seperti "lingkungan", "dokumen",
+							atau "pertek".
 						</p>
 					</div>
 				{/if}
@@ -1651,7 +1949,7 @@
 
 <style>
 	:global(.nav-menu-font) {
-		font-family: 'Roboto', 'Segoe UI', sans-serif;
+		font-family: "Roboto", "Segoe UI", sans-serif;
 	}
 
 	.mobile-menu-toggle {
@@ -1664,7 +1962,7 @@
 	}
 
 	.mobile-nav-solid::after {
-		content: '';
+		content: "";
 		position: absolute;
 		left: 0;
 		right: 0;
@@ -1680,7 +1978,7 @@
 	}
 
 	.mobile-menu-panel::before {
-		content: '';
+		content: "";
 		position: absolute;
 		inset: 0 0 auto;
 		height: 1px;
@@ -1689,7 +1987,7 @@
 	}
 
 	.mobile-menu-panel::after {
-		content: '';
+		content: "";
 		position: absolute;
 		top: 0;
 		left: 1rem;
@@ -1709,7 +2007,8 @@
 	}
 
 	.mobile-menu-panel.is-opening::after {
-		animation: mobile-menu-seam-open 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+		animation: mobile-menu-seam-open 380ms cubic-bezier(0.22, 1, 0.36, 1)
+			both;
 	}
 
 	.mobile-menu-panel.is-closing::after {
@@ -1717,11 +2016,13 @@
 	}
 
 	.mobile-menu-panel.is-opening .mobile-menu-panel__content {
-		animation: mobile-menu-content-open 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+		animation: mobile-menu-content-open 360ms cubic-bezier(0.22, 1, 0.36, 1)
+			both;
 	}
 
 	.mobile-menu-panel.is-closing .mobile-menu-panel__content {
-		animation: mobile-menu-content-close 220ms cubic-bezier(0.4, 0, 1, 1) both;
+		animation: mobile-menu-content-close 220ms cubic-bezier(0.4, 0, 1, 1)
+			both;
 	}
 
 	@keyframes mobile-menu-seam-open {
@@ -1824,15 +2125,17 @@
 		text-decoration: none;
 	}
 
-	:global(.universal-search-input[type='search']::-webkit-search-cancel-button),
-	:global(.universal-search-input[type='search']::-webkit-search-decoration) {
+	:global(
+			.universal-search-input[type="search"]::-webkit-search-cancel-button
+		),
+	:global(.universal-search-input[type="search"]::-webkit-search-decoration) {
 		-webkit-appearance: none;
 		appearance: none;
 		display: none;
 	}
 
-	:global(.universal-search-input[type='search']::-ms-clear),
-	:global(.universal-search-input[type='search']::-ms-reveal) {
+	:global(.universal-search-input[type="search"]::-ms-clear),
+	:global(.universal-search-input[type="search"]::-ms-reveal) {
 		display: none;
 		width: 0;
 		height: 0;
