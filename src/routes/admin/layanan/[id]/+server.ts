@@ -4,7 +4,7 @@ import { deleteMonitoringPengajuan, updateMonitoringPengajuan } from '$lib/serve
 import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import {
 	INTEGRASI_STATUS_VALUES,
-	STATUS_VALUES,
+	isStatusPengajuan,
 	type IntegrasiStatus,
 	type StatusPengajuan
 } from '$lib/supabase/constants'
@@ -174,7 +174,7 @@ const patchPengajuan = async (supabase: SupabaseClient<Database>, id: string, bo
 		return json({ message: 'Format tanggal update harus YYYY-MM-DD' }, { status: 400 })
 	}
 
-	if (hasStatusField && status && !STATUS_VALUES.includes(status)) {
+	if (hasStatusField && status && !isStatusPengajuan(status)) {
 		return json({ message: 'Status tidak valid' }, { status: 400 })
 	}
 

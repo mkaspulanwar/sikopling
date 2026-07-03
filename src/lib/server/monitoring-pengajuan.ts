@@ -1,4 +1,10 @@
-import { LAYANAN_VALUES, STATUS_VALUES, type Layanan, type StatusPengajuan } from '$lib/supabase/constants'
+import {
+	LAYANAN_VALUES,
+	isStatusPengajuanForLayanan,
+	isPerlingStatusValidForJenis,
+	type Layanan,
+	type StatusPengajuan
+} from '$lib/supabase/constants'
 import type { Database } from '$lib/supabase/database.types'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -27,6 +33,11 @@ type MonitoringBaseRow = Omit<Database['public']['Tables']['monitoring_perling']
 	jenis_layanan: string | null
 }
 type MonitoringPengajuanRow = MonitoringBaseRow & { layanan: Layanan }
+type MonitoringPengajuanContext = {
+	layanan: Layanan
+	jenisLayanan: string | null
+	status: StatusPengajuan
+}
 
 const LAYANAN_TABLE_MAP: Record<Layanan, MonitoringTableName> = {
 	perling: 'monitoring_perling',
@@ -39,11 +50,12 @@ const JENIS_COLUMN_MAP = {
 } as const satisfies Record<Layanan, 'jenis_perling' | 'jenis_pertek'>
 
 const STATUS_SELESAI: StatusPengajuan = 'SK Terbit'
-const STATUS_DITOLAK: StatusPengajuan = 'Ditolak'
+const STATUS_DITOLAK = 'Ditolak'
 const STATUS_PERLU_PERBAIKAN: StatusPengajuan[] = [
 	'Perbaikan Uji Administrasi',
 	'Belum Submit Perbaikan',
-	'Dikembalikan'
+	'Dikembalikan',
+	'Perbaikan Uji Adminstrasi FKA'
 ]
 
 const MONITORING_BASE_COLUMNS =
@@ -132,10 +144,19 @@ const normalizeCount = (value: unknown) => {
 const mapRowsWithLayanan = (rows: MonitoringBaseRow[] | null, layanan: Layanan): MonitoringPengajuanRow[] =>
 	(rows ?? []).map((row) => ({ ...row, layanan }))
 
+const isStatusValidForPengajuan = (
+	layanan: Layanan,
+	jenisLayanan: string | null | undefined,
+	status: string
+) => {
+	if (layanan === 'perling') return isPerlingStatusValidForJenis(jenisLayanan, status)
+	return isStatusPengajuanForLayanan(layanan, status)
+}
+
 const applyCommonFilters = <T>(query: T, params: ListMonitoringPengajuanParams, layanan: Layanan) => {
 	let nextQuery = query as any
 
-	if (params.status && STATUS_VALUES.includes(params.status)) {
+	if (params.status && isStatusPengajuanForLayanan(layanan, params.status)) {
 		nextQuery = nextQuery.eq('status', params.status)
 	}
 
@@ -187,16 +208,30 @@ const sortRows = (rows: MonitoringPengajuanRow[], sortBy: SortColumn, sortOrder:
 		return sortOrder === 'asc' ? comparison : -comparison
 	})
 
-const resolveLayananById = async (supabase: SupabaseClient<Database>, id: string): Promise<Layanan | null> => {
+const resolvePengajuanContextById = async (
+	supabase: SupabaseClient<Database>,
+	id: string
+): Promise<MonitoringPengajuanContext | null> => {
 	const checks = await Promise.all([
-		supabase.from('monitoring_perling').select('id').eq('id', id).maybeSingle(),
-		supabase.from('monitoring_pertek').select('id').eq('id', id).maybeSingle()
+		supabase.from('monitoring_perling').select('id, jenis_perling, status').eq('id', id).maybeSingle(),
+		supabase.from('monitoring_pertek').select('id, jenis_pertek, status').eq('id', id).maybeSingle()
 	])
 
 	for (const [index, result] of checks.entries()) {
 		if (result.error) throw result.error
 		if (result.data?.id) {
-			return index === 0 ? 'perling' : 'pertek'
+			if (index === 0) {
+				return {
+					layanan: 'perling',
+					jenisLayanan: (result.data as { jenis_perling: string | null }).jenis_perling,
+					status: (result.data as { status: StatusPengajuan }).status
+				}
+			}
+			return {
+				layanan: 'pertek',
+				jenisLayanan: (result.data as { jenis_pertek: string | null }).jenis_pertek,
+				status: (result.data as { status: StatusPengajuan }).status
+			}
 		}
 	}
 
@@ -365,14 +400,14 @@ export const updateStatusMonitoringPengajuan = async (
 		posisi?: string | null
 	}
 ) => {
-	if (!STATUS_VALUES.includes(payload.status)) {
+	const context = await resolvePengajuanContextById(supabase, payload.id)
+	if (!context) throw new Error('PENGAJUAN_NOT_FOUND')
+
+	if (!isStatusValidForPengajuan(context.layanan, context.jenisLayanan, payload.status)) {
 		throw new Error('Status pengajuan tidak valid')
 	}
 
-	const layanan = await resolveLayananById(supabase, payload.id)
-	if (!layanan) throw new Error('PENGAJUAN_NOT_FOUND')
-
-	const tableName = LAYANAN_TABLE_MAP[layanan]
+	const tableName = LAYANAN_TABLE_MAP[context.layanan]
 
 	const { data, error } = await supabase
 		.from(tableName as 'monitoring_perling')
@@ -382,11 +417,11 @@ export const updateStatusMonitoringPengajuan = async (
 			tanggal_update: new Date().toISOString().slice(0, 10)
 		})
 		.eq('id', payload.id)
-		.select(getSelectColumns(layanan))
+		.select(getSelectColumns(context.layanan))
 		.single()
 
 	if (error) throw error
-	return { ...(data as unknown as MonitoringBaseRow), layanan }
+	return { ...(data as unknown as MonitoringBaseRow), layanan: context.layanan }
 }
 
 export const createMonitoringPengajuan = async (
@@ -410,6 +445,15 @@ export const createMonitoringPengajuan = async (
 	const normalizedNoRegistrasi = normalizeNoRegistrasi(payload.noRegistrasi)
 	const tableName = LAYANAN_TABLE_MAP[payload.layanan]
 	const jenisColumn = getJenisColumn(payload.layanan)
+	const normalizedJenisLayanan = payload.jenisLayanan?.trim() || null
+	const defaultStatus =
+		payload.layanan === 'perling' && isPerlingStatusValidForJenis(normalizedJenisLayanan, 'Submit FKA')
+			? 'Submit FKA'
+			: 'Submit / Masuk'
+
+	if (payload.status && !isStatusValidForPengajuan(payload.layanan, normalizedJenisLayanan, payload.status)) {
+		throw new Error('Status pengajuan tidak valid')
+	}
 
 	const { data, error } = await (supabase.from(tableName) as any)
 		.insert({
@@ -417,9 +461,9 @@ export const createMonitoringPengajuan = async (
 			tanggal_masuk: payload.tanggalMasuk ?? null,
 			instansi: payload.instansi?.trim() || null,
 			kegiatan: payload.kegiatan?.trim() || null,
-			[jenisColumn]: payload.jenisLayanan?.trim() || null,
+			[jenisColumn]: normalizedJenisLayanan,
 			posisi: payload.posisi?.trim() || null,
-			status: payload.status ?? 'Submit / Masuk',
+			status: payload.status ?? defaultStatus,
 			tanggal_update: payload.tanggalUpdate ?? null
 		})
 		.select(getSelectColumns(payload.layanan))
@@ -443,9 +487,10 @@ export const updateMonitoringPengajuan = async (
 		status?: StatusPengajuan
 	}
 ) => {
-	const layanan = await resolveLayananById(supabase, payload.id)
-	if (!layanan) throw new Error('PENGAJUAN_NOT_FOUND')
+	const context = await resolvePengajuanContextById(supabase, payload.id)
+	if (!context) throw new Error('PENGAJUAN_NOT_FOUND')
 
+	const layanan = context.layanan
 	const jenisColumn = getJenisColumn(layanan)
 	const updates: Record<string, unknown> = {}
 
@@ -478,10 +523,20 @@ export const updateMonitoringPengajuan = async (
 	}
 
 	if (payload.status !== undefined) {
-		if (!STATUS_VALUES.includes(payload.status)) {
+		const nextJenisLayanan =
+			payload.jenisLayanan !== undefined ? payload.jenisLayanan?.trim() || null : context.jenisLayanan
+		if (!isStatusValidForPengajuan(layanan, nextJenisLayanan, payload.status)) {
 			throw new Error('Status pengajuan tidak valid')
 		}
 		updates.status = payload.status
+	} else if (payload.jenisLayanan !== undefined) {
+		const nextJenisLayanan = payload.jenisLayanan?.trim() || null
+		if (!isStatusValidForPengajuan(layanan, nextJenisLayanan, context.status)) {
+			updates.status =
+				layanan === 'perling' && isPerlingStatusValidForJenis(nextJenisLayanan, 'Submit FKA')
+					? 'Submit FKA'
+					: 'Submit / Masuk'
+		}
 	}
 
 	if (Object.keys(updates).length === 0) {
@@ -504,12 +559,12 @@ export const deleteMonitoringPengajuan = async (
 	supabase: SupabaseClient<Database>,
 	payload: { id: string }
 ) => {
-	const layanan = await resolveLayananById(supabase, payload.id)
-	if (!layanan) {
+	const context = await resolvePengajuanContextById(supabase, payload.id)
+	if (!context) {
 		throw new Error('PENGAJUAN_NOT_FOUND')
 	}
 
-	const tableName = LAYANAN_TABLE_MAP[layanan]
+	const tableName = LAYANAN_TABLE_MAP[context.layanan]
 
 	const { data: existingRow, error: existingError } = await supabase
 		.from(tableName)

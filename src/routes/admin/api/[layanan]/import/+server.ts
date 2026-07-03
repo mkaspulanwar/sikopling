@@ -1,4 +1,8 @@
-import { INTEGRASI_STATUS_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
+import {
+	INTEGRASI_STATUS_VALUES,
+	isStatusPengajuan,
+	type StatusPengajuan
+} from '$lib/supabase/constants'
 import { isLayanan, requireAdminSupabase } from '$lib/server/admin-route'
 import { createMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import { json } from '@sveltejs/kit'
@@ -173,8 +177,9 @@ export const POST: RequestHandler = async ({ locals, params, request }) => {
 		])
 		const posisi = readCell(row, columnMap, 'posisi')
 		const statusRaw = readCell(row, columnMap, 'status')
-		const status = STATUS_VALUES.includes(statusRaw as (typeof STATUS_VALUES)[number])
-			? (statusRaw as (typeof STATUS_VALUES)[number])
+		const status =
+			statusRaw && isStatusPengajuan(statusRaw)
+				? (statusRaw as StatusPengajuan)
 			: undefined
 
 		if (!noRegistrasi) {

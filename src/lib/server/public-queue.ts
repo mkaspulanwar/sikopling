@@ -1,7 +1,15 @@
 import { env as privateEnv } from '$env/dynamic/private'
 import { env as publicEnv } from '$env/dynamic/public'
 import { createClient } from '@supabase/supabase-js'
-import { INTEGRASI_STATUS_VALUES, type IntegrasiStatus } from '$lib/supabase/constants'
+import {
+	INTEGRASI_STATUS_VALUES,
+	PERLING_AMDAL_STATUS_VALUES,
+	PERLING_NON_AMDAL_STATUS_VALUES,
+	PERLING_STATUS_VALUES,
+	isAmdalJenisPerling,
+	type IntegrasiStatus,
+	type PerlingStatus
+} from '$lib/supabase/constants'
 import type { Database } from '$lib/supabase/database.types'
 
 type LayananType = 'perling' | 'pertek'
@@ -78,37 +86,73 @@ const asQueuePosition = (value: string | null): PublicQueueRow['position'] => {
 	return normalized
 }
 
-const mapPerlingStatus = (status: string): string => {
+const mapPerlingAmdalStatus = (status: string): PerlingStatus => {
+	if ((PERLING_AMDAL_STATUS_VALUES as readonly string[]).includes(status)) {
+		return status as PerlingStatus
+	}
+
 	switch (status) {
 		case 'Submit / Masuk':
 		case 'Masuk':
-			return 'Submit'
+			return 'Submit FKA'
 		case 'Penilaian KA':
 		case 'Verifikasi':
-			return 'Penilaian KA'
+		case 'Uji Administrasi':
+			return 'Uji Administrasi FKA'
 		case 'Perbaikan Uji Administrasi':
 		case 'Perbaikan':
-			return 'Perbaikan Uji Administrasi'
+		case 'Belum Submit Perbaikan':
+		case 'Dikembalikan':
+		case 'Ditolak':
+			return 'Perbaikan Uji Adminstrasi FKA'
 		case 'Penjadwalan Rapat':
 		case 'Penjadwalan':
-			return 'Penjadwalan Rapat'
+			return 'Penjadwalan Rapat FKA'
 		case 'Pasca Sidang':
-			return 'Pasca Sidang'
-		case 'Dikembalikan':
-			return 'Dikembalikan'
-		case 'Ditolak':
-			return 'Ditolak'
-		case 'Belum Submit Perbaikan':
-			return 'Perbaikan Uji Administrasi'
-		case 'Uji Administrasi':
-			return 'Penilaian KA'
+			return 'Pasca Sidang FKA'
+		case 'Drafting SK':
+			return 'Drafting SK'
 		case 'Selesai':
 		case 'SK Terbit':
-			return 'SK terbit'
+			return 'SK Terbit'
 		default:
-			return 'Submit'
+			return 'Submit FKA'
 	}
 }
+
+const mapPerlingNonAmdalStatus = (status: string): PerlingStatus => {
+	if ((PERLING_NON_AMDAL_STATUS_VALUES as readonly string[]).includes(status)) {
+		return status as PerlingStatus
+	}
+
+	switch (status) {
+		case 'Submit FKA':
+		case 'Masuk':
+			return 'Submit / Masuk'
+		case 'Uji Administrasi FKA':
+			return 'Uji Administrasi'
+		case 'Perbaikan Uji Adminstrasi FKA':
+		case 'Perbaikan':
+			return 'Perbaikan Uji Administrasi'
+		case 'Penjadwalan Rapat FKA':
+		case 'Penjadwalan':
+		case 'Penjadwalan Rapat Teknis':
+		case 'Penjadwalan Rapat Komisi':
+			return 'Penjadwalan Rapat'
+		case 'Pasca Sidang FKA':
+		case 'Pasca Sidang Andal RKL-RPL':
+			return 'Pasca Sidang'
+		case 'Selesai':
+			return 'SK Terbit'
+		default:
+			return 'Submit / Masuk'
+	}
+}
+
+const mapPerlingStatus = (status: string, jenisLayanan: string | null): PerlingStatus =>
+	isAmdalJenisPerling(jenisLayanan)
+		? mapPerlingAmdalStatus(status)
+		: mapPerlingNonAmdalStatus(status)
 
 const mapPertekStatus = (status: string): string => {
 	switch (status) {
@@ -174,7 +218,10 @@ export const getPublicQueueRows = async (layanan: LayananType, serverFetch: Serv
 		activity: row.kegiatan ?? '-',
 		documentType: row.jenis_layanan ?? '-',
 		position: asQueuePosition(row.posisi),
-		progressStatus: layanan === 'perling' ? mapPerlingStatus(row.status) : mapPertekStatus(row.status),
+		progressStatus:
+			layanan === 'perling'
+				? mapPerlingStatus(row.status, row.jenis_layanan)
+				: mapPertekStatus(row.status),
 		progressUpdatedDate: row.tanggal_update ?? row.tanggal_masuk ?? new Date().toISOString().slice(0, 10)
 	}))
 }

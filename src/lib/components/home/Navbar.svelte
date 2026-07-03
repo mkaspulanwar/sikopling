@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
 	import { onMount, tick } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { cubicInOut } from 'svelte/easing';

@@ -16,7 +16,7 @@ import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import {
 	INTEGRASI_STATUS_VALUES,
 	LAYANAN_VALUES,
-	STATUS_VALUES,
+	isStatusPengajuan,
 	type IntegrasiStatus,
 	type StatusPengajuan
 } from '$lib/supabase/constants'
@@ -138,7 +138,7 @@ const parseBulkDeletePayload = (body: unknown): BulkDeletePayload | null => {
 				? typeof payload.status === 'string' && INTEGRASI_STATUS_VALUES.includes(payload.status as IntegrasiStatus)
 					? (payload.status as IntegrasiStatus)
 					: undefined
-				: typeof payload.status === 'string' && STATUS_VALUES.includes(payload.status as StatusPengajuan)
+				: typeof payload.status === 'string' && isStatusPengajuan(payload.status)
 					? (payload.status as StatusPengajuan)
 					: undefined
 		const sortBy = typeof payload.sortBy === 'string' ? payload.sortBy : undefined
@@ -358,7 +358,7 @@ export const POST: RequestHandler = async ({ locals, request }) => {
 		return json({ message: 'Format tanggal update harus YYYY-MM-DD' }, { status: 400 })
 	}
 
-	if (status && !STATUS_VALUES.includes(status)) {
+	if (status && !isStatusPengajuan(status)) {
 		return json({ message: 'Status tidak valid' }, { status: 400 })
 	}
 
@@ -403,7 +403,7 @@ export const PATCH: RequestHandler = async ({ locals, request }) => {
 		return json({ message: 'id wajib diisi' }, { status: 400 })
 	}
 
-	if (!body?.status || !STATUS_VALUES.includes(body.status)) {
+	if (!body?.status || typeof body.status !== 'string' || !isStatusPengajuan(body.status)) {
 		return json({ message: 'status tidak valid' }, { status: 400 })
 	}
 

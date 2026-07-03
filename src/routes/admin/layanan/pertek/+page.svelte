@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/state'
-	import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
+	import { PERTEK_STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
 	import PositionDropdown from '$lib/components/admin/PositionDropdown.svelte'
 	import StatusDropdown from '$lib/components/admin/StatusDropdown.svelte'
 	import { cubicOut } from 'svelte/easing'
@@ -53,7 +53,8 @@
 
 	const numberFormatter = new Intl.NumberFormat('id-ID')
 
-	const statusBadgeClassMap: Record<StatusPengajuan, string> = {
+	const defaultStatusBadgeClass = 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]'
+	const statusBadgeClassMap: Partial<Record<StatusPengajuan, string>> = {
 		'Submit / Masuk': 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]',
 		'Perbaikan Uji Administrasi': 'border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]',
 		'Penjadwalan Rapat': 'border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]',
@@ -178,7 +179,7 @@
 
 	const formatDate = (value: string | null) => (value ? dateFormatter.format(new Date(`${value}T00:00:00`)) : '-')
 	const formatNumber = (value: number) => numberFormatter.format(value)
-	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status]
+	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status] ?? defaultStatusBadgeClass
 	const refreshPage = async () => {
 		await Promise.all([invalidate('admin:summary'), invalidate('admin:pertek')])
 	}
@@ -1094,7 +1095,7 @@
 						<span class="text-xs font-semibold text-slate-600">Status</span>
 						<StatusDropdown
 							bind:value={createForm.status}
-							options={STATUS_VALUES}
+							options={PERTEK_STATUS_VALUES}
 							disabled={isSavingCreate || data.unavailable}
 						/>
 					</label>
@@ -1179,7 +1180,7 @@
 						<span class="text-xs font-semibold text-slate-600">Status</span>
 						<StatusDropdown
 							bind:value={editForm.status}
-							options={STATUS_VALUES}
+							options={PERTEK_STATUS_VALUES}
 							disabled={isSavingEdit || data.unavailable}
 						/>
 					</label>
@@ -1281,7 +1282,6 @@
 		</div>
 	</div>
 {/if}
-
 
 
 

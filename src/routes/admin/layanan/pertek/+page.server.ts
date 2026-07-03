@@ -28,7 +28,7 @@ const normalizePertekPageSize = (value: string | null) => {
 export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
 	depends('admin:pertek')
 
-	const baseFilters = readAdminFilters(url.searchParams)
+	const baseFilters = readAdminFilters(url.searchParams, 'pertek')
 	const filters = {
 		...baseFilters,
 		pageSize: normalizePertekPageSize(url.searchParams.get('pageSize'))

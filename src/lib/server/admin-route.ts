@@ -1,5 +1,10 @@
 import { dev } from '$app/environment'
-import { STATUS_VALUES, type Layanan, type StatusPengajuan } from '$lib/supabase/constants'
+import {
+	isStatusPengajuan,
+	isStatusPengajuanForLayanan,
+	type Layanan,
+	type StatusPengajuan
+} from '$lib/supabase/constants'
 import type { Database } from '$lib/supabase/database.types'
 import { isAdminRole, resolveUserRole } from '$lib/server/supabase-auth'
 import type { SupabaseClient } from '@supabase/supabase-js'
@@ -71,16 +76,24 @@ const readSortBy = (value: string | null): SortableColumn => {
 
 const readSortOrder = (value: string | null): SortOrder => (value === 'asc' ? 'asc' : 'desc')
 
-export const readAdminFilters = (query: URLSearchParams): AdminListFilters => ({
-	page: Math.max(1, readNumber(query.get('page'), 1)),
-	pageSize: Math.min(100, Math.max(5, readNumber(query.get('pageSize'), 20))),
-	keyword: readString(query.get('keyword')),
-	status: STATUS_VALUES.includes(query.get('status') as StatusPengajuan)
-		? (query.get('status') as StatusPengajuan)
-		: undefined,
-	sortBy: readSortBy(query.get('sortBy')),
-	sortOrder: readSortOrder(query.get('sortOrder'))
-})
+const readStatus = (value: string | null, layanan?: Layanan): StatusPengajuan | undefined => {
+	if (!value) return undefined
+	if (layanan) {
+		return isStatusPengajuanForLayanan(layanan, value) ? value : undefined
+	}
+	return isStatusPengajuan(value) ? value : undefined
+}
+
+export const readAdminFilters = (query: URLSearchParams, layanan?: Layanan): AdminListFilters => {
+	return {
+		page: Math.max(1, readNumber(query.get('page'), 1)),
+		pageSize: Math.min(100, Math.max(5, readNumber(query.get('pageSize'), 20))),
+		keyword: readString(query.get('keyword')),
+		status: readStatus(query.get('status'), layanan),
+		sortBy: readSortBy(query.get('sortBy')),
+		sortOrder: readSortOrder(query.get('sortOrder'))
+	}
+}
 
 export const isLayanan = (value: string): value is Layanan => value === 'perling' || value === 'pertek'
 

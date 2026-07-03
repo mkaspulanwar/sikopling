@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { PERLING_STATUS_VALUES, type PerlingStatus } from "$lib/supabase/constants";
 	import ChevronDown from "lucide-svelte/icons/chevron-down";
 	import ChevronLeft from "lucide-svelte/icons/chevron-left";
 	import ChevronRight from "lucide-svelte/icons/chevron-right";
@@ -7,15 +8,7 @@
 	import Search from "lucide-svelte/icons/search";
 	import X from "lucide-svelte/icons/x";
 
-	type ProgressStatus =
-		| "SK terbit"
-		| "Perbaikan Uji Administrasi"
-		| "Pasca Sidang"
-		| "Penilaian KA"
-		| "Penjadwalan Rapat"
-		| "Dikembalikan"
-		| "Ditolak"
-		| "Submit";
+	type ProgressStatus = PerlingStatus;
 	type QueuePosition = string;
 
 	type QueueRow = {
@@ -86,14 +79,7 @@
 	];
 	const statusOptions: Array<"Semua Status" | ProgressStatus> = [
 		"Semua Status",
-		"SK terbit",
-		"Perbaikan Uji Administrasi",
-		"Pasca Sidang",
-		"Penilaian KA",
-		"Penjadwalan Rapat",
-		"Dikembalikan",
-		"Ditolak",
-		"Submit",
+		...PERLING_STATUS_VALUES,
 	];
 	const positionFilterOptions: Array<{
 		label: string;
@@ -116,15 +102,31 @@
 	const escapeCsvValue = (value: string) =>
 		`"${value.replaceAll('"', '""')}"`;
 	const statusBadgeClassMap: Record<ProgressStatus, string> = {
-		"SK terbit": "border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]",
+		"Submit FKA": "border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]",
+		"Uji Administrasi FKA": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
+		"Perbaikan Uji Adminstrasi FKA":
+			"border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]",
+		"Penjadwalan Rapat FKA": "border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]",
+		"Pasca Sidang FKA": "border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]",
+		"Submit Andal RKL-RPL": "border-[#bcc7d8] bg-[#f4f7fb] text-[#334155]",
+		"Uji Administrasi Andal RKL-RPL": "border-[#96c0d6] bg-[#edf8fb] text-[#1f596c]",
+		"Penjadwalan Rapat Teknis": "border-[#b8c78a] bg-[#f5f9e8] text-[#59651f]",
+		"Penjadwalan Rapat Komisi": "border-[#c7aa82] bg-[#fff5e8] text-[#71501f]",
+		"Pasca Sidang Andal RKL-RPL": "border-[#b4a0d8] bg-[#f4efff] text-[#4a2f80]",
+		"Drafting SK": "border-[#a8b8d6] bg-[#edf2ff] text-[#274472]",
+		"SK Terbit": "border-[#91c5ad] bg-[#e8f7ef] text-[#1f6d46]",
+		"Submit / Masuk": "border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]",
 		"Perbaikan Uji Administrasi":
 			"border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]",
-		"Pasca Sidang": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
-		"Penilaian KA": "border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]",
 		"Penjadwalan Rapat": "border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]",
-		Dikembalikan: "border-[#d9a98a] bg-[#fff1e8] text-[#8a4522]",
+		"Belum Submit Perbaikan": "border-[#e8b5a3] bg-[#fff2ed] text-[#8a3a2f]",
+		"Uji Administrasi": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
 		Ditolak: "border-[#e1a5a5] bg-[#fff0f0] text-[#8c2f2f]",
-		Submit: "border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]",
+		"Pasca Sidang": "border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]",
+		"Evaluasi Dokumen": "border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]",
+		Hold: "border-[#d5d8de] bg-[#f4f5f7] text-[#4b5563]",
+		Dikembalikan: "border-[#d9a98a] bg-[#fff1e8] text-[#8a4522]",
+		"Penilaian KA": "border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]",
 	};
 	const getStatusBadgeClass = (status: ProgressStatus) =>
 		statusBadgeClassMap[status];

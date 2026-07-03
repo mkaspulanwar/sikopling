@@ -1,7 +1,11 @@
 <script lang="ts">
 	import { goto, invalidate } from '$app/navigation'
 	import { page } from '$app/state'
-	import { STATUS_VALUES, type StatusPengajuan } from '$lib/supabase/constants'
+	import {
+		JENIS_PERLING_CATEGORY_VALUES,
+		getPerlingStatusValuesForJenis,
+		type StatusPengajuan
+	} from '$lib/supabase/constants'
 	import PositionDropdown from '$lib/components/admin/PositionDropdown.svelte'
 	import StatusDropdown from '$lib/components/admin/StatusDropdown.svelte'
 	import { cubicOut } from 'svelte/easing'
@@ -53,7 +57,18 @@
 
 	const numberFormatter = new Intl.NumberFormat('id-ID')
 
-	const statusBadgeClassMap: Record<StatusPengajuan, string> = {
+	const defaultStatusBadgeClass = 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]'
+	const statusBadgeClassMap: Partial<Record<StatusPengajuan, string>> = {
+		'Submit FKA': 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]',
+		'Uji Administrasi FKA': 'border-[#9cb6de] bg-[#edf4ff] text-[#1f4e8c]',
+		'Perbaikan Uji Adminstrasi FKA': 'border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]',
+		'Penjadwalan Rapat FKA': 'border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]',
+		'Pasca Sidang FKA': 'border-[#b6a6dd] bg-[#f4efff] text-[#4a2f80]',
+		'Submit Andal RKL-RPL': 'border-[#bcc7d8] bg-[#f4f7fb] text-[#334155]',
+		'Uji Administrasi Andal RKL-RPL': 'border-[#96c0d6] bg-[#edf8fb] text-[#1f596c]',
+		'Penjadwalan Rapat Teknis': 'border-[#b8c78a] bg-[#f5f9e8] text-[#59651f]',
+		'Penjadwalan Rapat Komisi': 'border-[#c7aa82] bg-[#fff5e8] text-[#71501f]',
+		'Pasca Sidang Andal RKL-RPL': 'border-[#b4a0d8] bg-[#f4efff] text-[#4a2f80]',
 		'Submit / Masuk': 'border-[#bfc8d7] bg-[#f4f6f9] text-[#364152]',
 		'Perbaikan Uji Administrasi': 'border-[#e3b985] bg-[#fff4e5] text-[#8a5a1e]',
 		'Penjadwalan Rapat': 'border-[#9bcfd5] bg-[#eaf8fa] text-[#1f5f69]',
@@ -75,9 +90,9 @@
 		tanggal_update: '',
 		instansi: '',
 		kegiatan: '',
-		jenis_layanan: '',
+		jenis_layanan: 'AMDAL',
 		posisi: 'Penyusun',
-		status: 'Submit / Masuk'
+		status: 'Submit FKA'
 	})
 	const ROWS_PER_PAGE_OPTIONS = [5, 10, 20] as const
 	type RowsPerPageOption = (typeof ROWS_PER_PAGE_OPTIONS)[number]
@@ -107,6 +122,14 @@
 		posisi: form.posisi,
 		status: form.status
 	})
+	const resolveStatusOptions = (jenisPerling: string) =>
+		getPerlingStatusValuesForJenis(jenisPerling)
+	const normalizeStatusForJenis = (form: QueueForm) => {
+		const options = resolveStatusOptions(form.jenis_layanan)
+		if (!(options as readonly string[]).includes(form.status)) {
+			form.status = options[0] as StatusPengajuan
+		}
+	}
 
 	let flash = $state<FlashState>(null)
 	let isImporting = $state(false)
@@ -178,10 +201,20 @@
 
 	const formatDate = (value: string | null) => (value ? dateFormatter.format(new Date(`${value}T00:00:00`)) : '-')
 	const formatNumber = (value: number) => numberFormatter.format(value)
-	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status]
+	const getStatusBadgeClass = (status: StatusPengajuan) => statusBadgeClassMap[status] ?? defaultStatusBadgeClass
+	const createStatusOptions = $derived(resolveStatusOptions(createForm.jenis_layanan))
+	const editStatusOptions = $derived(resolveStatusOptions(editForm.jenis_layanan))
 	const refreshPage = async () => {
 		await Promise.all([invalidate('admin:summary'), invalidate('admin:perling')])
 	}
+
+	$effect(() => {
+		if (isCreateModalOpen) normalizeStatusForJenis(createForm)
+	})
+
+	$effect(() => {
+		if (isEditModalOpen) normalizeStatusForJenis(editForm)
+	})
 
 	const buildListUrl = (params: URLSearchParams) => {
 		const queryString = params.toString()
@@ -1094,7 +1127,7 @@
 						<span class="text-xs font-semibold text-slate-600">Status</span>
 						<StatusDropdown
 							bind:value={createForm.status}
-							options={STATUS_VALUES}
+							options={createStatusOptions}
 							disabled={isSavingCreate || data.unavailable}
 						/>
 					</label>
@@ -1134,7 +1167,14 @@
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Jenis Perling</span>
-						<input type="text" bind:value={createForm.jenis_layanan} placeholder="Contoh: AMDAL" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+						<PositionDropdown
+							bind:value={createForm.jenis_layanan}
+							options={JENIS_PERLING_CATEGORY_VALUES}
+							disabled={isSavingCreate || data.unavailable}
+							customLabel="Lainnya"
+							placeholder="Isi jenis perling"
+							placement="bottom"
+						/>
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
@@ -1179,7 +1219,7 @@
 						<span class="text-xs font-semibold text-slate-600">Status</span>
 						<StatusDropdown
 							bind:value={editForm.status}
-							options={STATUS_VALUES}
+							options={editStatusOptions}
 							disabled={isSavingEdit || data.unavailable}
 						/>
 					</label>
@@ -1219,7 +1259,14 @@
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Jenis Perling</span>
-						<input type="text" bind:value={editForm.jenis_layanan} placeholder="Contoh: AMDAL" class="h-11 rounded-lg border border-[#c9dcb8] bg-white px-3 text-sm text-slate-700 transition focus:border-[#8fbd6d] focus:outline-none focus:ring-0 focus:shadow-none" />
+						<PositionDropdown
+							bind:value={editForm.jenis_layanan}
+							options={JENIS_PERLING_CATEGORY_VALUES}
+							disabled={isSavingEdit || data.unavailable}
+							customLabel="Lainnya"
+							placeholder="Isi jenis perling"
+							placement="bottom"
+						/>
 					</label>
 					<label class="grid gap-1.5 sm:col-span-2">
 						<span class="text-xs font-semibold text-slate-600">Posisi</span>
@@ -1281,8 +1328,6 @@
 		</div>
 	</div>
 {/if}
-
-
 
 
 

@@ -28,7 +28,7 @@ const normalizeDoklingPageSize = (value: string | null) => {
 export const load: PageServerLoad = async ({ locals, url, parent, depends }) => {
 	depends('admin:perling')
 
-	const baseFilters = readAdminFilters(url.searchParams)
+	const baseFilters = readAdminFilters(url.searchParams, 'perling')
 	const filters = {
 		...baseFilters,
 		pageSize: normalizeDoklingPageSize(url.searchParams.get('pageSize'))

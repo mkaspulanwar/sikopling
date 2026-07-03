@@ -1,4 +1,8 @@
-import { INTEGRASI_STATUS_VALUES, STATUS_VALUES } from '$lib/supabase/constants'
+import {
+	INTEGRASI_STATUS_VALUES,
+	isStatusPengajuan,
+	type StatusPengajuan
+} from '$lib/supabase/constants'
 import { isLayanan, requireAdminSupabase } from '$lib/server/admin-route'
 import { listMonitoringPengajuan } from '$lib/server/monitoring-pengajuan'
 import { error } from '@sveltejs/kit'
@@ -156,8 +160,9 @@ export const GET: RequestHandler = async ({ locals, params, url }) => {
 
 	const keyword = url.searchParams.get('keyword')?.trim() || undefined
 	const statusRaw = url.searchParams.get('status')
-	const status = STATUS_VALUES.includes(statusRaw as (typeof STATUS_VALUES)[number])
-		? (statusRaw as (typeof STATUS_VALUES)[number])
+	const status =
+		statusRaw && isStatusPengajuan(statusRaw)
+			? (statusRaw as StatusPengajuan)
 		: undefined
 
 	const allRows: Awaited<ReturnType<typeof listMonitoringPengajuan>>['data'] = []
