@@ -56,6 +56,7 @@
 	})
 
 	let dashboardPreferences = $state<AdminDashboardPreferences>({ ...DEFAULT_ADMIN_DASHBOARD_PREFERENCES })
+	let recentSearchKeyword = $state('')
 
 	const numberFormatter = new Intl.NumberFormat('id-ID')
 	const formatDateTime = (value: string | null) => {
@@ -101,6 +102,20 @@
 				.join('') || 'AS'
 	)
 	const recentRows = $derived.by(() => data.recentResult.data.slice(0, dashboardPreferences.recentItemsLimit))
+	const filteredRecentRows = $derived.by(() => {
+		const keyword = recentSearchKeyword.trim().toLowerCase()
+		if (!keyword) return recentRows
+		return recentRows.filter((row) =>
+			[
+				row.no_registrasi,
+				row.layanan,
+				row.status,
+				formatDateTime(row.updated_at)
+			]
+				.filter(Boolean)
+				.some((value) => String(value).toLowerCase().includes(keyword))
+		)
+	})
 	const summaryCardClass = $derived.by(
 		() =>
 			`rounded-xl border border-[#d7dee8] bg-white text-center ${
@@ -261,13 +276,25 @@
 		<section class="rounded-2xl border border-(--line) bg-[var(--surface)] p-4 sm:p-5">
 			<div class="flex flex-wrap items-center justify-between gap-2">
 				<h2 class="text-base font-semibold text-[var(--ink)] sm:text-lg">Pengajuan Terbaru</h2>
-				<a
-					href="/admin/layanan/perling"
-					class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--muted)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
-				>
-					Lihat antrian
-					<ArrowRight class="h-3.5 w-3.5" />
-				</a>
+				<div class="flex min-w-0 flex-1 flex-wrap items-center justify-end gap-2">
+					<label class="flex h-9 min-w-[13rem] flex-1 items-center gap-2 rounded-xl border border-[var(--line)] bg-white px-3 text-[var(--muted)] transition focus-within:border-[#64AD31] sm:max-w-xs">
+						<Search class="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+						<input
+							type="search"
+							bind:value={recentSearchKeyword}
+							placeholder="Cari pengajuan"
+							class="min-w-0 flex-1 border-0 bg-transparent text-xs font-medium text-[var(--ink)] outline-none ring-0 shadow-none focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none placeholder:text-[var(--muted)]"
+							aria-label="Cari pengajuan terbaru"
+						/>
+					</label>
+					<a
+						href="/admin/layanan/perling"
+						class="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-3 text-xs font-semibold text-[var(--muted)] transition hover:bg-[var(--accent-soft)] hover:text-[var(--ink)]"
+					>
+						Lihat antrian
+						<ArrowRight class="h-3.5 w-3.5" />
+					</a>
+				</div>
 			</div>
 
 			<div class="mt-3 overflow-hidden rounded-xl border border-(--line)">
@@ -281,12 +308,12 @@
 						</tr>
 					</thead>
 					<tbody>
-						{#if recentRows.length === 0}
+						{#if filteredRecentRows.length === 0}
 							<tr class="border-t border-[var(--line)]">
 								<td colspan="4" class="px-3 py-8 text-center text-sm text-[var(--muted)]">Belum ada data pengajuan.</td>
 							</tr>
 						{:else}
-							{#each recentRows as row}
+							{#each filteredRecentRows as row}
 								<tr class="border-t border-[var(--line)]">
 									<td class="px-3 py-2.5 text-sm font-semibold text-[var(--ink)]">{row.no_registrasi}</td>
 									<td class="px-3 py-2.5 text-sm uppercase text-[var(--muted)]">{row.layanan}</td>
@@ -299,10 +326,10 @@
 				</table>
 
 				<div class="space-y-2 p-3 md:hidden">
-					{#if recentRows.length === 0}
+					{#if filteredRecentRows.length === 0}
 						<p class="px-2 py-6 text-center text-sm text-[var(--muted)]">Belum ada data pengajuan.</p>
 					{:else}
-						{#each recentRows as row}
+						{#each filteredRecentRows as row}
 							<div class="rounded-xl border border-[var(--line)] bg-[var(--surface)] p-3">
 								<p class="text-sm font-semibold text-[var(--ink)]">{row.no_registrasi}</p>
 								<p class="mt-1 text-xs uppercase tracking-[0.08em] text-[var(--muted)]">{row.layanan}</p>

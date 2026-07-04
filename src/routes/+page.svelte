@@ -282,7 +282,7 @@
 				Antrian Dokumen & Persetujuan
 			</p>
 			<h2 id="overview-section"
-				class="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl lg:text-[2.7rem]"
+				class="mt-3 text-[clamp(1.875rem,8vw,2.25rem)] leading-[1.08] font-semibold tracking-tight sm:text-[clamp(2.2rem,5.5vw,4.5rem)]"
 			>
 				LAYANAN SIKOPLING 
 			</h2>
@@ -363,7 +363,7 @@
 						Layanan Dokumen Lingkungan
 					</p>
 					<h2
-						class="mt-2 sm:mt-6 text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl lg:text-[2.7rem]"
+						class="mt-2 text-[clamp(1.875rem,8vw,2.25rem)] leading-[1.08] font-semibold tracking-tight text-white sm:mt-6 sm:text-[clamp(2.2rem,5.5vw,4.5rem)]"
 					>
 						JENIS JENIS SIKOPLING
 					</h2>
@@ -386,12 +386,12 @@
 					8 Langkah Percepatan
 				</p>
 				<h2
-					class="mt-3 text-3xl font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
+					class="mt-3 text-[clamp(1.875rem,8vw,2.25rem)] leading-[1.08] font-semibold tracking-tight text-[var(--ink)] sm:text-[clamp(2.2rem,5.5vw,4.5rem)]"
 				>
 					Alur Persetujuan Lingkungan
 				</h2>
 				<p
-					class="mt-3 text-sm leading-relaxed text-[var(--muted)] sm:text-lg"
+					class="mt-4 text-base leading-relaxed text-[var(--muted)] sm:text-[1.125rem]"
 				>
 					Alur ini dirancang agar proses layanan lebih transparan,
 					terukur, dan efisien bagi pemrakarsa.
@@ -497,11 +497,11 @@
 					<span>{homeFaqItems.length} pertanyaan populer</span>
 				</div>
 				<h2
-					class="max-w-md text-3xl leading-tight font-semibold tracking-tight text-[var(--ink)] sm:text-4xl"
+					class="max-w-[43.75rem] text-[clamp(1.875rem,8vw,2.25rem)] leading-[1.08] font-semibold tracking-tight text-[var(--ink)] sm:text-[clamp(2.2rem,5.5vw,4.5rem)]"
 				>
 					Pertanyaan yang Sering Diajukan
 				</h2>
-				<p class="mt-4 max-w-sm text-base leading-relaxed text-[var(--muted)]">
+				<p class="mt-4 max-w-[28.75rem] text-base leading-relaxed text-[var(--muted)] sm:text-[1.125rem]">
 					FAQ untuk pertanyaan paling umum seputar layanan,
 					proses konsultasi, dan pemantauan dokumen.
 				</p>

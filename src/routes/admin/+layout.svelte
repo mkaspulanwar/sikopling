@@ -22,6 +22,7 @@
 	import PanelLeftOpen from 'lucide-svelte/icons/panel-left-open'
 	import SquareArrowRightExit from 'lucide-svelte/icons/square-arrow-right-exit'
 	import UserRound from 'lucide-svelte/icons/user-round'
+	import UsersRound from 'lucide-svelte/icons/users-round'
 	import type { LayoutData } from './$types'
 
 	let { children, data }: { children: Snippet; data: LayoutData } = $props()
@@ -48,6 +49,7 @@
 		]
 
 		if (isSuperAdmin) {
+			items.push({ type: 'link' as const, label: 'Akun Admin', href: '/admin/akun', icon: UsersRound })
 			items.push({ type: 'link' as const, label: 'Audit Log', href: '/admin/audit-log', icon: History })
 		}
 
@@ -442,11 +444,11 @@
 			{/each}
 		</nav>
 
-		<div class="mt-4 shrink-0 border-t border-[var(--line)] pt-4">
+		<div class="mt-auto shrink-0 space-y-2 border-t border-[var(--line)] pt-4">
 			<a
 				href="/"
 				title={isSidebarCollapsed ? 'Kembali ke Website' : undefined}
-				class={`mb-2 flex h-11 items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-sm font-semibold text-[var(--ink)] transition-colors duration-200 hover:border-[#64AD31] hover:bg-[var(--accent-soft)] ${
+				class={`flex h-11 items-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-sm font-semibold text-[var(--ink)] transition-colors duration-200 hover:border-[#64AD31] hover:bg-[var(--accent-soft)] ${
 					isSidebarCollapsed ? 'w-full justify-center px-0' : 'w-full justify-center gap-2 px-3'
 				}`}
 			>
@@ -484,13 +486,6 @@
 					Logout
 				</span>
 			</a>
-			<p
-				class={`mt-3 px-1 text-center text-[10px] leading-relaxed text-[var(--muted)] transition-all duration-300 ${
-					isSidebarCollapsed ? 'max-h-0 overflow-hidden opacity-0' : 'max-h-20 opacity-100'
-				}`}
-			>
-				Powered by Sikopling
-			</p>
 		</div>
 	</aside>
 
@@ -596,6 +591,10 @@
 							</div>
 
 							{#if isSuperAdmin}
+								<a href="/admin/akun" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
+									<span class="truncate">Akun Admin</span>
+									<ArrowUpRight class="h-4 w-4 opacity-75" />
+								</a>
 								<a href="/admin/audit-log" onclick={closeMobileMenu} class={mobileNavLinkClass()}>
 									<span class="truncate">Audit Log</span>
 									<ArrowUpRight class="h-4 w-4 opacity-75" />

@@ -17,6 +17,7 @@
 	import ChevronRight from 'lucide-svelte/icons/chevron-right'
 	import Download from 'lucide-svelte/icons/download'
 	import CirclePlus from 'lucide-svelte/icons/circle-plus'
+	import Search from 'lucide-svelte/icons/search'
 	import SquarePen from 'lucide-svelte/icons/square-pen'
 	import Trash from 'lucide-svelte/icons/trash'
 	import Upload from 'lucide-svelte/icons/upload'
@@ -233,9 +234,9 @@
 		return buildListUrl(params)
 	}
 
-	const applyFilters = async () => {
+	const applyFilters = async (keywordValue = filterKeyword) => {
 		const params = new URLSearchParams(page.url.searchParams)
-		const keyword = filterKeyword.trim()
+		const keyword = keywordValue.trim()
 		const sanitizedPageSize = normalizeRowsPerPage(rowsPerPage)
 
 		if (keyword) {
@@ -259,13 +260,11 @@
 			keepFocus: true
 		})
 	}
-
-	const resetFilters = async () => {
-		filterKeyword = ''
-		filterStatus = ''
-		rowsPerPage = 10
-		await applyFilters()
+	const restoreListWhenSearchCleared = (value: string) => {
+		if (value.trim() || !(data.filters.keyword ?? '').trim()) return
+		void applyFilters('')
 	}
+
 	const changeRowsPerPage = async (value: string) => {
 		const parsed = Number(value)
 		if (!Number.isFinite(parsed)) return
@@ -357,6 +356,16 @@
 		const nextSelectedRowsById = { ...selectedRowsById }
 		delete nextSelectedRowsById[row.id]
 		selectedRowsById = nextSelectedRowsById
+	}
+
+	const toggleRowSelection = (row: QueueRow) => {
+		setRowSelection(row, !isRowSelected(row.id))
+	}
+
+	const handleRowKeydown = (event: KeyboardEvent, row: QueueRow) => {
+		if (event.key !== 'Enter' && event.key !== ' ') return
+		event.preventDefault()
+		toggleRowSelection(row)
 	}
 
 	const setAllRowsSelection = (checked: boolean) => {
@@ -805,6 +814,23 @@
 					</ul>
 				{/if}
 			</div>
+			<form
+				onsubmit={(event) => {
+					event.preventDefault()
+					void applyFilters()
+				}}
+				class="flex h-9 w-full min-w-[13rem] items-center gap-2 rounded-lg border border-[#d7dee8] bg-white px-3 text-slate-500 transition focus-within:border-[#64AD31] sm:w-72"
+			>
+				<Search class="h-4 w-4 shrink-0" aria-hidden="true" />
+				<input
+					type="search"
+					bind:value={filterKeyword}
+					oninput={(event) => restoreListWhenSearchCleared(event.currentTarget.value)}
+					placeholder="Cari data"
+					class="min-w-0 flex-1 border-0 bg-transparent text-sm font-medium text-[#20232A] outline-none ring-0 shadow-none focus:border-0 focus:outline-none focus:ring-0 focus:shadow-none placeholder:text-slate-400"
+					aria-label="Cari data monitoring Perling"
+				/>
+			</form>
 			<p class="text-sm font-medium text-slate-700">
 				<span class="font-semibold text-slate-900">{selectionSummaryText}</span>
 			</p>
@@ -831,16 +857,6 @@
 			>
 				<CirclePlus class="h-4 w-4 text-white" />
 				<span class="hidden md:inline">Tambah</span>
-			</button>
-			<button
-				type="button"
-				onclick={openSelectedRowForEdit}
-				class="inline-flex h-10 w-10 cursor-pointer items-center justify-center gap-0 rounded-xl border border-[#d7dee8] bg-white px-0 text-sm font-semibold text-[#2f4f6f] transition hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2] focus-visible:ring-offset-2 active:translate-y-px md:w-auto md:justify-start md:gap-2 md:px-4"
-				aria-label="Edit data terpilih"
-				title="Edit"
-			>
-				<SquarePen class="h-4 w-4" />
-				<span class="hidden md:inline">Edit</span>
 			</button>
 			<button
 				type="button"
@@ -882,12 +898,13 @@
 					<th class="w-36 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Posisi</th>
 					<th class="w-36 border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Status</th>
 					<th class="border-b border-[#64AD31] px-4 py-4 text-left text-sm font-semibold tracking-[0.01em] text-white">Tanggal Update</th>
+					<th class="w-20 border-b border-[#64AD31] px-3 py-4 text-center text-sm font-semibold tracking-[0.01em] text-white">Aksi</th>
 				</tr>
 			</thead>
 			<tbody>
 				{#if data.result.data.length === 0}
 					<tr>
-						<td colspan="10" class="px-6 py-12 text-center">
+						<td colspan="11" class="px-6 py-12 text-center">
 							<p class="text-base font-semibold text-[var(--ink)]">Belum ada data monitoring Perling.</p>
 							<p class="mt-1 text-sm text-[var(--muted)]">Silakan tambah baris baru.</p>
 						</td>
@@ -895,14 +912,19 @@
 				{:else}
 					{#each data.result.data as row, index}
 						<tr
-							class={`border-t border-[#e9edf3] align-top transition ${
-								isRowSelected(row.id) ? 'bg-[#eef7e8]' : 'bg-white'
+							tabindex="0"
+							aria-selected={isRowSelected(row.id)}
+							onclick={() => toggleRowSelection(row)}
+							onkeydown={(event) => handleRowKeydown(event, row)}
+							class={`cursor-pointer border-t border-[#e9edf3] align-top transition ${
+								isRowSelected(row.id) ? 'bg-[#eef7e8]' : 'bg-white hover:bg-[#f8fbf5]'
 							}`}
 						>
 							<td class="px-2 py-4 text-center">
 								<input
 									type="checkbox"
 									checked={isRowSelected(row.id)}
+									onclick={(event) => event.stopPropagation()}
 									onchange={(event) => {
 										const target = event.currentTarget as HTMLInputElement
 										setRowSelection(row, target.checked)
@@ -925,6 +947,20 @@
 								</span>
 							</td>
 							<td class="px-4 py-4 text-sm text-[#20232A]">{formatDate(row.tanggal_update)}</td>
+							<td class="px-3 py-3 text-center">
+								<button
+									type="button"
+									onclick={(event) => {
+										event.stopPropagation()
+										openEditModal(row)
+									}}
+									class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[#d7dee8] bg-white text-[#2f4f6f] transition hover:border-[#64AD31] hover:text-[#2f6f1b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#cfe0f2]"
+									aria-label={`Edit data ${row.no_registrasi ?? 'terpilih'}`}
+									title="Edit"
+								>
+									<SquarePen class="h-4 w-4" />
+								</button>
+							</td>
 						</tr>
 					{/each}
 				{/if}
@@ -959,11 +995,22 @@
 				<ul>
 					{#each data.result.data as row, index}
 						<li class="border-t border-[var(--line)] first:border-t-0">
-							<div class={`grid grid-cols-[1.5rem_2.25rem_minmax(0,1fr)] items-start gap-3 px-3 py-3.5 ${isRowSelected(row.id) ? 'bg-[#f4fbea]' : ''}`}>
+							<div
+								role="checkbox"
+								tabindex="0"
+								aria-checked={isRowSelected(row.id)}
+								onclick={() => toggleRowSelection(row)}
+								onkeydown={(event) => {
+									if (event.currentTarget !== event.target) return
+									handleRowKeydown(event, row)
+								}}
+								class={`grid cursor-pointer grid-cols-[1.5rem_2.25rem_minmax(0,1fr)] items-start gap-3 px-3 py-3.5 ${isRowSelected(row.id) ? 'bg-[#f4fbea]' : ''}`}
+							>
 								<span class="inline-flex justify-center pt-0.5">
 									<input
 										type="checkbox"
 										checked={isRowSelected(row.id)}
+										onclick={(event) => event.stopPropagation()}
 										onchange={(event) => {
 											const target = event.currentTarget as HTMLInputElement
 											setRowSelection(row, target.checked)
@@ -979,7 +1026,10 @@
 								<button
 									type="button"
 									class="min-w-0 text-left"
-									onclick={() => toggleRowExpanded(row.id)}
+									onclick={(event) => {
+										event.stopPropagation()
+										toggleRowExpanded(row.id)
+									}}
 									aria-expanded={isRowExpanded(row.id)}
 								>
 									<div class="flex items-start justify-between gap-2">
@@ -1025,6 +1075,14 @@
 											<dd class="mt-1 text-sm text-[#20232A]">{row.posisi ?? '-'}</dd>
 										</div>
 									</dl>
+									<button
+										type="button"
+										onclick={() => openEditModal(row)}
+										class="mt-4 inline-flex h-9 items-center gap-2 rounded-lg border border-[#d7dee8] bg-white px-3 text-sm font-semibold text-[#2f4f6f] transition hover:border-[#64AD31] hover:text-[#2f6f1b]"
+									>
+										<SquarePen class="h-4 w-4" />
+										Edit
+									</button>
 								</div>
 							{/if}
 						</li>
@@ -1328,7 +1386,3 @@
 		</div>
 	</div>
 {/if}
-
-
-
-

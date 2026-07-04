@@ -6,6 +6,7 @@
 type LoginData = {
 	redirectTo: string
 	remember: boolean
+	authError: string | null
 }
 
 type LoginFormState = {
@@ -17,6 +18,7 @@ type LoginFormState = {
 	let showPassword = $state(false);
 
 	const { data, form }: { data: LoginData; form: LoginFormState | null } = $props();
+	const authErrorMessage = $derived(form?.error ?? data.authError);
 </script>
 
 <svelte:head>
@@ -84,14 +86,19 @@ type LoginFormState = {
 				<div class="flex min-h-full items-center justify-center py-5 sm:py-6">
 					<div class="w-full max-w-[28.5rem]">
 						<div class="rounded-[1.55rem] border border-white/28 bg-white/97 p-5 shadow-[0_26px_60px_-36px_rgba(15,23,42,0.78)] sm:p-6">
-							<h2 class="text-center text-[1.75rem] leading-tight font-semibold tracking-tight text-(--ink) sm:text-[1.95rem]">
-								Masuk
-							</h2>
-							<p class="mt-1.5 text-center text-sm text-(--muted) sm:text-[0.96rem]">
-								Silakan masuk dengan akun terdaftar.
-							</p>
+							<div>
+								<p class="text-center text-xs font-semibold uppercase tracking-[0.14em] text-[#64AD31]">
+									Panel Admin
+								</p>
+								<h2 class="mt-2 text-center text-[1.85rem] leading-tight font-semibold tracking-tight text-(--ink) sm:text-[2.05rem]">
+									Masuk ke Dashboard
+								</h2>
+								<p class="mx-auto mt-2 max-w-[22rem] text-center text-sm leading-relaxed text-(--muted) sm:text-[0.96rem]">
+									Gunakan akun admin terdaftar untuk mengelola layanan dan pengumuman.
+								</p>
+							</div>
 
-							<form class="mt-5 space-y-3.5" method="post" novalidate>
+							<form class="mt-5 space-y-3.5" method="post" action="?/login" novalidate>
 								<input type="hidden" name="redirectTo" value={form?.redirectTo ?? data.redirectTo} />
 
 								<div class="space-y-1.5">
@@ -136,9 +143,9 @@ type LoginFormState = {
 									</div>
 								</div>
 
-								{#if form?.error}
+								{#if authErrorMessage}
 									<p class="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-700">
-										{form.error}
+										{authErrorMessage}
 									</p>
 								{/if}
 
@@ -165,6 +172,22 @@ type LoginFormState = {
 									class="inline-flex h-11 w-full items-center justify-center rounded-xl bg-[#64AD31] text-sm font-semibold !text-white transition-colors hover:bg-[#4f8925]"
 								>
 									Masuk
+								</button>
+							</form>
+							<div class="my-4 flex items-center gap-3">
+								<span class="h-px flex-1 bg-[#e5eaf1]"></span>
+								<span class="text-xs font-semibold uppercase tracking-[0.12em] text-[#98a2b3]">atau</span>
+								<span class="h-px flex-1 bg-[#e5eaf1]"></span>
+							</div>
+							<form method="post" action="?/google">
+								<input type="hidden" name="redirectTo" value={form?.redirectTo ?? data.redirectTo} />
+								<input type="hidden" name="remember" value={(form?.remember ?? data.remember) ? 'on' : ''} />
+								<button
+									type="submit"
+									class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-[#d7dee8] bg-white text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f8fafc]"
+								>
+									<span class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#d7dee8] text-[0.76rem] font-bold text-[#4285f4]">G</span>
+									Masuk dengan Google
 								</button>
 							</form>
 

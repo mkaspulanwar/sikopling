@@ -2,7 +2,6 @@
 	import ChevronDown from "lucide-svelte/icons/chevron-down";
 	import ChevronLeft from "lucide-svelte/icons/chevron-left";
 	import ChevronRight from "lucide-svelte/icons/chevron-right";
-	import Download from "lucide-svelte/icons/download";
 	import ListFilterPlus from "lucide-svelte/icons/list-filter-plus";
 	import Search from "lucide-svelte/icons/search";
 	import X from "lucide-svelte/icons/x";
@@ -19,7 +18,6 @@
 	const { data }: { data: { publishingRows: PublishingRow[] } } = $props();
 	const publishingRows = $derived(data.publishingRows);
 
-	const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
 	const dateFormatter = new Intl.DateTimeFormat("id-ID", {
 		day: "2-digit",
 		month: "long",
@@ -48,7 +46,6 @@
 	const formatDate = (value: string) => dateFormatter.format(new Date(`${value}T00:00:00`));
 	const formatNumber = (value: number) => numberFormatter.format(value);
 	const normalize = (value: string) => value.trim().toLowerCase();
-	const escapeCsvValue = (value: string) => `"${value.replaceAll('"', '""')}"`;
 
 	const filteredRows = $derived.by(() => {
 		const query = normalize(searchQuery);
@@ -191,25 +188,6 @@
 		}
 	});
 
-	const exportFilteredRows = () => {
-		if (sortedRows.length === 0) return;
-
-		const header = ["Instansi", "Kegiatan", "No SK", "Tanggal"];
-		const lines = sortedRows.map((row) =>
-			[row.agency, row.activity, row.skNumber, formatDate(row.date)].map(escapeCsvValue).join(","),
-		);
-		const csvContent = [`\uFEFF${header.map(escapeCsvValue).join(",")}`, ...lines].join("\r\n");
-		const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-		const objectUrl = URL.createObjectURL(blob);
-		const anchor = document.createElement("a");
-		anchor.href = objectUrl;
-		anchor.download = `penerbitan-integrasi-${formatIsoDate(new Date())}.csv`;
-		document.body.append(anchor);
-		anchor.click();
-		anchor.remove();
-		URL.revokeObjectURL(objectUrl);
-	};
-
 	const resetAdvancedFilters = () => {
 		sortOption = "Terbaru";
 		closeAllDropdownMenus();
@@ -252,7 +230,7 @@
 						/>
 					</label>
 
-					<div class="grid grid-cols-2 gap-2 sm:flex sm:items-center md:shrink-0">
+					<div class="grid grid-cols-1 gap-2 sm:flex sm:items-center md:shrink-0">
 						<button
 							type="button"
 							bind:this={filterToggleButton}
@@ -269,16 +247,6 @@
 								</span>
 							{/if}
 							<ChevronDown class={`h-4 w-4 text-(--muted) transition-transform ${isFilterPanelOpen ? "rotate-180" : ""}`} strokeWidth={2.1} />
-						</button>
-
-						<button
-							type="button"
-							onclick={exportFilteredRows}
-							disabled={totalFilteredRows === 0}
-							class="inline-flex h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#cfd7e3] bg-[#ffffff] px-3 text-sm font-semibold text-[#20232A] transition-colors hover:bg-[#f4f8f0] focus:ring-2 focus:ring-[#e8f2de] focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-4"
-						>
-							<Download class="h-4 w-4" strokeWidth={2.2} />
-							Download
 						</button>
 					</div>
 				</div>

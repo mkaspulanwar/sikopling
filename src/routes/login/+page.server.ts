@@ -11,6 +11,12 @@ const resolveRedirectTarget = (value: string) => {
 	return value
 }
 
+const resolveAuthRedirectUrl = (url: URL, redirectTo: string) => {
+	const callbackUrl = new URL('/auth/callback', url.origin)
+	callbackUrl.searchParams.set('redirectTo', resolveRedirectTarget(redirectTo))
+	return callbackUrl.toString()
+}
+
 const mapSignInErrorMessage = (error: AuthError | null) => {
 	if (!error) return 'Email atau kata sandi tidak valid, atau akun belum terdaftar di Supabase Auth.'
 
@@ -31,6 +37,7 @@ const mapSignInErrorMessage = (error: AuthError | null) => {
 export const load: PageServerLoad = async ({ url, locals, cookies }) => {
 	const redirectTo = resolveRedirectTarget(url.searchParams.get('redirectTo') ?? '/admin/dashboard')
 	const remember = isRememberMeEnabled(cookies)
+	const authError = url.searchParams.get('authError')
 
 	const { session, user } = await locals.safeGetSession()
 	const role = resolveUserRole(user)
@@ -38,11 +45,11 @@ export const load: PageServerLoad = async ({ url, locals, cookies }) => {
 		throw redirect(303, redirectTo)
 	}
 
-	return { redirectTo, remember }
+	return { redirectTo, remember, authError }
 }
 
 export const actions: Actions = {
-	default: async ({ request, locals, url, cookies }) => {
+	login: async ({ request, locals, url, cookies }) => {
 		const formData = await request.formData()
 		const email = String(formData.get('email') ?? '').trim()
 		const password = String(formData.get('password') ?? '')
@@ -96,5 +103,43 @@ export const actions: Actions = {
 			})
 		}
 		throw redirect(303, redirectTo)
+	},
+	google: async ({ request, locals, url, cookies }) => {
+		const formData = await request.formData()
+		const redirectTo = resolveRedirectTarget(String(formData.get('redirectTo') ?? '/admin/dashboard'))
+		const remember = formData.get('remember') === 'on'
+		const secureCookie = !dev && url.protocol === 'https:'
+
+		if (!locals.supabase) {
+			return fail(503, {
+				error: 'Supabase belum dikonfigurasi. Hubungi administrator.',
+				redirectTo,
+				remember
+			})
+		}
+
+		locals.rememberSessionOverride = remember
+		setRememberMeCookie(cookies, remember, secureCookie)
+
+		const { data, error } = await locals.supabase.auth.signInWithOAuth({
+			provider: 'google',
+			options: {
+				redirectTo: resolveAuthRedirectUrl(url, redirectTo),
+				queryParams: {
+					access_type: 'offline',
+					prompt: 'select_account'
+				}
+			}
+		})
+
+		if (error || !data.url) {
+			return fail(400, {
+				error: 'Login Google belum dapat dimulai. Pastikan provider Google aktif di Supabase Auth.',
+				redirectTo,
+				remember
+			})
+		}
+
+		throw redirect(303, data.url)
 	}
 }
